@@ -20,12 +20,12 @@ const ferramentas = [
     descricao: "Acompanhe as métricas da organização de forma única.",
     logo: "/imagens/logo-Condomed.png",
   },
-  {
-    nome: "Acompanhamento Comercial",
-    url: "/acompanhamento",
-    descricao: "Acompanhe as métricas do comercial de forma única.",
-    logo: "/imagens/LOGO.png",
-  },
+  // {
+  //   nome: "Acompanhamento Comercial",
+  //   url: "/acompanhamento",
+  //   descricao: "Acompanhe as métricas do comercial de forma única.",
+  //   logo: "/imagens/LOGO.png",
+  // },
 ];
 
 const Metricas = () => (
