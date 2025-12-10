@@ -26,6 +26,10 @@ import Acompanhamento from './components/Comercial/DashboardComercial'
 import AgendaComercial from './components/Comercial/AgendaComercial'
 import Financeiro from './components/Comercial/Financeiro'
 
+import Produtos from './components/Produtos/Produtos';
+
+import PdfAutomation from './components/Operacional/PdfAutomation';
+
 import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
 import Cadastro from './components/Dropdown/dropItens/Cadastro';
@@ -91,6 +95,8 @@ function AppRoutes() {
             <Route path="/acompanhamento" element={<Acompanhamento />} />
             <Route path="/agenda-comercial" element={<AgendaComercial />} />
             <Route path="/financeiro" element={<Financeiro />} />
+            <Route path="/produtos" element={<Produtos />} />
+            <Route path="/operacional" element={<PdfAutomation />} />
           </Route>
         </Route>
       </Routes>

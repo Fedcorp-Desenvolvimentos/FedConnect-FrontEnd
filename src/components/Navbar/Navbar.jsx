@@ -48,7 +48,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
           <Link to="/home" className="logo-link">
             {/* Logo completa - só desktop */}
             <img
-              src="https://i.postimg.cc/Gh597vbr/LOGO.png"
+              src="../../imagens/LOGO.png"
               alt="Logo"
               className="logo-desktop"
             />
@@ -70,7 +70,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </Link>
             </li>
 
-            {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
+            {["admin", "usuario", "comercial","ti"].includes(nivelAcesso) && (
               <li className={location.pathname === "/consultas" ? "active" : ""}>
                 <Link to="/consultas">
                   <div className="sidebar-icon-tooltip">
@@ -80,7 +80,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 </Link>
               </li>
             )}
-
+{/* 
             {["admin", "moderador"].includes(nivelAcesso) && (
               <li className={location.pathname === "/home-adm" ? "active" : ""}>
                 <Link to="/home-adm">
@@ -90,7 +90,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                   </div>
                 </Link>
               </li>
-            )}
+            )} */}
 
             {["admin", "comercial"].includes(nivelAcesso) && (
               <li className={location.pathname === "/consulta-comercial" ? "active" : ""}>
@@ -103,7 +103,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </li>
             )}
 
-            {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
+            {["admin", "usuario", "comercial", "ti"].includes(nivelAcesso) && (
               <li>
                 <Link to="/ferramentas">
                   <div className="sidebar-icon-tooltip">
@@ -114,7 +114,18 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </li>
             )}
 
-            {["admin", "comercial"].includes(nivelAcesso) && (
+               {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
+              <li>
+                <Link to="/operacional">
+                  <div className="sidebar-icon-tooltip">
+                    <i className="bi bi-folder"></i>
+                    <span>Operacional</span>
+                  </div>
+                </Link>
+              </li>
+            )}
+
+            {["admin"].includes(nivelAcesso) && (
               <li>
                 <Link to="/metricas">
                   <div className="sidebar-icon-tooltip">
@@ -136,7 +147,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </li>
             )} */}
 
-            {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
+            {["admin", "usuario", "comercial","ti"].includes(nivelAcesso) && (
               <li className={location.pathname === "/agenda" ? "active" : ""}>
                 <Link to="/agenda">
                   <div className="sidebar-icon-tooltip">
