@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import "../styles/Comercial.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FaBriefcase, FaFileExcel, FaSearch } from "react-icons/fa";
-import { Clapperboard} from "lucide-react";
+import { Clapperboard, MapPin} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 
@@ -304,13 +304,13 @@ const ConsultaComercial = () => {
                 <FaFileExcel size={25} className="subcard-icon" />
                 <span>Consulta em Massa</span>
               </div>
-              {/* <div
+               <div
                 className="subcard-option"
                 onClick={() => navigate("/comercial-regiao")}
               >
                 <MapPin size={25} className="subcard-icon" />
                 <span>Consulta por Região</span>
-              </div> */}
+              </div>
             </div>
           )}
         </div>
