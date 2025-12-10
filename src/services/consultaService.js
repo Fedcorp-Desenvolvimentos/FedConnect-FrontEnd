@@ -152,4 +152,8 @@ export const ConsultaService = {
     const response = await api.post(`/consultas/faturas/`, payload)
     return response.data;
   },
+  consultaRegiao: async (payload) => {
+    const response = await api.post(`consulta/comercial-regiao/`, payload)
+    return response.data;
+  }
 };
