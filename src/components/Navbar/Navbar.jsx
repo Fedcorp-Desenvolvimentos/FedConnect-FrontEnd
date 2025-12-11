@@ -114,7 +114,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </li>
             )}
 
-               {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
+               {/* {["admin", "usuario", "comercial"].includes(nivelAcesso) && (
               <li>
                 <Link to="/operacional">
                   <div className="sidebar-icon-tooltip">
@@ -123,7 +123,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                   </div>
                 </Link>
               </li>
-            )}
+            )} */}
 
             {["admin"].includes(nivelAcesso) && (
               <li>
