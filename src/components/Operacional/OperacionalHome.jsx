@@ -4,14 +4,14 @@ import "../styles/ConsultasHome.css";
 import { useAuth } from "../../context/AuthContext";
 
 const operacionais = [
-  {
-    key: "pdf-automation",
-    icon: <i className="bi bi-file-earmark-pdf-fill" />,
-    title: "PDF Automation",
-    desc: "Renomear, separar e automatizar processos com PDFs usando regras e arquivos modelo.",
-    to: "/operacional/pdf-automation",
-    niveis: ["admin", "usuario", "ti"],
-  },
+//   {
+//     key: "pdf-automation",
+//     icon: <i className="bi bi-file-earmark-pdf-fill" />,
+//     title: "PDF Automation",
+//     desc: "Renomear, separar e automatizar processos com PDFs usando regras e arquivos modelo.",
+//     to: "/operacional/pdf-automation",
+//     niveis: ["admin", "usuario", "ti"],
+//   },
   {
     key: "cancelamento-fatura",
     icon: <i className="bi bi-x-octagon-fill" />,
