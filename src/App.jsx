@@ -28,7 +28,9 @@ import Financeiro from './components/Comercial/Financeiro'
 
 import Produtos from './components/Produtos/Produtos';
 
+import OperacionalHome from './components/Operacional/OperacionalHome';
 import PdfAutomation from './components/Operacional/PdfAutomation';
+import OperacionalCancelamento from './components/Operacional/OperacionalCancelamento';
 
 import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
@@ -96,7 +98,10 @@ function AppRoutes() {
             <Route path="/agenda-comercial" element={<AgendaComercial />} />
             <Route path="/financeiro" element={<Financeiro />} />
             <Route path="/produtos" element={<Produtos />} />
-            <Route path="/operacional" element={<PdfAutomation />} />
+            <Route path="/operacional" element={<OperacionalHome />} />
+            <Route path="/operacional/pdf-automation" element={<PdfAutomation />} />
+            <Route path="/operacional/cancelamento" element={<OperacionalCancelamento />} />
+            
           </Route>
         </Route>
       </Routes>

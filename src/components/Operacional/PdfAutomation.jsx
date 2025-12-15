@@ -96,19 +96,19 @@ const PdfAutomation = () => {
             value: 'separar',
             title: 'Separar arquivos',
             description: 'Divide PDFs em arquivos individuais',
-            icon: '📄',
+            
         },
         {
             value: 'renomear',
             title: 'Renomear arquivos',
             description: 'Aplica regras de nomenclatura',
-            icon: '✏️',
+            
         },
         {
             value: 'ambos',
             title: 'Separar e renomear',
             description: 'Executa ambas as operações',
-            icon: '⚡',
+            
         },
     ];
 
