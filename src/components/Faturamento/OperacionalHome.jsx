@@ -4,31 +4,31 @@ import "../styles/ConsultasHome.css";
 import { useAuth } from "../../context/AuthContext";
 
 const operacionais = [
-//   {
-//     key: "pdf-automation",
-//     icon: <i className="bi bi-file-earmark-pdf-fill" />,
-//     title: "PDF Automation",
-//     desc: "Renomear, separar e automatizar processos com PDFs usando regras e arquivos modelo.",
-//     to: "/operacional/pdf-automation",
-//     niveis: ["admin", "usuario", "comercial"],
-//   },
+  {
+    key: "pdf-automation",
+    icon: <i className="bi bi-file-earmark-pdf-fill" />,
+    title: "PDF Automation",
+    desc: "Renomear, separar e automatizar processos com PDFs usando regras e arquivos modelo.",
+    to: "/operacional/pdf-automation",
+    niveis: ["admin", "faturamento"]
+  },
   {
     key: "cancelamento-fatura",
     icon: <i className="bi bi-x-octagon-fill" />,
     title: "Cancelamento dos FedBnk",
     desc: "Solicite e acompanhe cancelamentos de faturas ou boletos com validações e registro interno.",
     to: "/operacional/cancelamento",
-    niveis: ["admin", "usuario", "comercial"],
+    niveis: ["admin", "faturamento"],
   },
-//   {
-//     key: "emissao-nf",
-//     icon: <i className="bi bi-file-earmark-bar-graph-fill" />,
-//     title: "Sistema de NF",
-//     desc: "Solicite e acompanhe emissão, cancelamento e substituição de Nota Fiscal.",
-//     to: "https://SEU-DEPLOY-AQUI.com.br", 
-//     external: true,
-//     niveis: ["admin", "usuario", "comercial"],
-//   },
+  {
+    key: "emissao-nf",
+    icon: <i className="bi bi-file-earmark-bar-graph-fill" />,
+    title: "Sistema de NF",
+    desc: "Solicite e acompanhe emissão, cancelamento e substituição de Nota Fiscal.",
+    to: "https://SEU-DEPLOY-AQUI.com.br", 
+    external: true,
+     niveis: ["admin", "faturamento"]
+  },
 ];
 
 const OperacionalHome = () => {
