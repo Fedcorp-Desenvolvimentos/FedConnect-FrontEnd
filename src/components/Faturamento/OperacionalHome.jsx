@@ -15,7 +15,7 @@ const operacionais = [
   {
     key: "cancelamento-fatura",
     icon: <i className="bi bi-x-octagon-fill" />,
-    title: "Cancelamento dos FedBnk",
+    title: "Cancelamentos FedBnk",
     desc: "Solicite e acompanhe cancelamentos de faturas ou boletos com validações e registro interno.",
     to: "/operacional/cancelamento",
     niveis: ["admin", "faturamento"],
@@ -25,7 +25,7 @@ const operacionais = [
     icon: <i className="bi bi-file-earmark-bar-graph-fill" />,
     title: "Sistema de NF",
     desc: "Solicite e acompanhe emissão, cancelamento e substituição de Nota Fiscal.",
-    to: "https://SEU-DEPLOY-AQUI.com.br", 
+    to: "https://nf-fedcorp.com.br", 
     external: true,
      niveis: ["admin", "faturamento"]
   },
