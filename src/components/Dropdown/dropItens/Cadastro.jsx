@@ -161,6 +161,7 @@ function Cadastro() {
                                 <option value="usuario">Usuário</option>
                                 <option value="comercial">Comercial</option>
                                 <option value="moderador">Moderador</option>
+                                <option value="faturamento">Faturamento</option>
                             </select>
                         </div>
 

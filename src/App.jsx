@@ -28,9 +28,9 @@ import Financeiro from './components/Comercial/Financeiro'
 
 import Produtos from './components/Produtos/Produtos';
 
-import OperacionalHome from './components/Operacional/OperacionalHome';
-import PdfAutomation from './components/Operacional/PdfAutomation';
-import OperacionalCancelamento from './components/Operacional/OperacionalCancelamento';
+import OperacionalHome from './components/Faturamento/OperacionalHome';
+import PdfAutomation from './components/Faturamento/PdfAutomation';
+import OperacionalCancelamento from './components/Faturamento/OperacionalCancelamento';
 
 import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
