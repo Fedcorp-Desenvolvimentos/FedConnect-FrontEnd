@@ -38,7 +38,7 @@ const OperacionalCancelamento = () => {
     if (documento.trim().length < 5) return "O número parece curto demais. Confere aí antes de cancelar o universo.";
     return "";
   };
-
+console.log(user)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ type: "", message: "" });
@@ -53,7 +53,7 @@ const OperacionalCancelamento = () => {
       method: tipo,
       number: documento.trim(),
       motivo: observacoes.trim(),
-      mail: user?.mail || "danielmello@condomed.com.br",
+      mail: user?.email || "danielmello@condomed.com.br",
       
     };
 
