@@ -50,7 +50,7 @@ import { AuthProvider } from './context/AuthContext';
 import { LoadingProvider, useLoading } from './context/LoadingContext';
 import LoadingSpinner from './components/LoadingSpinner';
 
-
+// Teste
 
 function AppRoutes() {
   const location = useLocation();

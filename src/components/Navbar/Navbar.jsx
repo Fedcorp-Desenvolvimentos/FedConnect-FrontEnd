@@ -103,7 +103,10 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               </li>
             )}
 
+
             {["admin", "usuario", "comercial", "faturamento", "ti"].includes(nivelAcesso) && (
+
+  
               <li>
                 <Link to="/ferramentas">
                   <div className="sidebar-icon-tooltip">
@@ -113,8 +116,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 </Link>
               </li>
             )}
-
                {["admin", "faturamento", "ti"].includes(nivelAcesso) && (
+
               <li>
                 <Link to="/operacional">
                   <div className="sidebar-icon-tooltip">
@@ -148,6 +151,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             )} */}
 
             {["admin", "usuario", "comercial", "faturamento", "ti"].includes(nivelAcesso) && (
+
               <li className={location.pathname === "/agenda" ? "active" : ""}>
                 <Link to="/agenda">
                   <div className="sidebar-icon-tooltip">

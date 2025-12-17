@@ -2,11 +2,12 @@ import React, { useMemo, useState } from "react";
 import "../styles/ConsultasHome.css";
 import "../styles/OperacionalCancelamento.css";
 import { useAuth } from "../../context/AuthContext";
+import {triggerWebhook} from "../../services/boletofedbnk"
 
 const OperacionalCancelamento = () => {
   const { user, isAuthenticated, loading } = useAuth();
 
-  const [tipo, setTipo] = useState("fatura");
+  const [tipo, setTipo] = useState("FATURA");
   const [documento, setDocumento] = useState("");
   const [motivo, setMotivo] = useState("");
   const [observacoes, setObservacoes] = useState("");
@@ -24,9 +25,8 @@ const OperacionalCancelamento = () => {
   }, [currentUserType]);
 
   const limpar = () => {
-    setTipo("fatura");
+    setTipo("FATURA");
     setDocumento("");
-    setMotivo("");
     setObservacoes("");
     setAnexo(null);
     setStatus({ type: "", message: "" });
@@ -36,10 +36,9 @@ const OperacionalCancelamento = () => {
     if (!tipo) return "Selecione se é fatura ou boleto.";
     if (!documento.trim()) return "Informe o número da fatura/boleto.";
     if (documento.trim().length < 5) return "O número parece curto demais. Confere aí antes de cancelar o universo.";
-    if (!motivo.trim()) return "Informe o motivo do cancelamento.";
     return "";
   };
-
+console.log(user)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ type: "", message: "" });
@@ -51,18 +50,17 @@ const OperacionalCancelamento = () => {
     }
 
     const payload = {
-      tipo, // "fatura" | "boleto"
-      documento: documento.trim(),
-      motivo: motivo.trim(),
-      observacoes: observacoes.trim(),
-      solicitado_por: user?.email || user?.usuario || "usuario",
+      method: tipo,
+      number: documento.trim(),
+      motivo: observacoes.trim(),
+      mail: user?.email || "danielmello@condomed.com.br",
       
     };
 
     try {
       setSending(true);
-            // Simulação:
-      await new Promise((r) => setTimeout(r, 500));
+      const response = await triggerWebhook(payload);
+     
 
       setStatus({
         type: "success",
@@ -119,8 +117,8 @@ const OperacionalCancelamento = () => {
                 <div className="op-field">
                   <label>Tipo</label>
                   <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
-                    <option value="fatura">Fatura</option>
-                    <option value="boleto">Boleto</option>
+                    <option value="FATURA">Fatura</option>
+                    <option value="BOLETO">Boleto</option>
                   </select>
                 </div>
 
@@ -137,18 +135,7 @@ const OperacionalCancelamento = () => {
               </div>
 
               <div className="op-field">
-                <label>Motivo</label>
-                <input
-                  type="text"
-                  value={motivo}
-                  onChange={(e) => setMotivo(e.target.value)}
-                  placeholder="Ex: pagamento duplicado, cobrança indevida, erro de emissão..."
-                  autoComplete="off"
-                />
-              </div>
-
-              <div className="op-field">
-                <label>Observações (opcional)</label>
+                <label>Motivo (opcional)</label>
                 <textarea
                   value={observacoes}
                   onChange={(e) => setObservacoes(e.target.value)}
