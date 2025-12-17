@@ -106,7 +106,7 @@ const ReimpressaoBoleto = () => {
                                     <input
                                         value={numeroFatura}
                                         onChange={(e) => setNumeroFatura(e.target.value)}
-                                        placeholder="Ex: FAT-2025-000123"
+                                        placeholder="Digite o número da fatura"
                                         autoComplete="off"
                                     />
                                 </div>
@@ -118,13 +118,13 @@ const ReimpressaoBoleto = () => {
 
                             <div className="rb-row">
                                 <div className="rb-field">
-                                    <label>Número do Boleto (opcional)</label>
+                                    <label>Número do Boleto</label>
                                     <input
                                         value={numeroBoleto}
                                         onChange={(e) => setNumeroBoleto(e.target.value)}
-                                        placeholder="Digite parte do número do boleto"
+                                        placeholder="Digite o número do boleto"
                                         autoComplete="off"
-                                        disabled={!boletos.length}
+                                        
                                     />
                                 </div>
 
@@ -161,7 +161,7 @@ const ReimpressaoBoleto = () => {
 
                             {boletos.length === 0 ? (
                                 <div className="rb-empty">
-                                    Informe a fatura para listar os boletos.
+                                   Preencha as informações para listar os boletos.
                                 </div>
                             ) : boletosFiltrados.length === 0 ? (
                                 <div className="rb-empty">
