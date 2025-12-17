@@ -1,0 +1,163 @@
+.rb-card {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 6px 26px rgba(24, 88, 214, 0.08);
+  padding: 22px;
+  max-width: 1100px;
+}
+
+.rb-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rb-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.rb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rb-field label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1f2a44;
+}
+
+.rb-field input {
+  border: 1px solid #dfe6f2;
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  font-size: 14px;
+}
+
+.rb-field input:disabled {
+  background: #f5f7fb;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: #eef2ff;
+  border: 1px solid #dbe2ff;
+  color: #1f2a44;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-secondary:disabled,
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.rb-alert {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.rb-alert.success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.rb-alert.info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+
+.rb-alert.error {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #9f1239;
+}
+
+.rb-list {
+  margin-top: 22px;
+}
+
+.rb-subtitle {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #1f2a44;
+}
+
+.rb-empty {
+  padding: 16px;
+  border: 1px dashed #dfe6f2;
+  border-radius: 12px;
+  color: #6b7280;
+  background: #fafbff;
+}
+
+.rb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rb-table th,
+.rb-table td {
+  border-bottom: 1px solid #eef2f7;
+  padding: 12px 10px;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.rb-table th {
+  font-weight: 700;
+  color: #1f2a44;
+}
+
+.rb-table tr:hover td {
+  background: #f9fbff;
+}
+
+.rb-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+@media (max-width: 768px) {
+  .rb-row {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-table th,
+  .rb-table td {
+    font-size: 13px;
+  }
+
+  .rb-card {
+    padding: 16px;
+  }
+}
+
+.rb-btn-print {
+  width: auto;             
+  min-width: 10px;        
+  padding: 8px 14px;       
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

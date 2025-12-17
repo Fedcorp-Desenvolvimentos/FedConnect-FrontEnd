@@ -31,6 +31,7 @@ import Produtos from './components/Produtos/Produtos';
 import OperacionalHome from './components/Faturamento/OperacionalHome';
 import PdfAutomation from './components/Faturamento/PdfAutomation';
 import OperacionalCancelamento from './components/Faturamento/OperacionalCancelamento';
+import ReimpressaoBoleto from './components/Faturamento/ReimpressaoBoleto';
 
 import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
@@ -101,6 +102,7 @@ function AppRoutes() {
             <Route path="/operacional" element={<OperacionalHome />} />
             <Route path="/operacional/pdf-automation" element={<PdfAutomation />} />
             <Route path="/operacional/cancelamento" element={<OperacionalCancelamento />} />
+            <Route path="/operacional/reimpressao-boleto" element={<ReimpressaoBoleto />} />
             
           </Route>
         </Route>

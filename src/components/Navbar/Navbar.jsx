@@ -118,7 +118,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               <li>
                 <Link to="/operacional">
                   <div className="sidebar-icon-tooltip">
-                    <i className="bi bi-folder"></i>
+                    <i className="bi bi-wallet2"></i>
                     <span>Faturamento</span>
                   </div>
                 </Link>
