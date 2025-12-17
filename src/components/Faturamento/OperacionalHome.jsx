@@ -18,7 +18,7 @@ const operacionais = [
     title: "Cancelamentos FedBnk",
     desc: "Solicite e acompanhe cancelamentos de faturas ou boletos com validações e registro interno.",
     to: "/operacional/cancelamento",
-    niveis: ["admin", "faturamento"],
+    niveis: ["admin", "faturamento", "ti"],
   },
   // {
   //   key: "reimpressao-boleto",
