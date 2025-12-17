@@ -10,7 +10,7 @@ const consultas = [
         title: "Dados Pessoais",
         desc: "Informações sobre pessoas registradas na Receita Federal, incluindo CPF, nome, filiação e data de nascimento.",
         to: "/consulta-pf",
-        niveis: ["admin", "usuario", "comercial", "ti"],
+        niveis: ["admin", "usuario", "comercial", "faturamento"],
     },
     {
         key: "cnpj",
@@ -18,7 +18,7 @@ const consultas = [
         title: "Dados Empresariais",
         desc: "Informações sobre empresas registradas, como razão social, CNPJ, e situação cadastral.",
         to: "/consulta-cnpj",
-        niveis: ["admin", "usuario", "comercial", "ti"],
+        niveis: ["admin", "usuario", "comercial", "faturamento"],
     },
     {
         key: "endereco",
@@ -26,7 +26,7 @@ const consultas = [
         title: "Endereços",
         desc: "Informações detalhadas sobre logradouros, CEPs, cidades e estados.",
         to: "/consulta-end",
-        niveis: ["admin", "usuario", "comercial", "ti"],
+        niveis: ["admin", "usuario", "comercial", "faturamento"],
     },
     {
         key: "segurados",
@@ -34,7 +34,7 @@ const consultas = [
         title: "Consulta Segurados",
         desc: "Localize informações sobre segurados com base nos registros disponíveis.",
         to: "/consulta-segurados",
-        niveis: ["admin", "usuario", "comercial", "ti"],
+        niveis: ["admin", "usuario", "comercial", "faturamento"],
     },
     {
         key: "faturas",
@@ -42,7 +42,7 @@ const consultas = [
         title: "Consultar Faturas",
         desc: "Localize informações sobre faturamento com base nos registros disponíveis.",
         to: "/consulta-faturas",
-        niveis: ["admin", "usuario", "comercial", "ti"],
+        niveis: ["admin", "usuario", "comercial", "faturamento"],
     },
     
 ];
