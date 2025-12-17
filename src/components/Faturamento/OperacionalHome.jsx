@@ -20,14 +20,14 @@ const operacionais = [
     to: "/operacional/cancelamento",
     niveis: ["admin", "faturamento"],
   },
-  {
-    key: "reimpressao-boleto",
-    icon: <i class="bi bi-file-earmark-check-fill"/>,
-    title: "Reimpressão FedBnk",
-    desc: "Realize a reimpressão de boletos FedBnk de forma rápida e prática.",
-    to: "/operacional/reimpressao-boleto",
-    niveis: ["admin", "faturamento"],
-  },
+  // {
+  //   key: "reimpressao-boleto",
+  //   icon: <i class="bi bi-file-earmark-check-fill"/>,
+  //   title: "Reimpressão FedBnk",
+  //   desc: "Realize a reimpressão de boletos FedBnk de forma rápida e prática.",
+  //   to: "/operacional/reimpressao-boleto",
+  //   niveis: ["admin", "faturamento"],
+  // },
   // {
   //   key: "emissao-nf",
   //   icon: <i className="bi bi-file-earmark-bar-graph-fill" />,
