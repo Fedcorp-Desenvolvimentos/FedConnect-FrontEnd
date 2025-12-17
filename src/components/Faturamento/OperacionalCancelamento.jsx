@@ -13,14 +13,14 @@ const OperacionalCancelamento = () => {
   const [observacoes, setObservacoes] = useState("");
   const [anexo, setAnexo] = useState(null);
 
-  const [status, setStatus] = useState({ type: "", message: "" }); // success | error | info
+  const [status, setStatus] = useState({ type: "", message: "" }); 
   const [sending, setSending] = useState(false);
 
   const currentUserType = user?.nivel_acesso;
 
   const podeAcessar = useMemo(() => {
     
-    const niveis = ["admin", "usuario", "comercial"];
+    const niveis = ["admin", "usuario", "comercial", "faturamento"];
     return niveis.includes(currentUserType);
   }, [currentUserType]);
 
