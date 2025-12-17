@@ -162,6 +162,7 @@ function Cadastro() {
                                 <option value="comercial">Comercial</option>
                                 <option value="moderador">Moderador</option>
                                 <option value="faturamento">Faturamento</option>
+                                <option value="ti">TI</option>
                             </select>
                         </div>
 

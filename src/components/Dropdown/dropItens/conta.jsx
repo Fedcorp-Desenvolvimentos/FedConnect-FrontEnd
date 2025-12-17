@@ -106,7 +106,7 @@ const ConfigConta = () => {
     }
   };
 
-  const niveisAcesso = ['admin', 'usuario', 'comercial', 'moderador'];
+  const niveisAcesso = ['admin', 'usuario', 'comercial', 'moderador', 'ti'];
 
   const usuariosFiltrados = useMemo(() => {
     const termo = filtroBusca.trim().toLowerCase();
