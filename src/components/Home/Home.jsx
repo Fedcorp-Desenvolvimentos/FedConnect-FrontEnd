@@ -25,7 +25,7 @@ const imagensCarrossel = [
       mobile: "/imagens/Banner-01-mobile.png",
     },
     alt: "Manual do Usuário",
-    link: "/MANUAL-FEDCONNECT-3.pdf",
+    link: "/MANUAL-FEDCONNECT-4.pdf",
     download: true,
   },
   {
