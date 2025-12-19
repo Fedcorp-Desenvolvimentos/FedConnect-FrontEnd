@@ -114,14 +114,14 @@
 .rb-table th,
 .rb-table td {
   border-bottom: 1px solid #eef2f7;
-  padding: 12px 10px;
+  padding: 3px 8px;
   text-align: left;
   vertical-align: middle;
   font-size: 14px;
 }
 
 .rb-table th {
-  font-weight: 700;
+  font-weight: 600;
   color: #1f2a44;
 }
 
@@ -132,7 +132,7 @@
 .rb-mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
-  font-size: 12px;
+  font-size: 10px;
   word-break: break-all;
 }
 
@@ -160,4 +160,138 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+}
+
+.rb-spin {
+  display: inline-block;
+  animation: rb-rotate 0.9s linear infinite;
+}
+
+@keyframes rb-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+.rb-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0 14px 0;
+}
+
+.rb-page-btn {
+  border: 1px solid #dbe2ff;
+  background: #eef2ff;
+  color: #1f2a44;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.rb-page-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.rb-page-info {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rb-toast {
+  position: fixed;
+  bottom: 18px;   
+  right: 18px;    
+  top: auto;      
+  z-index: 9999;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+
+  min-width: 280px;
+  max-width: 420px;
+
+  padding: 12px 14px;
+  border-radius: 14px;
+
+  background: hsl(209, 66%, 86%);
+  box-shadow: 0 10px 26px rgba(24, 88, 214, 0.18);
+  border: 1px solid #eef2f7;
+
+  animation: rb-toast-in-bottom 0.18s ease-out;
+}
+
+@keyframes rb-toast-in-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rb-toast-icon i {
+  font-size: 18px;
+}
+
+.rb-toast-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1f2a44;
+  line-height: 1.25;
+}
+
+.rb-toast-close {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 10px;
+  color: #6b7280;
+}
+
+.rb-toast-close:hover {
+  background: #f3f6ff;
+}
+
+.rb-toast.success {
+  border-left: 4px solid #10b981;
+}
+
+.rb-toast.success .rb-toast-icon i {
+  color: #10b981;
+}
+
+.rb-toast.info {
+  border-left: 4px solid #3b82f6;
+}
+
+.rb-toast.info .rb-toast-icon i {
+  color: #3b82f6;
+}
+
+.rb-toast.error {
+  border-left: 4px solid #ef4444;
+}
+
+.rb-toast.error .rb-toast-icon i {
+  color: #ef4444;
+}
+
+@media (max-width: 520px) {
+  .rb-toast {
+    left: 14px;
+    right: 14px;
+    top: 14px;
+    max-width: none;
+    min-width: 0;
+  }
 }
