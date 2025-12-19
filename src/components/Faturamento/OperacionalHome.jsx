@@ -17,17 +17,17 @@ const operacionais = [
     icon: <i className="bi bi-x-octagon-fill" />,
     title: "Cancelamentos FedBnk",
     desc: "Solicite e acompanhe cancelamentos de faturas ou boletos com validações e registro interno.",
-    to: "/operacional/cancelamento",
+    to: "/faturamento/cancelamento",
     niveis: ["admin", "faturamento", "ti"],
   },
-  // {
-  //   key: "reimpressao-boleto",
-  //   icon: <i class="bi bi-file-earmark-check-fill"/>,
-  //   title: "Reimpressão FedBnk",
-  //   desc: "Realize a reimpressão de boletos FedBnk de forma rápida e prática.",
-  //   to: "/operacional/reimpressao-boleto",
-  //   niveis: ["admin", "faturamento"],
-  // },
+  {
+    key: "reimpressao-boleto",
+    icon: <i class="bi bi-file-earmark-check-fill"/>,
+    title: "Reimpressão FedBnk",
+    desc: "Realize a reimpressão de boletos FedBnk de forma rápida e prática.",
+    to: "/faturamento/reimpressao-boleto",
+    niveis: ["admin", "faturamento"],
+  },
   // {
   //   key: "emissao-nf",
   //   icon: <i className="bi bi-file-earmark-bar-graph-fill" />,
@@ -64,7 +64,7 @@ const OperacionalHome = () => {
       <main>
         <div className="container02">
           <h1 className="consultas-title">
-            <i className="bi bi-gear-fill"></i> Operacional
+            <i className="bi bi-gear-fill"></i> Faturamento
           </h1>
 
           <div className="cards-container">

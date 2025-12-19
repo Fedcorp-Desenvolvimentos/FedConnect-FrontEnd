@@ -119,7 +119,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                {["admin", "faturamento", "ti"].includes(nivelAcesso) && (
 
               <li>
-                <Link to="/operacional">
+                <Link to="/faturamento">
                   <div className="sidebar-icon-tooltip">
                     <i className="bi bi-wallet2"></i>
                     <span>Faturamento</span>

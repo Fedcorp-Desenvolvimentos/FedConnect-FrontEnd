@@ -99,10 +99,10 @@ function AppRoutes() {
             <Route path="/agenda-comercial" element={<AgendaComercial />} />
             <Route path="/financeiro" element={<Financeiro />} />
             <Route path="/produtos" element={<Produtos />} />
-            <Route path="/operacional" element={<OperacionalHome />} />
-            <Route path="/operacional/pdf-automation" element={<PdfAutomation />} />
-            <Route path="/operacional/cancelamento" element={<OperacionalCancelamento />} />
-            <Route path="/operacional/reimpressao-boleto" element={<ReimpressaoBoleto />} />
+            <Route path="/faturamento" element={<OperacionalHome />} />
+            <Route path="/faturamento/pdf-automation" element={<PdfAutomation />} />
+            <Route path="/faturamento/cancelamento" element={<OperacionalCancelamento />} />
+            <Route path="/faturamento/reimpressao-boleto" element={<ReimpressaoBoleto />} />
             
           </Route>
         </Route>
