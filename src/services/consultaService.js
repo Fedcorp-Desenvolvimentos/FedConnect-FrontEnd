@@ -155,5 +155,11 @@ export const ConsultaService = {
   consultaRegiao: async (payload) => {
     const response = await api.post(`consulta/comercial-regiao/`, payload)
     return response.data;
+  },
+
+  boletosFatura:async(payload)=>{
+    const response = await api.get(`consultar-boletosfedbnk/?numero=${payload}`)
+    return response.data;
+
   }
 };

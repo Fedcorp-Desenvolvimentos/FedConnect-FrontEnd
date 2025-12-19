@@ -1,26 +1,32 @@
 import React, { useMemo, useState } from "react";
 import "../styles/ConsultasHome.css";
 import "../styles/ReimpressaoBoleto.css";
+import { impressWebhook } from "../../services/boletofedbnk";
+import { ConsultaService } from "../../services/consultaService";
 
 const buscarBoletosPorFatura = async (numeroFatura) => {
+    try {
+        const response = await ConsultaService.boletosFatura(numeroFatura);
+        
+        // Verifica se a resposta é um array
+        if (!Array.isArray(response)) {
+            console.error("Resposta inesperada da API:", response);
+            return [];
+        }
 
-    await new Promise((r) => setTimeout(r, 400));
-    return [
-        {
-            id: 1,
-            numero_boleto: "2379000",
-            vencimento: "20-12-2025",
-            valor: 199.9,
-            pdf_url: "https://example.com/boleto1.pdf",
-        },
-        {
-            id: 2,
-            numero_boleto: "2379012",
-            vencimento: "27-12-2025",
-            valor: 289.5,
-            pdf_url: "https://example.com/boleto2.pdf",
-        },
-    ];
+        // Mapeia os dados do Backend para o Frontend
+        return response.map((item) => ({
+            id: item.documento, // Usando documento como chave única
+            numero_boleto: item.nosso_numero,
+            valor: item.valor,
+            fatura: item.fatura,
+            status: item.stat,
+            original: item
+        }));
+    } catch (error) {
+        console.error("Erro no serviço de busca:", error);
+        throw error;
+    }
 };
 
 const ReimpressaoBoleto = () => {
@@ -29,7 +35,7 @@ const ReimpressaoBoleto = () => {
     const [boletos, setBoletos] = useState([]);
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState({ type: "", text: "" });
-
+    const [method, setmethod] = useState("")
     const handleBuscar = async (e) => {
         e.preventDefault();
         setMsg({ type: "", text: "" });
@@ -74,20 +80,98 @@ const ReimpressaoBoleto = () => {
         );
     }, [boletos, numeroBoleto]);
 
-    const reimprimirBoleto = (boleto) => {
-        if (!boleto?.pdf_url) {
-            setMsg({ type: "error", text: "Esse boleto não possui link de impressão." });
-            return;
+   const reimprimirBoleto = async (boleto) => {
+        // Log para depuração: garante que o objeto correto chegou aqui
+        console.log("Solicitando download do boleto:", boleto.numero_boleto);
+
+        try {
+            const payload = { 
+                number: boleto.numero_boleto, 
+                method: "boleto"  
+            };
+
+            // Faz a requisição
+            const pdfBlob = await impressWebhook(payload);
+
+            // Verifica se o Blob é válido
+            if (!pdfBlob) {
+                throw new Error("O arquivo retornado está vazio.");
+            }
+
+            // 1. Limpeza de segurança: Remove qualquer link 'zumbi' que possa ter ficado
+            const oldLink = document.getElementById('temp-download-link');
+            if (oldLink) {
+                document.body.removeChild(oldLink);
+            }
+
+            // 2. Cria o novo Blob e URL
+            const blob = new Blob([pdfBlob], { type: 'application/pdf' });
+            const fileURL = window.URL.createObjectURL(blob);
+
+            // 3. Cria o elemento de link com um ID específico
+            const link = document.createElement('a');
+            link.id = 'temp-download-link'; // ID fixo para garantir que controlamos este elemento
+            link.href = fileURL;
+            link.setAttribute('download', `boleto_${boleto.numero_boleto}.pdf`);
+            link.style.display = 'none'; // Garante que não afeta o layout
+            
+            // 4. Adiciona ao corpo
+            document.body.appendChild(link);
+            
+            // 5. Clica no elemento exato que acabamos de criar
+            link.click();
+            
+            // 6. Limpeza com delay seguro
+            setTimeout(() => {
+                if (document.body.contains(link)) {
+                    document.body.removeChild(link);
+                }
+                window.URL.revokeObjectURL(fileURL);
+                console.log("Download finalizado e memória limpa para:", boleto.numero_boleto);
+            }, 200); // 200ms é suficiente para o navegador registrar o download
+
+        } catch (error) {
+            console.error("Erro ao fazer download do boleto:", error);
+            setMsg({ type: "error", text: "Erro ao gerar o arquivo do boleto." });
         }
-        window.open(boleto.pdf_url, "_blank", "noopener,noreferrer");
     };
 
-    const reimprimirTodos = () => {
+    const reimprimirTodos = async () => {
         if (!boletosFiltrados.length) {
             setMsg({ type: "info", text: "Não há boletos para reimprimir." });
             return;
         }
-        boletosFiltrados.forEach((b, idx) => setTimeout(() => reimprimirBoleto(b), idx * 200));
+        const payload = {
+            number: numeroFatura,
+            method: "fatura"
+         }
+        const pdfBlob = await impressWebhook(payload);
+
+        const blob = new Blob([pdfBlob], { type: 'application/pdf' });
+            const fileURL = window.URL.createObjectURL(blob);
+
+            // 3. Cria o elemento de link com um ID específico
+            const link = document.createElement('a');
+            link.id = 'temp-download-link'; // ID fixo para garantir que controlamos este elemento
+            link.href = fileURL;
+            link.setAttribute('download', `fatura_${numeroFatura}.pdf`);
+            link.style.display = 'none'; // Garante que não afeta o layout
+            
+            // 4. Adiciona ao corpo
+            document.body.appendChild(link);
+            
+            // 5. Clica no elemento exato que acabamos de criar
+            link.click();
+            
+            // 6. Limpeza com delay seguro
+            setTimeout(() => {
+                if (document.body.contains(link)) {
+                    document.body.removeChild(link);
+                }
+                window.URL.revokeObjectURL(fileURL);
+                console.log("Download finalizado e memória limpa para:", boleto.numero_boleto);
+            }, 200); // 200ms é suficiente para o navegador registrar o download
+        
     };
 
     return (
@@ -124,7 +208,6 @@ const ReimpressaoBoleto = () => {
                                         onChange={(e) => setNumeroBoleto(e.target.value)}
                                         placeholder="Digite o número do boleto"
                                         autoComplete="off"
-                                        
                                     />
                                 </div>
 
@@ -161,7 +244,7 @@ const ReimpressaoBoleto = () => {
 
                             {boletos.length === 0 ? (
                                 <div className="rb-empty">
-                                   Preencha as informações para listar os boletos.
+                                    Preencha as informações para listar os boletos.
                                 </div>
                             ) : boletosFiltrados.length === 0 ? (
                                 <div className="rb-empty">
@@ -171,26 +254,35 @@ const ReimpressaoBoleto = () => {
                                 <table className="rb-table">
                                     <thead>
                                         <tr>
+                                            <th>Fatura</th>
                                             <th>Nº Boleto</th>
-                                            <th>Vencimento</th>
+                                            <th>Documento</th>
+                                            <th>Registrado</th>
+                                            <th>Status (FINANC)</th>
                                             <th>Valor</th>
                                             <th>Ação</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {boletosFiltrados.map((b) => (
+                                            
                                             <tr key={b.id}>
+                                                <td>{b.original.fatura}</td>
                                                 <td className="rb-mono">{b.numero_boleto}</td>
-                                                <td>{b.vencimento}</td>
+
+                                                <td>{b.original.documento}</td>
+                                                <td>{b.original.identificador==null?"Não" :"Sim"}</td>
+                                                <td>{b.original.status=="C"?"Cancelado":"Ativo"}</td>
+                                                {console.log(b)}
                                                 <td>
                                                     {typeof b.valor === "number"
                                                         ? b.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
                                                         : b.valor}
                                                 </td>
                                                 <td>
-                                                    <button className="btn-primary rb-btn-print" 
-                                                    type="button" 
-                                                    onClick={() => reimprimirBoleto(b)}>
+                                                    <button className="btn-primary rb-btn-print"
+                                                        type="button"
+                                                        onClick={() => reimprimirBoleto(b)}>
                                                         <i className="bi bi-printer-fill"></i>
                                                     </button>
                                                 </td>
