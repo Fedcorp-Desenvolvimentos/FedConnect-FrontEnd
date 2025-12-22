@@ -84,7 +84,7 @@ const OperacionalCancelamento = () => {
     } catch (err) {
       setStatus({
         type: "error",
-        message: "Não consegui registrar a solicitação. Tenta de novo — ou ameaça com um log bem bonito.",
+        message: "Erro ao realizar o cancelamento. Por favor tente novamente mais tarde.",
       });
       console.error(err);
       setConfirmOpen(false);
