@@ -101,3 +101,153 @@
     grid-template-columns: 1fr;
   }
 }
+
+.op-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0.363);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.op-modal {
+  width: 100%;
+  max-width: 560px;
+  background: #fff; 
+  color: black;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  animation: opModalIn 160ms ease-out;
+}
+
+@keyframes opModalIn {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.op-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.op-modal-header i {
+  font-size: 20px;
+}
+
+.op-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: black;
+}
+
+.op-modal-close {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: black;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 10px;
+  transition: 0.15s ease;
+}
+
+.op-modal-close:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: black;
+}
+
+.op-modal-close:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.op-modal-body {
+  padding: 16px;
+  color: black;
+  line-height: 1.45;
+}
+
+.op-modal-body p {
+  margin: 0 0 12px 0;
+}
+
+.op-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 13px;
+  color: black;
+}
+
+.op-modal-warning {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: rgba(245, 158, 11, 0.10); 
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  padding: 12px;
+  border-radius: 12px;
+  margin: 12px 0;
+}
+
+.op-modal-warning i {
+  font-size: 18px;
+  margin-top: 1px;
+}
+
+.op-modal-preview {
+  margin-top: 12px;
+}
+
+.op-modal-preview small {
+  display: block;
+  margin-bottom: 6px;
+  color: black;
+}
+
+.op-modal-preview-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: black ;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.op-muted {
+  color: black;
+}
+
+.op-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 12px 16px 16px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 480px) {
+  .op-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .op-modal-actions .btn-primary,
+  .op-modal-actions .btn-secondary {
+    width: 100%;
+  }
+}
