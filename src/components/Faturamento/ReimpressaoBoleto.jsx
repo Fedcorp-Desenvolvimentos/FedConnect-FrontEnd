@@ -85,17 +85,24 @@ const ReimpressaoBoleto = () => {
 
   const isAnyDownloading = downloadingAll || downloadingId !== null;
 
+  const isRegistrado = (b) => {
+    const id = b?.original?.identificador;
+    return id !== null && id !== undefined && String(id).trim() !== "";
+  };
+
   const boletosFiltrados = useMemo(() => {
     const termo = numeroBoleto.trim();
     const termoNorm = termo.replace(/\s/g, "");
 
+    const boletosRegistrados = boletos.filter(isRegistrado);
+
     const filtrados = termo
-      ? boletos.filter((b) =>
+      ? boletosRegistrados.filter((b) =>
           String(b.numero_boleto || "")
             .replace(/\s/g, "")
             .includes(termoNorm)
         )
-      : boletos;
+      : boletosRegistrados;
 
     return [...filtrados].sort((a, b) => {
       const na = String(a.numero_boleto || "").replace(/\D/g, "");
@@ -179,7 +186,14 @@ const ReimpressaoBoleto = () => {
       }
 
       setBoletos(lista);
-      showToast("success", `Boletos carregados: ${lista.length}.`);
+
+      const registradosCount = (lista || []).filter(isRegistrado).length;
+
+      if (registradosCount === 0) {
+        showToast("info", "Nenhum boleto registrado disponível para reimpressão nessa fatura.");
+      } else {
+        showToast("success", `Boletos carregados: ${registradosCount} registrado(s) (de ${lista.length}).`);
+      }
     } catch (err) {
       showToast("error", normalizeErrorMessage(err));
     } finally {
@@ -190,6 +204,11 @@ const ReimpressaoBoleto = () => {
   const reimprimirBoleto = async (boleto) => {
     if (!boleto?.numero_boleto) {
       showToast("error", "Número do boleto inválido para reimpressão.");
+      return;
+    }
+
+    if (!isRegistrado(boleto)) {
+      showToast("info", "Esse boleto não está registrado. Reimpressão indisponível.");
       return;
     }
 
@@ -216,7 +235,7 @@ const ReimpressaoBoleto = () => {
 
   const reimprimirTodos = async () => {
     if (!boletosFiltrados.length) {
-      showToast("info", "Não há boletos para reimprimir.");
+      showToast("info", "Não há boletos registrados para reimprimir.");
       return;
     }
 
@@ -233,7 +252,7 @@ const ReimpressaoBoleto = () => {
       const pdfBlob = await impressWebhook(payload);
 
       baixarBlobComoPdf(pdfBlob, `fatura_${fatura}.pdf`);
-      showToast("success", `Download iniciado: fatura ${fatura} (todos os boletos disponíveis).`, 3500);
+      showToast("success", `Download iniciado: fatura ${fatura} (boletos registrados).`, 3500);
     } catch (error) {
       const isEmpty = String(error?.message || "").includes("arquivo_vazio");
       showToast(
@@ -249,7 +268,7 @@ const ReimpressaoBoleto = () => {
 
   return (
     <div className="home-grid">
-            {toast.open && (
+      {toast.open && (
         <div className={`rb-toast ${toast.type}`} role="status" aria-live="polite">
           <div className="rb-toast-icon">
             <i
@@ -343,7 +362,9 @@ const ReimpressaoBoleto = () => {
               {boletos.length === 0 ? (
                 <div className="rb-empty">Preencha as informações para listar os boletos.</div>
               ) : boletosFiltrados.length === 0 ? (
-                <div className="rb-empty">Nenhum boleto bate com esse filtro.</div>
+                <div className="rb-empty">
+                  Nenhum boleto registrado disponível (ou nenhum bate com esse filtro).
+                </div>
               ) : (
                 <>
                   <table className="rb-table">
@@ -367,7 +388,7 @@ const ReimpressaoBoleto = () => {
                             <td>{b.original.fatura}</td>
                             <td className="rb-mono">{b.numero_boleto}</td>
                             <td>{b.original.documento}</td>
-                            <td>{b.original.identificador == null ? "Não" : "Sim"}</td>
+                            <td>{isRegistrado(b) ? "Sim" : "Não"}</td>
                             <td>{b.original.status === "C" ? "Cancelado" : "Ativo"}</td>
                             <td>
                               {typeof b.valor === "number"
