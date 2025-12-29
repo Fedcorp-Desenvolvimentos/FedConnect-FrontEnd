@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 1. Criação da instância do Axios
 const apiClient = axios.create({
-  baseURL: 'https://d072d7ebc3f9.ngrok-free.app',
+  baseURL: 'https://steeply-outlandish-reese.ngrok-free.dev',
   headers: {
     'Content-Type': 'application/json',
     // 2. IMPORTANTE: Esse header evita a tela de aviso do Ngrok na versão free
