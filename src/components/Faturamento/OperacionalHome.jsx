@@ -28,15 +28,15 @@ const operacionais = [
     to: "/faturamento/reimpressao-boleto",
     niveis: ["admin", "faturamento"],
   },
-  // {
-  //   key: "emissao-nf",
-  //   icon: <i className="bi bi-file-earmark-bar-graph-fill" />,
-  //   title: "Sistema de NF",
-  //   desc: "Solicite e acompanhe emissão, cancelamento e substituição de Nota Fiscal.",
-  //   to: "https://nf-fedcorp.com.br", 
-  //   external: true,
-  //    niveis: ["admin", "faturamento"]
-  // },
+  {
+    key: "emissao-nf",
+    icon: <i className="bi bi-file-earmark-bar-graph-fill" />,
+    title: "Sistema de NF",
+    desc: "Solicite e acompanhe emissão e cancelamento de Nota Fiscal.",
+    to: "https://fedcorp.com.br/suporte/nota/", 
+    external: true,
+     niveis: ["admin", "faturamento"]
+  },
 ];
 
 const OperacionalHome = () => {
