@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 1. Criação da instância do Axios
 const apiClient = axios.create({
-  baseURL: 'https://steeply-outlandish-reese.ngrok-free.dev',
+  baseURL: 'https://nfsefedcorp-reese.ngrok-free.dev',
   headers: {
     'Content-Type': 'application/json',
     // 2. IMPORTANTE: Esse header evita a tela de aviso do Ngrok na versão free
@@ -11,8 +11,8 @@ const apiClient = axios.create({
   timeout: 10000, // 10 segundos de timeout
 });
 
-const CANCEL_PATH = '/webhook/edc4b608-35fd-483a-a9e8-4bfea34b6247';
-const IMPRESS_PATH = '/webhook/5bb0be23-844b-47f9-9d89-ca94ce02e428';
+const CANCEL_PATH = '/webhook/boletofedbnk/cancelamento/';
+const IMPRESS_PATH = '/webhook/boletofedbnk/impressao/';
 
 /**
  * Envia dados para o Webhook.
