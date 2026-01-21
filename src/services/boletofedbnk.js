@@ -8,7 +8,7 @@ const apiClient = axios.create({
     // 2. IMPORTANTE: Esse header evita a tela de aviso do Ngrok na versão free
     'ngrok-skip-browser-warning': 'true' 
   },
-  timeout: 10000, // 10 segundos de timeout
+  timeout: 10000, 
 });
 
 const CANCEL_PATH = '/webhook/boletofedbnk/cancelamento/';
