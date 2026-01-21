@@ -4,9 +4,7 @@ import axios from 'axios';
 const apiClient = axios.create({
   baseURL: 'https://nfsefedcorp-reese.ngrok-free.dev',
   headers: {
-    'Content-Type': 'application/json',
-    // 2. IMPORTANTE: Esse header evita a tela de aviso do Ngrok na versão free
-    'ngrok-skip-browser-warning': 'true' 
+    'Content-Type': 'application/json'
   },
   timeout: 10000, 
 });
