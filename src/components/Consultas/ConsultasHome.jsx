@@ -44,6 +44,14 @@ const consultas = [
         to: "/consulta-faturas",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     },
+    {
+        key: "faturas-dinamicas",
+        icon: <i class="bi bi-file-earmark-text"></i>,
+        title: "Consultar Faturas - Filtros",
+        desc: "Localize informações sobre faturas com parametros de pesquisa.",
+        to: "/consulta-faturas-geral",
+        niveis: ["admin", "usuario", "comercial", "ti"],
+    },
     
 ];
 

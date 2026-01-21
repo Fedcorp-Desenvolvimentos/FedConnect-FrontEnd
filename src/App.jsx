@@ -49,6 +49,7 @@ import { AuthProvider } from './context/AuthContext';
 
 import { LoadingProvider, useLoading } from './context/LoadingContext';
 import LoadingSpinner from './components/LoadingSpinner';
+import ConsultaFaturaDinamicamente from './components/Consultas/ConsultaFaturaDinamicamente';
 
 // Teste
 
@@ -82,6 +83,7 @@ function AppRoutes() {
             <Route path="/comercial-regiao" element={<BuscaRegiao />} />
             <Route path="/consulta-segurados" element={<Segurados />} />
             <Route path="/consulta-faturas" element={<ConsultaFat />} />
+            <Route path="/consulta-faturas-geral" element={<ConsultaFaturaDinamicamente />} />
             <Route path="/conta" element={<Conta />} />
             <Route path="/config" element={<Config />} />
             <Route path="/cadastro" element={<Cadastro />} />
