@@ -4,7 +4,7 @@ import api from "./api";
 export const getFaturaPorNumero = async (numeroFatura) => {
   try {
     const token = localStorage.getItem("accessToken", "")
-    const response = await api.get(`/consultas/fatura/${numeroFatura}/`, {
+    const response = await api.get(`https://steeply-outlandish-reese.ngrok-free.dev/consultas/fatura/${numeroFatura}/`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -20,7 +20,7 @@ export const getFaturaDinamicamente = async (filtros = {}) => {
     const token = localStorage.getItem("accessToken", "");
 
     const response = await api.get(
-      "/consultas/fatura/fatura-dinamica/",
+      "https://steeply-outlandish-reese.ngrok-free.dev/consultas/fatura/fatura-dinamica/",
       {
         params: filtros,
         headers: {
