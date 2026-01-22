@@ -17,7 +17,6 @@ export const getFaturaPorNumero = async (numero_fatura) => {
 export const getFaturaDinamicamente = async (filtros = {}) => {
   try {
     const token = localStorage.getItem("accessToken", "");
-
     const response = await api.get(
       "consultas/faturas/fatura-dinamica/",
       {

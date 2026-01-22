@@ -1,0 +1,703 @@
+/* Estilos Padronizados para Consulta Dinâmica e Detalhe */
+
+.consulta-fatura-container {
+    padding-left: 220px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-top: 20px;
+    min-height: 100vh;
+    box-sizing: border-box;
+    border-bottom: 1.5px solid #e5e9ef;
+}
+
+.consultas-title {
+    color: #2463eb;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.consultas-title i {
+    font-size: 1.8rem;
+}
+
+.form-fatura {
+    background: #fff;
+    border-radius: 18px;
+    padding: 2.2rem 2.8rem 1.6rem 2.8rem;
+    box-shadow: 0 4px 24px #2463eb18;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto 2.5rem auto;
+    border: 1.5px solid #e4e8ee;
+    width: 100%;
+}
+
+.form-fatura label {
+    font-weight: 600;
+    color: #2463eb !important;
+    margin-bottom: 0.4rem;
+    font-size: 1.15rem !important;
+}
+
+.form-fatura input[type="text"],
+.form-fatura input[type="number"],
+.form-fatura input[type="date"],
+.form-fatura select {
+    width: 100%;
+    padding: 0.8rem 1.1rem;
+    border-radius: 8px;
+    border: 1.5px solid #e4e8ee;
+    font-size: 1.08rem;
+    background: #f8fafc;
+    transition: border 0.16s;
+    margin-bottom: 0.5rem;
+}
+
+.form-fatura input:focus,
+.form-fatura select:focus {
+    border-color: #2463eb;
+    outline: none;
+    background: #f0f5fd;
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.group-btn-wrapper {
+    width: 100%;
+    margin-bottom: 1.4rem;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-toggle-filtros {
+    background: #fff;
+    color: #2463eb;
+    border: 1.5px solid #2463eb;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-toggle-filtros:hover {
+    background: #2463eb;
+    color: #fff;
+}
+
+.filtros-count {
+    background: #2463eb;
+    color: #fff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    margin-left: 5px;
+}
+
+.filtros-avancados {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1.5px solid #e4e8ee;
+    width: 100%;
+}
+
+.grid-3-colunas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.input-group {
+    display: flex;
+    width: 100%;
+}
+
+.input-group-text {
+    background: #f0f5fd;
+    border: 1.5px solid #e4e8ee;
+    border-right: none;
+    padding: 0.8rem 1rem;
+    border-radius: 8px 0 0 8px;
+    color: #2463eb;
+    font-weight: 600;
+}
+
+.input-group .form-control {
+    border-radius: 0 8px 8px 0;
+    border-left: none;
+}
+
+.botoes-acao {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn {
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    min-width: 150px;
+}
+
+.btn-primary {
+    background: #2463eb;
+    color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px #2463eb40;
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: #f0f5fd;
+    color: #2463eb;
+    border: 1.5px solid #2463eb;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #e4e8ee;
+}
+
+.erro-msg {
+    background: #fff4f4;
+    color: #d21a1a;
+    border-radius: 7px;
+    padding: 0.8rem 1.1rem;
+    margin: 1rem auto;
+    font-size: 1rem;
+    text-align: center;
+    font-weight: 600;
+    max-width: 600px;
+}
+
+.resultado-fatura {
+    margin-top: 1.4rem;
+    background: #fff;
+    border-radius: 22px;
+    padding: 2.4rem 2.9rem 2.2rem 2.9rem;
+    box-shadow: 0 8px 40px 0 #2463eb18;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 2.5px solid #e5e9ef;
+    
+}
+
+.resultados-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1.5px solid #e5e9ef;
+    
+}
+
+.title-consulta {
+    color: #2463eb;
+    font-size: 1.45rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: 0.7px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.total-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.total-badge {
+    background: #2463eb;
+    color: #fff;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.filtros-ativos {
+    color: #666;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tabela-resultados {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabela-faturas {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.tabela-faturas thead {
+    background: #f0f5fd;
+}
+
+.tabela-faturas th {
+    padding: 1rem;
+    text-align: left;
+    color: #2463eb;
+    font-weight: 700;
+    font-size: 1rem;
+    border-bottom: 2px solid #e4e8ee;
+}
+
+.tabela-faturas td {
+    padding: 1rem;
+    border-bottom: 1px solid #e4e8ee;
+    color: #1a2340;
+}
+
+.tabela-faturas tbody tr {
+    transition: background 0.2s;
+}
+
+.linha-clicavel:hover {
+    background: #f8fafc;
+    cursor: pointer;
+}
+
+.numero-fatura {
+    color: #2463eb;
+    font-weight: 700;
+}
+
+.valor-premio {
+    font-weight: 700;
+    color: #1a2340;
+}
+
+.vencido {
+    color: #d21a1a;
+    font-weight: 600;
+}
+
+.vigencia {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-ativa {
+    background: #eafbf1;
+    color: #128c3c;
+    border: 1px solid #a7f3d0;
+}
+
+.status-cancelada {
+    background: #fff4f4;
+    color: #d21a1a;
+    border: 1px solid #fecaca;
+}
+
+.status-pendente {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fde68a;
+}
+
+.status-quitada {
+    background: #e3f2fd;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.status-inativa {
+    background: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+}
+
+.status-desconhecida {
+    background: #f8fafc;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+}
+
+.nenhum-resultado {
+    background: #fff;
+    border-radius: 22px;
+    padding: 4rem 2rem;
+    box-shadow: 0 8px 40px 0 #2463eb18;
+    max-width: 600px;
+    margin: 2rem auto;
+    text-align: center;
+    border: 2.5px solid #e5e9ef;
+}
+
+.icone-vazio {
+    font-size: 4rem;
+    color: #e4e8ee;
+    margin-bottom: 1rem;
+}
+
+.nenhum-resultado h5 {
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.nenhum-resultado p {
+    color: #718096;
+    margin: 0;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #2463eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Estilos específicos para página de detalhes */
+.detalhe-fatura {
+    max-width: 1200px !important;
+}
+
+.cabecalho-detalhe {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.btn-voltar {
+    background: #f0f5fd;
+    color: #2463eb;
+    border: 1.5px solid #2463eb;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+}
+
+.btn-voltar:hover {
+    background: #2463eb;
+    color: #fff;
+}
+
+.titulo-detalhe {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1.5px solid #e5e9ef;
+}
+
+.resultado-dados {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.3rem 2.7rem;
+    font-size: 1rem;
+    color: #1a2340;
+    margin-bottom: 2.5rem;
+    align-items: start;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-break: break-word;
+}
+
+.campo strong {
+    color: #2463eb;
+    font-size: 1em;
+    font-weight: 700;
+    margin-bottom: 0.10rem;
+    letter-spacing: 0.10px;
+}
+
+.campo span, .campo div:not(:first-child) {
+    font-weight: 500;
+    font-size: 1.07em;
+    color: #1a2340;
+    line-height: 1.32;
+    word-break: break-word;
+}
+
+.informacoes-adicionais {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1.5px solid #e5e9ef;
+}
+
+.informacoes-adicionais h4 {
+    color: #2463eb;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.grid-adicionais {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.item-adicional {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.label-adicional {
+    font-size: 0.9rem;
+    color: #718096;
+    font-weight: 600;
+}
+
+.valor-adicional {
+    font-size: 1rem;
+    color: #1a2340;
+    font-weight: 500;
+}
+
+.lista-faturas {
+    margin-top: 2.5rem;
+    background: #fff;
+    border-radius: 22px;
+    padding: 2rem;
+    box-shadow: 0 8px 40px 0 #2463eb18;
+    border: 2.5px solid #e5e9ef;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.titulo-lista {
+    color: #2463eb;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tabela-lista {
+    overflow-x: auto;
+}
+
+.linha-lista:hover {
+    background: #f8fafc;
+    cursor: pointer;
+}
+
+.linha-lista.ativo {
+    background: #e3f2fd;
+    border-left: 3px solid #2463eb;
+}
+
+.erro-container {
+    background: #fff;
+    border-radius: 22px;
+    padding: 4rem 2rem;
+    box-shadow: 0 8px 40px 0 #2463eb18;
+    max-width: 600px;
+    margin: 2rem auto;
+    text-align: center;
+    border: 2.5px solid #e5e9ef;
+}
+
+.icone-erro {
+    font-size: 4rem;
+    color: #d21a1a;
+    margin-bottom: 1.5rem;
+}
+
+.erro-container h3 {
+    color: #d21a1a;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.erro-container p {
+    color: #4a5568;
+    margin-bottom: 2rem;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+    .grid-3-colunas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .resultado-dados {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .grid-adicionais {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .consulta-fatura-container {
+        padding-left: 0;
+        padding-top: 70px;
+    }
+    
+    .form-fatura {
+        max-width: 90%;
+        padding: 1.8rem;
+    }
+    
+    .resultado-fatura {
+        max-width: 90%;
+        padding: 1.8rem;
+    }
+    
+    .grid-3-colunas {
+        grid-template-columns: 1fr;
+    }
+    
+    .grid-adicionais {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .consultas-title {
+        font-size: 1.6rem;
+    }
+    
+    .form-fatura {
+        padding: 1.5rem;
+    }
+    
+    .resultado-fatura {
+        padding: 1.5rem;
+    }
+    
+    .resultados-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .total-info {
+        align-items: flex-start;
+    }
+    
+    .resultado-dados {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .grid-adicionais {
+        grid-template-columns: 1fr;
+    }
+    
+    .botoes-acao {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .consulta-fatura-container {
+        padding: 15px;
+        padding-top: 70px;
+    }
+    
+    .consultas-title {
+        font-size: 1.4rem;
+    }
+    
+    .form-fatura {
+        padding: 1.2rem;
+    }
+    
+    .resultado-fatura {
+        padding: 1.2rem;
+    }
+    
+    .title-consulta {
+        font-size: 1.2rem;
+    }
+}
