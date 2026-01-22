@@ -1,10 +1,9 @@
-import axios from "axios";
 import api from "./api";
 
-export const getFaturaPorNumero = async (numeroFatura) => {
+export const getFaturaPorNumero = async (numero_fatura) => {
   try {
     const token = localStorage.getItem("accessToken", "")
-    const response = await api.get(`https://steeply-outlandish-reese.ngrok-free.dev/consultas/fatura/${numeroFatura}/`, {
+    const response = await api.get(`consultas/faturas/${numero_fatura}/`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -20,7 +19,7 @@ export const getFaturaDinamicamente = async (filtros = {}) => {
     const token = localStorage.getItem("accessToken", "");
 
     const response = await api.get(
-      "https://steeply-outlandish-reese.ngrok-free.dev/consultas/fatura/fatura-dinamica/",
+      "consultas/faturas/fatura-dinamica/",
       {
         params: filtros,
         headers: {
