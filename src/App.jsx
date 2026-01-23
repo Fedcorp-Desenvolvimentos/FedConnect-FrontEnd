@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 import Login from './components/Login/Login';
@@ -41,7 +41,7 @@ import HistoricoPage from './components/Dropdown/dropItens/HistoricoPage';
 import HomeAdm from './components/Adm/ImportacaoAdmPage';
 import Upload from './components/Adm/Upload';
 import ImportVida from './components/Adm/ImportVida';
-import ImportAlug from './components/Adm/ImportAlug';
+// import ImportAlug from './components/Adm/ImportAlug';
 
 import DashboardLayout from './Layouts/DashboardLayout';
 import PrivateRoute from './services/privateRoute';
@@ -49,8 +49,8 @@ import { AuthProvider } from './context/AuthContext';
 
 import { LoadingProvider, useLoading } from './context/LoadingContext';
 import LoadingSpinner from './components/LoadingSpinner';
-import ConsultaFaturaDinamicamente from './components/Consultas/ConsultaFaturaDinamicamente';
 import ConsultaDetalhe from './components/Detalhes/ConsultaDetalhe';
+import ConsultaFaturamento from './components/Consultas/ConsultaFaturamento';
 
 // Teste
 
@@ -84,7 +84,7 @@ function AppRoutes() {
             <Route path="/comercial-regiao" element={<BuscaRegiao />} />
             <Route path="/consulta-segurados" element={<Segurados />} />
             <Route path="/consulta-faturas" element={<ConsultaFat />} />
-            <Route path="/consulta-faturas-geral" element={<ConsultaFaturaDinamicamente />} />
+            <Route path="/consulta-faturamento" element={<ConsultaFaturamento />} />
             <Route path="/consulta-detalhes/:id" element={<ConsultaDetalhe />} />
             <Route path="/conta" element={<Conta />} />
             <Route path="/config" element={<Config />} />

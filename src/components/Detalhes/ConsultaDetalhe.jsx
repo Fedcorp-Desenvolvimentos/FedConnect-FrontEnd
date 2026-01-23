@@ -5,16 +5,7 @@ import { formatarData } from "../../utils/formatar_data";
 import { 
   FiArrowLeft, 
   FiFileText, 
-  FiCheckCircle, 
-  FiXCircle, 
-  FiClock, 
   FiAlertCircle,
-  FiDollarSign,
-  FiCalendar,
-  FiHash,
-  FiPercent,
-  FiUser,
-  FiShield
 } from "react-icons/fi";
 import { getFaturaPorNumero } from '../../services/consultaFatura';
 
