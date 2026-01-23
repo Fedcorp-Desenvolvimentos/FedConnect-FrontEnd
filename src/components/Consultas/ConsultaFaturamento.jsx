@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import "../styles/ConsultaFaturamento.css";
 import { exportarFaturasParaExcel, exportarFaturasParaPDF, getFaturasComBoletos } from '../../services/consultaFatura';
 import { getEmpresas } from '../../services/empresasService';
@@ -43,7 +43,14 @@ const ConsultaFaturamento = () => {
         has_next: false,
         has_previous: false,
     });
-    const [paginationLocal, setPaginationLocal] = useState({
+    const [termoPesquisa, setTermoPesquisa] = useState('');
+    const [expandedRow, setExpandedRow] = useState(null);
+    const [empresasMap, setEmpresasMap] = useState({});
+
+    const resultadosRef = useRef(null);       
+
+    // PAGINAÇÃO LOCAL - Estado separado para filtro local
+    const [localPagination, setLocalPagination] = useState({
         current_page: 1,
         page_size: 10,
         total_records: 0,
@@ -51,18 +58,22 @@ const ConsultaFaturamento = () => {
         has_next: false,
         has_previous: false,
     });
-    const [termoPesquisa, setTermoPesquisa] = useState('');
-    const [expandedRow, setExpandedRow] = useState(null);
-    const [empresasMap, setEmpresasMap] = useState({});
 
-    console.log("resultados", resultados)
-
-    // Função para carregar uma página específica
+    // Função para carregar uma página específica do BACKEND
     const carregarPagina = async (pageNumber = 1) => {
         setLoading(true);
         setErro('');
         setTermoPesquisa('');
         setExpandedRow(null);
+        // Resetar paginação local quando buscar novos dados
+        setLocalPagination({
+            current_page: 1,
+            page_size: 10,
+            total_records: 0,
+            total_pages: 1,
+            has_next: false,
+            has_previous: false,
+        });
 
         try {
             // Filtrar campos vazios
@@ -93,7 +104,7 @@ const ConsultaFaturamento = () => {
                 const dados = response.resultado?.data || [];
                 setResultados(dados);
                 
-                // Atualizar informações de paginação
+                // Atualizar informações de paginação DO BACKEND
                 if (response.resultado?.pagination) {
                     setPagination(response.resultado.pagination);
                 } else {
@@ -134,10 +145,8 @@ const ConsultaFaturamento = () => {
         const carregarEmpresas = async () => {
             try {
                 const response = await getEmpresas();
-                console.log("response LOCAL", response);
                 if (response?.status === 'success') {
                     const empresasList = response.data || [];
-                    // setEmpresas(empresasList); // REMOVER ESTA LINHA
                     
                     // Criar mapa de código -> nome
                     const mapa = {};
@@ -158,7 +167,7 @@ const ConsultaFaturamento = () => {
         return empresasMap[codigo] || codigo || '-';
     };
 
-    // Funções de navegação de página
+    // Funções de navegação de página DO BACKEND
     const irParaProximaPagina = () => {
         if (pagination.has_next) {
             carregarPagina(pagination.current_page + 1);
@@ -177,12 +186,48 @@ const ConsultaFaturamento = () => {
         }
     };
 
+    // Funções de navegação de página LOCAL
+    const irParaProximaPaginaLocal = () => {
+        if (localPagination.has_next) {
+            setLocalPagination(prev => ({
+                ...prev,
+                current_page: prev.current_page + 1,
+            }));
+        }
+    };
+
+    const irParaPaginaAnteriorLocal = () => {
+        if (localPagination.has_previous) {
+            setLocalPagination(prev => ({
+                ...prev,
+                current_page: prev.current_page - 1,
+            }));
+        }
+    };
+
+    const irParaPaginaLocal = (pageNumber) => {
+        if (pageNumber >= 1 && pageNumber <= localPagination.total_pages) {
+            setLocalPagination(prev => ({
+                ...prev,
+                current_page: pageNumber,
+            }));
+        }
+    };
+
     const handleChangePageSize = (newSize) => {
         setPagination(prev => ({
             ...prev,
             page_size: parseInt(newSize),
         }));
         carregarPagina(1);
+    };
+
+    const handleChangeLocalPageSize = (newSize) => {
+        setLocalPagination(prev => ({
+            ...prev,
+            page_size: parseInt(newSize),
+            current_page: 1, // Resetar para primeira página ao mudar tamanho
+        }));
     };
 
     const handleChange = (e) => {
@@ -204,7 +249,15 @@ const ConsultaFaturamento = () => {
         setResultados([]);
         setPagination({
             current_page: 1,
-            page_size: 50,
+            page_size: 10,
+            total_records: 0,
+            total_pages: 1,
+            has_next: false,
+            has_previous: false,
+        });
+        setLocalPagination({
+            current_page: 1,
+            page_size: 10,
             total_records: 0,
             total_pages: 1,
             has_next: false,
@@ -215,140 +268,7 @@ const ConsultaFaturamento = () => {
         setExpandedRow(null);
     };
 
-    // Componente de controles de paginação
-    const PaginationControls = () => {
-        if (pagination.total_pages <= 1 || pagination.total_records === 0) return null;
-
-        const renderPageNumbers = () => {
-            const pages = [];
-            const maxVisible = 5;
-            let startPage = Math.max(1, pagination.current_page - Math.floor(maxVisible / 2));
-            let endPage = Math.min(pagination.total_pages, startPage + maxVisible - 1);
-
-            // Ajustar se não houver páginas suficientes no início
-            if (endPage - startPage + 1 < maxVisible) {
-                startPage = Math.max(1, endPage - maxVisible + 1);
-            }
-
-            // Primeira página
-            if (startPage > 1) {
-                pages.push(
-                    <button
-                        key="first"
-                        onClick={() => irParaPagina(1)}
-                        className="pagination-btn"
-                        title="Primeira página"
-                        disabled={loading}
-                    >
-                        1
-                    </button>
-                );
-                if (startPage > 2) {
-                    pages.push(<span key="ellipsis1" className="pagination-ellipsis">...</span>);
-                }
-            }
-
-            // Páginas do meio
-            for (let i = startPage; i <= endPage; i++) {
-                pages.push(
-                    <button
-                        key={i}
-                        onClick={() => irParaPagina(i)}
-                        className={`pagination-btn ${pagination.current_page === i ? 'active' : ''}`}
-                        disabled={loading}
-                    >
-                        {i}
-                    </button>
-                );
-            }
-
-            // Última página
-            if (endPage < pagination.total_pages) {
-                if (endPage < pagination.total_pages - 1) {
-                    pages.push(<span key="ellipsis2" className="pagination-ellipsis">...</span>);
-                }
-                pages.push(
-                    <button
-                        key="last"
-                        onClick={() => irParaPagina(pagination.total_pages)}
-                        className="pagination-btn"
-                        title="Última página"
-                        disabled={loading}
-                    >
-                        {pagination.total_pages}
-                    </button>
-                );
-            }
-
-            return pages;
-        };
-
-        return (
-        <div className="pagination-container">
-            
-            <div className="pagination-info">
-            Mostrando <strong>{(pagination.current_page - 1) * pagination.page_size + 1}</strong>
-            {' – '}
-            <strong>{Math.min(
-                pagination.current_page * pagination.page_size,
-                pagination.total_records
-            )}</strong>
-            {' de '}
-            <strong>{pagination.total_records}</strong> registros
-            </div>
-
-            <div className="pagination-controls">
-            <button
-                onClick={irParaPaginaAnterior}
-                disabled={!pagination.has_previous || loading}
-                className="pagination-btn nav"
-                title="Página anterior"
-            >
-                ‹
-            </button>
-
-            {renderPageNumbers()}
-
-            <button
-                onClick={irParaProximaPagina}
-                disabled={!pagination.has_next || loading}
-                className="pagination-btn nav"
-                title="Próxima página"
-            >
-                ›
-            </button>
-            </div>
-
-            {/* <div className="page-size-selector">
-            <span>Itens por página</span>
-            <select
-                value={pagination.page_size}
-                onChange={(e) => handleChangePageSize(e.target.value)}
-                disabled={loading}
-            >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-                <option value="200">200</option>
-            </select>
-            </div> */}
-
-        </div>
-        );
-
-    };
-
-    const formatarValor = (valor) => {
-        if (valor === null || valor === undefined || valor === '') return '-';
-        const num = Number(valor);
-        return isNaN(num) ? '-' : num.toLocaleString('pt-BR', { 
-            style: 'currency',
-            currency: 'BRL'
-        });
-    };
-
-    const formatarData = (dataString) => {
+        const formatarData = (dataString) => {
         if (!dataString) return '-';
         
         try {
@@ -378,6 +298,228 @@ const ConsultaFaturamento = () => {
         const inicio = formatarData(dataInicio);
         const fim = formatarData(dataFim);
         return `${inicio} até ${fim}`;
+    };
+
+    // Filtrar resultados com base no termo de pesquisa
+    const resultadosFiltrados = useMemo(() => {
+        if (!termoPesquisa.trim()) return resultados;
+
+        const termo = termoPesquisa.toLowerCase().trim();
+        
+        return resultados.filter(fatura => {
+            // Buscar em todos os campos importantes
+            const camposParaBuscar = [
+                fatura.APOLICE || '',
+                fatura.ADMINISTRADORA || '',
+                fatura.FATURA || '',
+                fatura.NOME_COBRADO || '',
+                fatura.CNPJ_COBRADO || '',
+                fatura.DOCUMENTO || '',
+                obterNomeCedente(fatura.CEDENTE) || '',
+                // Formatar datas para texto
+                formatarData(fatura.DATA_FAT),
+                formatarData(fatura.VENCIMENTO),
+                formatarVigencia(fatura.DT_INI_VIG, fatura.DT_FIM_VIG)
+            ].map(campo => campo?.toString().toLowerCase() || '');
+
+            return camposParaBuscar.some(campo => campo.includes(termo));
+        });
+    }, [resultados, termoPesquisa, empresasMap]);
+
+    // Atualizar paginação LOCAL quando os resultados filtrados mudam
+    useEffect(() => {
+        if (termoPesquisa.trim()) {
+            const totalLocal = resultadosFiltrados.length;
+            const pageSize = localPagination.page_size;
+            const totalPages = Math.max(1, Math.ceil(totalLocal / pageSize));
+            
+            // Ajustar página atual se necessário
+            let currentPage = localPagination.current_page;
+            if (currentPage > totalPages) {
+                currentPage = 1;
+            }
+            
+            setLocalPagination(prev => ({
+                ...prev,
+                current_page: currentPage,
+                total_records: totalLocal,
+                total_pages: totalPages,
+                has_next: currentPage < totalPages,
+                has_previous: currentPage > 1,
+            }));
+        } else {
+            // Sem filtro local, resetar paginação local
+            setLocalPagination({
+                current_page: 1,
+                page_size: 10,
+                total_records: 0,
+                total_pages: 1,
+                has_next: false,
+                has_previous: false,
+            });
+        }
+    }, [resultadosFiltrados, termoPesquisa]);
+
+    // Obter resultados paginados (com base no filtro local se ativo)
+    const resultadosPaginados = useMemo(() => {
+        if (!termoPesquisa.trim()) {
+            // Sem filtro local, mostrar resultados completos (já paginados pelo backend)
+            return resultados;
+        }
+        
+        // Com filtro local, aplicar paginação local
+        const startIndex = (localPagination.current_page - 1) * localPagination.page_size;
+        const endIndex = startIndex + localPagination.page_size;
+        
+        return resultadosFiltrados.slice(startIndex, endIndex);
+    }, [resultados, resultadosFiltrados, termoPesquisa, localPagination]);
+
+    // Componente de controles de paginação
+    const PaginationControls = () => {
+        // Decidir qual paginação mostrar
+        const usandoFiltroLocal = termoPesquisa.trim() !== '';
+        const paginationAtual = usandoFiltroLocal ? localPagination : pagination;
+        const totalRecords = paginationAtual.total_records;
+        
+        if (totalRecords === 0 || paginationAtual.total_pages <= 1) return null;
+
+        const renderPageNumbers = () => {
+            const pages = [];
+            const maxVisible = 5;
+            let startPage = Math.max(1, paginationAtual.current_page - Math.floor(maxVisible / 2));
+            let endPage = Math.min(paginationAtual.total_pages, startPage + maxVisible - 1);
+
+            // Ajustar se não houver páginas suficientes no início
+            if (endPage - startPage + 1 < maxVisible) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+
+            // Primeira página
+            if (startPage > 1) {
+                pages.push(
+                    <button
+                        key="first"
+                        onClick={() => usandoFiltroLocal ? irParaPaginaLocal(1) : irParaPagina(1)}
+                        className="pagination-btn"
+                        title="Primeira página"
+                        disabled={loading}
+                    >
+                        1
+                    </button>
+                );
+                if (startPage > 2) {
+                    pages.push(<span key="ellipsis1" className="pagination-ellipsis">...</span>);
+                }
+            }
+
+            // Páginas do meio
+            for (let i = startPage; i <= endPage; i++) {
+                pages.push(
+                    <button
+                        key={i}
+                        onClick={() => usandoFiltroLocal ? irParaPaginaLocal(i) : irParaPagina(i)}
+                        className={`pagination-btn ${paginationAtual.current_page === i ? 'active' : ''}`}
+                        disabled={loading}
+                    >
+                        {i}
+                    </button>
+                );
+            }
+
+            // Última página
+            if (endPage < paginationAtual.total_pages) {
+                if (endPage < paginationAtual.total_pages - 1) {
+                    pages.push(<span key="ellipsis2" className="pagination-ellipsis">...</span>);
+                }
+                pages.push(
+                    <button
+                        key="last"
+                        onClick={() => usandoFiltroLocal ? irParaPaginaLocal(paginationAtual.total_pages) : irParaPagina(paginationAtual.total_pages)}
+                        className="pagination-btn"
+                        title="Última página"
+                        disabled={loading}
+                    >
+                        {paginationAtual.total_pages}
+                    </button>
+                );
+            }
+
+            return pages;
+        };
+
+        return (
+            <div className="pagination-container">
+                <div className="pagination-info">
+                    {usandoFiltroLocal ? (
+                        <>
+                            Mostrando <strong>{(localPagination.current_page - 1) * localPagination.page_size + 1}</strong>
+                            {' – '}
+                            <strong>{Math.min(localPagination.current_page * localPagination.page_size, localPagination.total_records)}</strong>
+                            {' de '}
+                            <strong>{localPagination.total_records}</strong> registros filtrados
+                            <br />
+                            <small className="text-muted">
+                                (Total: {pagination.total_records} registros da consulta)
+                            </small>
+                        </>
+                    ) : (
+                        <>
+                            Mostrando <strong>{(pagination.current_page - 1) * pagination.page_size + 1}</strong>
+                            {' – '}
+                            <strong>{Math.min(pagination.current_page * pagination.page_size, pagination.total_records)}</strong>
+                            {' de '}
+                            <strong>{pagination.total_records}</strong> registros
+                        </>
+                    )}
+                </div>
+
+                <div className="pagination-controls">
+                    <button
+                        onClick={usandoFiltroLocal ? irParaPaginaAnteriorLocal : irParaPaginaAnterior}
+                        disabled={usandoFiltroLocal ? !localPagination.has_previous : !pagination.has_previous || loading}
+                        className="pagination-btn nav"
+                        title="Página anterior"
+                    >
+                        ‹
+                    </button>
+
+                    {renderPageNumbers()}
+
+                    <button
+                        onClick={usandoFiltroLocal ? irParaProximaPaginaLocal : irParaProximaPagina}
+                        disabled={usandoFiltroLocal ? !localPagination.has_next : !pagination.has_next || loading}
+                        className="pagination-btn nav"
+                        title="Próxima página"
+                    >
+                        ›
+                    </button>
+                </div>
+
+                {/* <div className="page-size-selector">
+                    <span>Itens por página:</span>
+                    <select
+                        value={usandoFiltroLocal ? localPagination.page_size : pagination.page_size}
+                        onChange={(e) => usandoFiltroLocal ? handleChangeLocalPageSize(e.target.value) : handleChangePageSize(e.target.value)}
+                        disabled={loading}
+                    >
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div> */}
+            </div>
+        );
+    };
+
+    const formatarValor = (valor) => {
+        if (valor === null || valor === undefined || valor === '') return '-';
+        const num = Number(valor);
+        return isNaN(num) ? '-' : num.toLocaleString('pt-BR', { 
+            style: 'currency',
+            currency: 'BRL'
+        });
     };
 
     const renderStatusBadge = (status, quitado) => {
@@ -416,32 +558,6 @@ const ConsultaFaturamento = () => {
         }
     };
 
-    // Filtrar resultados com base no termo de pesquisa
-    const resultadosFiltrados = useMemo(() => {
-        if (!termoPesquisa.trim()) return resultados;
-
-        const termo = termoPesquisa.toLowerCase().trim();
-        
-        return resultados.filter(fatura => {
-            // Buscar em todos os campos importantes
-            const camposParaBuscar = [
-                fatura.APOLICE || '',
-                fatura.ADMINISTRADORA || '',
-                fatura.FATURA || '',
-                fatura.NOME_COBRADO || '',
-                fatura.CNPJ_COBRADO || '',
-                fatura.DOCUMENTO || '',
-                obterNomeCedente(fatura.CEDENTE) || '',
-                // Formatar datas para texto
-                formatarData(fatura.DATA_FAT),
-                formatarData(fatura.VENCIMENTO),
-                formatarVigencia(fatura.DT_INI_VIG, fatura.DT_FIM_VIG)
-            ].map(campo => campo?.toString().toLowerCase() || '');
-
-            return camposParaBuscar.some(campo => campo.includes(termo));
-        });
-    }, [resultados, termoPesquisa, empresasMap]);
-
     // Contar filtros ativos
     const filtrosAtivos = Object.values(formData).filter(
         valor => valor && valor.toString().trim() !== ''
@@ -462,10 +578,8 @@ const ConsultaFaturamento = () => {
                     .filter(([_, value]) => value && value.toString().trim() !== '')
             );
             
-            // Chamar função de exportação
+            // Chamar função de exportação (sempre exporta do banco)
             await exportarFaturasParaExcel(filtrosAtivos);
-            
-            console.log('Exportação concluída com sucesso!');
             
         } catch (error) {
             console.error('Erro na exportação:', error);
@@ -493,6 +607,15 @@ const ConsultaFaturamento = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (!loading && resultados.length > 0 && resultadosRef.current) {
+            resultadosRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    }, [loading, resultados]);
 
     return (
         <div className="consulta-fatura-container">
@@ -592,12 +715,18 @@ const ConsultaFaturamento = () => {
             {erro && <div className="erro-msg">{erro}</div>}
 
             {resultados.length > 0 ? (
-                <div className="resultado-fatura">
+                <div className="resultado-fatura" ref={resultadosRef}>
                     <div className="resultados-header">
                         <h3 className='title-consulta'>
                             <i className="bi-list-check"></i> Resultados
                             <span className="ms-2 total-badge">
-                                {pagination.total_records} {pagination.total_records === 1 ? 'registro' : 'registros'}
+                                {termoPesquisa.trim() ? localPagination.total_records : pagination.total_records} 
+                                {' '}
+                                {termoPesquisa.trim() ? 
+                                    (localPagination.total_records === 1 ? 'registro filtrado' : 'registros filtrados') : 
+                                    (pagination.total_records === 1 ? 'registro' : 'registros')
+                                }
+                                {termoPesquisa.trim() && ` (de ${pagination.total_records})`}
                             </span>
                         </h3>
                         
@@ -608,11 +737,18 @@ const ConsultaFaturamento = () => {
                                     {filtrosAtivos} filtro(s) ativo(s)
                                 </small>
                             )}
+                            {termoPesquisa.trim() && (
+                                <small className="filtro-local-info">
+                                    <i className="bi-search"></i>
+                                    Filtro local ativo
+                                </small>
+                            )}
                             <div className="export-buttons">
                                 <button 
                                     className="btn btn-success btn-sm ms-2"
                                     onClick={exportarParaExcel}
                                     disabled={resultados.length === 0 || loading}
+                                    title="Exportar dados do banco (ignora filtro local)"
                                 >
                                     <i className="bi-file-excel me-1"></i> Excel
                                 </button>
@@ -620,13 +756,13 @@ const ConsultaFaturamento = () => {
                                     className="btn btn-danger btn-sm ms-2"
                                     onClick={exportarParaPDF}
                                     disabled={resultados.length === 0 || loading}
+                                    title="Exportar dados do banco (ignora filtro local)"
                                 >
                                     <i className="bi-file-pdf me-1"></i> PDF
                                 </button>
                             </div>
                         </div>
                     </div>
-                    
                     
                     {/* Barra de pesquisa nos resultados */}
                     <div className="barra-pesquisa-wrapper">
@@ -638,15 +774,32 @@ const ConsultaFaturamento = () => {
                                 <input
                                     type="text"
                                     className="form-control pesquisa-input"
-                                    placeholder="Pesquisar por fatura, apólice, tomador, CNPJ..."
+                                    placeholder="Filtrar resultados localmente..."
                                     value={termoPesquisa}
-                                    onChange={(e) => setTermoPesquisa(e.target.value)}
+                                    onChange={(e) => {
+                                        setTermoPesquisa(e.target.value);
+                                        // Resetar para página 1 ao começar a pesquisar
+                                        if (e.target.value.trim() && !termoPesquisa.trim()) {
+                                            setLocalPagination(prev => ({ ...prev, current_page: 1 }));
+                                        }
+                                    }}
                                     disabled={loading || resultados.length === 0}
                                 />
                                 {termoPesquisa && (
                                     <button 
                                         className="btn-limpar-pesquisa"
-                                        onClick={() => setTermoPesquisa('')}
+                                        onClick={() => {
+                                            setTermoPesquisa('');
+                                            // Resetar paginação local ao limpar filtro
+                                            setLocalPagination({
+                                                current_page: 1,
+                                                page_size: 10,
+                                                total_records: 0,
+                                                total_pages: 1,
+                                                has_next: false,
+                                                has_previous: false,
+                                            });
+                                        }}
                                         type="button"
                                         disabled={loading}
                                     >
@@ -654,16 +807,20 @@ const ConsultaFaturamento = () => {
                                     </button>
                                 )}
                             </div>
-                            {termoPesquisa && resultadosFiltrados.length > 0 && (
+                            {termoPesquisa && (
                                 <div className="info-pesquisa">
-                                    <i className="bi-info-circle me-1"></i>
-                                    Mostrando {resultadosFiltrados.length} de {resultados.length} registros
-                                </div>
-                            )}
-                            {termoPesquisa && resultadosFiltrados.length === 0 && (
-                                <div className="info-pesquisa sem-resultados">
-                                    <i className="bi-exclamation-circle me-1"></i>
-                                    Nenhum resultado encontrado para "{termoPesquisa}"
+                                    {resultadosFiltrados.length > 0 ? (
+                                        <>
+                                            <i className="bi-info-circle me-1"></i>
+                                            Mostrando {resultadosFiltrados.length} de {resultados.length} registros
+                                            {resultadosFiltrados.length < resultados.length && ' (filtrados localmente)'}
+                                        </>
+                                    ) : (
+                                        <div className="sem-resultados">
+                                            <i className="bi-exclamation-circle me-1"></i>
+                                            Nenhum resultado encontrado para "{termoPesquisa}"
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -684,7 +841,7 @@ const ConsultaFaturamento = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {resultadosFiltrados.map((fatura, index) => {
+                                {resultadosPaginados.map((fatura, index) => {
                                     const vencimentoInfo = verificarVencimento(fatura.VENCIMENTO);
                                     const isExpanded = expandedRow === index;
                                     
@@ -721,7 +878,7 @@ const ConsultaFaturamento = () => {
                                                 <tr className="expanded-details">
                                                     <td colSpan="8">
                                                         <div className="expansion-content">
-                                                            <div className="row g-3"> {/* Adicionar espaçamento */}
+                                                            <div className="row g-3">
                                                                 <div className="col-lg-6 col-md-12">
                                                                     <h6 className="section-title">
                                                                         <i className="bi-file-text me-2"></i>Informações da Fatura

@@ -1108,3 +1108,103 @@
 .pt-3 {
     padding-top: 1rem !important;
 }
+
+
+/* Adicione ao seu CSS existente */
+
+/* Indicador de filtro local */
+.filtro-local-info {
+    color: #2463eb;
+    background-color: #e8f0fe;
+    border: 1px solid #c2d6ff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filtro-local-info i {
+    color: #2463eb;
+}
+
+/* Texto informativo */
+.text-muted {
+    color: #6c757d !important;
+    font-size: 0.8rem;
+}
+
+/* Ajuste no badge total */
+.total-badge {
+    font-size: 0.85rem;
+}
+
+/* Melhorar a indicação de paginação local */
+.pagination-info small {
+    display: block;
+    margin-top: 2px;
+}
+
+/* Responsividade para paginação */
+@media (max-width: 992px) {
+    .pagination-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .pagination-info, 
+    .pagination-controls, 
+    .page-size-selector {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+/* Estilo para mensagem de exportação */
+.btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 5px;
+}
+
+.btn {
+    position: relative;
+}
+
+/* Ajuste na tabela para linha expandida */
+.expansion-content {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Melhorar a responsividade da barra de pesquisa */
+@media (max-width: 768px) {
+    .barra-pesquisa-resultados {
+        min-width: 100%;
+    }
+    
+    .pesquisa-input {
+        min-width: 100%;
+    }
+    
+    .total-info {
+        flex-wrap: wrap;
+    }
+    
+    .filtro-local-info,
+    .filtros-ativos {
+        margin-bottom: 5px;
+    }
+}
