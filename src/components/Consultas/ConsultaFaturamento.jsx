@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import "../styles/ConsultaFaturamento.css";
 import { exportarFaturasParaExcel, exportarFaturasParaPDF, getFaturasComBoletos } from '../../services/consultaFatura';
 import { getEmpresas } from '../../services/empresasService';
+import Loading from '../Loading/Loading';
 
 function traduzirErroApi(mensagem) {
     if (!mensagem) return "Erro inesperado. Por favor, tente novamente.";
@@ -618,6 +619,7 @@ const ConsultaFaturamento = () => {
     }, [loading, resultados]);
 
     return (
+        <>
         <div className="consulta-fatura-container">
             <h1 className="consultas-title">
                 <i className="bi-clipboard-data"></i> Consulta de Faturamento
@@ -971,23 +973,24 @@ const ConsultaFaturamento = () => {
                     
                     <PaginationControls />
                 </div>
-            ) : !loading && !erro && resultados.length === 0 && (
-                <div className="nenhum-resultado">
-                    <div className="icone-vazio">
-                        <i className="bi-search"></i>
-                    </div>
-                    <h5>Nenhuma consulta realizada</h5>
-                    <p>Preencha os filtros e clique em "Consultar" para buscar faturas</p>
-                </div>
-            )}
-
-            {loading && (
-                <div className="loading-container">
-                    <div className="spinner"></div>
-                    <p>Buscando faturas com boletos...</p>
-                </div>
-            )}
+            ) : !loading && !erro && resultados.length === 0 && ( ""
+                // <div className="nenhum-resultado">
+                //     <div className="icone-vazio">
+                //         <i className="bi-search"></i>
+                //     </div>
+                //     <h5>Nenhuma consulta realizada</h5>
+                //     <p>Preencha os filtros e clique em "Consultar" para buscar faturas</p>
+                // </div>
+            )}  
         </div>
+        {loading && (
+            <Loading 
+                fullScreen 
+                message="Buscando faturas..."
+                size="large"
+            />
+        )}
+        </>
     );
 };
 
