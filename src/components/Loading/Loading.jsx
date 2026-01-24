@@ -15,9 +15,9 @@ const Loading = ({
   if (fullScreen) {
     return (
       <div className="loading-overlay">
-        <div className="loading-container">
+        <div className="loading-wrapper">
           <LoadingSpinner />
-          {message && <p className="loading-message">{message}</p>}
+          {message && <p className="loading-output">{message}</p>}
         </div>
       </div>
     );

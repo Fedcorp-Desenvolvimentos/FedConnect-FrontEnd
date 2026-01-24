@@ -14,13 +14,11 @@
   z-index: 9999;
 }
 
-.loading-container {
+.loading-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  min-height: 100%;
   text-align: center;
 }
 
@@ -59,7 +57,7 @@
   border-width: 5px;
 }
 
-.loading-message {
+.loading-output {
   color: #374151; /* Cinza escuro */
   font-size: 0.875rem;
   font-weight: 500;
