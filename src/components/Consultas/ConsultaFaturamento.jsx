@@ -543,19 +543,31 @@ const ConsultaFaturamento = () => {
     const verificarVencimento = (vencimento) => {
         if (!vencimento) return { status: 'desconhecido', label: 'Data inválida' };
         
-        const hoje = new Date();
-        hoje.setHours(0, 0, 0, 0);
-        const dataVenc = new Date(vencimento);
-        dataVenc.setHours(0, 0, 0, 0);
-        
-        if (dataVenc < hoje) {
-            return { status: 'vencido', label: 'Vencido' };
-        } else if (dataVenc.getTime() === hoje.getTime()) {
-            return { status: 'hoje', label: 'Vence hoje' };
-        } else {
-            const diffTime = dataVenc - hoje;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return { status: 'pendente', label: `Vence em ${diffDays} dias` };
+        try {
+            // Criar data de HOJE (meia-noite local)
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            
+            // Dividir a string da data (formato YYYY-MM-DD)
+            const [ano, mes, dia] = vencimento.split('-').map(Number);
+            
+            // Criar data de vencimento (meia-noite local)
+            const dataVenc = new Date(ano, mes - 1, dia, 0, 0, 0, 0);
+            
+            // Comparar as datas
+            if (dataVenc < hoje) {
+                return { status: 'vencido', label: 'Vencido' };
+            } else if (dataVenc.getTime() === hoje.getTime()) {
+                return { status: 'hoje', label: 'Vence hoje' };
+            } else {
+                const diffTime = dataVenc - hoje;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return { status: 'pendente', label: `Vence em ${diffDays} dias` };
+            }
+            
+        } catch (error) {
+            console.error('Erro ao processar data de vencimento:', error);
+            return { status: 'desconhecido', label: 'Data inválida' };
         }
     };
 
