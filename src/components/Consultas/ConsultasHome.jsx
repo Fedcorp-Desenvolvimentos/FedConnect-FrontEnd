@@ -9,7 +9,7 @@ const consultas = [
         icon: <i className="bi bi-person-fill" />,
         title: "Dados Pessoais",
         desc: "Informações sobre pessoas registradas na Receita Federal, incluindo CPF, nome, filiação e data de nascimento.",
-        to: "/consulta-pf",
+        to: "/consultas/consulta-pf",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     },
     {
@@ -17,7 +17,7 @@ const consultas = [
         icon: <i className="bi bi-building-fill" />,
         title: "Dados Empresariais",
         desc: "Informações sobre empresas registradas, como razão social, CNPJ, e situação cadastral.",
-        to: "/consulta-cnpj",
+        to: "/consultas/consulta-cnpj",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     },
     {
@@ -25,7 +25,7 @@ const consultas = [
         icon: <i className="bi bi-geo-alt-fill" />,
         title: "Endereços",
         desc: "Informações detalhadas sobre logradouros, CEPs, cidades e estados.",
-        to: "/consulta-end",
+        to: "/consultas/consulta-end",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     },
     {
@@ -33,7 +33,7 @@ const consultas = [
         icon:<i className="bi bi-shield-check" />,
         title: "Consulta Segurados",
         desc: "Localize informações sobre segurados com base nos registros disponíveis.",
-        to: "/consulta-segurados",
+        to: "/consultas/consulta-segurados",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     },
     {
@@ -41,7 +41,7 @@ const consultas = [
         icon: <i class="bi bi-file-earmark-text"></i>,
         title: "Consultar Faturas",
         desc: "Localize informações sobre faturamento com base nos registros disponíveis.",
-        to: "/consulta-faturas",
+        to: "/consultas/consulta-faturas",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     },
     {
@@ -49,7 +49,7 @@ const consultas = [
         icon: <i class="bi bi-file-earmark-text"></i>,
         title: "Consultar Faturamento",
         desc: "Consulte faturamento de maneira detalhada com parâmetros de pesquisa..",
-        to: "/consulta-faturamento",
+        to: "/consultas/consulta-faturamento",
         niveis: ["admin", "usuario", "comercial", "ti"],
     },
     

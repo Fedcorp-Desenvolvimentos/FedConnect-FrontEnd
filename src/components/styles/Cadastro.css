@@ -1,6 +1,5 @@
 
 .cadastro-container {
-  padding-left: 260px;
   min-height: 100vh;
   background: #f8fafc;
   box-sizing: border-box;
@@ -25,7 +24,7 @@
   display: flex;
   gap: 2.3rem;
   max-width: 930px;
-  margin-left: calc(260px + (100vw - 260px - 930px)/2); 
+  margin-left: calc(200px + (100vw - 260px - 930px)/2); 
   margin-right: auto;
 }
 
@@ -242,10 +241,8 @@
 
 @media (max-width: 600px) {
   .cadastro-container {
-    padding: 0.3rem 0.1rem 0 0.1rem;
     min-height: 100vh;
     background: #f8fafc;
-    margin-left: 1.5rem;
   }
   .cadastro-title {
     font-size: 1.15rem;
@@ -308,7 +305,7 @@
 
 @media (min-width: 1800px) {
   .cadastro-container {
-    margin-left: 3vw;
+    margin-left: 0vw;
     
   }
   .cadastro-layout {
@@ -356,10 +353,8 @@
 
 @media (max-width: 600px) {
   .cadastro-container {
-    padding: 0.3rem 0.1rem 0 0.1rem;
     min-height: 100vh;
     background: #f8fafc;
-    margin-left: 1.5rem;
   }
   .cadastro-title {
     font-size: 1.15rem;

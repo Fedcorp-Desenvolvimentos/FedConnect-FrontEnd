@@ -1,5 +1,6 @@
 .agenda-sala-page {
-    padding: 2rem 1rem 1rem 240px;
+    /* padding: 2rem 1rem 1rem 240px; */
+    padding: 20px;
     background: #f7fafc;
     min-height: 100vh;
     
@@ -463,16 +464,8 @@
 }
 
 
-
-@media (max-width: 900px) {
-    .agenda-sala-page {
-        padding-left: 18px;
-    }
-}
-
 @media (max-width: 600px) {
   .agenda-sala-page {
-    padding: 1rem 3vw 1.5rem 3vw !important;
     min-height: 100vh;
     box-sizing: border-box;
   }

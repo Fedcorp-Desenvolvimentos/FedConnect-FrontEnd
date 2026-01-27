@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar/Navbar';
+import Breadcrumb from '../components/Breadcrumb/Breadcrumb';
 import { Outlet } from 'react-router-dom';
+import '../components/styles/DashboardLayout.css';
 
 const DashboardLayout = () => {
-  // Sidebar começa aberta no desktop, fechada no mobile
-  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 650);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
 
-  // Atualiza quando a tela muda de tamanho
   useEffect(() => {
     function handleResize() {
-      setSidebarOpen(window.innerWidth > 650);
+      setSidebarOpen(window.innerWidth > 768);
     }
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -18,8 +18,15 @@ const DashboardLayout = () => {
   return (
     <div className="dashboard-layout">
       <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      <div className={`dashboard-content${sidebarOpen ? ' with-sidebar' : ''}`}>
-        <Outlet context={{ withSidebar: sidebarOpen }} />
+      <div className="dashboard-main">
+        <div className={`dashboard-content${sidebarOpen ? ' with-sidebar' : ''}`}>
+          <Breadcrumb sidebarOpen={sidebarOpen} />
+          <div className="content-wrapper">
+            <div className="page-content">
+              <Outlet context={{ withSidebar: sidebarOpen }} />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

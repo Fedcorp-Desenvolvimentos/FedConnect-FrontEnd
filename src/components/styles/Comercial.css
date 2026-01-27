@@ -5,11 +5,10 @@
   min-height: 100vh;
   background: #fff;
   box-sizing: border-box;
-  padding: 2rem 2rem 2rem 240px;
+  padding: 20px;
 }
 
 .comercial-page.with-sidebar {
-  padding-left: 240px;
   align-items: center;
 }
 

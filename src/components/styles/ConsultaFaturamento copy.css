@@ -919,6 +919,7 @@
 /* Ajuste para sidebar */
 @media (min-width: 651px) {
     .consulta-fatura-container {
+        width: calc(100% - 220px);
         transition: margin-left 0.2s ease;
     }
     

@@ -77,15 +77,15 @@ function AppRoutes() {
           <Route element={<DashboardLayout />}>
             <Route path="/home" element={<Home />} />
             <Route path="/consultas" element={<ConsultasHome />} />
-            <Route path="/consulta-pf" element={<ConsultaPF />} />
-            <Route path="/consulta-end" element={<ConsultaEnd />} />
-            <Route path="/consulta-cnpj" element={<ConsultaCNPJ />} />
+            <Route path="/consultas/consulta-pf" element={<ConsultaPF />} />
+            <Route path="/consultas/consulta-end" element={<ConsultaEnd />} />
+            <Route path="/consultas/consulta-cnpj" element={<ConsultaCNPJ />} />
             <Route path="/consulta-comercial" element={<Comercial />} />
-            <Route path="/comercial-regiao" element={<BuscaRegiao />} />
-            <Route path="/consulta-segurados" element={<Segurados />} />
-            <Route path="/consulta-faturas" element={<ConsultaFat />} />
-            <Route path="/consulta-faturamento" element={<ConsultaFaturamento />} />
-            <Route path="/consulta-detalhes/:id" element={<ConsultaDetalhe />} />
+            <Route path="/consultas/comercial-regiao" element={<BuscaRegiao />} />
+            <Route path="/consultas/consulta-segurados" element={<Segurados />} />
+            <Route path="/consultas/consulta-faturas" element={<ConsultaFat />} />
+            <Route path="/consultas/consulta-faturamento" element={<ConsultaFaturamento />} />
+            <Route path="/consultas/consulta-detalhes/:id" element={<ConsultaDetalhe />} />
             <Route path="/conta" element={<Conta />} />
             <Route path="/config" element={<Config />} />
             <Route path="/cadastro" element={<Cadastro />} />

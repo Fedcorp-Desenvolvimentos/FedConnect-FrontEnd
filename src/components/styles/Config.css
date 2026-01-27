@@ -1,5 +1,4 @@
 .config-container {
-  padding-left: 80px; 
   min-height: 100vh;
   background: #f8fafc;
   box-sizing: border-box;
@@ -291,7 +290,6 @@
 @media (max-width: 700px) {
   .config-container {
     padding: 0.9rem 0.1rem 0 0.1rem;
-    margin-left: 4rem;
     min-width: 0;
     box-sizing: border-box;
   }

@@ -1,5 +1,4 @@
 .historico-container {
-  padding-left: 220px;
   padding-top: 10px;
   min-height: 100vh;
   max-width: 1200px;
@@ -324,7 +323,6 @@
   .input-pesquisa {
     width: 70vw !important;
     max-width: 99vw;
-    margin-left: 2rem;
     font-size: 0.96rem;
     border-radius: 7px;
     padding: 0.49rem 0.66rem;
@@ -362,7 +360,6 @@
 }
 
 .historico-container {
-  padding-left: calc(var(--sidebar-width) + 24px);
   padding-right: 24px;
   max-width: 1400px;   
   margin: 0 auto;
@@ -371,14 +368,12 @@
 @media (min-width: 1440px) {
   .historico-container {
     max-width: 1600px;
-    padding-left: calc(var(--sidebar-width) + 32px);
     padding-right: 32px;
   }
 }
 
 @media (max-width: 1024px) {
   .historico-container {
-    padding-left: 16px;
     padding-right: 16px;
     max-width: 100vw;
   }

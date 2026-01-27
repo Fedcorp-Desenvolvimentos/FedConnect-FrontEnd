@@ -1,9 +1,5 @@
 .home-grid {
- min-height: 100vh;
-  box-sizing: border-box;
-  margin-top: 1rem;
-  margin-left: 240px; 
-  transition: margin-left 0.2s;
+  min-height: 100vh;
 }
 
 .container02 {
@@ -108,7 +104,6 @@
 /* DESKTOP GRANDE: Sidebar fixa */
 @media (min-width: 1500px) {
   .home-grid {
-    margin-left: 18vw;  
     margin-right: 0;
     padding-left: 0;
   }
@@ -121,7 +116,6 @@
 
 @media (min-width: 1200px) and (max-width: 1499px) {
   .home-grid {
-    margin-left: 17w;   
     margin-right: 0;
     padding-left: 0;
   }
