@@ -193,7 +193,7 @@ const EnvioEmail = () => {
     };
 
     return (
-        <div className="consulta-container03">
+        <div className="consulta-container">
             <h1 className="email-title">
                 <i className="bi bi-envelope-fill"></i> Escolha a opção desejada
             </h1>

@@ -449,7 +449,7 @@ const ConsultaCNPJ = () => {
   };
 
   return (
-    <div className="consulta-container03">
+    <div className="consulta-container">
       {showPopup && (
         <div className="popup-copiado">
           <FiCheck style={{ marginRight: 8 }} />

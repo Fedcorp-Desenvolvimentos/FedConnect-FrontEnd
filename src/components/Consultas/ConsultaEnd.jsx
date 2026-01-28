@@ -369,7 +369,7 @@ const ConsultaEnd = () => {
   }
 
   return (
-    <div className="consulta-container03">
+    <div className="consulta-container">
       <h1 className="consultas-title">
         <i className="bi-clipboard-data"></i> Consultas Disponíveis
       </h1>

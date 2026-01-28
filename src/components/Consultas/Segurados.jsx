@@ -512,7 +512,7 @@ const ConsultaSegurado = () => {
   }, [resultado]);
 
   return (
-    <div className="consulta-container04">
+    <div className="consulta-container">
       <h1 className="consultas-title">
         <i className="bi-clipboard-data"></i> Consultas Disponíveis
       </h1>

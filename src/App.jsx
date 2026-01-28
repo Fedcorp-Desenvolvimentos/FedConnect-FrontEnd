@@ -51,6 +51,7 @@ import { LoadingProvider, useLoading } from './context/LoadingContext';
 import LoadingSpinner from './components/LoadingSpinner';
 import ConsultaDetalhe from './components/Detalhes/ConsultaDetalhe';
 import ConsultaFaturamento from './components/Consultas/ConsultaFaturamento';
+import ScrollToTop from './utils/scrolltop';
 
 // Teste
 
@@ -120,6 +121,7 @@ function App() {
     <Router>
       <AuthProvider>
         <LoadingProvider>
+          <ScrollToTop />
           <AppRoutes />
         </LoadingProvider>
       </AuthProvider>
