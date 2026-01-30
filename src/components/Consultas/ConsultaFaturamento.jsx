@@ -26,6 +26,7 @@ function traduzirErroApi(mensagem) {
 
 const ConsultaFaturamento = () => {
     const [formData, setFormData] = useState({
+        fatura: '',
         apolice: '',
         administradora: '',
         data_ini: '',
@@ -47,6 +48,8 @@ const ConsultaFaturamento = () => {
     const [termoPesquisa, setTermoPesquisa] = useState('');
     const [expandedRow, setExpandedRow] = useState(null);
     const [empresasMap, setEmpresasMap] = useState({});
+
+    console.log("resultados", resultados)
 
     const resultadosRef = useRef(null);       
 
@@ -310,6 +313,7 @@ const ConsultaFaturamento = () => {
         return resultados.filter(fatura => {
             // Buscar em todos os campos importantes
             const camposParaBuscar = [
+                fatura.FATURA || '',
                 fatura.APOLICE || '',
                 fatura.ADMINISTRADORA || '',
                 fatura.FATURA || '',
@@ -639,6 +643,18 @@ const ConsultaFaturamento = () => {
             
             <form className="form-fatura" onSubmit={carregarFaturas}>
                 <div className="filtros-principais">
+                    <div className="form-group">
+                        <label htmlFor="fatura">Fatura:</label>
+                        <input
+                            type="text"
+                            id="fatura"
+                            name="fatura"
+                            value={formData.fatura}
+                            onChange={handleChange}
+                            placeholder="Número da fatura"
+                            className="form-control"
+                        />
+                    </div>
                     <div className="form-group">
                         <label htmlFor="apolice">Apólice:</label>
                         <input
