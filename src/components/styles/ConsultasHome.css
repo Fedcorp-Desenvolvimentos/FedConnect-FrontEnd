@@ -26,17 +26,16 @@
   margin-bottom: 2.5rem;
   color: #2463eb;
   text-align: center;
-  
 }
 
 .cards-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); 
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.4rem 1.4rem;
   justify-items: center;
   align-items: stretch;
   width: 100%;
-  max-width: 1100px;     
+  max-width: 1100px;
   margin: 0 auto;
 }
 
@@ -48,12 +47,12 @@
   width: 100%;
   max-width: 350px;
   text-align: center;
-  transition: box-shadow .2s, transform .15s;
+  transition: box-shadow 0.2s, transform 0.15s;
   border: 1.5px solid #d8dde6;
 }
 
 .card:hover {
-  box-shadow: 0 8px 28px rgba(44,99,255,0.16);
+  box-shadow: 0 8px 28px rgba(44, 99, 255, 0.16);
   transform: translateY(-4px) scale(1.02);
 }
 
@@ -67,7 +66,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 3px 16px rgba(33,102,227,0.15);
+  box-shadow: 0 3px 16px rgba(33, 102, 227, 0.15);
 }
 
 .card h2 {
@@ -93,12 +92,31 @@
   padding: 0.75rem 1rem;
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 0 1px 5px rgba(44,99,255,0.08);
+  box-shadow: 0 1px 5px rgba(44, 99, 255, 0.08);
   transition: background 0.18s;
 }
 
 .btn-primary:hover {
   background: #1747b0;
+}
+
+/* DESKTOP GRANDE (ex: 1920x1080): centraliza de verdade e remove o "empurrão" do margin-right */
+@media (min-width: 1800px) {
+  .container02 {
+    max-width: 1400px;
+    margin: 0 auto !important;
+  }
+
+  .home-grid {
+    margin-right: 0;
+    padding-left: 0;
+  }
+
+  .cards-container {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 1250px;
+    margin: 0 auto;
+  }
 }
 
 /* DESKTOP GRANDE: Sidebar fixa */
@@ -107,10 +125,16 @@
     margin-right: 0;
     padding-left: 0;
   }
+
   .cards-container {
     grid-template-columns: repeat(3, 1fr);
     max-width: 1200px;
     margin: 0 auto;
+  }
+
+  /* garante que não fique desalinhado por causa do margin-right fixo */
+  .container02 {
+    margin: 0 auto !important;
   }
 }
 
@@ -119,10 +143,15 @@
     margin-right: 0;
     padding-left: 0;
   }
+
   .cards-container {
     grid-template-columns: repeat(3, 1fr);
     max-width: 1050px;
     margin: 0 auto;
+  }
+
+  .container02 {
+    margin: 0 auto !important;
   }
 }
 
@@ -132,10 +161,15 @@
     margin-right: 0;
     padding-left: 0;
   }
+
   .cards-container {
     grid-template-columns: repeat(3, 1fr);
     max-width: 700px;
     margin: 0 auto;
+  }
+
+  .container02 {
+    margin: 0 auto !important;
   }
 }
 
@@ -145,10 +179,29 @@
     margin-right: 0;
     padding-left: 0;
   }
+
   .cards-container {
     grid-template-columns: 1fr;
     max-width: 98vw;
     margin: 0 auto;
   }
+
+  .container02 {
+    max-width: 98vw;
+    margin: 0 auto !important;
+  }
 }
 
+@media (min-width: 1200px) {
+  .consulta-container03,
+  .consulta-container04 {
+    margin-left: 15vw;
+    margin-right: auto;
+    max-width: 1440px;
+  }
+
+  .form-container,
+  .card-resultado {
+    margin: 32px auto 0 auto !important;
+  }
+}
