@@ -32,6 +32,7 @@ import OperacionalHome from './components/Faturamento/OperacionalHome';
 import PdfAutomation from './components/Faturamento/PdfAutomation';
 import OperacionalCancelamento from './components/Faturamento/OperacionalCancelamento';
 import ReimpressaoBoleto from './components/Faturamento/ReimpressaoBoleto';
+import Payxbox from './components/Faturamento/Paybox';
 
 import Conta from './components/Dropdown/dropItens/conta';
 import Config from './components/Dropdown/dropItens/Configuracoes';
@@ -108,6 +109,7 @@ function AppRoutes() {
             <Route path="/faturamento/pdf-automation" element={<PdfAutomation />} />
             <Route path="/faturamento/cancelamento" element={<OperacionalCancelamento />} />
             <Route path="/faturamento/reimpressao-boleto" element={<ReimpressaoBoleto />} />
+            <Route path="/faturamento/paybox" element={<Payxbox />} />
             
           </Route>
         </Route>
