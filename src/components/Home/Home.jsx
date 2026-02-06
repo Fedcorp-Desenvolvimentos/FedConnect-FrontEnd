@@ -30,7 +30,7 @@ const imagensCarrossel = [
   },
   {
     src: {
-      desktop: "/imagens/Banner-02-1200x675.png",
+      desktop: "/imagens/fedbnk02.png",
       mobile: "/imagens/Banner-02-mobile.png",
     },
     alt: "Ir para Consulta",
@@ -48,7 +48,7 @@ const imagensCarrossel = [
   },
   {
     src: {
-      desktop: "/imagens/Banner-04-1200x675.png",
+      desktop: "/imagens/fedconnect02.png",
       mobile: "/imagens/Banner-04-mobile.png",
     },
     name: "banner04",
