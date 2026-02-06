@@ -5,8 +5,8 @@ export const PRODUTOS = [
     categoria: 'Residencial',
     preco: 'R$ 21,90/mês',
     imagens: [
-      '/imagens/produtos/ruptura-encanamentos1.jpg',
-      '/imagens/produtos/ruptura-encanamentos2.jpg'
+      '/imagens/produtos/ruptura-atual-1.jpg',
+      '/imagens/produtos/ruptura-atual-2.jpg'
     ],
     destaques: [
       'Cobertura de R$ 5.000,00 para danos no apartamento',
@@ -64,16 +64,16 @@ export const PRODUTOS = [
     id: 'incendio-conteudo',
     nome: 'Incêndio Conteúdo + Clube de Descontos',
     categoria: 'Residencial',
-    preco: 'R$ 9,90/mês',
+    preco: 'R$ 9,98/mês',
     imagens: [
-      '/imagens/produtos/incendio-conteudo1.jpg',
-      '/imagens/produtos/incendio-conteudo2.jpg'
+      '/imagens/produtos/incendio-conteudo-atual-1.jpg',
+      '/imagens/produtos/incendio-conteudo-atual-2.jpg'
     ],
     destaques: [
       'Cobertura para móveis, eletros e utensílios',
-      'R$ 80.000,00 para imóveis residenciais',
-      'R$ 60.000,00 para imóveis comerciais',
-      'Perda de aluguel: indenização adicional de R$ 6.000,00',
+      'R$ 100.000,00 para imóveis residenciais',
+      'R$ 80.000,00 para imóveis comerciais',
+      'Perda de aluguel: indenização adicional de R$ 10.000,00',
       'Assistência residencial 24h e Clube de Descontos'
     ]
   },
@@ -108,7 +108,10 @@ export const PRODUTOS = [
     nome: 'Vida Funcionários Condomínio',
     categoria: 'Vida',
     preco: 'Sob consulta',
-    imagens: ['/imagens/produtos/seguro-vida.jpg'],
+    imagens: ['/imagens/produtos/vida-atual-1.jpg'
+      ,
+      '/imagens/produtos/vida-atual-2.jpg'
+    ],
     destaques: [
       'Atende 100% da convenção coletiva',
       'Morte natural/acidental: 25x salário mínimo',

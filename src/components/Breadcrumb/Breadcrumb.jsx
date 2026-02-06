@@ -422,14 +422,14 @@ const Breadcrumb = ({ sidebarOpen }) => {
               {user?.nome_completo || user?.email || 'Usuário'}
             </div>
             <div className="user-meta">
-              <span className="user-role">
+              {/* <span className="user-role">
                 <i className="bi bi-shield-check"></i>
                 {accessLevelMap[user?.nivel_acesso] || user?.nivel_acesso || 'N/A'}
-              </span>
-              <span className="user-status">
+              </span> */}
+              {/* <span className="user-status">
                 <i className={`bi bi-circle-fill ${user?.is_active ? 'active' : 'inactive'}`}></i>
                 {user?.is_active ? 'Ativo' : 'Inativo'}
-              </span>
+              </span> */}
               <span className="user-fed">
                 <i className="bi bi-calendar3"></i>
                 {getCurrentDateTime()}
