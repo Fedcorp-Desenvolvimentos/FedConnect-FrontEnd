@@ -1,14 +1,31 @@
-/* ConsultaFatComBoleto.css */
-
 .consulta-fatura-container {
-    padding: 20px;
     width: 100%;
-    min-height: 100vh;
+    min-height: calc(100vh - 12px);
     box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    padding: 8px;
+    
 }
 
+.consulta-fatura-container .container,
+.consulta-fatura-container .container-sm,
+.consulta-fatura-container .container-md,
+.consulta-fatura-container .container-lg,
+.consulta-fatura-container .container-xl,
+.consulta-fatura-container .container-xxl {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Título */
 .consultas-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
     color: #2463eb;
     font-weight: 700;
     letter-spacing: 0.7px;
@@ -16,28 +33,44 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    margin-top: 1rem;
-    margin-bottom: 2rem;
+    margin: 0.5rem 0 .075rem;
+    
 }
 
 .consultas-title i {
     color: #2463eb;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
 }
 
-/* Formulário */
-.form-fatura {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    margin-bottom: 25px;
+.form-fatura,
+.resultado-fatura {
     width: 100%;
+    max-width: none;
+    margin: 0;
+    box-sizing: border-box;
+
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.form-fatura {
+    padding: 25px;
+}
+
+.resultado-fatura {
+    padding: 25px;
+    animation: fadeIn 0.5s ease;
+
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
 }
 
 .filtros-principais {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 15px;
 }
 
@@ -49,25 +82,25 @@
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    font-weight: 500;
-    color: #4a5568;
-    font-size: 0.9rem;
+    font-weight: 500 !important;
+    color: #2563eb;
+    font-size: 1rem !important;
 }
 
 .form-control {
     width: 100%;
-    padding: 10px 15px;
+    padding: 10px 10px !important;
     border: 1px solid #e2e8f0;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 14px;
     transition: all 0.2s;
     box-sizing: border-box;
-    background: white;
+    background: #fff;
 }
 
 .form-control:focus {
     border-color: #4299e1;
-    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.12);
     outline: none;
 }
 
@@ -84,30 +117,36 @@
     opacity: 1;
 }
 
-/* Botões */
+/* =======================
+   BOTÕES
+======================= */
+
 .botoes-acao {
     display: flex;
-    gap: 12px;
-    padding-top: 20px;
-    border-top: 1px solid #eaeaea;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
     gap: 20px;
+
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #eaeaea;
 }
 
 .btn {
     padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: 500;
+    border-radius: 10px;
+    font-weight: 600;
     transition: all 0.2s;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     border: none;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     gap: 8px;
-    min-height: 40px;
-    min-width: 150px;
+    min-height: 44px;
+    min-width: 170px;
+    position: relative;
 }
 
 .btn-primary {
@@ -145,7 +184,7 @@
     cursor: not-allowed;
 }
 
-/* Botões de Exportação */
+/* Export */
 .export-buttons {
     display: flex;
     gap: 10px;
@@ -181,43 +220,37 @@
 .btn-sm {
     padding: 8px 16px;
     font-size: 0.85rem;
-    min-height: 36px;
-    border-radius: 5px;
+    min-height: 38px;
+    border-radius: 10px;
 }
 
-/* Botões dentro da expansão */
-.btn-outline-primary {
-    background-color: transparent;
-    border: 1px solid #2463eb;
-    color: #2463eb;
-}
-
-.btn-outline-primary:hover {
-    background-color: #2463eb;
+/* Tooltip simples pra botões com title */
+.btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111827;
     color: white;
-    transform: translateY(-1px);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
 }
 
-.btn-outline-secondary {
-    background-color: transparent;
-    border: 1px solid #6c757d;
-    color: #6c757d;
-}
+/* =======================
+   ERROS
+======================= */
 
-.btn-outline-secondary:hover {
-    background-color: #6c757d;
-    color: white;
-    transform: translateY(-1px);
-}
-
-/* Mensagem de erro */
 .erro-msg {
     background-color: #fee;
     border: 1px solid #fcc;
     color: #c00;
     padding: 15px 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    border-radius: 10px;
+    margin: 0;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -229,25 +262,17 @@
     font-size: 1.2rem;
 }
 
-/* Resultados */
-.resultado-fatura {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    width: 100%;
-    box-sizing: border-box;
-    animation: fadeIn 0.5s ease;
-}
+/* =======================
+   RESULTADOS - HEADER
+======================= */
 
 .resultados-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     flex-wrap: wrap;
-    gap: 15px;
-    
+    gap: 12px;
 }
 
 .title-consulta {
@@ -269,7 +294,7 @@
     padding: 6px 16px;
     border-radius: 20px;
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-left: 10px;
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
@@ -277,36 +302,42 @@
 .total-info {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 14px;
+    flex-wrap: wrap;
 }
 
-.filtros-ativos {
-    color: #6c757d;
+.filtros-ativos,
+.filtro-local-info {
+    color: #2463eb;
+    background-color: #e8f0fe;
+    border: 1px solid #c2d6ff;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.9rem;
-    background: #f8f9fa;
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: 1px solid #e9ecef;
-    
 }
 
-.filtros-ativos i {
-    color: #4299e1;
+.filtros-ativos i,
+.filtro-local-info i {
+    color: #2463eb;
 }
 
-.barra-pesquisa-wrapper{
+/* =======================
+   BARRA DE PESQUISA
+======================= */
+
+.barra-pesquisa-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Barra de pesquisa */
 .barra-pesquisa-resultados {
-    margin-bottom: 25px;
-    min-width: 600px;
+    margin-bottom: 16px;
+    width: min(900px, 100%);
+    /* grande, mas respeita a tela */
 }
 
 .input-group-pesquisa {
@@ -318,18 +349,22 @@
 .input-group-pesquisa .input-group-text {
     background: #f7fafc;
     border: 1px solid #e2e8f0;
-    border-right: none;
     padding: 12px 15px;
-    border-radius: 8px 0 0 8px;
+    border-radius: 10px;
     color: #718096;
     font-size: 16px;
-    display: flex;
-    align-items: center;
+
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    z-index: 2;
 }
 
 .input-group-pesquisa .form-control {
-    border-radius: 0 8px 8px 0;
+    border-radius: 10px;
     padding: 12px 15px;
+    padding-left: 56px;
     padding-right: 45px;
     font-size: 15px;
     height: 46px;
@@ -337,7 +372,7 @@
 
 .btn-limpar-pesquisa {
     position: absolute;
-    right: 10px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
@@ -348,55 +383,7 @@
     align-items: center;
     justify-content: center;
     padding: 6px;
-    border-radius: 50%;
-}
-.input-group-pesquisa .input-group-text {
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
-    border-right: none;
-    padding: 12px 15px;
-    border-radius: 8px 0 0 8px;
-    color: #718096;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    z-index: 2;
-    position: absolute;
-
-}
-
-.input-group-pesquisa .form-control {
-    border-radius: 0 8px 8px 0;
-    padding: 12px 15px;
-    padding-left: 46px;
-    padding-right: 45px;
-    font-size: 15px;
-    height: 46px;
-}
-
-.input-group-pesquisa .form-control:focus {
-    border-color: #e2e8f0;
-    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
-}
-
-.input-group-pesquisa .form-control:focus + .input-group-text {
-    border-color: #4299e1;
-}
-
-.btn-limpar-pesquisa {
-    position: absolute;
-    right: 12px;
-    top: 40%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #718096;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px;
-    border-radius: 50%;
+    border-radius: 999px;
     transition: all 0.2s;
     z-index: 3;
 }
@@ -420,10 +407,18 @@
     font-size: 0.9rem;
 }
 
-/* Tabela */
+/* =======================
+   TABELA (SCROLL INTERNO)
+======================= */
+
 .tabela-resultados {
-    overflow-x: auto;
-    border-radius: 8px;
+    flex: 1;
+    /* ocupa o resto do card */
+    min-height: 0;
+    /* permite scroll interno */
+    overflow: auto;
+    /* scroll aqui */
+    border-radius: 10px;
     border: 1px solid #e2e8f0;
     background: white;
 }
@@ -432,32 +427,47 @@
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    table-layout: fixed; /* Adicionar esta linha */
+    table-layout: fixed;
+    min-width: 100%;
 }
 
-.tabela-faturas th:nth-child(1) { width: 40px; } /* Ícone */
-.tabela-faturas th:nth-child(2) { width: 100px; } /* Fatura */
-.tabela-faturas th:nth-child(3) { width: 120px; } /* Apólice */
-.tabela-faturas th:nth-child(4) { width: 120px; } /* Administradora */
-.tabela-faturas th:nth-child(5) { width: 100px; } /* Data */
-.tabela-faturas th:nth-child(6) { width: 180px; } /* Vigência */
-.tabela-faturas th:nth-child(7) { width: 100px; } /* Status */
-.tabela-faturas th:nth-child(8) { width: 120px; } /* Vencimento */
-
-
-/* Adicionar overflow para conteúdo muito longo */
-.info-item span {
-    word-break: break-word;
-    overflow-wrap: break-word;
-    max-width: 100%;
+.tabela-faturas th:nth-child(1) {
+    width: 40px;
 }
 
+.tabela-faturas th:nth-child(2) {
+    width: 100px;
+}
+
+.tabela-faturas th:nth-child(3) {
+    width: 120px;
+}
+
+.tabela-faturas th:nth-child(4) {
+    width: 140px;
+}
+
+.tabela-faturas th:nth-child(5) {
+    width: 110px;
+}
+
+.tabela-faturas th:nth-child(6) {
+    width: 180px;
+}
+
+.tabela-faturas th:nth-child(7) {
+    width: 110px;
+}
+
+.tabela-faturas th:nth-child(8) {
+    width: 130px;
+}
 
 .tabela-faturas th {
     background: linear-gradient(to bottom, #f8fafc, #edf2f7);
-    padding: 16px 12px;
+    padding: 14px 12px;
     text-align: left;
-    font-weight: 600;
+    font-weight: 700;
     color: #2d3748;
     border-bottom: 2px solid #e2e8f0;
     white-space: nowrap;
@@ -468,7 +478,7 @@
 }
 
 .tabela-faturas td {
-    padding: 16px 12px;
+    padding: 14px 12px;
     border-bottom: 1px solid #f1f5f9;
     vertical-align: middle;
     font-size: 0.9rem;
@@ -488,7 +498,7 @@
 .linha-clicavel:hover {
     background-color: #f7fafc;
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .linha-clicavel.expanded {
@@ -497,7 +507,7 @@
 }
 
 .linha-clicavel.expanded td:first-child {
-    padding-left: 9px; /* Compensa a borda */
+    padding-left: 9px;
 }
 
 .linha-clicavel td:first-child {
@@ -506,45 +516,58 @@
     font-size: 0.9rem;
 }
 
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* =======================
+   DETALHES EXPANDIDOS
+======================= */
+
+.expansion-content {
+    padding: 24px;
+    background: white;
+    border-left: 3px solid #4299e1;
+    animation: slideDown 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
+.section-title {
+    color: #2c3e50;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
 .info-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 16px;
 }
 
 .info-item {
     display: flex;
     flex-direction: column;
-    padding: 12px;
+    padding: 14px;
     background-color: #f8fafc;
-    border-radius: 6px;
+    border-radius: 10px;
     border: 1px solid #e2e8f0;
     transition: all 0.2s;
 }
 
 .info-item:hover {
     border-color: #cbd5e0;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .info-item strong {
     font-size: 0.85rem;
     color: #4a5568;
-    margin-bottom: 6px;
-    font-weight: 500;
+    margin-bottom: 8px;
+    font-weight: 700;
 }
 
 .info-item span {
@@ -552,24 +575,38 @@
     color: #2d3748;
     font-weight: 400;
     word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.4;
+}
+
+.small-text,
+.font-monospace {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 }
 
 .small-text {
-    font-size: 0.8rem !important;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.85rem !important;
     word-break: break-all;
     background: #f1f5f9;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 6px 10px;
+    border-radius: 8px;
     border: 1px solid #e2e8f0;
 }
 
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-/* Elementos específicos */
+/* =======================
+   BADGES / STATUS
+======================= */
+
 .numero-fatura {
     color: #2463eb;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 800;
 }
 
 .vigencia {
@@ -582,9 +619,9 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 6px 10px;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 700;
     transition: all 0.2s;
 }
 
@@ -618,22 +655,21 @@
     margin-top: 2px;
 }
 
-/* Status badges */
 .status-badge {
     padding: 6px 12px;
-    border-radius: 20px;
+    border-radius: 999px;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 800;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 80px;
+    min-width: 90px;
     transition: all 0.2s;
 }
 
 .status-badge:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .status-ativa {
@@ -660,19 +696,17 @@
     border: 1px solid #bfdbfe;
 }
 
-.status-inativa {
+.status-inativa,
+.status-desconhecida {
     background-color: #e5e7eb;
     color: #374151;
     border: 1px solid #d1d5db;
 }
 
-.status-desconhecida {
-    background-color: #f3f4f6;
-    color: #6b7280;
-    border: 1px solid #e5e7eb;
-}
+/* =======================
+   LOADING / VAZIO
+======================= */
 
-/* Loading e estados vazios */
 .loading-container {
     display: flex;
     flex-direction: column;
@@ -681,8 +715,8 @@
     padding: 60px 20px;
     text-align: center;
     background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     animation: fadeIn 0.3s ease;
 }
 
@@ -696,14 +730,9 @@
     margin-bottom: 20px;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 .nenhum-resultado {
-    margin-top: 30px;
-    padding: 60px 40px;
+    margin-top: 16px;
+    padding: 40px 24px;
     background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
     border: 2px dashed #cbd5e0;
     border-radius: 12px;
@@ -743,12 +772,8 @@
 .nenhum-resultado h5 {
     margin: 0;
     font-size: 1.2rem;
-    font-weight: 600;
+    font-weight: 800;
     color: #2d3748;
-}
-
-.nenhum-resultado.vazio-consulta h5 {
-    color: #742a2a;
 }
 
 .nenhum-resultado p {
@@ -758,178 +783,60 @@
     line-height: 1.6;
 }
 
-.nenhum-resultado.vazio-consulta p {
-    color: #9b2c2c;
+.sem-resultados {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-top: 8px;
 }
 
-/* Animações */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsividade */
-@media (max-width: 1200px) {
-    .filtros-principais {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .consulta-fatura-container {
-        padding: 15px;
-    }
-    
-    .form-fatura {
-        padding: 20px;
-    }
-    
-    .filtros-principais {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .resultados-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-    }
-    
-    .total-info {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-    
-    .export-buttons {
-        align-self: stretch;
-        justify-content: flex-start;
-    }
-    
-    .botoes-acao {
-        flex-direction: column;
-    }
-    
-    .btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .tabela-faturas th,
-    .tabela-faturas td {
-        padding: 12px 8px;
-        font-size: 0.85rem;
-    }
-    
-    .info-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    
-    .input-group-pesquisa {
-        max-width: 100%;
-    }
-}
-
-@media (max-width: 576px) {
-    .consulta-fatura-container {
-        padding: 10px;
-    }
-    
-    .form-fatura {
-        padding: 15px;
-    }
-    
-    .resultado-fatura {
-        padding: 15px;
-    }
-    
-    .consultas-title {
-        font-size: 1.3rem;
-    }
-    
-    .nenhum-resultado {
-        padding: 40px 20px;
-    }
-    
-    .vencimento {
-        padding: 4px 6px;
-    }
-    
-    .status-badge {
-        padding: 4px 8px;
-        min-width: 70px;
-    }
-}
-
-/* Ajuste para sidebar */
-@media (min-width: 651px) {
-    .consulta-fatura-container {
-        transition: margin-left 0.2s ease;
-    }
-    
-    .sidebar.closed + .dashboard-content .consulta-fatura-container {
-        margin-left: 52px;
-        width: calc(100% - 52px);
-    }
-}
-
-/* Ajuste para mobile */
-@media (max-width: 650px) {
-    .consulta-fatura-container {
-        margin-left: 0;
-        width: 100%;
-        padding-top: 70px;
-    }
-}
-
-/* Estilos para paginação */
-/* ================= PAGINAÇÃO ================= */
+/* =======================
+   PAGINAÇÃO
+======================= */
 
 .pagination-container {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     gap: 12px;
     padding: 16px 20px;
-    margin-top: 24px;
+    margin-top: 16px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    border-radius: 10px;
+    border-radius: 12px;
     align-items: center;
 }
 
-/* Info */
 .pagination-info {
     font-size: 0.9rem;
     color: #475569;
+    line-height: 1.4;
 }
 
-/* Controles */
 .pagination-controls {
     display: flex;
     gap: 6px;
     align-items: center;
     justify-content: center;
+    min-height: 38px;
 }
 
-/* Botões */
 .pagination-btn {
     min-width: 36px;
     height: 36px;
     padding: 0 10px;
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid #cbd5e1;
     background: white;
     color: #334155;
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .pagination-btn:hover:not(:disabled) {
@@ -940,296 +847,13 @@
     background: #2463eb;
     color: white;
     border-color: #2463eb;
-    font-weight: 600;
-}
-
-.pagination-btn.nav {
-    font-size: 1.2rem;
-    padding: 0 12px;
-}
-
-.pagination-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-/* Ellipsis */
-.pagination-ellipsis {
-    padding: 0 6px;
-    color: #64748b;
-}
-
-/* Page size */
-.page-size-selector {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.85rem;
-    color: #475569;
-}
-
-.page-size-selector select {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #cbd5e1;
-    background: white;
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-    .pagination-container {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-
-    .page-size-selector {
-        justify-content: center;
-    }
-}
-
-
-/* Barra de pesquisa melhorada */
-.pesquisa-input {
-    min-width: 300px;
-}
-
-.sem-resultados {
-    color: #dc3545;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    padding: 8px 12px;
-    border-radius: 6px;
-    margin-top: 8px;
-}
-
-/* Tabela com largura fixa */
-.tabela-faturas {
-    table-layout: fixed;
-    min-width: 100%;
-}
-
-/* Ajustes responsivos */
-@media (max-width: 1200px) {
-    .tabela-faturas {
-        table-layout: auto;
-    }
-}
-
-/* Seção com título */
-.section-title {
-    color: #2c3e50;
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #e9ecef;
-}
-
-/* Estilo para valores monetários */
-.valor {
-    font-weight: 600;
-    color: #198754;
-}
-
-/* Fontes monoespaçadas para códigos */
-.font-monospace {
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-    font-size: 0.85rem;
-}
-
-/* Cores para status */
-.text-success {
-    color: #198754 !important;
-    font-weight: 600;
-}
-
-.text-secondary {
-    color: #6c757d !important;
-}
-
-/* Espaçamento nas grids */
-.g-3 {
-    gap: 1rem !important;
-}
-
-.mt-4 {
-    margin-top: 1.5rem !important;
-}
-
-.pt-3 {
-    padding-top: 1rem !important;
-}
-
-
-/* Adicione ao seu CSS existente */
-
-/* Indicador de filtro local */
-.filtro-local-info {
-    color: #2463eb;
-    background-color: #e8f0fe;
-    border: 1px solid #c2d6ff;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.filtro-local-info i {
-    color: #2463eb;
-}
-
-/* Texto informativo */
-.text-muted {
-    color: #6c757d !important;
-    font-size: 0.8rem;
-}
-
-/* Ajuste no badge total */
-.total-badge {
-    font-size: 0.85rem;
-}
-
-/* Melhorar a indicação de paginação local */
-.pagination-info small {
-    display: block;
-    margin-top: 2px;
-}
-
-/* Responsividade para paginação */
-@media (max-width: 992px) {
-    .pagination-container {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .pagination-info, 
-    .pagination-controls, 
-    .page-size-selector {
-        width: 100%;
-        justify-content: center;
-        text-align: center;
-    }
-}
-
-/* Estilo para mensagem de exportação */
-.btn[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #333;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    z-index: 1000;
-    margin-bottom: 5px;
-}
-
-.btn {
-    position: relative;
-}
-
-/* Melhorar a responsividade da barra de pesquisa */
-@media (max-width: 768px) {
-    .barra-pesquisa-resultados {
-        min-width: 100%;
-    }
-    
-    .pesquisa-input {
-        min-width: 100%;
-    }
-    
-    .total-info {
-        flex-wrap: wrap;
-    }
-    
-    .filtro-local-info,
-    .filtros-ativos {
-        margin-bottom: 5px;
-    }
-}
-
-/* ================= PAGINAÇÃO (ATUALIZADO) ================= */
-
-.pagination-container {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 12px;
-    padding: 16px 20px;
-    margin-top: 24px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    align-items: center;
-}
-
-/* Info */
-.pagination-info {
-    font-size: 0.9rem;
-    color: #475569;
-    line-height: 1.4;
-}
-
-/* Controles */
-.pagination-controls {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    min-height: 38px; /* Garantir altura mínima */
-}
-
-/* Botões */
-.pagination-btn {
-    min-width: 36px;
-    height: 36px;
-    padding: 0 10px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    background: white;
-    color: #334155;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
-
-.pagination-btn:hover:not(:disabled) {
-    background: #5c9ef5;
-}
-
-.pagination-btn.active {
-    background: #2463eb;
-    color: white;
-    border-color: #2463eb;
-    font-weight: 600;
+    font-weight: 800;
 }
 
 .pagination-btn.nav {
     font-size: 1rem;
     padding: 0 12px;
-    font-weight: normal;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 36px;
     min-width: 38px;
-}
-
-/* Ajuste especial para setas */
-.pagination-btn.nav i {
-    font-size: 1.1rem;
-    line-height: 1;
 }
 
 .pagination-btn:disabled {
@@ -1238,7 +862,6 @@
     background: #f1f5f9;
 }
 
-/* Ellipsis */
 .pagination-ellipsis {
     padding: 0 6px;
     color: #64748b;
@@ -1248,7 +871,6 @@
     font-size: 0.9rem;
 }
 
-/* Page size */
 .page-size-selector {
     display: flex;
     justify-content: flex-end;
@@ -1256,27 +878,126 @@
     gap: 10px;
     font-size: 0.85rem;
     color: #475569;
-    height: 100%;
 }
 
 .page-size-selector select {
     padding: 6px 10px;
-    border-radius: 6px;
+    border-radius: 8px;
     border: 1px solid #cbd5e1;
     background: white;
     height: 36px;
 }
 
-/* Garantir que todos os elementos da linha de paginação tenham a mesma altura */
-.pagination-controls > * {
-    display: inline-flex;
-    align-items: center;
-    height: 36px;
-    box-sizing: border-box;
+/* =======================
+   UTILITÁRIOS
+======================= */
+
+.valor {
+    font-weight: 800;
+    color: #198754;
 }
 
-/* Mobile */
+.text-success {
+    color: #198754 !important;
+    font-weight: 800;
+}
+
+.text-secondary {
+    color: #6c757d !important;
+    font-weight: 700;
+}
+
+.text-muted {
+    color: #6c757d !important;
+    font-size: 0.8rem;
+}
+
+/* =======================
+   ANIMAÇÕES
+======================= */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =======================
+   RESPONSIVIDADE
+======================= */
+
+@media (max-width: 1200px) {
+    .filtros-principais {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tabela-faturas {
+        table-layout: auto;
+    }
+}
+
 @media (max-width: 768px) {
+    .consulta-fatura-container {
+        padding: 10px;
+    }
+
+    .form-fatura,
+    .resultado-fatura {
+        padding: 16px;
+    }
+
+    .filtros-principais {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .resultados-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .botoes-acao {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .barra-pesquisa-resultados {
+        width: 100%;
+    }
+
     .pagination-container {
         grid-template-columns: 1fr;
         text-align: center;
@@ -1285,206 +1006,33 @@
 
     .page-size-selector {
         justify-content: center;
-        margin-top: 10px;
-    }
-    
-    .pagination-controls {
-        order: 1;
-    }
-    
-    .pagination-info {
-        order: 2;
-    }
-    
-    .page-size-selector {
-        order: 3;
     }
 }
 
-/* Melhoria para visualização em telas muito pequenas */
-@media (max-width: 480px) {
-    .pagination-controls {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 4px;
+@media (max-width: 576px) {
+    .consulta-fatura-container {
+        padding: 8px;
     }
-    
-    .pagination-btn {
-        min-width: 32px;
-        height: 32px;
-        font-size: 0.85rem;
+
+    .consultas-title {
+        font-size: 1.3rem;
     }
-    
-    .pagination-btn.nav {
-        min-width: 34px;
-        height: 32px;
-        font-size: 1.1rem;
+
+    .nenhum-resultado {
+        padding: 28px 16px;
+    }
+
+    .status-badge {
+        min-width: 70px;
+        padding: 4px 8px;
     }
 }
 
-
-/* ================ DETALHES EXPANDIDOS ================ */
-
-.expansion-content {
-    padding: 24px;
-    background: white;
-    border-left: 3px solid #4299e1;
-    animation: slideDown 0.3s ease;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.expansion-content .section-title {
-    color: #2c3e50;
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #e2e8f0;
-    display: flex;
-    align-items: center;
-}
-
-.expansion-content .section-title i {
-    color: #2463eb;
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 16px;
-}
-
-.info-item {
-    display: flex;
-    flex-direction: column;
-    padding: 14px;
-    background-color: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s;
-}
-
-.info-item:hover {
-    border-color: #cbd5e0;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.info-item strong {
-    font-size: 0.85rem;
-    color: #4a5568;
-    margin-bottom: 8px;
-    font-weight: 500;
-}
-
-.info-item span {
-    font-size: 0.95rem;
-    color: #2d3748;
-    font-weight: 400;
-    word-break: break-word;
-    line-height: 1.4;
-}
-
-/* Para campos longos */
-.small-text {
-    font-size: 0.85rem !important;
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-    word-break: break-all;
-    background: #f1f5f9;
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
-}
-
-.font-monospace {
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-    font-size: 0.9rem;
-}
-
-.text-truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Valores monetários */
-.valor {
-    font-weight: 600;
-    color: #198754;
-    font-size: 0.95rem;
-}
-
-/* Status colors */
-.text-success {
-    color: #198754 !important;
-    font-weight: 600;
-}
-
-.text-secondary {
-    color: #6c757d !important;
-    font-weight: 500;
-}
-
-/* Animação */
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsividade */
-@media (max-width: 1200px) {
-    .info-grid {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    }
-}
-
-@media (max-width: 992px) {
-    .info-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    .expansion-content {
-        padding: 16px;
-    }
-    
-    .info-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-    
-    .info-item {
-        padding: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .expansion-content {
-        padding: 12px;
-    }
-    
-    .section-title {
-        font-size: 0.95rem !important;
-        margin-bottom: 16px;
-    }
-    
-    .info-item {
-        padding: 10px;
-    }
-    
-    .info-item strong {
-        font-size: 0.8rem;
-    }
-    
-    .info-item span {
-        font-size: 0.9rem;
+/* Mobile antigo do seu projeto: se tiver header fixo empurrando, mantém */
+@media (max-width: 650px) {
+    .consulta-fatura-container {
+        margin-left: 0;
+        width: 100%;
+        padding-top: 70px;
     }
 }

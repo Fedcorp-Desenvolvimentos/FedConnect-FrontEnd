@@ -763,16 +763,6 @@ const ConsultaFaturamento = () => {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="administradora">Administradora:</label>
-                        <AdministradoraAutocomplete
-                            value={formData.administradora}
-                            onChange={handleChange}
-                            onSelect={handleAdministradoraSelect}
-                            placeholder="Digite o nome da administradora..."
-                            disabled={loading}
-                        />
-                    </div>
 
                     <div className="form-group">
                         <label htmlFor="status">Status:</label>
@@ -810,6 +800,17 @@ const ConsultaFaturamento = () => {
                             value={formData.data_fim}
                             onChange={handleChange}
                             className="form-control"
+                        />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label htmlFor="administradora">Administradora:</label>
+                        <AdministradoraAutocomplete
+                            value={formData.administradora}
+                            onChange={handleChange}
+                            onSelect={handleAdministradoraSelect}
+                            placeholder="Digite o nome da administradora..."
+                            disabled={loading}
                         />
                     </div>
                 </div>
@@ -1020,41 +1021,41 @@ const ConsultaFaturamento = () => {
                                                                     <strong>Prêmio Bruto:</strong>
                                                                     <span className="valor">{formatarValor(fatura.PREMIO_BRUTO)}</span>
                                                                 </div>
-                                                                <div className="info-item">
+                                                                {/* <div className="info-item">
                                                                     <strong>Valor Boleto:</strong>
                                                                     <span className="valor">{formatarValor(fatura.VALOR)}</span>
-                                                                </div>
-                                                                <div className="info-item">
+                                                                </div> */}
+                                                                {/* <div className="info-item">
                                                                     <strong>Prêmio Líquido:</strong>
                                                                     <span className="valor">{formatarValor(fatura.PREMIO_LIQ)}</span>
-                                                                </div>
+                                                                </div> */}
                                                                 <div className="info-item">
                                                                     <strong>Comissão:</strong>
                                                                     <span className="valor">{formatarValor(fatura.COMISSAO)}</span>
                                                                 </div>
-                                                                <div className="info-item">
+                                                                {/* <div className="info-item">
                                                                     <strong>Comissão Líquida:</strong>
                                                                     <span className="valor">{formatarValor(fatura.COMISSAO_LIQ)}</span>
-                                                                </div>
+                                                                </div> */}
                                                                 <div className="info-item">
                                                                     <strong>Documento:</strong>
                                                                     <span className="font-monospace">{fatura.DOCUMENTO || '-'}</span>
                                                                 </div>
-                                                                <div className="info-item">
+                                                                {/* <div className="info-item">
                                                                     <strong>Linha Digitável:</strong>
                                                                     <span className="small-text font-monospace">{fatura.LINHA_DIGITAVEL || '-'}</span>
-                                                                </div>
-                                                                <div className="info-item">
+                                                                </div> */}
+                                                                {/* <div className="info-item">
                                                                     <strong>Boleta Recebida:</strong>
                                                                     <span className="valor">{formatarValor(fatura.BOLETA_REC)}</span>
-                                                                </div>
-                                                                <div className="info-item">
+                                                                </div> */}
+                                                                {/* <div className="info-item">
                                                                     <strong>Boleta Quitada:</strong>
                                                                     <span className={fatura.BOLETA_QUITADA === 'S' ? 'text-success' : 'text-secondary'}>
                                                                         {fatura.BOLETA_QUITADA === 'S' ? 'Sim' : 'Não'}
                                                                     </span>
-                                                                </div>
-                                                                <div className="info-item">
+                                                                </div> */}
+                                                                {/* <div className="info-item">
                                                                     <strong>Acréscimo:</strong>
                                                                     <span className="valor">{formatarValor(fatura.ACRESCIMO)}</span>
                                                                 </div>
@@ -1065,7 +1066,7 @@ const ConsultaFaturamento = () => {
                                                                 <div className="info-item">
                                                                     <strong>Devolução:</strong>
                                                                     <span className="valor">{formatarValor(fatura.DEVOLUCAO)}</span>
-                                                                </div>
+                                                                </div> */}
                                                                 <div className="info-item">
                                                                     <strong>Data Repasse:</strong>
                                                                     <span>{formatarData(fatura.DATA_REPASSE)}</span>
