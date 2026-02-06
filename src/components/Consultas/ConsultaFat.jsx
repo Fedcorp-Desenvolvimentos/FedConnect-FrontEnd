@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import "../styles/ConsultaFat.css";
 import { getFaturaPorNumero } from '../../services/consultaFatura';
+import { getAdministradoraEspecificaPorCodigo } from '../../services/consultaAdmService';
 
 function traduzirErroApi(mensagem) {
     if (!mensagem) return "Erro inesperado. Por favor, tente novamente.";
@@ -27,6 +28,7 @@ const ConsultaFatura = () => {
     const [resultado, setResultado] = useState(null);
     const [erro, setErro] = useState('');
     const [loading, setLoading] = useState(false);
+    const [administradora, setAdministradora] = useState(null);
 
     const handleConsulta = async (e) => {
         e.preventDefault();
@@ -76,6 +78,28 @@ const ConsultaFatura = () => {
         return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
     };
 
+    useEffect(() => {
+        const buscarNomeAdministradora = async () => {
+            try {
+                const adm = await getAdministradoraEspecificaPorCodigo(resultado.ADMINISTRADORA);
+                
+                if (adm?.sucesso && adm.data) {
+                    const nome = adm.data.NOME_ADM || adm.data.nome_adm || `Código: ${resultado.ADMINISTRADORA}`;
+                    setAdministradora(nome);
+                } else {
+                    setAdministradora(`Código: ${resultado.ADMINISTRADORA}`);
+                }
+            } catch (error) {
+                console.error("Erro ao recuperar administradora:", error);
+                setAdministradora(`Código: ${resultado.ADMINISTRADORA} (erro ao buscar)`);
+            }
+        };
+        
+        if (resultado) {
+            buscarNomeAdministradora();
+        }
+    }, [resultado]);
+
     return (
         <div className="consulta-fatura-container">
             <h1 className="consultas-title">
@@ -108,11 +132,31 @@ const ConsultaFatura = () => {
                     <div className="resultado-dados">
                         <div className="campo longo">
                             <strong>Administradora:</strong>
-                            <span>{resultado.ADMINISTRADORA || '-'}</span>
+                            <span>{administradora || resultado.ADMINISTRADORA || '-'}</span>
                         </div>
 
                         <div className="campo">
                             <strong>Apólice:</strong> {resultado.APOLICE || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Seguradora:</strong> {resultado.SEGURADORA || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Ramo:</strong> {resultado.RAMO || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Cedente:</strong> {resultado.CEDENTE || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Corretor:</strong> {resultado.CORRETOR || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Corretor 2:</strong> {resultado.CORRETOR2 || '-'}
                         </div>
 
                         <div className="campo">
@@ -128,11 +172,55 @@ const ConsultaFatura = () => {
                         </div>
 
                         <div className="campo">
+                            <strong>Comissão 2:</strong> {formatarValor(resultado.COMISSAO2)}%
+                        </div>
+
+                        <div className="campo">
+                            <strong>Comissão Líquida:</strong> R$ {formatarValor(resultado.COMISSAO_LIQ)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Comissão Líquida 2:</strong> R$ {formatarValor(resultado.COMISSAO_LIQ2)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Desconto Comissão:</strong> R$ {formatarValor(resultado.DESC_COMISSAO)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Desconto Comissão 2:</strong> R$ {formatarValor(resultado.DESC_COMISSAO2)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>IOF:</strong> R$ {formatarValor(resultado.IOF)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Acréscimo:</strong> R$ {formatarValor(resultado.ACRESCIMO)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Ajustes:</strong> R$ {formatarValor(resultado.AJUSTES)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Devolução:</strong> R$ {formatarValor(resultado.DEVOLUCAO)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Capital Total:</strong> R$ {formatarValor(resultado.CAPITAL_TOTAL)}
+                        </div>
+
+                        <div className="campo">
                             <strong>Data da Fatura:</strong> {formatarData(resultado.DATA_FAT)}
                         </div>
 
                         <div className="campo">
                             <strong>Vencimento:</strong> {formatarData(resultado.VENCIMENTO)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Data Repasse:</strong> {formatarData(resultado.DATA_REPASSE)}
                         </div>
 
                         <div className="campo">
@@ -143,11 +231,91 @@ const ConsultaFatura = () => {
                         </div>
 
                         <div className="campo">
+                            <strong>Tipo Fatura:</strong> {resultado.TIPO_FAT || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Parcelas:</strong> {resultado.PARCELAS || '1'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Quantidade Itens:</strong> {resultado.QTD_ITENS || '1'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Contabiliza:</strong> {resultado.CONTABILIZA === 'S' ? 'Sim' : 'Não'}
+                        </div>
+
+                        <div className="campo">
                             <strong>Início Vigência:</strong> {formatarData(resultado.DT_INI_VIG)}
                         </div>
 
                         <div className="campo">
                             <strong>Fim Vigência:</strong> {formatarData(resultado.DT_FIM_VIG)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Endosso:</strong> {resultado.ENDOSSO || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Sequência:</strong> {resultado.SEQ || '1'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Sequência Endosso:</strong> {resultado.SEQ_ENDOSSO || '0'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Nosso Número:</strong> {resultado.NOSSO_NUMERO || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Voucher:</strong> {resultado.VOUCHER || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Fatura Reajuste:</strong> {resultado.FATURA_REAJUSTE === 'S' ? 'Sim' : 'Não'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Tipo Comissão:</strong> {resultado.TIPO_COMISSAO || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Tipo Comissão 2:</strong> {resultado.TIPO_COMISSAO2 || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Total Segurados:</strong> {resultado.TOTAL_SEG || '0'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Valor Bruto Assistência:</strong> R$ {formatarValor(resultado.VALOR_BR_ASSIST)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Fatura Externa:</strong> {resultado.OUT_FAT || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Usuário Cadastro:</strong> {resultado.USUARIO_CAD || '-'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Boleta Recebida:</strong> R$ {formatarValor(resultado.BOLETA_REC)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Boleta Quitada:</strong> {resultado.BOLETA_QUITADA === 'S' ? 'Sim' : 'Não'}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Valor Quitado:</strong> R$ {formatarValor(resultado.VALOR_QUITADO)}
+                        </div>
+
+                        <div className="campo">
+                            <strong>Data Baixa:</strong> {formatarData(resultado.DT_BAIXA)}
                         </div>
 
                         {resultado.DT_CANCEL && (

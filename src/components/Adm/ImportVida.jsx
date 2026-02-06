@@ -42,7 +42,6 @@ export default function ImportacaoVida() {
     }
 
     try {
-      console.log("Dados enviados:", form);
       setSuccess(true);
     } catch (err) {
       setError("Erro ao enviar dados. Tente novamente.");

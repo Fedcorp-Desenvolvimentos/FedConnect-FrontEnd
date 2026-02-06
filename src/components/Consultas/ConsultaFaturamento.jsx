@@ -3,6 +3,8 @@ import "../styles/ConsultaFaturamento.css";
 import { exportarFaturasParaExcel, exportarFaturasParaPDF, getFaturasComBoletos } from '../../services/consultaFatura';
 import { getEmpresas } from '../../services/empresasService';
 import Loading from '../Loading/Loading';
+import AdministradoraAutocomplete from '../Adm/AdministradorasAutocomplete';
+import { getAdministradoraEspecificaPorCodigo } from '../../services/consultaAdmService';
 
 function traduzirErroApi(mensagem) {
     if (!mensagem) return "Erro inesperado. Por favor, tente novamente.";
@@ -48,10 +50,102 @@ const ConsultaFaturamento = () => {
     const [termoPesquisa, setTermoPesquisa] = useState('');
     const [expandedRow, setExpandedRow] = useState(null);
     const [empresasMap, setEmpresasMap] = useState({});
+    const [administradorasMap, setAdministradorasMap] = useState({});
 
+    const resultadosRef = useRef(null);
+    
     console.log("resultados", resultados)
+    
+    const handleAdministradoraSelect = (administradora) => {
+        if (administradora) {
+            console.log('Administradora selecionada:', administradora);
+        }
+    };
 
-    const resultadosRef = useRef(null);       
+    const obterNomeAdministradora = async (codigo) => {
+        if (!codigo) return '-';
+        
+        // Verificar se já temos no cache
+        if (administradorasMap[codigo]) {
+            return administradorasMap[codigo];
+        }
+        
+        try {
+            const adm = await getAdministradoraEspecificaPorCodigo(codigo);
+            console.log("Dados da administradora:", adm);
+            
+            let nome = `Código: ${codigo}`; // Valor padrão
+            
+            if (adm?.sucesso && adm.data) {
+                // Dependendo da estrutura da resposta
+                nome = adm.data.NOME_ADM || adm.data.nome_adm || adm.data.NOME || `Código: ${codigo}`;
+            }
+            
+            // Atualizar o cache
+            setAdministradorasMap(prev => ({
+                ...prev,
+                [codigo]: nome
+            }));
+            
+            return nome;
+        } catch (error) {
+            console.error(`Erro ao recuperar administradora ${codigo}:`, error);
+            return `Código: ${codigo}`;
+        }
+    };
+
+    // Função para buscar múltiplas administradoras de uma vez
+    const buscarAdministradorasEmLote = async (codigosUnicos) => {
+        try {
+            const promises = codigosUnicos.map(async (codigo) => {
+                try {
+                    const adm = await getAdministradoraEspecificaPorCodigo(codigo);
+                    if (adm?.sucesso && adm.data) {
+                        return {
+                            codigo,
+                            nome: adm.data.NOME_ADM || adm.data.nome_adm || adm.data.NOME || `Código: ${codigo}`
+                        };
+                    }
+                    return { codigo, nome: `Código: ${codigo}` };
+                } catch (error) {
+                    console.error(`Erro ao buscar administradora ${codigo}:`, error);
+                    return { codigo, nome: `Código: ${codigo}` };
+                }
+            });
+            
+            const resultados = await Promise.all(promises);
+            const novoMapa = {};
+            resultados.forEach(result => {
+                if (result.codigo && result.nome) {
+                    novoMapa[result.codigo] = result.nome;
+                }
+            });
+            
+            setAdministradorasMap(prev => ({ ...prev, ...novoMapa }));
+        } catch (error) {
+            console.error('Erro ao buscar administradoras em lote:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (resultados.length > 0) {
+            // Extrair códigos únicos de administradoras
+            const codigosAdministradoras = [...new Set(
+                resultados
+                    .filter(fatura => fatura.ADMINISTRADORA)
+                    .map(fatura => fatura.ADMINISTRADORA)
+            )];
+            
+            // Filtrar apenas códigos que ainda não estão no cache
+            const codigosParaBuscar = codigosAdministradoras.filter(
+                codigo => !administradorasMap[codigo]
+            );
+            
+            if (codigosParaBuscar.length > 0) {
+                buscarAdministradorasEmLote(codigosParaBuscar);
+            }
+        }
+    }, [resultados, administradorasMap]);
 
     // PAGINAÇÃO LOCAL - Estado separado para filtro local
     const [localPagination, setLocalPagination] = useState({
@@ -103,6 +197,7 @@ const ConsultaFaturamento = () => {
             };
 
             const response = await getFaturasComBoletos(filtrosComPaginacao);
+            // const response = await getFaturasComBoletosPaginada(filtrosComPaginacao);
             
             if (response.sucesso) {
                 const dados = response.resultado?.data || [];
@@ -272,7 +367,7 @@ const ConsultaFaturamento = () => {
         setExpandedRow(null);
     };
 
-        const formatarData = (dataString) => {
+    const formatarData = (dataString) => {
         if (!dataString) return '-';
         
         try {
@@ -315,7 +410,7 @@ const ConsultaFaturamento = () => {
             const camposParaBuscar = [
                 fatura.FATURA || '',
                 fatura.APOLICE || '',
-                fatura.ADMINISTRADORA || '',
+                administradorasMap[fatura.ADMINISTRADORA] || '',
                 fatura.FATURA || '',
                 fatura.NOME_COBRADO || '',
                 fatura.CNPJ_COBRADO || '',
@@ -670,14 +765,12 @@ const ConsultaFaturamento = () => {
 
                     <div className="form-group">
                         <label htmlFor="administradora">Administradora:</label>
-                        <input
-                            type="text"
-                            id="administradora"
-                            name="administradora"
+                        <AdministradoraAutocomplete
                             value={formData.administradora}
                             onChange={handleChange}
-                            placeholder="Código administradora"
-                            className="form-control"
+                            onSelect={handleAdministradoraSelect}
+                            placeholder="Digite o nome da administradora..."
+                            disabled={loading}
                         />
                     </div>
 
@@ -693,7 +786,6 @@ const ConsultaFaturamento = () => {
                             <option value="">Todos</option>
                             <option value="A">Ativa</option>
                             <option value="C">Cancelada</option>
-                            <option value="Q">Quitada</option>
                         </select>
                     </div>
 
@@ -744,7 +836,7 @@ const ConsultaFaturamento = () => {
 
             {erro && <div className="erro-msg">{erro}</div>}
 
-            {resultados.length > 0 ? (
+            {loading || resultados.length > 0 ? (
                 <div className="resultado-fatura" ref={resultadosRef}>
                     <div className="resultados-header">
                         <h3 className='title-consulta'>
@@ -890,7 +982,7 @@ const ConsultaFaturamento = () => {
                                                     </strong>
                                                 </td>
                                                 <td>{fatura.APOLICE || '-'}</td>
-                                                <td>{fatura.ADMINISTRADORA || '-'}</td>
+                                                <td>{administradorasMap[fatura.ADMINISTRADORA] || fatura.ADMINISTRADORA || '-'}</td>
                                                 <td>{formatarData(fatura.DATA_FAT)}</td>
                                                 <td className="vigencia">
                                                     {formatarVigencia(fatura.DT_INI_VIG, fatura.DT_FIM_VIG)}
@@ -908,85 +1000,76 @@ const ConsultaFaturamento = () => {
                                                 <tr className="expanded-details">
                                                     <td colSpan="8">
                                                         <div className="expansion-content">
-                                                            <div className="row g-3">
-                                                                <div className="col-lg-6 col-md-12">
-                                                                    <h6 className="section-title">
-                                                                        <i className="bi-file-text me-2"></i>Informações da Fatura
-                                                                    </h6>
-                                                                    <div className="info-grid">
-                                                                        <div className="info-item">
-                                                                            <strong>Tomador:</strong>
-                                                                            <span className="text-truncate">{fatura.NOME_COBRADO || '-'}</span>
-                                                                        </div>
-                                                                        <div className="info-item">
-                                                                            <strong>Usuário:</strong>
-                                                                            <span>{fatura.USUARIO_CAD || '-'}</span>
-                                                                        </div>
-                                                                        <div className="info-item">
-                                                                            <strong>CNPJ:</strong>
-                                                                            <span className="font-monospace">{fatura.CNPJ_COBRADO || '-'}</span>
-                                                                        </div>
-                                                                        <div className="info-item">
-                                                                            <strong>Prêmio Bruto:</strong>
-                                                                            <span className="valor">{formatarValor(fatura.PREMIO_BRUTO)}</span>
-                                                                        </div>
-                                                                        <div className="info-item">
-                                                                            <strong>Valor Boleto:</strong>
-                                                                            <span className="valor">{formatarValor(fatura.VALOR)}</span>
-                                                                        </div>
-                                                                        <div className="info-item">
-                                                                            <strong>Parcela:</strong>
-                                                                            <span>{fatura.PARCELA || '-'}/{fatura.PARCELAS || '-'}</span>
-                                                                        </div>
-                                                                        <div className="info-item">
-                                                                            <strong>Documento:</strong>
-                                                                            <span className="font-monospace">{fatura.DOCUMENTO || '-'}</span>
-                                                                        </div>
-                                                                    </div>
+                                                            <h6 className="section-title">
+                                                                <i className="bi-info-circle me-2"></i>Detalhes da Fatura
+                                                            </h6>
+                                                            <div className="info-grid">
+                                                                <div className="info-item">
+                                                                    <strong>Tomador:</strong>
+                                                                    <span className="text-truncate">{fatura.NOME_COBRADO || '-'}</span>
                                                                 </div>
-                                                                <div className="col-lg-6 col-md-12">
-                                                                    <h6 className="section-title">
-                                                                        <i className="bi-receipt me-2"></i>Detalhes do Boleto
-                                                                    </h6>
-                                                                    <div className="info-grid">
-                                                                        <div className="info-item">
-                                                                            <strong>Nosso Número:</strong>
-                                                                            <span className="font-monospace">{fatura.NOSSO_NUMERO || '-'}</span>
-                                                                        </div>
-                                                                        <div className="info-item">
-                                                                            <strong>Cedente:</strong>
-                                                                            <span className="text-truncate">{obterNomeCedente(fatura.CEDENTE)}</span>
-                                                                        </div>
-                                                                        <div className="info-item">
-                                                                            <strong>Agência/Conta:</strong>
-                                                                            <span className="font-monospace">
-                                                                                {fatura.AGENCIA || '-'}/{fatura.CONTA || '-'}{fatura.DV_CONTA ? `-${fatura.DV_CONTA}` : ''}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className="info-item">
-                                                                            <strong>Linha Digitável:</strong>
-                                                                            <span className="small-text font-monospace">{fatura.LINHA_DIGITAVEL || '-'}</span>
-                                                                        </div>
-                                                                        <div className="info-item">
-                                                                            <strong>Boleta Recebida:</strong>
-                                                                            <span className="valor">{formatarValor(fatura.BOLETA_REC)}</span>
-                                                                        </div>
-                                                                        <div className="info-item">
-                                                                            <strong>Boleta Quitada:</strong>
-                                                                            <span className={fatura.BOLETA_QUITADA === 'S' ? 'text-success' : 'text-secondary'}>
-                                                                                {fatura.BOLETA_QUITADA === 'S' ? 'Sim' : 'Não'}
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
+                                                                <div className="info-item">
+                                                                    <strong>CNPJ:</strong>
+                                                                    <span className="font-monospace">{fatura.CNPJ_COBRADO || '-'}</span>
                                                                 </div>
-                                                            </div>
-                                                            <div className="expansion-actions mt-4 pt-3 border-top">
-                                                                <button className="btn btn-outline-primary btn-sm me-2" disabled>
-                                                                    <i className="bi-download me-1"></i> Baixar Boleto
-                                                                </button>
-                                                                <button className="btn btn-outline-secondary btn-sm me-2" disabled>
-                                                                    <i className="bi-printer me-1"></i> Imprimir
-                                                                </button>
+                                                                <div className="info-item">
+                                                                    <strong>Cedente:</strong>
+                                                                    <span className="text-truncate">{obterNomeCedente(fatura.CEDENTE)}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Prêmio Bruto:</strong>
+                                                                    <span className="valor">{formatarValor(fatura.PREMIO_BRUTO)}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Valor Boleto:</strong>
+                                                                    <span className="valor">{formatarValor(fatura.VALOR)}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Prêmio Líquido:</strong>
+                                                                    <span className="valor">{formatarValor(fatura.PREMIO_LIQ)}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Comissão:</strong>
+                                                                    <span className="valor">{formatarValor(fatura.COMISSAO)}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Comissão Líquida:</strong>
+                                                                    <span className="valor">{formatarValor(fatura.COMISSAO_LIQ)}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Documento:</strong>
+                                                                    <span className="font-monospace">{fatura.DOCUMENTO || '-'}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Linha Digitável:</strong>
+                                                                    <span className="small-text font-monospace">{fatura.LINHA_DIGITAVEL || '-'}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Boleta Recebida:</strong>
+                                                                    <span className="valor">{formatarValor(fatura.BOLETA_REC)}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Boleta Quitada:</strong>
+                                                                    <span className={fatura.BOLETA_QUITADA === 'S' ? 'text-success' : 'text-secondary'}>
+                                                                        {fatura.BOLETA_QUITADA === 'S' ? 'Sim' : 'Não'}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Acréscimo:</strong>
+                                                                    <span className="valor">{formatarValor(fatura.ACRESCIMO)}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Ajustes:</strong>
+                                                                    <span className="valor">{formatarValor(fatura.AJUSTES)}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Devolução:</strong>
+                                                                    <span className="valor">{formatarValor(fatura.DEVOLUCAO)}</span>
+                                                                </div>
+                                                                <div className="info-item">
+                                                                    <strong>Data Repasse:</strong>
+                                                                    <span>{formatarData(fatura.DATA_REPASSE)}</span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </td>

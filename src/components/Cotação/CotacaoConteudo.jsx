@@ -79,7 +79,6 @@ const CotacaoConteudo = () => {
 
     try {
       const response = await cotacaoService.cotacaoIncendio(dadosParaEnvio);
-      console.log("Resposta da API:", response);
 
       setPremioLiquido(response.premio_liquido);
       setComissaoAdministradora(response.comissao_administradora);

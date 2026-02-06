@@ -295,7 +295,6 @@ const ConsultaCNPJ = () => {
 
     try {
       const response = await ConsultaService.realizarConsulta(payload);
-      console.log('[ConsultaCNPJ] Resposta bruta da API:', response);
       const apiData = response?.data ?? response;
       setResultado(apiData);
       setScrollOnNextResult(true);

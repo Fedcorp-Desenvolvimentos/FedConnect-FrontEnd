@@ -79,7 +79,6 @@ const OperacionalCancelamento = () => {
         message: "Cancelamento registrado com sucesso!",
       });
 
-      console.log("CANCELAMENTO_PAYLOAD:", payload);
       setConfirmOpen(false);
     } catch (err) {
       setStatus({
