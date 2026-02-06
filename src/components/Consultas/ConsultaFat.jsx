@@ -82,7 +82,7 @@ const ConsultaFatura = () => {
         const buscarNomeAdministradora = async () => {
             try {
                 const adm = await getAdministradoraEspecificaPorCodigo(resultado.ADMINISTRADORA);
-                
+
                 if (adm?.sucesso && adm.data) {
                     const nome = adm.data.NOME_ADM || adm.data.nome_adm || `Código: ${resultado.ADMINISTRADORA}`;
                     setAdministradora(nome);
@@ -94,7 +94,7 @@ const ConsultaFatura = () => {
                 setAdministradora(`Código: ${resultado.ADMINISTRADORA} (erro ao buscar)`);
             }
         };
-        
+
         if (resultado) {
             buscarNomeAdministradora();
         }
@@ -130,6 +130,7 @@ const ConsultaFatura = () => {
                     <h3 className="title-consulta">Fatura #{resultado.FATURA}</h3>
 
                     <div className="resultado-dados">
+                        {/* tratar exibição do nome da adm */}
                         <div className="campo longo">
                             <strong>Administradora:</strong>
                             <span>{administradora || resultado.ADMINISTRADORA || '-'}</span>
@@ -139,18 +140,18 @@ const ConsultaFatura = () => {
                             <strong>Apólice:</strong> {resultado.APOLICE || '-'}
                         </div>
 
-                        <div className="campo">
+                        {/* <div className="campo">
                             <strong>Seguradora:</strong> {resultado.SEGURADORA || '-'}
-                        </div>
+                        </div> */}
 
-                        <div className="campo">
+                        {/* <div className="campo">
                             <strong>Ramo:</strong> {resultado.RAMO || '-'}
-                        </div>
+                        </div> */}
 
-                        <div className="campo">
+                        {/* <div className="campo">
                             <strong>Cedente:</strong> {resultado.CEDENTE || '-'}
-                        </div>
-
+                        </div> */}
+{/* tratar exibição do nome do coretor */}
                         <div className="campo">
                             <strong>Corretor:</strong> {resultado.CORRETOR || '-'}
                         </div>
@@ -159,13 +160,6 @@ const ConsultaFatura = () => {
                             <strong>Corretor 2:</strong> {resultado.CORRETOR2 || '-'}
                         </div>
 
-                        <div className="campo">
-                            <strong>Prêmio Bruto:</strong> R$ {formatarValor(resultado.PREMIO_BRUTO)}
-                        </div>
-
-                        <div className="campo">
-                            <strong>Prêmio Líquido:</strong> R$ {formatarValor(resultado.PREMIO_LIQ)}
-                        </div>
 
                         <div className="campo">
                             <strong>Comissão:</strong> {formatarValor(resultado.COMISSAO)}%
@@ -173,6 +167,14 @@ const ConsultaFatura = () => {
 
                         <div className="campo">
                             <strong>Comissão 2:</strong> {formatarValor(resultado.COMISSAO2)}%
+                        </div>
+
+                        <div className="campo">
+                            <strong>Prêmio Bruto:</strong> R$ {formatarValor(resultado.PREMIO_BRUTO)}
+                        </div>
+
+                        {/* <div className="campo">
+                            <strong>Prêmio Líquido:</strong> R$ {formatarValor(resultado.PREMIO_LIQ)}
                         </div>
 
                         <div className="campo">
@@ -210,7 +212,7 @@ const ConsultaFatura = () => {
                         <div className="campo">
                             <strong>Capital Total:</strong> R$ {formatarValor(resultado.CAPITAL_TOTAL)}
                         </div>
-
+ */}
                         <div className="campo">
                             <strong>Data da Fatura:</strong> {formatarData(resultado.DATA_FAT)}
                         </div>
@@ -222,7 +224,7 @@ const ConsultaFatura = () => {
                         <div className="campo">
                             <strong>Data Repasse:</strong> {formatarData(resultado.DATA_REPASSE)}
                         </div>
-
+{/* tratar para ativo ou cancelado */}
                         <div className="campo">
                             <strong>Status:</strong>
                             <span className="status-badge">
@@ -230,11 +232,11 @@ const ConsultaFatura = () => {
                             </span>
                         </div>
 
-                        <div className="campo">
+                        {/* <div className="campo">
                             <strong>Tipo Fatura:</strong> {resultado.TIPO_FAT || '-'}
-                        </div>
+                        </div> */}
 
-                        <div className="campo">
+                        {/* <div className="campo">
                             <strong>Parcelas:</strong> {resultado.PARCELAS || '1'}
                         </div>
 
@@ -244,7 +246,7 @@ const ConsultaFatura = () => {
 
                         <div className="campo">
                             <strong>Contabiliza:</strong> {resultado.CONTABILIZA === 'S' ? 'Sim' : 'Não'}
-                        </div>
+                        </div> */}
 
                         <div className="campo">
                             <strong>Início Vigência:</strong> {formatarData(resultado.DT_INI_VIG)}
@@ -253,7 +255,7 @@ const ConsultaFatura = () => {
                         <div className="campo">
                             <strong>Fim Vigência:</strong> {formatarData(resultado.DT_FIM_VIG)}
                         </div>
-
+{/* 
                         <div className="campo">
                             <strong>Endosso:</strong> {resultado.ENDOSSO || '-'}
                         </div>
@@ -264,17 +266,17 @@ const ConsultaFatura = () => {
 
                         <div className="campo">
                             <strong>Sequência Endosso:</strong> {resultado.SEQ_ENDOSSO || '0'}
-                        </div>
+                        </div> */}
 
-                        <div className="campo">
+                        {/* <div className="campo">
                             <strong>Nosso Número:</strong> {resultado.NOSSO_NUMERO || '-'}
-                        </div>
+                        </div> */}
 
-                        <div className="campo">
+                        {/* <div className="campo">
                             <strong>Voucher:</strong> {resultado.VOUCHER || '-'}
-                        </div>
+                        </div> */}
 
-                        <div className="campo">
+                        {/* <div className="campo">
                             <strong>Fatura Reajuste:</strong> {resultado.FATURA_REAJUSTE === 'S' ? 'Sim' : 'Não'}
                         </div>
 
@@ -312,7 +314,7 @@ const ConsultaFatura = () => {
 
                         <div className="campo">
                             <strong>Valor Quitado:</strong> R$ {formatarValor(resultado.VALOR_QUITADO)}
-                        </div>
+                        </div> */}
 
                         <div className="campo">
                             <strong>Data Baixa:</strong> {formatarData(resultado.DT_BAIXA)}
