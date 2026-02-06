@@ -14,7 +14,7 @@
 
 .dashboard-content {
   flex: 1;
-  padding: 1.5rem;
+  padding: 0 1.5rem 1.5rem; /* topo 0 */
   width: 100%;
   position: relative;
   z-index: 1;
@@ -57,5 +57,22 @@
 @media (max-width: 576px) {
   .dashboard-content {
     padding: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 0 1rem 1rem; /* topo 0 */
+  }
+
+  .dashboard-content.with-sidebar,
+  .dashboard-content:not(.with-sidebar) {
+    padding-left: 1rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-content {
+    padding: 0 0.75rem 0.75rem; /* topo 0 */
   }
 }
