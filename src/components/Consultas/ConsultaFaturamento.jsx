@@ -201,6 +201,13 @@ const ConsultaFaturamento = () => {
             
             if (response.sucesso) {
                 const dados = response.resultado?.data || [];
+                const codigos = [...new Set(
+                    dados
+                    .filter(f => f.ADMINISTRADORA)
+                    .map(f => f.ADMINISTRADORA)
+                )];
+
+                await buscarAdministradorasEmLote(codigos);
                 setResultados(dados);
                 
                 // Atualizar informações de paginação DO BACKEND
@@ -1014,8 +1021,8 @@ const ConsultaFaturamento = () => {
                                                                     <span className="font-monospace">{fatura.CNPJ_COBRADO || '-'}</span>
                                                                 </div>
                                                                 <div className="info-item">
-                                                                    <strong>Cedente:</strong>
-                                                                    <span className="text-truncate">{obterNomeCedente(fatura.CEDENTE)}</span>
+                                                                    <strong className={`cedente-text`}>Cedente:</strong>
+                                                                    <span>{obterNomeCedente(fatura.CEDENTE)}</span>
                                                                 </div>
                                                                 <div className="info-item">
                                                                     <strong>Prêmio Bruto:</strong>
@@ -1098,7 +1105,7 @@ const ConsultaFaturamento = () => {
         {loading && (
             <Loading 
                 fullScreen 
-                message="Buscando faturas..."
+                message="Processando faturas..."
                 size="large"
             />
         )}
