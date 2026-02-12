@@ -228,6 +228,13 @@ const ConsultaFaturasUnificada = () => {
 
             if (response?.sucesso) {
                 const dados = response.resultado?.data || [];
+                const codigos = [...new Set(
+                    dados
+                    .filter(f => f.ADMINISTRADORA)
+                    .map(f => f.ADMINISTRADORA)
+                )];
+
+                await buscarAdministradorasEmLote(codigos);
                 setResultados(dados);
 
                 if (response.resultado?.pagination) {

@@ -60,6 +60,29 @@ export const getFaturasComBoletos = async (filtros = {}) => {
   }
 };
 
+export const getFaturasComBoletosESegurados = async (filtros = {}) => {
+  try {
+    const token = localStorage.getItem("accessToken", "");
+    const response = await api.get(
+      "consultas/faturas/com-boletos-e-segurados/",
+      {
+        params: filtros,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Erro de endpoint ao consultar faturas com boletos",
+      error
+    );
+    throw error;
+  }
+};
+
 export const exportarFaturasParaExcel = async (filtros = {}) => {
   try {
     const token = localStorage.getItem("accessToken", "");

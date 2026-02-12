@@ -626,10 +626,19 @@
     border: 1px solid #e2e8f0;
 }
 
-.text-truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.cedente-text {
+  display: inline-block;
+  max-width: 35ch;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  font-size: 0.95rem;
+}
+
+.cedente-long {
+  font-size: 0.8rem;
+  max-width: 40ch; /* ganha um pouco mais de espaço */
 }
 
 /* =======================
@@ -998,71 +1007,3 @@
 
 /* =======================
    BOTÃO EXCEL CUSTOMIZADO
-======================= */
-
-.btn-excel-custom {
-    background-color: #198754 !important;
-    border-color: #198754 !important;
-    color: white !important;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.2s ease !important;
-}
-
-/* Efeito de onda */
-.btn-excel-custom::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    transform: translate(-50%, -50%);
-    transition: width 0.4s ease, height 0.4s ease;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.btn-excel-custom:hover:not(:disabled) {
-    background-color: #157347 !important;
-    border-color: #146c43 !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(25, 135, 84, 0.35) !important;
-    color: white !important;
-}
-
-.btn-excel-custom:hover:not(:disabled)::before {
-    width: 300px;
-    height: 300px;
-}
-
-.btn-excel-custom:focus {
-    background-color: #157347 !important;
-    border-color: #146c43 !important;
-    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.5) !important;
-    color: white !important;
-}
-
-.btn-excel-custom:active:not(:disabled) {
-    background-color: #146c43 !important;
-    border-color: #13653f !important;
-    transform: translateY(0) !important;
-    box-shadow: 0 2px 8px rgba(25, 135, 84, 0.2) !important;
-    color: white !important;
-}
-
-.btn-excel-custom i,
-.btn-excel-custom span {
-    position: relative;
-    z-index: 1;
-}
-
-.btn-excel-custom:disabled {
-    background-color: #6c757d !important;
-    border-color: #6c757d !important;
-    opacity: 0.65 !important;
-    cursor: not-allowed !important;
-    transform: none !important;
-}
