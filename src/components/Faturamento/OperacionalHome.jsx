@@ -38,14 +38,14 @@ const operacionais = [
      niveis: ["admin", "faturamento"]
   },
 
-   {
-    key: "paybox",
-    icon: <i class="bi bi-file-earmark-check-fill"/>,
-    title: "Paybox",
-    desc: "Gere o arquivo paybox através do número da fatura e da nota fiscal.",
-    to: "/faturamento/paybox",
-    niveis: ["admin", "faturamento"],
-  },
+  //  {
+  //   key: "paybox",
+  //   icon: <i class="bi bi-file-earmark-check-fill"/>,
+  //   title: "Paybox",
+  //   desc: "Gere o arquivo paybox através do número da fatura e da nota fiscal.",
+  //   to: "/faturamento/paybox",
+  //   niveis: ["admin", "faturamento"],
+  // },
 ];
 
 const OperacionalHome = () => {

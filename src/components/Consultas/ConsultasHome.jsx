@@ -36,14 +36,14 @@ const consultas = [
         to: "/consultas/consulta-segurados",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     },
-    {
-        key: "faturas",
-        icon: <i class="bi bi-file-earmark-text"></i>,
-        title: "Consultar Faturas",
-        desc: "Localize informações sobre faturamento com base nos registros disponíveis.",
-        to: "/consultas/consulta-faturas",
-        niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
-    },
+    // {
+    //     key: "faturas",
+    //     icon: <i class="bi bi-file-earmark-text"></i>,
+    //     title: "Consultar Faturas",
+    //     desc: "Localize informações sobre faturamento com base nos registros disponíveis.",
+    //     to: "/consultas/consulta-faturas",
+    //     niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
+    // },
     {
         key: "faturas-dinamicas",
         icon: <i class="bi bi-file-earmark-text"></i>,
