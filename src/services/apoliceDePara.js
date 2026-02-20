@@ -1,4 +1,3 @@
-// Mapa: código/numero da apólice -> possíveis nomes de produto (array para lidar com duplicidades)
 export const APOLICE_DEPARA = {
   "132": ["ALUG"],
   "238": ["ALUG"],
@@ -6,7 +5,7 @@ export const APOLICE_DEPARA = {
   "278": ["ALUG"],
   "279": ["ALUG"],
   "280": ["ALUG"],
-  "4803": ["ALUG", "VIDA"], // aparece em ambas na sua lista
+  "4803": ["ALUG", "VIDA"],
   "4008": ["CONTEUDO"],
   "5008": ["CONTEUDO"],
   "9008": ["CONTEUDO"],
@@ -45,7 +44,7 @@ export const APOLICE_DEPARA = {
   "CD00010": ["SST"],
   "CD00011": ["SST"],
   "CD00012": ["SST"],
-  "CD0002": ["SST", "ASO"], // aparece como SST e também ASO
+  "CD0002": ["SST", "ASO"], 
   "CD0003": ["CURSO"],
   "CD0004": ["AUTOVISTORIA"],
   "CD0005": ["SST"],
@@ -63,7 +62,6 @@ export const APOLICE_DEPARA = {
   "BPS001": ["BAPS"],
 };
 
-// Helper: resolve pelo código (e tenta desambiguar com pistas opcionais)
 export function resolveNomeApolice(codeRaw, hintTexts = []) {
   if (!codeRaw) return null;
   const code = String(codeRaw).trim().toUpperCase();
@@ -71,7 +69,6 @@ export function resolveNomeApolice(codeRaw, hintTexts = []) {
   if (!produtos || produtos.length === 0) return null;
   if (produtos.length === 1) return produtos[0];
 
-  // tenta desambiguar usando valores do próprio registro (ex.: PRODUTO/RAMO/TIPO)
   const hints = hintTexts
     .filter(Boolean)
     .map((h) => String(h).toUpperCase());
@@ -81,11 +78,9 @@ export function resolveNomeApolice(codeRaw, hintTexts = []) {
     if (match) return match;
   }
 
-  // não deu pra desambiguar → retorna todos
   return [...new Set(produtos)].join(" / ");
 }
 
-// Conveniência: extrai o código do próprio objeto de resultado
 export function resolveNomeApoliceFromRecord(seg) {
   if (!seg) return null;
   const candidateKeys = [
@@ -106,7 +101,6 @@ export function resolveNomeApoliceFromRecord(seg) {
   }
   if (!code) return null;
 
-  // pistas para desambiguar
   const hints = [seg.PRODUTO, seg.RAMO, seg.TIPO];
   return resolveNomeApolice(code, hints);
 }

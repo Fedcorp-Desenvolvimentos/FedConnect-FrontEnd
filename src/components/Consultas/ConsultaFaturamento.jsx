@@ -815,7 +815,7 @@ const ConsultaFaturasUnificada = () => {
 
                                                 {isExpanded && (
                                                     <tr className="expanded-details">
-                                                        <td colSpan="8">
+                                                        <td colSpan="7">
                                                             <div className="expansion-content">
                                                                 <h6 className="section-title">
                                                                     <i className="bi-info-circle me-2"></i>Detalhes da Fatura

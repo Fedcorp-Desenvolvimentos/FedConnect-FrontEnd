@@ -210,8 +210,8 @@
 }
 
 /* Desabilita tooltip padrão dos botões */
-.btn[title]::after { 
-    content: none; 
+.btn[title]::after {
+    content: none;
 }
 
 /* Tooltip custom só quando você quiser (classe .tooltip-custom) */
@@ -279,7 +279,7 @@
 }
 
 .total-badge {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #667eea 0%, #4299e1 100%);
     color: white;
     padding: 6px 16px;
     border-radius: 20px;
@@ -326,12 +326,13 @@
 
 .barra-pesquisa-resultados {
     margin-bottom: 16px;
-    width: min(900px, 100%);
+    width: min(1400px, 100%);
 }
+
 
 /* Container do input */
 .input-group-pesquisa {
-    width: 100%;
+    width: 1030px;
     height: 46px;
     position: relative;
 
@@ -432,7 +433,7 @@
 }
 
 /* Garante que nada vire absolute dentro da barra */
-.input-group-pesquisa > * {
+.input-group-pesquisa>* {
     position: static !important;
 }
 

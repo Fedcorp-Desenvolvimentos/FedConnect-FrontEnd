@@ -52,6 +52,15 @@ const consultas = [
         to: "/consultas/consulta-faturamento",
         niveis: ["admin", "usuario", "comercial", "ti"],
     },
+// Comentado enquanto desenvolvemos a parte de consulta de administradora
+    //    {
+    //     key: "consulta-administradora",
+    //      icon: <i className="bi bi-building-fill" />,
+    //     title: "Consultar Administradora",
+    //     desc: "Consulte dados da administradora com base nas informações disponíveis.",
+    //     to: "/consultas/consulta-administradora",
+    //     niveis: ["admin", "usuario", "comercial", "ti"],
+    // },
     
 ];
 
