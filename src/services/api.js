@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://goldfish-app-nk5x6.ondigitalocean.app/",
+  baseURL: "https://fedconnect-back-end-fedcorp-s3ho5.ondigitalocean.app/",
   // baseURL: "http://localhost:8000/",
 });
 
