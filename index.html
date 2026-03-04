@@ -1,29 +1,57 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <meta name="google-site-verification" content="U7f_r01jOF0pmJlLTOMlNEl_mJwYt9JAgfXugQS72JE" />
+    <!-- Verificação Google Search Console -->
+    <meta
+      name="google-site-verification"
+      content="U7f_r01jOF0pmJlLTOMlNEl_mJwYt9JAgfXugQS72JE"
+    />
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/imagens/Fedcorp-icone02-50x50-Cmau4-hl.png" />
+    <!-- SEO -->
+    <title>Fed Connect - Sistema Corporativo de Consulta de Dados</title>
+    <meta
+      name="description"
+      content="Fed Connect é uma plataforma corporativa para consulta de dados de pessoas físicas, jurídicas, faturamento, beneficiários e endereços."
+    />
+    <meta name="keywords" content="FedConnect, Fed Connect, consulta de dados, CPF, CNPJ, faturamento, beneficiários, sistema corporativo" />
+    <meta name="author" content="FedCorp" />
+    <meta name="robots" content="index, follow" />
 
-  <!-- SEO Básico -->
-  <title>Fed Connect - Sistema Corporativo de Consulta de Dados</title>
-  <meta name="description" content="Fed Connect é uma plataforma corporativa para consulta de dados de pessoas físicas, jurídicas, faturamento, beneficiários e endereços." />
-  <meta name="keywords" content="FedConnect, Fed Connect, consulta de dados, CPF, CNPJ, faturamento, beneficiários, sistema corporativo" />
-  <meta name="author" content="FedCorp" />
+    <!-- Canonical -->
+    <link rel="canonical" href="https://fedconnect.com.br/" />
 
-  <!-- Open Graph (para compartilhamento) -->
-  <meta property="og:title" content="Fed Connect - Sistema Corporativo" />
-  <meta property="og:description" content="Plataforma corporativa para consulta e validação de dados." />
-  <meta property="og:type" content="website" />
-  <meta property="og:locale" content="pt_BR" />
-</head>
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/png"
+      href="/imagens/Fedcorp-icone02-50x50-Cmau4-hl.png"
+    />
+
+    <!-- Open Graph (Compartilhamento) -->
+    <meta
+      property="og:title"
+      content="Fed Connect - Sistema Corporativo de Consulta de Dados"
+    />
+    <meta
+      property="og:description"
+      content="Plataforma corporativa para consulta de dados, faturamento e beneficiários."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://fedconnect.com.br" />
+    <meta property="og:locale" content="pt_BR" />
+  </head>
 
   <body>
+    <!-- Texto fallback (ajuda em SPA/React e com JS desabilitado) -->
+    <noscript>
+      Fed Connect é uma plataforma corporativa para consulta de dados de pessoas físicas, jurídicas,
+      faturamento, beneficiários e endereços. Para acessar, habilite o JavaScript no navegador.
+    </noscript>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
-</html> 
+</html>
