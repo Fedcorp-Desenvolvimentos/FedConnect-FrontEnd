@@ -306,7 +306,7 @@ const ConsultaComercial = () => {
               </div>
                <div
                 className="subcard-option"
-                onClick={() => navigate("/comercial-regiao")}
+                onClick={() => navigate("/consultas/comercial-regiao")}
               >
                 <MapPin size={25} className="subcard-icon" />
                 <span>Consulta por Região</span>
