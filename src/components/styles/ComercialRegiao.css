@@ -781,7 +781,7 @@
 
 @media (min-width: 1400px) {
   .comercial-regiao-container {
-    margin-left: 31vw !important;
+    margin-left: 18vw !important;
     max-width: 950px !important;
     padding: 3rem !important;
     border-radius: 2rem !important;
@@ -791,7 +791,7 @@
 
 @media (min-width: 1200px) and (max-width: 1399px) {
   .comercial-regiao-container {
-    margin-left: 36vw !important;
+    margin-left: 14vw !important;
     max-width: 600px !important;
     padding: 2.5rem !important;
     border-radius: 1.6rem !important;
