@@ -194,3 +194,166 @@
 .page-container {
   align-items: flex-start;
 }
+
+.paybox-history {
+  margin-top: 24px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 14px;
+  background: #fff;
+}
+
+.history-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.history-item-body p {
+  margin: 4px 0;
+}
+
+.history-empty {
+  color: #666;
+  font-style: italic;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.geracao {
+  background: #e7f1ff;
+  color: #0d6efd;
+}
+
+.badge.importacao {
+  background: #e8fff1;
+  color: #198754;
+}
+
+.btn-clear-history {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .paybox-card {
+    margin-top: 16px;
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .paybox-form {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    justify-content: stretch;
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
+
+.actions .btn-secondary {
+  background: #ffffff;
+  color: #2463eb;
+  border: 1px solid #cdd7ee;
+  box-shadow: none;
+}
+
+.actions .btn-secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(9, 60, 168, 0.12);
+}
+
+.field-modelo {
+  margin-bottom: 16px;
+}
+
+.field select {
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  font-size: 14px;
+  color: #101828;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.field select:hover {
+  border-color: #b2c2da;
+}
+
+.field select:focus {
+  outline: none;
+  border-color: #2e6bd6;
+  box-shadow: 0 0 0 4px rgba(46, 107, 214, 0.15);
+}
+
+.actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.actions .btn-secondary {
+  background: #ffffff;
+  color: #2463eb;
+  border: 1px solid #cdd7ee;
+  box-shadow: none;
+}
+
+.actions .btn-secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(36, 99, 235, 0.12);
+}
+
+@media (max-width: 768px) {
+  .actions {
+    justify-content: stretch;
+    flex-direction: column;
+  }
+
+  .actions button,
+  .field select {
+    width: 100%;
+  }
+}
