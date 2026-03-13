@@ -18,12 +18,38 @@ function formatDateBR(dateStr) {
   return dateStr;
 }
 
+function isValorNaoEncontrado(valor) {
+  if (valor === null || valor === undefined) return true;
+
+  const texto = String(valor).trim().toLowerCase();
+
+  return (
+    texto === "" ||
+    texto === "n/a" ||
+    texto === "na" ||
+    texto === "null" ||
+    texto === "undefined" ||
+    texto === "-"
+  );
+}
+
+function isBasicDataInvalido(basicData) {
+  if (!basicData || typeof basicData !== "object") return true;
+
+  return (
+    isValorNaoEncontrado(basicData.Name) &&
+    isValorNaoEncontrado(basicData.TaxIdNumber) &&
+    isValorNaoEncontrado(basicData.BirthDate) &&
+    isValorNaoEncontrado(basicData.MotherName)
+  );
+}
+
 const ConsultaPF = () => {
   const [copiado, setCopiado] = useState({});
   const [showPopup, setShowPopup] = useState(false);
 
   function copiarParaClipboard(texto, campo) {
-    if (!texto) return;
+    if (!texto || isValorNaoEncontrado(texto)) return;
     navigator.clipboard.writeText(texto);
     setCopiado((prev) => ({ ...prev, [campo]: true }));
     setShowPopup(true);
@@ -38,7 +64,6 @@ const ConsultaPF = () => {
   const [error, setError] = useState(null);
   const [resultado, setResultado] = useState(null);
 
-  // 🆕 Flag para controlar o scroll automático somente após novo resultado
   const [scrollOnNextResult, setScrollOnNextResult] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -51,6 +76,7 @@ const ConsultaPF = () => {
   });
 
   const [massConsultaMessage, setMassConsultaMessage] = useState("");
+
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     let formattedValue = value;
@@ -63,12 +89,12 @@ const ConsultaPF = () => {
       ...prev,
       [name]: formattedValue,
     }));
-    setScrollOnNextResult(false); // evita scroll enquanto o usuário edita
+    setScrollOnNextResult(false);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setScrollOnNextResult(false); // zera antes de iniciar nova consulta
+    setScrollOnNextResult(false);
     setLoading(true);
     setError(null);
     setResultado(null);
@@ -122,15 +148,44 @@ const ConsultaPF = () => {
       const response = await ConsultaService.realizarConsulta(payload);
       const apiData = response?.data ?? response;
 
-      // Opcional: checagem de status específico se a API retornar isso
       const apiStatus =
         apiData?.resultado_api?.Status?.api || apiData?.Status?.api;
+
       if (Array.isArray(apiStatus) && apiStatus[0]?.Code === -128) {
         setError("Erro na base de consulta, tente novamente mais tarde");
         setResultado(null);
       } else {
-        setResultado(apiData);
-        setScrollOnNextResult(true); // ativa o scroll apenas após resultado chegar
+        const results = apiData?.resultado_api?.Result;
+
+        if (activeForm === "cpf") {
+          const primeiroResultado = Array.isArray(results) ? results[0] : null;
+          const basicData = primeiroResultado?.BasicData || null;
+
+          if (!primeiroResultado || isBasicDataInvalido(basicData)) {
+            setError("CPF não encontrado. Verifique os parâmetros de busca.");
+            setResultado(null);
+          } else {
+            setResultado(apiData);
+            setScrollOnNextResult(true);
+          }
+        } else if (activeForm === "chaves") {
+          const resultadosValidos = Array.isArray(results)
+            ? results.filter((item) => !isBasicDataInvalido(item?.BasicData))
+            : [];
+
+          setResultado({
+            ...apiData,
+            resultado_api: {
+              ...apiData?.resultado_api,
+              Result: resultadosValidos,
+            },
+          });
+
+          setScrollOnNextResult(true);
+        } else {
+          setResultado(apiData);
+          setScrollOnNextResult(true);
+        }
       }
     } catch (err) {
       const friendly =
@@ -138,7 +193,19 @@ const ConsultaPF = () => {
         err?.response?.data?.message ||
         err?.message ||
         "Erro ao realizar consulta.";
-      setError(friendly);
+
+      const friendlyText = String(friendly).trim().toLowerCase();
+
+      if (
+        friendlyText === "n/a" ||
+        friendlyText.includes("cpf não encontrado") ||
+        friendlyText.includes("cpf nao encontrado") ||
+        friendlyText.includes("not found")
+      ) {
+        setError("CPF não encontrado. Verifique os parâmetros de busca.");
+      } else {
+        setError(friendly);
+      }
     } finally {
       setLoading(false);
     }
@@ -195,7 +262,7 @@ const ConsultaPF = () => {
         );
 
         const allResults = [];
-        const batchSize = 5; // Número de requisições por lote
+        const batchSize = 5;
         const totalCpfs = cpfsValidos.length;
 
         for (let i = 0; i < totalCpfs; i += batchSize) {
@@ -212,9 +279,12 @@ const ConsultaPF = () => {
 
           batchResults.forEach((result, idx) => {
             if (result.status === "fulfilled") {
+              const apiData = result.value?.data ?? result.value;
               const consultaResult =
+                apiData?.resultado_api?.Result?.[0]?.BasicData ||
                 result.value?.resultado_api?.Result?.[0]?.BasicData;
-              if (consultaResult) {
+
+              if (consultaResult && !isBasicDataInvalido(consultaResult)) {
                 allResults.push({
                   "CPF Original": batch[idx].CPF,
                   "Nome Completo": consultaResult.Name || "N/A",
@@ -232,21 +302,21 @@ const ConsultaPF = () => {
                         ? "Sim"
                         : "Não"
                       : "N/A",
-                  Erro: "N/A",
+                  Erro: "",
                 });
               } else {
                 allResults.push({
                   "CPF Original": batch[idx].CPF,
-                  "Nome Completo": "N/A",
-                  CPF: "N/A",
-                  "Situação Cadastral": "N/A",
-                  "Data de Nascimento": "N/A",
-                  Idade: "N/A",
-                  "Nome da Mãe": "N/A",
-                  Gênero: "N/A",
-                  "Nome Comum (Alias)": "N/A",
-                  "Indicação de Óbito": "N/A",
-                  Erro: "Nenhum resultado encontrado.",
+                  "Nome Completo": "",
+                  CPF: "",
+                  "Situação Cadastral": "",
+                  "Data de Nascimento": "",
+                  Idade: "",
+                  "Nome da Mãe": "",
+                  Gênero: "",
+                  "Nome Comum (Alias)": "",
+                  "Indicação de Óbito": "",
+                  Erro: "CPF não encontrado. Verifique os parâmetros de busca.",
                 });
               }
             } else {
@@ -256,15 +326,15 @@ const ConsultaPF = () => {
               );
               allResults.push({
                 "CPF Original": batch[idx].CPF,
-                "Nome Completo": "N/A",
-                CPF: "N/A",
-                "Situação Cadastral": "N/A",
-                "Data de Nascimento": "N/A",
-                Idade: "N/A",
-                "Nome da Mãe": "N/A",
-                Gênero: "N/A",
-                "Nome Comum (Alias)": "N/A",
-                "Indicação de Óbito": "N/A",
+                "Nome Completo": "",
+                CPF: "",
+                "Situação Cadastral": "",
+                "Data de Nascimento": "",
+                Idade: "",
+                "Nome da Mãe": "",
+                Gênero: "",
+                "Nome Comum (Alias)": "",
+                "Indicação de Óbito": "",
                 Erro: `Falha na consulta. Motivo: ${
                   result.reason?.message || "Erro de rede/servidor"
                 }`,
@@ -351,7 +421,6 @@ const ConsultaPF = () => {
 
   const resultadoRef = useRef(null);
 
-  // 🆕 Scroll controlado: só rola quando houver novo resultado e a flag estiver ativa
   useEffect(() => {
     const hasCpfResults =
       activeForm === "cpf" &&
@@ -369,7 +438,7 @@ const ConsultaPF = () => {
           behavior: "smooth",
           block: "start",
         });
-        setScrollOnNextResult(false); // desliga após usar
+        setScrollOnNextResult(false);
       }
     }
   }, [loading, scrollOnNextResult, resultado, activeForm]);
@@ -396,7 +465,7 @@ const ConsultaPF = () => {
             setError(null);
             setResultado(null);
             setMassConsultaMessage("");
-            setScrollOnNextResult(false); // evita scroll ao trocar de aba
+            setScrollOnNextResult(false);
           }}
         >
           <div className="icon-container">
@@ -418,8 +487,7 @@ const ConsultaPF = () => {
         </div>
 
         <div
-          className={`card card-option ${activeForm === "chaves" ? "active" : ""
-            }`}
+          className={`card card-option ${activeForm === "chaves" ? "active" : ""}`}
           onClick={() => {
             setActiveForm("chaves");
             setFormData({
@@ -433,7 +501,7 @@ const ConsultaPF = () => {
             setError(null);
             setResultado(null);
             setMassConsultaMessage("");
-            setScrollOnNextResult(false); // evita scroll ao trocar de aba
+            setScrollOnNextResult(false);
           }}
         >
           <div className="icon-container">
@@ -450,14 +518,13 @@ const ConsultaPF = () => {
         </div>
 
         <div
-          className={`card card-option ${activeForm === "massa" ? "active" : ""
-            }`}
+          className={`card card-option ${activeForm === "massa" ? "active" : ""}`}
           onClick={() => {
             setActiveForm("massa");
             setError(null);
             setResultado(null);
             setMassConsultaMessage("");
-            setScrollOnNextResult(false); // evita scroll ao trocar de aba
+            setScrollOnNextResult(false);
           }}
         >
           <div className="icon-container">
@@ -509,7 +576,9 @@ const ConsultaPF = () => {
                       type="button"
                       className="copy-btn"
                       title="Copiar Nome"
-                      onClick={() => copiarParaClipboard(basicData.Name || "N/A", "nome")}
+                      onClick={() =>
+                        copiarParaClipboard(basicData.Name || "N/A", "nome")
+                      }
                     >
                       {copiado.nome ? <FiCheck color="#20bf55" /> : <FiCopy />}
                     </button>
@@ -517,12 +586,21 @@ const ConsultaPF = () => {
 
                   <label>CPF:</label>
                   <div className="input-copy-group">
-                    <input type="text" value={basicData.TaxIdNumber || "N/A"} disabled />
+                    <input
+                      type="text"
+                      value={basicData.TaxIdNumber || "N/A"}
+                      disabled
+                    />
                     <button
                       type="button"
                       className="copy-btn"
                       title="Copiar CPF"
-                      onClick={() => copiarParaClipboard(basicData.TaxIdNumber || "N/A", "cpf")}
+                      onClick={() =>
+                        copiarParaClipboard(
+                          basicData.TaxIdNumber || "N/A",
+                          "cpf"
+                        )
+                      }
                     >
                       {copiado.cpf ? <FiCheck color="#20bf55" /> : <FiCopy />}
                     </button>
@@ -530,27 +608,53 @@ const ConsultaPF = () => {
 
                   <label>Situação Cadastral:</label>
                   <div className="input-copy-group">
-                    <input type="text" value={basicData.TaxIdStatus || "N/A"} disabled />
+                    <input
+                      type="text"
+                      value={basicData.TaxIdStatus || "N/A"}
+                      disabled
+                    />
                     <button
                       type="button"
                       className="copy-btn"
                       title="Copiar Situação"
-                      onClick={() => copiarParaClipboard(basicData.TaxIdStatus || "N/A", "situacao")}
+                      onClick={() =>
+                        copiarParaClipboard(
+                          basicData.TaxIdStatus || "N/A",
+                          "situacao"
+                        )
+                      }
                     >
-                      {copiado.situacao ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                      {copiado.situacao ? (
+                        <FiCheck color="#20bf55" />
+                      ) : (
+                        <FiCopy />
+                      )}
                     </button>
                   </div>
 
                   <label>Data de Nascimento:</label>
                   <div className="input-copy-group">
-                    <input type="text" value={formatDateBR(basicData.BirthDate)} disabled />
+                    <input
+                      type="text"
+                      value={formatDateBR(basicData.BirthDate)}
+                      disabled
+                    />
                     <button
                       type="button"
                       className="copy-btn"
                       title="Copiar Data de Nascimento"
-                      onClick={() => copiarParaClipboard(formatDateBR(basicData.BirthDate), "nascimento")}
+                      onClick={() =>
+                        copiarParaClipboard(
+                          formatDateBR(basicData.BirthDate),
+                          "nascimento"
+                        )
+                      }
                     >
-                      {copiado.nascimento ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                      {copiado.nascimento ? (
+                        <FiCheck color="#20bf55" />
+                      ) : (
+                        <FiCopy />
+                      )}
                     </button>
                   </div>
 
@@ -561,7 +665,9 @@ const ConsultaPF = () => {
                       type="button"
                       className="copy-btn"
                       title="Copiar Idade"
-                      onClick={() => copiarParaClipboard(basicData.Age || "N/A", "idade")}
+                      onClick={() =>
+                        copiarParaClipboard(basicData.Age || "N/A", "idade")
+                      }
                     >
                       {copiado.idade ? <FiCheck color="#20bf55" /> : <FiCopy />}
                     </button>
@@ -569,12 +675,21 @@ const ConsultaPF = () => {
 
                   <label>Nome da Mãe:</label>
                   <div className="input-copy-group">
-                    <input type="text" value={basicData.MotherName || "N/A"} disabled />
+                    <input
+                      type="text"
+                      value={basicData.MotherName || "N/A"}
+                      disabled
+                    />
                     <button
                       type="button"
                       className="copy-btn"
                       title="Copiar Nome da Mãe"
-                      onClick={() => copiarParaClipboard(basicData.MotherName || "N/A", "mae")}
+                      onClick={() =>
+                        copiarParaClipboard(
+                          basicData.MotherName || "N/A",
+                          "mae"
+                        )
+                      }
                     >
                       {copiado.mae ? <FiCheck color="#20bf55" /> : <FiCopy />}
                     </button>
@@ -582,25 +697,47 @@ const ConsultaPF = () => {
 
                   <label>Gênero:</label>
                   <div className="input-copy-group">
-                    <input type="text" value={basicData.Gender || "N/A"} disabled />
+                    <input
+                      type="text"
+                      value={basicData.Gender || "N/A"}
+                      disabled
+                    />
                     <button
                       type="button"
                       className="copy-btn"
                       title="Copiar Gênero"
-                      onClick={() => copiarParaClipboard(basicData.Gender || "N/A", "genero")}
+                      onClick={() =>
+                        copiarParaClipboard(
+                          basicData.Gender || "N/A",
+                          "genero"
+                        )
+                      }
                     >
-                      {copiado.genero ? <FiCheck color="#20bf55" /> : <FiCopy />}
+                      {copiado.genero ? (
+                        <FiCheck color="#20bf55" />
+                      ) : (
+                        <FiCopy />
+                      )}
                     </button>
                   </div>
 
                   <label>Nome Comum (Alias):</label>
                   <div className="input-copy-group">
-                    <input type="text" value={basicData.Aliases?.CommonName || "N/A"} disabled />
+                    <input
+                      type="text"
+                      value={basicData.Aliases?.CommonName || "N/A"}
+                      disabled
+                    />
                     <button
                       type="button"
                       className="copy-btn"
                       title="Copiar Alias"
-                      onClick={() => copiarParaClipboard(basicData.Aliases?.CommonName || "N/A", "alias")}
+                      onClick={() =>
+                        copiarParaClipboard(
+                          basicData.Aliases?.CommonName || "N/A",
+                          "alias"
+                        )
+                      }
                     >
                       {copiado.alias ? <FiCheck color="#20bf55" /> : <FiCopy />}
                     </button>
@@ -612,7 +749,9 @@ const ConsultaPF = () => {
                       type="text"
                       value={
                         basicData.HasObitIndication !== undefined
-                          ? basicData.HasObitIndication ? "Sim" : "Não"
+                          ? basicData.HasObitIndication
+                            ? "Sim"
+                            : "Não"
                           : "N/A"
                       }
                       disabled
@@ -624,7 +763,9 @@ const ConsultaPF = () => {
                       onClick={() =>
                         copiarParaClipboard(
                           basicData.HasObitIndication !== undefined
-                            ? basicData.HasObitIndication ? "Sim" : "Não"
+                            ? basicData.HasObitIndication
+                              ? "Sim"
+                              : "Não"
                             : "N/A",
                           "obito"
                         )
@@ -720,6 +861,7 @@ const ConsultaPF = () => {
           {error && <p className="error-message">{error}</p>}
         </form>
       )}
+
       {activeForm === "massa" && (
         <div className="form-massa-container">
           <input
@@ -747,8 +889,8 @@ const ConsultaPF = () => {
 
           {loading && (
             <div className="loading-indicator">
-              <div className="spinner"></div>{" "}
-              <p>{massConsultaMessage || "Processando..."}</p>{" "}
+              <div className="spinner"></div>
+              <p>{massConsultaMessage || "Processando..."}</p>
             </div>
           )}
 
@@ -858,6 +1000,7 @@ const ConsultaPF = () => {
             </table>
           </div>
         )}
+
       {activeForm === "chaves" &&
         resultado?.resultado_api?.Result &&
         resultado.resultado_api.Result.length === 0 && (
