@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import "../styles/Home.css";
+import "../../styles/Home.css";
 
 function useIsMobile(breakpoint = 700) {
   const getIsMobile = () => window.innerWidth <= breakpoint;

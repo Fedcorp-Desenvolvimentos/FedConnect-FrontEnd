@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-import "../styles/EnvEmail.css";
+import "../../styles/EnvEmail.css";
 import { Mail, History, Settings, FileSpreadsheet } from "lucide-react";
 
 const EnvioEmail = () => {
@@ -309,8 +309,6 @@ const EnvioEmail = () => {
             {activeForm === "historico" && (
                 <div className="card-resultado">
                     <h4>Histórico de envios</h4>
-
-                    {historicoLoading && <p>Carregando histórico…</p>}
 
                     {!historicoLoading && historico.length === 0 && (
                         <p className="message">Nenhum envio encontrado.</p>

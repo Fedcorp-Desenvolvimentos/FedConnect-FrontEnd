@@ -1,5 +1,5 @@
-import React from "react";
-import "../styles/Ferramentas.css";
+import PageTemplate from "../PageTemplate/PageTemplate";
+import "../../styles/Ferramentas.css";
 
 const ferramentas = [
   {
@@ -24,42 +24,45 @@ const ferramentas = [
   },
   {
     nome: "Produtos ADM",
-    url: "https://fedcorp.store/login",
+    url: "",
     descricao: "Em breve: produtos da administradora integrados na plataforma.",
   },
 ];
 
-const Ferramentas = () => (
-  <div className="ferramentas-container">
-    <h1 className="ferramentas-title">
-      <i className="bi bi-tools"></i> Ferramentas da FedCorp
-    </h1>
-    <p className="ferramentas-desc">
-      Acesse rapidamente as principais plataformas e soluções digitais da FedCorp. Escolha uma ferramenta abaixo:
-    </p>
-    <div className="ferramentas-grid">
-      {ferramentas.map((ferramenta, idx) => (
-        <div className="ferramenta-card" key={idx}>
-          <div className="ferramenta-nome">
-            <i className="bi bi-link-45deg"></i> {ferramenta.nome}
+const Ferramentas = () => {
+  // Subtítulo opcional
+  const subtitle = "Acesse rapidamente as principais plataformas e soluções digitais da FedCorp.";
+
+  return (
+    <PageTemplate
+      title="Ferramentas da FedCorp"
+      icon={<i className="bi bi-tools"></i>}
+      subtitle={subtitle}
+    >
+      <div className="ferramentas-grid">
+        {ferramentas.map((ferramenta, idx) => (
+          <div className="ferramenta-card" key={idx}>
+            <div className="ferramenta-nome">
+              <i className="bi bi-link-45deg"></i> {ferramenta.nome}
+            </div>
+            <div className="ferramenta-desc">{ferramenta.descricao}</div>
+            {ferramenta.url ? (
+              <a
+                href={ferramenta.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ferramenta-btn"
+              >
+                Acessar
+              </a>
+            ) : (
+              <span className="ferramenta-em-breve">Em breve</span>
+            )}
           </div>
-          <div className="ferramenta-desc">{ferramenta.descricao}</div>
-          {ferramenta.url ? (
-            <a
-              href={ferramenta.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ferramenta-btn"
-            >
-              Acessar
-            </a>
-          ) : (
-            <span className="ferramenta-em-breve">Em breve</span>
-          )}
-        </div>
-      ))}
-    </div>
-  </div>
-);
+        ))}
+      </div>
+    </PageTemplate>
+  );
+};
 
 export default Ferramentas;

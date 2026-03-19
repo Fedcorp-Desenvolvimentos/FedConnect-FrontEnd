@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api.js';
+import { useGlobal } from './GlobalContext.jsx';
 
 const AuthContext = createContext(null);
 
@@ -12,10 +13,13 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const { loading, setLoading, setLoadingMessage } = useGlobal();
     const navigate = useNavigate();
 
+    // console.log("user", user)
+
     const login = useCallback(async (credentials) => {
+        setLoadingMessage("Fazendo login...");
         setLoading(true);
         try {
             // 1. Faz a requisição de login
@@ -44,31 +48,36 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-
     const logout = useCallback(() => {
+        setLoadingMessage("Fazendo logout...");
+        setLoading(true);
         // Remove o token do localStorage
         localStorage.removeItem('accessToken');
         setUser(null);
         setIsAuthenticated(false);
         navigate('/login');
+        setLoading(false);
     }, [navigate]);
 
     useEffect(() => {
         const checkAuthStatus = async () => {
             // Tenta obter o token do localStorage
             const token = localStorage.getItem('accessToken');
+            const publicRoutes = ["/", "/login", "/esqueci-senha", "/404"];
 
             // Se não houver token, o usuário não está autenticado
-            if (!token) {
+           if (!token) {
                 setLoading(false);
                 setIsAuthenticated(false);
-                if (window.location.pathname !== '/login') {
-                    navigate('/login');
+
+                const isPublicRoute = publicRoutes.includes(window.location.pathname);
+
+                if (!isPublicRoute) {
+                    navigate("/login");
                 }
+
                 return;
             }
-
-
             try {
                 const response = await api.get('/users/me/');
                 setUser(response.data);
@@ -81,8 +90,10 @@ export const AuthProvider = ({ children }) => {
                 setUser(null);
                 setIsAuthenticated(false);
 
-                if (window.location.pathname !== '/login') {
-                    navigate('/login');
+                const isPublicRoute = publicRoutes.includes(window.location.pathname);
+
+                if (!isPublicRoute) {
+                    navigate("/login");
                 }
             } finally {
                 setLoading(false);

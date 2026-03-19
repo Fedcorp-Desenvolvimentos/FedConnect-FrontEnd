@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PRODUTOS } from '../../data/produtos';
-import '../styles/Produtos.css';
+import '../../styles/Produtos.css';
 
 const CATEGORIAS = ["Todos", "Residencial", "Condomínio", "Vida", "Saúde", "Auto", "Garantias", "Institucional"];
 

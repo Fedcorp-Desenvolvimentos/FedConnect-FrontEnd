@@ -3,8 +3,10 @@ import KanbanVisitas from "./KanbanVisitas";
 import GraficoVisitas from "./GraficoVisitas";
 import DetalheVisita from "./DetalheVisita";
 import { AgendaComercialService } from "../../services/agenda_comercial";
-import "../styles/DashboardComercial.css";
+import "../../styles/DashboardComercial.css";
 import * as XLSX from "xlsx";
+import PageTemplate from "../PageTemplate/PageTemplate";
+import { IoIosBusiness } from "react-icons/io";
 
 /* ==================== utils ==================== */
 function toBRDate(d) {
@@ -394,131 +396,138 @@ export default function DashboardComercial() {
   }
 
   return (
-    <div className="fedconnect-dashboard">
-      <div className="dashboard-topo">
-        <h2>Acompanhamento Comercial</h2>
-      </div>
+    <PageTemplate
+      title="Consultas comerciais"
+      subtitle="Consulte informações comerciais"
+      icon={<IoIosBusiness />}
+      className="consulta-comercial-page"
+      >
+      <div className="fedconnect-dashboard">
+        <div className="dashboard-topo">
+          <h2>Acompanhamento Comercial</h2>
+        </div>
 
-      <div className="dashboard-filtros agenda-filtros">
-        <input
-          type="text"
-          placeholder="Buscar por empresa…"
-          value={filters.empresa}
-          onChange={(e) =>
-            setFilters((f) => ({ ...f, empresa: e.target.value }))
-          }
-        />
-
-        <select
-          value={filters.comercial}
-          onChange={(e) =>
-            setFilters((f) => ({ ...f, comercial: e.target.value }))
-          }
-          aria-label="Filtrar por comercial"
-        >
-          {comerciaisOptions.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt === "all" ? "Todos os comerciais" : opt}
-            </option>
-          ))}
-        </select>
-
-        <input
-          type="month"
-          className="month-input"
-          onChange={handleMonthInput}
-          aria-label="Selecionar mês"
-          value={`${activeMonth.getFullYear()}-${String(
-            activeMonth.getMonth() + 1
-          ).padStart(2, "0")}`}
-        />
-
-        <button
-          className="btn-light"
-          onClick={() => setFilters({ empresa: "", comercial: "all" })}
-        >
-          Limpar
-        </button>
-      </div>
-
-      {/* Desktop: gráfico | Mobile: totalizador */}
-      {isMobile ? (
-        <>
-          <section className="dashboard-totalizador">
-            <div className="totals">
-              <span>
-                <strong>Agendadas:</strong> {totals.agendadas}
-              </span>
-              <span className="sep">|</span>
-              <span>
-                <strong>Realizadas:</strong> {totals.realizadas}
-              </span>
-              <span className="sep">|</span>
-              <span>
-                <strong>Canceladas:</strong> {totals.canceladas}
-              </span>
-            </div>
-          </section>
-
-          <button
-            className="btn-exportar-relatorio"
-            onClick={exportarRelatorioExcel}
-            disabled={!filteredVisitas?.length}
-            title={
-              filteredVisitas?.length
-                ? "Exportar relatório em Excel"
-                : "Sem dados para exportar"
+        <div className="dashboard-filtros agenda-filtros">
+          <input
+            type="text"
+            placeholder="Buscar por empresa…"
+            value={filters.empresa}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, empresa: e.target.value }))
             }
-            aria-disabled={!filteredVisitas?.length}
-          >
-            Exportar Relatório
-          </button>
-        </>
-      ) : (
-        <section className="dashboard-graph-container">
-          <div className="graph-wrapper">
-            <GraficoVisitas visitas={filteredVisitas} />
-          </div>
-
-          <button
-            className="btn-exportar-relatorio"
-            onClick={exportarRelatorioExcel}
-            disabled={!filteredVisitas?.length}
-            title={
-              filteredVisitas?.length
-                ? "Exportar relatório em Excel"
-                : "Sem dados para exportar"
-            }
-            aria-disabled={!filteredVisitas?.length}
-          >
-            Exportar Relatório
-          </button>
-        </section>
-      )}
-
-      <div className="dashboard-kanban">
-        {isMobile ? (
-          <MobileAccordionVisitas
-            visitas={filteredVisitas}
-            onCardClick={handleCardClick}
           />
+
+          <select
+            value={filters.comercial}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, comercial: e.target.value }))
+            }
+            aria-label="Filtrar por comercial"
+          >
+            {comerciaisOptions.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt === "all" ? "Todos os comerciais" : opt}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="month"
+            className="month-input"
+            onChange={handleMonthInput}
+            aria-label="Selecionar mês"
+            value={`${activeMonth.getFullYear()}-${String(
+              activeMonth.getMonth() + 1
+            ).padStart(2, "0")}`}
+          />
+
+          <button
+            className="btn-light"
+            onClick={() => setFilters({ empresa: "", comercial: "all" })}
+          >
+            Limpar
+          </button>
+        </div>
+
+        {/* Desktop: gráfico | Mobile: totalizador */}
+        {isMobile ? (
+          <>
+            <section className="dashboard-totalizador">
+              <div className="totals">
+                <span>
+                  <strong>Agendadas:</strong> {totals.agendadas}
+                </span>
+                <span className="sep">|</span>
+                <span>
+                  <strong>Realizadas:</strong> {totals.realizadas}
+                </span>
+                <span className="sep">|</span>
+                <span>
+                  <strong>Canceladas:</strong> {totals.canceladas}
+                </span>
+              </div>
+            </section>
+
+            <button
+              className="btn-exportar-relatorio"
+              onClick={exportarRelatorioExcel}
+              disabled={!filteredVisitas?.length}
+              title={
+                filteredVisitas?.length
+                  ? "Exportar relatório em Excel"
+                  : "Sem dados para exportar"
+              }
+              aria-disabled={!filteredVisitas?.length}
+            >
+              Exportar Relatório
+            </button>
+          </>
         ) : (
-          <KanbanVisitas
-            visitas={filteredVisitas}
-            onConfirmar={abrirModalConfirmacao}
-            onStatusChange={atualizarStatus}
-            onCardClick={handleCardClick}
+          <section className="dashboard-graph-container">
+            <div className="graph-wrapper">
+              <GraficoVisitas visitas={filteredVisitas} />
+            </div>
+
+            <button
+              className="btn-exportar-relatorio"
+              onClick={exportarRelatorioExcel}
+              disabled={!filteredVisitas?.length}
+              title={
+                filteredVisitas?.length
+                  ? "Exportar relatório em Excel"
+                  : "Sem dados para exportar"
+              }
+              aria-disabled={!filteredVisitas?.length}
+            >
+              Exportar Relatório
+            </button>
+          </section>
+        )}
+
+        <div className="dashboard-kanban">
+          {isMobile ? (
+            <MobileAccordionVisitas
+              visitas={filteredVisitas}
+              onCardClick={handleCardClick}
+            />
+          ) : (
+            <KanbanVisitas
+              visitas={filteredVisitas}
+              onConfirmar={abrirModalConfirmacao}
+              onStatusChange={atualizarStatus}
+              onCardClick={handleCardClick}
+            />
+          )}
+        </div>
+
+        {visitaDetalhe && (
+          <DetalheVisita
+            visita={visitaDetalhe}
+            onClose={() => setVisitaDetalhe(null)}
           />
         )}
+
       </div>
-
-      {visitaDetalhe && (
-        <DetalheVisita
-          visita={visitaDetalhe}
-          onClose={() => setVisitaDetalhe(null)}
-        />
-      )}
-
-    </div>
+    </PageTemplate>
   );
 }

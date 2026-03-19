@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/DashboardComercial.css";
+import "../../styles/DashboardComercial.css";
 
 const statusLabels = {
   agendado: "Agendadas",

@@ -1,8 +1,9 @@
-import React from "react";
 import { Link } from "react-router-dom";
-import "../styles/ConsultasHome.css";
+import "../../styles/ConsultasHome.css";
 import { useAuth } from "../../context/AuthContext";
-
+import PageTemplate from "../PageTemplate/PageTemplate";
+import { FaHammer } from "react-icons/fa";
+ 
 const operacionais = [
   // {
   //   key: "pdf-automation",
@@ -20,14 +21,14 @@ const operacionais = [
     to: "/faturamento/cancelamento",
     niveis: ["admin", "faturamento", "ti"],
   },
-   {
-     key: "reimpressao-boleto",
-     icon: <i class="bi bi-file-earmark-check-fill"/>,
-     title: "Reimpressão FedBnk",
-     desc: "Realize a reimpressão de boletos FedBnk de forma rápida e prática.",
-     to: "/faturamento/reimpressao-boleto",
-     niveis: ["admin", "faturamento"],
-   },
+  // {
+  //   key: "reimpressao-boleto",
+  //   icon: <i class="bi bi-file-earmark-check-fill"/>,
+  //   title: "Reimpressão FedBnk",
+  //   desc: "Realize a reimpressão de boletos FedBnk de forma rápida e prática.",
+  //   to: "/faturamento/reimpressao-boleto",
+  //   niveis: ["admin", "faturamento"],
+  // },
   {
     key: "emissao-nf",
     icon: <i className="bi bi-file-earmark-bar-graph-fill" />,
@@ -38,27 +39,19 @@ const operacionais = [
      niveis: ["admin", "faturamento"]
   },
 
-   {
-    key: "paybox",
-    icon: <i class="bi bi-file-earmark-check-fill"/>,
-    title: "Paybox",
-    desc: "Gere o arquivo paybox através do número da fatura e da nota fiscal.",
-    to: "/faturamento/paybox",
-    niveis: ["admin", "faturamento"],
-  },
+  //  {
+  //   key: "paybox",
+  //   icon: <i class="bi bi-file-earmark-check-fill"/>,
+  //   title: "Paybox",
+  //   desc: "Gere o arquivo paybox através do número da fatura e da nota fiscal.",
+  //   to: "/faturamento/paybox",
+  //   niveis: ["admin", "faturamento"],
+  // },
 ];
 
 const OperacionalHome = () => {
   const { user, isAuthenticated, loading } = useAuth();
   const currentUserType = user?.nivel_acesso;
-
-  if (loading) {
-    return (
-      <div className="home-grid">
-        <p>Carregando informações do usuário...</p>
-      </div>
-    );
-  }
 
   if (!isAuthenticated) {
     return (
@@ -69,54 +62,57 @@ const OperacionalHome = () => {
   }
 
   return (
-    <div className="home-grid">
-      <main>
-        <div className="container02">
-          <h1 className="consultas-title">
-            <i className="bi bi-gear-fill"></i> Faturamento
-          </h1>
+    <PageTemplate
+      title="Processos operacionais"
+      subtitle="Acesse ferramentas e sistemas para otimizar processos operacionais"
+      icon={<FaHammer />}
+      className="operacional-page"
+      >
+      <div className="home-grid">
+        <main>
+          <div className="container02">
+            <div className="cards-container">
+              {operacionais
+                .filter((c) => c.niveis.includes(currentUserType))
+                .map((item) => (
+                  <div className="card" key={item.key}>
+                    <div className="card-body">
+                      <div className="feature-icon">{item.icon}</div>
 
-          <div className="cards-container">
-            {operacionais
-              .filter((c) => c.niveis.includes(currentUserType))
-              .map((item) => (
-                <div className="card" key={item.key}>
-                  <div className="card-body">
-                    <div className="feature-icon">{item.icon}</div>
+                      <h2>
+                        {item.title}
+                        {item.external && (
+                          <i
+                            
+                            style={{ marginLeft: 6, fontSize: 14 }}
+                          />
+                        )}
+                      </h2>
 
-                    <h2>
-                      {item.title}
-                      {item.external && (
-                        <i
-                          
-                          style={{ marginLeft: 6, fontSize: 14 }}
-                        />
+                      <p>{item.desc}</p>
+
+                      {item.external ? (
+                        <a
+                          href={item.to}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-primary"
+                        >
+                          Acessar
+                        </a>
+                      ) : (
+                        <Link to={item.to} className="btn-primary">
+                          Acessar
+                        </Link>
                       )}
-                    </h2>
-
-                    <p>{item.desc}</p>
-
-                    {item.external ? (
-                      <a
-                        href={item.to}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-primary"
-                      >
-                        Acessar
-                      </a>
-                    ) : (
-                      <Link to={item.to} className="btn-primary">
-                        Acessar
-                      </Link>
-                    )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+            </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </PageTemplate>
   );
 };
 

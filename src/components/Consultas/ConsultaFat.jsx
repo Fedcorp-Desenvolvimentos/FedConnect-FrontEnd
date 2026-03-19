@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import "../styles/ConsultaFat.css";
+import "../../styles/ConsultaFat.css";
 import { getFaturaPorNumero } from '../../services/consultaFatura';
 import { getAdministradoraEspecificaPorCodigo } from '../../services/consultaAdmService';
 
@@ -44,7 +44,7 @@ const ConsultaFatura = () => {
 
         try {
             const resposta = await getFaturaPorNumero(fatura);
-            console.log("resposta", resposta);
+            // console.log("resposta", resposta);
 
             if (resposta?.sucesso && Array.isArray(resposta.data) && resposta.data.length > 0) {
                 setResultado(resposta.data[0]);

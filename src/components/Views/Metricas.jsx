@@ -1,10 +1,11 @@
-import React from "react";
-import "../styles/Ferramentas.css";
+import "../../styles/Ferramentas.css";
+import PageTemplate from "../PageTemplate/PageTemplate";
+import { FaChartSimple } from "react-icons/fa6";
 
 const ferramentas = [
   {
     nome: "Dashboard Peaga",
-    url: "https://app.powerbi.com/view?r=eyJrIjoiZjM2NjBmMDgtZDNiOS00ZmMwLWFlZDUtYjE5NDdhOTUyMjU4IiwidCI6IjVhMjY0OWI1LTAzODMtNDA4Ni04MzYwLTJlNGI2YmZmMGEzZSJ9",
+    url: "https://app.powerbi.com/view?r=eyJrIjoiNzQ2NzYxNDktNDQ5My00MWNiLWE0ZDUtOWQxMzMwMzkzNDUxIiwidCI6IjVhMjY0OWI1LTAzODMtNDA4Ni04MzYwLTJlNGI2YmZmMGEzZSJ9",
     descricao: "Acompanhe as métricas da organização de forma única.",
     logo: "/imagens/Logo-Peaga.jpg",
   },
@@ -29,56 +30,56 @@ const ferramentas = [
 ];
 
 const Metricas = () => (
-  <div className="ferramentas-container">
-    <h1 className="ferramentas-title">
-      <i className="bi bi-bar-chart-fill"></i>
-      Métricas da FedCorp
-    </h1>
-    <p className="ferramentas-desc">
-      Acesse rapidamente as principais métricas e resultados do Grupo FedCorp. Escolha uma opção abaixo:
-    </p>
-    <div className="ferramentas-grid">
-      {ferramentas.map((ferramenta, idx) => (
-        <div className="ferramenta-card" key={idx}>
-          {ferramenta.logo && (
-            <img
-              src={ferramenta.logo}
-              alt={ferramenta.nome}
-              className="ferramenta-logo"
-              style={{
-                width: 56,
-                height: 56,
-                objectFit: "contain",
-                marginBottom: 12,
-                borderRadius: "1.1rem",
-                display: "block",
-                background: "#f8fafc",
-                marginLeft: "auto",
-                marginRight: "auto",
-                boxShadow: "0 1px 8px rgba(24,88,214,0.09)"
-              }}
-            />
-          )}
-          <div className="ferramenta-nome">
-            <i className="bi bi-link-45deg"></i> {ferramenta.nome}
+  <PageTemplate
+      title="Métricas da FedCorp"
+      subtitle="Acompanhe as principais métricas e resultados do Grupo FedCorp"
+      icon={<FaChartSimple />}
+      className="metricas-page"
+      >
+    <div className="ferramentas-container">
+      <div className="ferramentas-grid">
+        {ferramentas.map((ferramenta, idx) => (
+          <div className="ferramenta-card" key={idx}>
+            {ferramenta.logo && (
+              <img
+                src={ferramenta.logo}
+                alt={ferramenta.nome}
+                className="ferramenta-logo"
+                style={{
+                  width: 56,
+                  height: 56,
+                  objectFit: "contain",
+                  marginBottom: 12,
+                  borderRadius: "1.1rem",
+                  display: "block",
+                  background: "#f8fafc",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  boxShadow: "0 1px 8px rgba(24,88,214,0.09)"
+                }}
+              />
+            )}
+            <div className="ferramenta-nome">
+              <i className="bi bi-link-45deg"></i> {ferramenta.nome}
+            </div>
+            <div className="ferramenta-desc">{ferramenta.descricao}</div>
+            {ferramenta.url ? (
+              <a
+                href={ferramenta.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ferramenta-btn"
+              >
+                Acessar
+              </a>
+            ) : (
+              <span className="ferramenta-em-breve">Em Produção</span>
+            )}
           </div>
-          <div className="ferramenta-desc">{ferramenta.descricao}</div>
-          {ferramenta.url ? (
-            <a
-              href={ferramenta.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ferramenta-btn"
-            >
-              Acessar
-            </a>
-          ) : (
-            <span className="ferramenta-em-breve">Em Produção</span>
-          )}
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
-  </div>
+  </PageTemplate>
 );
 
 export default Metricas;

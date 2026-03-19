@@ -76,10 +76,6 @@ const AdministradoraAutocomplete = ({ onChange, disabled }) => {
     }
   };
 
-  if (!showDropdown && loading) {
-    return <div style={{ padding: 10 }}>Carregando...</div>;
-  }
-
   return (
     <div style={{ position: 'relative' }}>
       <div style={{ position: 'relative' }}>

@@ -1,0 +1,109 @@
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+  position: relative;
+}
+
+.dashboard-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+}
+
+/* Breadcrumb com margem esquerda dinâmica */
+.dashboard-main .breadcrumb-nav {
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+/* DESKTOP: Sidebar aberta */
+.dashboard-main .breadcrumb-nav.with-sidebar-open {
+  margin-left: 220px; /* mesma largura da sidebar */
+  width: calc(100% - 220px);
+}
+
+/* DESKTOP: Sidebar fechada */
+.dashboard-main .breadcrumb-nav.with-sidebar-closed {
+  margin-left: 62px; /* largura da sidebar fechada */
+  width: calc(100% - 62px);
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 0 1.5rem 1.5rem;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* DESKTOP: Sidebar aberta */
+.dashboard-content.with-sidebar {
+  padding-left: calc(220px + 1.5rem);
+}
+
+/* DESKTOP: Sidebar fechada */
+.dashboard-content.without-sidebar {
+  padding-left: calc(62px + 1.5rem);
+}
+
+.page-container {
+  width: 100%;
+}
+
+.page-content {
+  width: 100%;
+}
+
+/* Telas médias (992px - 1200px) */
+@media (max-width: 1200px) {
+  .dashboard-content.with-sidebar {
+    padding-left: calc(200px + 1.5rem);
+  }
+  
+  .dashboard-main .breadcrumb-nav.with-sidebar-open {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+  }
+}
+
+/* Telas menores (768px - 992px) */
+@media (max-width: 992px) {
+  .dashboard-content.with-sidebar {
+    padding-left: calc(180px + 1.5rem);
+  }
+  
+  .dashboard-main .breadcrumb-nav.with-sidebar-open {
+    margin-left: 180px;
+    width: calc(100% - 180px);
+  }
+}
+
+/* MOBILE: Até 768px */
+@media (max-width: 768px) {
+  .dashboard-main .breadcrumb-nav.with-sidebar-open,
+  .dashboard-main .breadcrumb-nav.with-sidebar-closed,
+  .dashboard-main .breadcrumb-nav {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .dashboard-content {
+    padding: 0 1rem 1rem;
+  }
+  
+  .dashboard-content.with-sidebar,
+  .dashboard-content.without-sidebar {
+    padding-left: 1rem !important;
+  }
+}
+
+/* Mobile pequeno (até 576px) */
+@media (max-width: 576px) {
+  .dashboard-content {
+    padding: 0 0.75rem 0.75rem;
+  }
+}

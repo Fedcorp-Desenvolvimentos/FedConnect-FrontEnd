@@ -37,6 +37,31 @@ export const getFaturaDinamicamente = async (filtros = {}) => {
   }
 };
 
+export const getFaturamentoGeral = async (filtros = {}) => {
+  try {
+    const token = localStorage.getItem("accessToken", "");
+    const response = await api.get(
+      "consultas/faturamento/",
+      {
+        params: filtros,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("response", response);
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Erro de endpoint ao consultar faturamento geral",
+      error
+    );
+    throw error;
+  }
+};
+
 export const getFaturasComBoletos = async (filtros = {}) => {
   try {
     const token = localStorage.getItem("accessToken", "");
@@ -49,6 +74,8 @@ export const getFaturasComBoletos = async (filtros = {}) => {
         },
       }
     );
+
+    console.log("response", response);
 
     return response.data;
   } catch (error) {

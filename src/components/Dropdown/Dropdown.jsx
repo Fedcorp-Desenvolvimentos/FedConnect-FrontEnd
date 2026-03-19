@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/Dropdown.css';
+import '../../styles/Dropdown.css';
 import { useAuth } from '../../context/AuthContext';
+
 
 const Dropdown = ({ sidebarOpen = true }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,6 +30,7 @@ const Dropdown = ({ sidebarOpen = true }) => {
 
   return (
     <div className={`dropdown-opcoes sidebar-dropdown${sidebarOpen ? "" : " collapsed"}`} ref={dropdownRef}>
+      
       <button className="dropdown-btn" type="button" onClick={toggleDropdown} title="Opções">
         <i className="bi bi-three-dots-vertical"></i>
         {sidebarOpen && <span>Opções</span>}
@@ -38,7 +40,7 @@ const Dropdown = ({ sidebarOpen = true }) => {
         {["admin", "usuario", "moderador", "comercial", "administradora", "faturamento", "ti"].includes(nivelAcesso) && (
           <>
             <li>
-              <Link to="/config" className="dropdown-item" onClick={() => setIsOpen(false)}>
+              <Link to="/minha-conta" className="dropdown-item" onClick={() => setIsOpen(false)}>
                 <i className="bi bi-person-circle"></i> Conta
               </Link>
             </li>
@@ -52,7 +54,7 @@ const Dropdown = ({ sidebarOpen = true }) => {
         {nivelAcesso === 'admin' && (
           <>
             <li>
-              <Link to="/conta" className="dropdown-item" onClick={() => setIsOpen(false)}>
+              <Link to="/gerenciar-usuarios" className="dropdown-item" onClick={() => setIsOpen(false)}>
                 <i className="bi bi-gear"></i> Configurações
               </Link>
             </li>

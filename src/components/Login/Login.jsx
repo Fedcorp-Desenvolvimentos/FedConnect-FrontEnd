@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Login.css';
+import '../../styles/Login.css';
 import { useAuth } from '../../context/AuthContext'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
@@ -97,9 +97,9 @@ const Login = () => {
                                 {loading ? 'Entrando...' : 'Entrar'}
                             </button>
 
-                            <a href="/esqueci-senha" className="forgot-password">
+                            {/* <a href="/esqueci-senha" className="forgot-password">
                                 Esqueceu sua senha?
-                            </a>
+                            </a> */}
                         </form>
                     </div>
                 </div>

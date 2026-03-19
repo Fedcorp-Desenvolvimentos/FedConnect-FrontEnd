@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "../styles/AgendaSala.css";
+import "../../styles/AgendaSala.css";
 
 const HORARIOS = [
   "09:00",

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import "../styles/ComercialRegiao.css";
+import "../../styles/ComercialRegiao.css";
 import * as XLSX from "xlsx";
 import { ConsultaService } from "../../services/consultaService";
 import { FiCopy, FiCheck, FiX } from "react-icons/fi";

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/ImportVida.css";
+import "../../styles/ImportVida.css";
 import { useAuth } from "../../context/AuthContext";
 
 export default function ImportacaoVida() {

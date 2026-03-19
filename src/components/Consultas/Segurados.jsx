@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import "../styles/Consulta.css";
+import "../../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { resolveNomeApoliceFromRecord } from "../../services/apoliceDePara";
+import PageTemplate from "../PageTemplate/PageTemplate";
+import { IoShieldCheckmarkOutline } from "react-icons/io5";
 
 function traduzirErroApi(mensagem) {
   if (!mensagem) return "Erro inesperado. Por favor, tente novamente.";
@@ -512,11 +514,13 @@ const ConsultaSegurado = () => {
   }, [resultado]);
 
   return (
+    <PageTemplate
+      title="Consulta de Segurados"
+      subtitle="Consulte informações de segurados"
+      icon={<IoShieldCheckmarkOutline />}
+      className="consulta-segurados-page"
+    >
     <div className="consulta-container">
-      <h1 className="consultas-title">
-        <i className="bi-clipboard-data"></i> Consultas Disponíveis
-      </h1>
-
       <div className="card-options-wrapper01">
         <div
           className={`card card-option ${activeForm === "vida" ? "active" : ""}`}
@@ -742,6 +746,7 @@ const ConsultaSegurado = () => {
         </div>
       )}
     </div>
+    </PageTemplate>
   );
 };
 

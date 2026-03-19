@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/ConfigEmail.css";
+import "../../styles/ConfigEmail.css";
 
 const ConfigEmail = () => {
     const [mode, setMode] = useState("cadastro");

@@ -1,29 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar/Navbar';
+import { useState, useEffect } from 'react';
+import Sidebar from '../components/Sidebar/Sidebar';
 import Breadcrumb from '../components/Breadcrumb/Breadcrumb';
 import { Outlet } from 'react-router-dom';
-import '../components/styles/DashboardLayout.css';
+import '../styles/DashboardLayout.css';
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
 
   useEffect(() => {
     function handleResize() {
-      setSidebarOpen(window.innerWidth > 768);
+      const newState = window.innerWidth > 768;
+      setSidebarOpen(newState);
     }
+    
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const toggleSidebar = () => {
+    setSidebarOpen(prev => !prev);
+  };
+
+  const breadcrumbClass = `breadcrumb-nav ${
+    window.innerWidth > 768 
+      ? sidebarOpen ? 'with-sidebar-open' : 'with-sidebar-closed'
+      : ''
+  }`;
+
   return (
     <div className="dashboard-layout">
-      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="dashboard-main">
-        <div className={`dashboard-content${sidebarOpen ? ' with-sidebar' : ''}`}>
-          <Breadcrumb sidebarOpen={sidebarOpen} />
+        <Breadcrumb 
+          onToggleSidebar={toggleSidebar}
+          sidebarOpen={sidebarOpen}
+          className={breadcrumbClass}
+        />
+        <div className={`dashboard-content ${sidebarOpen ? 'with-sidebar' : 'without-sidebar'}`}>
           <div className="content-wrapper">
-            <div className="page-content">
-              <Outlet context={{ withSidebar: sidebarOpen }} />
+            <div className="page-container">
+              <div className="page-content">
+                <Outlet context={{ withSidebar: sidebarOpen }} />
+              </div>
             </div>
           </div>
         </div>

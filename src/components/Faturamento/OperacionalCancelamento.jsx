@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
-import "../styles/ConsultasHome.css";
-import "../styles/OperacionalCancelamento.css";
+import "../../styles/ConsultasHome.css";
+import "../../styles/OperacionalCancelamento.css";
 import { useAuth } from "../../context/AuthContext";
 import { triggerWebhook } from "../../services/boletofedbnk";
 
@@ -91,14 +91,6 @@ const OperacionalCancelamento = () => {
       setSending(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="home-grid">
-        <p>Carregando informações do usuário...</p>
-      </div>
-    );
-  }
 
   if (!isAuthenticated) {
     return (

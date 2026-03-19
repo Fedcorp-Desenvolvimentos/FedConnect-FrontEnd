@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
-import "../styles/Upload.css";
+import "../../styles/Upload.css";
 import { FaFileExcel, FaUpload, FaPaperPlane, FaDownload } from "react-icons/fa";
 
 export default function UploadCard({ onDataParsed }) {

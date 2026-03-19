@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserService } from '../../../services/userService';
 import { CompanyService } from '../../../services/companyService'; 
-import '../../styles/Cadastro.css';
-import { Link } from 'react-router-dom';
+import '../../../styles/Cadastro.css';
 
 function Cadastro() {
     const [activeTab, setActiveTab] = useState('cadastro');

@@ -1,9 +1,9 @@
-// components/Loading.jsx
-import '../styles/loading.css';
+// src/components/Loading/Loading.jsx
+import '../../styles/loading.css';
 
 const Loading = ({ 
   fullScreen = false, 
-  message = 'Carregando...',
+  message = '',
   size = 'medium'
 }) => {
   const LoadingSpinner = () => (

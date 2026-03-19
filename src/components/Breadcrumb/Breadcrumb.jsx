@@ -1,33 +1,74 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import '../styles/Breadcrumb.css';
-import { useAuth } from "../../context/AuthContext";
-import { Settings, ChevronRight, MoreVertical, Home, User, History, Users, LogOut } from "lucide-react";
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { 
+  FiMenu,
+  FiChevronDown, 
+  FiLogOut, 
+  FiHome,
+  FiChevronRight,
+  FiUser,
+  FiUsers,
+  FiUserPlus,
+  FiShield,
+  FiKey,
+  FiAward
+} from 'react-icons/fi';
+import { FaHistory, FaRegUser } from "react-icons/fa";
+import { useAuth } from '../../context/AuthContext';
+import '../../styles/Breadcrumb.css';
+import { getAccessLevelLabel, getAccessLevelColor, ACCESS_LEVELS } from '../../utils/accessLevels';
 
-const Breadcrumb = ({ sidebarOpen }) => {
-  const location = useLocation();
+function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const mobileMenuRef = useRef(null);
-  const dropdownRef = useRef(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Atualiza isMobile no resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Mapeamento de rotas para nomes amigáveis
-  const pathMap = {
+  const routeNames = {
     '/home': 'Dashboard',
     
     // Consultas
     '/consultas': 'Consultas',
-    '/consulta-pf': 'Consulta PF',
-    '/consulta-end': 'Consulta Endereço',
-    '/consulta-cnpj': 'Consulta CNPJ',
+    '/consultas/consulta-pf': 'Consulta PF',
+    '/consultas/consulta-end': 'Consulta Endereço',
+    '/consultas/consulta-cnpj': 'Consulta CNPJ',
     '/consulta-comercial': 'Comercial',
-    '/comercial-regiao': 'Busca por Região',
-    '/consulta-segurados': 'Segurados',
-    '/consulta-faturas': 'Faturas',
-    '/consulta-faturamento': 'Consulta Faturamento',
-    '/consulta-detalhes/:id': 'Detalhes da Consulta',
+    '/consultas/comercial-regiao': 'Busca por Região',
+    '/consultas/consulta-segurados': 'Segurados',
+    '/consultas/consulta-faturas': 'Faturas',
+    '/consultas/consulta-faturamento': 'Consulta Faturamento',
+    '/consultas/consulta-detalhes/:id': 'Detalhes da Consulta',
     
     // Comercial
     '/acompanhamento': 'Acompanhamento Comercial',
@@ -43,6 +84,7 @@ const Breadcrumb = ({ sidebarOpen }) => {
     '/faturamento/pdf-automation': 'Automação PDF',
     '/faturamento/cancelamento': 'Cancelamento',
     '/faturamento/reimpressao-boleto': 'Reimpressão de Boleto',
+    '/faturamento/paybox': 'Paybox',
     
     // Métricas
     '/metricas': 'Métricas',
@@ -63,486 +105,309 @@ const Breadcrumb = ({ sidebarOpen }) => {
     '/importacao-vida': 'Importação Vida',
     
     // Conta do usuário
-    '/conta': 'Minha Conta',
-    '/config': 'Configurações',
+    '/gerenciar-usuarios': 'Gerenciar Usuários',
+    '/minha-conta': 'Minha Conta',
     '/cadastro': 'Cadastro',
     '/historico': 'Histórico'
   };
 
-  // Mapeamento de níveis de acesso para nomes amigáveis
-  const accessLevelMap = {
-    'admin': 'Administrador',
-    'usuario': 'Colaborador',
-    'comercial': 'Comercial',
-    'faturamento': 'Faturamento',
-    'ti': 'TI',
-    'financeiro': 'Financeiro',
-    'moderador': 'Moderador'
-  };
-
-  // Mapeamento com ícones
-  const pathMapWithIcons = {
-    '/home': { label: 'Dashboard', icon: 'bi-house' },
+  // Função para gerar o breadcrumb
+  const getBreadcrumb = () => {
+    const pathSegments = location.pathname.split('/').filter(segment => segment);
     
-    // Consultas
-    '/consultas': { label: 'Consultas', icon: 'bi-search' },
-    '/consulta-pf': { label: 'Consulta PF', icon: 'bi-person' },
-    '/consulta-end': { label: 'Consulta Endereço', icon: 'bi-geo-alt' },
-    '/consulta-cnpj': { label: 'Consulta CNPJ', icon: 'bi-building' },
-    '/consulta-comercial': { label: 'Comercial', icon: 'bi-graph-up' },
-    '/comercial-regiao': { label: 'Busca por Região', icon: 'bi-map' },
-    '/consulta-segurados': { label: 'Segurados', icon: 'bi-people' },
-    '/consulta-faturas': { label: 'Faturas', icon: 'bi-receipt' },
-    '/consulta-faturamento': { label: 'Consulta Faturamento', icon: 'bi-cash-stack' },
-    '/consulta-detalhes/:id': { label: 'Detalhes', icon: 'bi-eye' },
+    let breadcrumbItems = [];
+    let currentPath = '';
     
-    // Comercial
-    '/acompanhamento': { label: 'Acompanhamento', icon: 'bi-bar-chart' },
-    '/agenda-comercial': { label: 'Agenda Comercial', icon: 'bi-calendar-check' },
-    '/financeiro': { label: 'Financeiro', icon: 'bi-currency-dollar' },
-    
-    // Ferramentas
-    '/ferramentas': { label: 'Ferramentas', icon: 'bi-tools' },
-    '/cotacao-conteudo': { label: 'Cotação', icon: 'bi-file-earmark-text' },
-    
-    // Faturamento
-    '/faturamento': { label: 'Faturamento', icon: 'bi-wallet2' },
-    '/faturamento/pdf-automation': { label: 'Automação PDF', icon: 'bi-file-pdf' },
-    '/faturamento/cancelamento': { label: 'Cancelamento', icon: 'bi-x-circle' },
-    '/faturamento/reimpressao-boleto': { label: 'Reimpressão', icon: 'bi-printer' },
-    
-    // Métricas
-    '/metricas': { label: 'Métricas', icon: 'bi-graph-up-arrow' },
-    
-    // E-mail
-    '/envio-email': { label: 'Envio de E-mail', icon: 'bi-envelope' },
-    '/config-email': { label: 'Config. E-mail', icon: 'bi-gear' },
-    
-    // Agenda
-    '/agenda': { label: 'Agenda', icon: 'bi-calendar-event' },
-    
-    // Produtos
-    '/produtos': { label: 'Produtos', icon: 'bi-box-seam' },
-    
-    // Administração
-    '/home-adm': { label: 'Administração', icon: 'bi-shield-check' },
-    '/upload': { label: 'Upload', icon: 'bi-cloud-upload' },
-    '/importacao-vida': { label: 'Importação Vida', icon: 'bi-database' },
-    
-    // Conta do usuário
-    '/conta': { label: 'Minha Conta', icon: 'bi-person-circle' },
-    '/config': { label: 'Configurações', icon: 'bi-sliders' },
-    '/cadastro': { label: 'Cadastro', icon: 'bi-person-plus' },
-    '/historico': { label: 'Histórico', icon: 'bi-clock-history' }
-  };
-
-  // Formatar data atual
-  const getCurrentDateTime = () => {
-    const now = new Date();
-    return now.toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-
-  // Função para construir breadcrumb dinâmico
-  const buildBreadcrumbItems = () => {
-    const segments = location.pathname.split('/').filter(Boolean);
-    
-    // Se estiver na página inicial, retorna apenas o item "Dashboard"
-    if (location.pathname === '/home' || location.pathname === '/') {
-      return [{ label: 'Início', path: '/home', isActive: true }];
+    // Adiciona "Home" como primeiro item se não estiver na raiz
+    if (location.pathname !== '/home') {
+      breadcrumbItems.push({
+        label: 'Home',
+        icon: <FiHome size={14} />,
+        path: '/home'
+      });
     }
-
-    const items = [{ label: 'Início', path: '/home' }];
-
-    let accumulatedPath = '';
-
-    segments.forEach((segment, index) => {
-      accumulatedPath += `/${segment}`;
-
-      // remove ids numéricos
-      const cleanPath = accumulatedPath.replace(/\/\d+$/g, '');
-
-      let label =
-        pathMap[accumulatedPath] ||
-        pathMap[cleanPath];
-
-      // fallback elegante
+    
+    // Para cada segmento da rota
+    pathSegments.forEach((segment, index) => {
+      currentPath += `/${segment}`;
+      
+      // Pula se for 'home' e já adicionamos
+      if (segment === 'home' && index === 0) return;
+      
+      // Tenta encontrar no mapeamento exato, depois tenta com wildcard
+      let label = routeNames[currentPath];
+      
+      // Se não achou exato, tenta encontrar rota com parâmetro
       if (!label) {
-        label = segment
-          .split('-')
-          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(' ');
+        // Procura rotas que tenham :id no lugar do segmento atual
+        const possibleRoute = Object.keys(routeNames).find(route => {
+          const routeParts = route.split('/');
+          const currentParts = currentPath.split('/');
+          
+          if (routeParts.length !== currentParts.length) return false;
+          
+          return routeParts.every((part, i) => 
+            part.startsWith(':') || part === currentParts[i]
+          );
+        });
+        
+        label = possibleRoute ? routeNames[possibleRoute] : formatSegment(segment);
       }
-
-      items.push({
-        label,
-        path: accumulatedPath,
-        isActive: index === segments.length - 1
+      
+      breadcrumbItems.push({
+        label: label,
+        path: currentPath
       });
     });
-
-    return items;
-  };
-
-  const breadcrumbItems = buildBreadcrumbItems();
-
-  // Filtrar breadcrumbs para mobile (mostrar apenas últimos 2 itens)
-  const getMobileBreadcrumbItems = () => {
-    if (breadcrumbItems.length <= 2) return breadcrumbItems;
-    return [
-      breadcrumbItems[0],
-      { label: '...', path: '#', isEllipsis: true },
-      ...breadcrumbItems.slice(-2)
-    ];
-  };
-
-  // Fechar menus ao clicar fora
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
-        setShowMobileMenu(false);
-      }
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
     
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    return breadcrumbItems;
+  };
 
-  const nivelAcesso = user?.nivel_acesso;
+  // Formata segmentos de rota para nomes legíveis
+  const formatSegment = (segment) => {
+    return segment
+      .replace(/-/g, ' ')
+      .replace(/^\w/, c => c.toUpperCase());
+  };
+
+  // Funções de verificação de permissão
+  const canManageUsers = () => {
+    return user?.nivel_acesso === ACCESS_LEVELS.ADMIN || 
+           user?.nivel_acesso === ACCESS_LEVELS.MASTER;
+  };
+
+  const canRegisterUsers = () => {
+    return user?.nivel_acesso === ACCESS_LEVELS.ADMIN || 
+           user?.nivel_acesso === ACCESS_LEVELS.MASTER;
+  };
+
+  const canViewHistory = () => {
+    // Ajuste conforme sua lógica de negócio
+    return user?.nivel_acesso === ACCESS_LEVELS.ADMIN || 
+           user?.nivel_acesso === ACCESS_LEVELS.MASTER ||
+           user?.nivel_acesso === ACCESS_LEVELS.USER;
+  };
 
   const handleLogout = () => {
-    setShowMobileMenu(false);
-    setShowDropdown(false);
     logout();
+    navigate('/login');
+    setShowUserMenu(false);
   };
 
+  const breadcrumbItems = getBreadcrumb();
+
+  // Extrai informações do usuário com fallbacks
+  const getUserInitials = () => {
+    if (user?.nome_completo) {
+      const names = user.nome_completo.split(' ');
+      if (names.length > 1) {
+        return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+      }
+      return user.nome_completo.charAt(0).toUpperCase();
+    }
+    if (user?.nome) return user.nome.charAt(0).toUpperCase();
+    if (user?.username) return user.username.charAt(0).toUpperCase();
+    if (user?.email) return user.email.charAt(0).toUpperCase();
+    return 'U';
+  };
+
+  const getUserName = () => {
+    if (user?.nome_completo) {
+      return user.nome_completo.split(' ')[0];
+    }
+    if (user?.nome) {
+      return user.nome.split(' ')[0];
+    }
+    if (user?.username) {
+      return user.username.split(' ')[0];
+    }
+    if (user?.email) {
+      return user.email.split('@')[0].split(' ')[0];
+    }
+    return 'Usuário';
+  };
+
+  const getUserEmail = () => {
+    return user?.email || 'usuario@email.com';
+  };
+
+  // Ícone baseado no nível de acesso
+  const getAccessLevelIcon = () => {
+    switch(user?.nivel_acesso) {
+      case ACCESS_LEVELS.MASTER:
+        return <FiAward className="access-icon master" />;
+      case ACCESS_LEVELS.ADMIN:
+        return <FiShield className="access-icon admin" />;
+      case ACCESS_LEVELS.USER:
+        return <FiUser className="access-icon user" />;
+      default:
+        return <FiKey className="access-icon default" />;
+    }
+  };
+
+  const accessLevelLabel = getAccessLevelLabel(user?.nivel_acesso);
+  const accessLevelColor = getAccessLevelColor(user?.nivel_acesso);
+
   return (
-    <nav className={`breadcrumb-container ${sidebarOpen ? 'with-sidebar' : ''}`} aria-label="Navegação estrutural">
-      {/* Lado esquerdo: Breadcrumb tradicional */}
+    <nav className={className || "breadcrumb-nav"}>
       <div className="breadcrumb-left">
-        {/* Mobile: Breadcrumb compacto */}
-        <div className="breadcrumb-mobile">
-          <div className="mobile-breadcrumb">
-            <button 
-              className="mobile-home-btn"
-              onClick={() => navigate('/home')}
-              title="Home"
-            >
-              <Home size={18} />
-            </button>
-            
-            <ol className="mobile-breadcrumb-list">
-              {getMobileBreadcrumbItems().map((item, index, array) => {
-                if (item.isEllipsis) {
-                  return (
-                    <li key="ellipsis" className="breadcrumb-ellipsis">
-                      <span>...</span>
-                    </li>
-                  );
-                }
-                
-                let routeInfo = pathMapWithIcons[item.path];
-                if (!routeInfo) {
-                  const cleanPath = item.path.replace(/\/\d+$/g, '');
-                  routeInfo = pathMapWithIcons[cleanPath];
-                }
-                
-                return (
-                  <li key={index} className="mobile-breadcrumb-item">
-                    {index === array.length - 1 ? (
-                      <span className="mobile-breadcrumb-current">
-                        {item.label}
-                      </span>
-                    ) : (
-                      <Link to={item.path} className="mobile-breadcrumb-link">
-                        {item.label}
-                      </Link>
-                    )}
-                    {index < array.length - 1 && !item.isEllipsis && (
-                      <ChevronRight size={12} className="mobile-separator" />
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-          
-          {/* Botão de dropdown mobile */}
-          <div className="mobile-menu-container" ref={mobileMenuRef}>
-            <button 
-              className="mobile-menu-btn"
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-              aria-label="Menu"
-            >
-              <MoreVertical size={20} />
-            </button>
-            
-            {/* Menu dropdown mobile */}
-            {showMobileMenu && (
-              <div className="mobile-dropdown-menu">
-                <div className="mobile-user-info">
-                  <div className="mobile-user-name">
-                    {user?.nome_completo || user?.email || 'Usuário'}
-                  </div>
-                  <div className="mobile-user-role">
-                    {accessLevelMap[user?.nivel_acesso] || user?.nivel_acesso || 'N/A'}
-                  </div>
-                  <div className="mobile-user-date">
-                    <i className="bi bi-calendar3"></i>
-                    {getCurrentDateTime()}
-                  </div>
-                </div>
-                
-                <div className="mobile-dropdown-divider"></div>
-                
-                <div className="mobile-menu-items">
-                  {/* Opções baseadas no nível de acesso */}
-                  {["admin", "usuario", "moderador", "comercial", "administradora", "faturamento", "ti"].includes(nivelAcesso) && (
-                    <>
-                      <button 
-                        className="mobile-menu-item"
-                        onClick={() => {
-                          navigate('/config');
-                          setShowMobileMenu(false);
-                        }}
-                      >
-                        <i className="bi bi-person-circle"></i>
-                        <span>Conta</span>
-                      </button>
-                      
-                      <button 
-                        className="mobile-menu-item"
-                        onClick={() => {
-                          navigate('/historico');
-                          setShowMobileMenu(false);
-                        }}
-                      >
-                        <i className="bi bi-clock-history"></i>
-                        <span>Histórico</span>
-                      </button>
-                    </>
-                  )}
-                  
-                  {nivelAcesso === 'admin' && (
-                    <>
-                      <button 
-                        className="mobile-menu-item"
-                        onClick={() => {
-                          navigate('/conta');
-                          setShowMobileMenu(false);
-                        }}
-                      >
-                        <i className="bi bi-gear"></i>
-                        <span>Configurações</span>
-                      </button>
-                      
-                      <button 
-                        className="mobile-menu-item"
-                        onClick={() => {
-                          navigate('/cadastro');
-                          setShowMobileMenu(false);
-                        }}
-                      >
-                        <i className="bi bi-people-fill"></i>
-                        <span>Cadastrar Usuários</span>
-                      </button>
-                    </>
-                  )}
-                  
-                  <div className="mobile-dropdown-divider"></div>
-                  
-                  <button 
-                    className="mobile-menu-item"
-                    onClick={() => {
-                      navigate('/settings');
-                      setShowMobileMenu(false);
-                    }}
-                  >
-                    <Settings size={16} />
-                    <span>Configurações Gerais</span>
-                  </button>
-                  
-                  <button 
-                    className="mobile-menu-item logout"
-                    onClick={handleLogout}
-                  >
-                    <i className="bi bi-box-arrow-right"></i>
-                    <span>Sair</span>
-                  </button>
-                </div>
+        {/* Botão de menu hambúrguer */}
+        <button 
+          className={`menu-button ${!sidebarOpen && isMobile ? 'menu-closed' : ''}`}
+          onClick={onToggleSidebar}
+          aria-label={sidebarOpen ? "Fechar menu" : "Abrir menu"}
+        >
+          <FiMenu size={20} />
+        </button>
+
+        {/* Breadcrumb */}
+        <div className="breadcrumb-container">
+          {breadcrumbItems.map((item, index) => (
+            <div key={index} className="breadcrumb-item">
+              {index > 0 && <FiChevronRight className="breadcrumb-separator" />}
+              <button
+                className={`breadcrumb-link ${index === breadcrumbItems.length - 1 ? 'active' : ''}`}
+                onClick={() => {
+                  if (index < breadcrumbItems.length - 1) {
+                    navigate(item.path);
+                  }
+                }}
+                disabled={index === breadcrumbItems.length - 1}
+              >
+                {item.icon && <span className="breadcrumb-icon">{item.icon}</span>}
+                <span className="breadcrumb-label">{item.label}</span>
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="breadcrumb-right">
+        {/* Usuário */}
+        <div className="user-container" ref={dropdownRef}>
+          <button 
+            className="user-btn"
+            onClick={() => setShowUserMenu(!showUserMenu)}
+          >
+            <div className="user-avatar">
+              {getUserInitials()}
+            </div>
+            {!isMobile && (
+              <div className="user-info">
+                <span className="user-name">
+                  {getUserName()}
+                </span>
+                <span className="user-role" style={{ color: accessLevelColor }}>
+                  {accessLevelLabel}
+                </span>
               </div>
             )}
-          </div>
-        </div>
-        
-        {/* Desktop: Breadcrumb completo */}
-        <ol className="breadcrumb-list desktop-breadcrumb">
-          {breadcrumbItems.map((item, index) => {
-            let routeInfo = pathMapWithIcons[item.path];
-            
-            if (!routeInfo) {
-              const cleanPath = item.path.replace(/\/\d+$/g, '');
-              routeInfo = pathMapWithIcons[cleanPath];
-            }
-            
-            return (
-              <li key={index} className="breadcrumb-item">
-                {index === breadcrumbItems.length - 1 ? (
-                  <span className="breadcrumb-current" aria-current="page">
-                    {routeInfo && <i className={`bi ${routeInfo.icon}`}></i>}
-                    {item.label}
-                  </span>
-                ) : (
-                  <Link to={item.path} className="breadcrumb-link">
-                    {routeInfo && <i className={`bi ${routeInfo.icon}`}></i>}
-                    {item.label}
-                  </Link>
-                )}
-                {index < breadcrumbItems.length - 1 && (
-                  <ChevronRight size={14} className="breadcrumb-separator" />
-                )}
-              </li>
-            );
-          })}
-        </ol>
-      </div>
+            <FiChevronDown className={`dropdown-arrow ${showUserMenu ? 'rotated' : ''}`} />
+          </button>
 
-      {/* Lado direito: Informações do usuário, ações e dropdown desktop */}
-      <div className="breadcrumb-right desktop-user-info">
-        {/* Informações do usuário */}
-        <div className="user-info-container">
-          <div className="user-details">
-            <div className="user-name">
-              {user?.nome_completo || user?.email || 'Usuário'}
-            </div>
-            <div className="user-meta">
-              {/* <span className="user-role">
-                <i className="bi bi-shield-check"></i>
-                {accessLevelMap[user?.nivel_acesso] || user?.nivel_acesso || 'N/A'}
-              </span> */}
-              {/* <span className="user-status">
-                <i className={`bi bi-circle-fill ${user?.is_active ? 'active' : 'inactive'}`}></i>
-                {user?.is_active ? 'Ativo' : 'Inativo'}
-              </span> */}
-              <span className="user-fed">
-                <i className="bi bi-calendar3"></i>
-                {getCurrentDateTime()}
-              </span>
-            </div>
-          </div>
-
-          {/* Ações do usuário */}
-          <div className="user-actions">
-            {/* Dropdown desktop */}
-            <div className="dropdown-container" ref={dropdownRef}>
-              <button 
-                className="action-btn dropdown-btn"
-                onClick={() => setShowDropdown(!showDropdown)}
-                title="Mais opções"
-                aria-label="Mais opções"
-              >
-                <MoreVertical size={20} />
-              </button>
-              
-              {/* Dropdown menu desktop */}
-              {showDropdown && (
-                <div className="dropdown-menu desktop-dropdown">
-                  <div className="dropdown-items">
-                    {/* Opções baseadas no nível de acesso */}
-                    {["admin", "usuario", "moderador", "comercial", "administradora", "faturamento", "ti"].includes(nivelAcesso) && (
-                      <>
-                        <button 
-                          className="dropdown-item"
-                          onClick={() => {
-                            navigate('/config');
-                            setShowDropdown(false);
+          {showUserMenu && (
+            <div className="user-dropdown">
+              <div className="user-dropdown-header">
+                <div className="dropdown-user-info">
+                  <div className="dropdown-avatar-wrapper">
+                    <div className="dropdown-avatar">
+                      {getUserInitials()}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="dropdown-name">{getUserName()}</p>
+                    <p className="dropdown-email">{getUserEmail()}</p>
+                    {user?.nivel_acesso && (
+                      <p className="dropdown-nivel">
+                        <span 
+                          className="access-badge"
+                          style={{ 
+                            color: accessLevelColor,
+                            borderColor: accessLevelColor
                           }}
                         >
-                          <User size={16} />
-                          <span>Minha Conta</span>
-                        </button>
-                        
-                        <button 
-                          className="dropdown-item"
-                          onClick={() => {
-                            navigate('/historico');
-                            setShowDropdown(false);
-                          }}
-                        >
-                          <History size={16} />
-                          <span>Histórico</span>
-                        </button>
-                      </>
+                          {accessLevelLabel}
+                        </span>
+                      </p>
                     )}
-                    
-                    {nivelAcesso === 'admin' && (
-                      <>
-                        <button 
-                          className="dropdown-item"
-                          onClick={() => {
-                            navigate('/conta');
-                            setShowDropdown(false);
-                          }}
-                        >
-                          <Settings size={16} />
-                          <span>Configurações Gerais</span>
-                        </button>
-                        
-                        <button 
-                          className="dropdown-item"
-                          onClick={() => {
-                            navigate('/cadastro');
-                            setShowDropdown(false);
-                          }}
-                        >
-                          <Users size={16} />
-                          <span>Cadastrar Usuários</span>
-                        </button>
-                      </>
-                    )}
-                    
-                    <div className="dropdown-divider"></div>
-                    
-                    <button 
-                      className="dropdown-item logout"
-                      onClick={handleLogout}
-                    >
-                      <LogOut size={16} />
-                      <span>Sair</span>
-                    </button>
                   </div>
                 </div>
+              </div>
+              
+              <div className="dropdown-divider"></div>
+              
+              {/* Menu - Minha Conta (sempre visível) */}
+              <button 
+                className="dropdown-item"
+                onClick={() => {
+                  navigate('/minha-conta');
+                  setShowUserMenu(false);
+                }}
+              >
+                <FaRegUser className="dropdown-icon" /> Minha Conta
+              </button>
+
+              {/* Menu - Gerenciar Usuários (apenas admin/master) */}
+              {canManageUsers() && (
+                <button 
+                  className="dropdown-item"
+                  onClick={() => {
+                    navigate('/gerenciar-usuarios');
+                    setShowUserMenu(false);
+                  }}
+                >
+                  <FiUsers className="dropdown-icon" /> Gerenciar Usuários
+                </button>
               )}
+
+              {/* Menu - Cadastrar Usuários (apenas admin/master) */}
+              {canRegisterUsers() && (
+                <button 
+                  className="dropdown-item"
+                  onClick={() => {
+                    navigate('/cadastro');
+                    setShowUserMenu(false);
+                  }}
+                >
+                  <FiUserPlus className="dropdown-icon" /> Cadastrar Usuários
+                </button>
+              )}
+
+              {/* Menu - Histórico (se tiver permissão) */}
+              {canViewHistory() && (
+                <button 
+                  className="dropdown-item"
+                  onClick={() => {
+                    navigate('/historico');
+                    setShowUserMenu(false);
+                  }}
+                >
+                  <FaHistory className="dropdown-icon" /> Histórico
+                </button>
+              )}
+              
+              <div className="dropdown-divider"></div>
+              
+              <button 
+                className="dropdown-item logout"
+                onClick={handleLogout}
+              >
+                <FiLogOut className="dropdown-icon" /> Sair
+              </button>
             </div>
-            
-            <button 
-              className="action-btn profile-btn"
-              title="Configurações"
-              aria-label="Configurações"
-              onClick={() => navigate('/config')}
-            >
-              <Settings size={20} />
-            </button>
-            
-            <button 
-              className="action-btn logout-btn"
-              title="Sair"
-              aria-label="Sair"
-              onClick={logout}
-            >
-              <i className="bi bi-box-arrow-right"></i>
-            </button>
-          </div>
+          )}
         </div>
       </div>
+
+      {/* Overlay para fechar menus ao clicar fora */}
+      {showUserMenu && (
+        <div 
+          className="menu-overlay"
+          onClick={() => setShowUserMenu(false)}
+        />
+      )}
     </nav>
   );
-};
+}
 
 export default Breadcrumb;

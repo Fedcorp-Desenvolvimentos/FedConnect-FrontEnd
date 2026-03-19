@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import "../styles/ConsultaFat.css";
+import "../../styles/ConsultaFat.css";
 import { formatarData } from "../../utils/formatar_data";
 import { 
   FiArrowLeft, 
@@ -211,17 +211,6 @@ const ConsultaDetalhe = () => {
       </div>
     );
   };
-
-  if (loading) {
-    return (
-      <div className="consulta-fatura-container">
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Carregando detalhes da fatura...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (error || (!fatura && faturasList.length === 0)) {
     return (

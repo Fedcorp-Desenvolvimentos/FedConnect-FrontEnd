@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, Upload, Download, Zap, CheckCircle, AlertCircle, Info } from 'lucide-react';
-import '../styles/PdfAutomation.css';
+import '../../styles/PdfAutomation.css';
 
 const PdfAutomation = () => {
     const [modelFile, setModelFile] = useState(null);

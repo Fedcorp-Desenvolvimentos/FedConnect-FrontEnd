@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../../styles/HistoricoPage.css';
+import '../../../styles/HistoricoPage.css';
 import { ConsultaService } from '../../../services/consultaService';
 import { useAuth } from '../../../context/AuthContext';
 
@@ -154,7 +154,6 @@ const HistoricoConsulta = () => {
         className='input-pesquisa'
       />
 
-      {loading && <p className="loading-message">Carregando histórico...</p>}
       {error && <p className="error-message">{error}</p>}
 
       {!loading && !error && consultas.length === 0 && (
@@ -196,7 +195,6 @@ const HistoricoConsulta = () => {
                       <tr>
                         <td colSpan="5">
                           <div className="detalhes-historico-panel">
-                            {detalhesLoading && <p className="detalhes-loading">Carregando detalhes...</p>}
                             {detalhesError && <p className="detalhes-error">{detalhesError}</p>}
 
                             {detalhesConsulta && detalhesConsulta.resultado && detalhesConsulta.resultado.Result && detalhesConsulta.resultado.Result.length > 0 ? (

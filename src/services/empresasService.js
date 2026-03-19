@@ -5,7 +5,7 @@ import api from "./api"
 export const getEmpresas = async () => {
     try {
         const token = localStorage.getItem("accessToken", "")
-        const response = await api.get("empresas/todas", {
+        const response = await api.get("empresas/", {
         headers: {
             Authorization: `Bearer ${token}`
         }

@@ -23,17 +23,22 @@ api.interceptors.request.use(
   }
 );
 
+const publicRoutes = ["/login", "/", "/esqueci-senha", "/404"];
+
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401 && window.location.pathname !== "/login") {
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !publicRoutes.includes(window.location.pathname)
+    ) {
       localStorage.removeItem("accessToken");
       window.location.href = "/login";
     }
+
     return Promise.reject(error);
   }
-);
+)
 
 export default api;

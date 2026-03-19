@@ -1,0 +1,384 @@
+/* ========== SIDEBAR BASE ========== */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 220px;
+  height: 100vh;
+  background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+  box-shadow: 3px 0 20px rgba(36, 99, 235, 0.1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
+  overflow-y: auto;
+  border-right: 1px solid #e8edf5;
+  
+}
+
+.sidebar.closed {
+  width: 62px;
+}
+
+/* ========== HEADER ========== */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  height: 70px;
+  border-bottom: 1px solid #e8edf5;
+  justify-content: center;
+  position: relative;
+  background: white;
+  margin: 10px;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  transition: opacity 0.2s ease;
+}
+
+.logo-link:hover {
+  opacity: 0.9;
+}
+
+.logo-desktop {
+  display: block;
+  width: 240px;
+  padding: 10px;
+  height: auto;
+  transition: all 0.3s ease;
+}
+
+.logo-mobile {
+  display: none;
+  width: 200px;
+  padding: 10px;
+  height: 200px;
+  object-fit: contain;
+
+}
+
+.sidebar-close-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: #64748b;
+  cursor: pointer;
+  display: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  z-index: 100;
+}
+
+
+
+.sidebar-close-btn:hover {
+  background-color: #f1f5f9;
+  color: #2463eb;
+}
+
+/* ========== NAVEGAÇÃO ========== */
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #e0e7ef #f8fafc;
+  padding: 1.5rem 0.5rem;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+  background: #f8fafc;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #e0e7ef;
+  border-radius: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav li {
+  display: block;
+  margin-bottom: 2px;
+  position: relative;
+}
+
+.sidebar-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 0.75rem;
+  color: #334155;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  background: transparent;
+  width: 100%;
+  min-height: 46px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Alinhamento perfeito ícone-texto */
+.sidebar-nav li a .sidebar-icon-tooltip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+/* Menu fechado - centraliza apenas o ícone */
+.sidebar.closed .sidebar-nav li a {
+  justify-content: center;
+  padding: 0.85rem;
+}
+
+.sidebar.closed .sidebar-nav li a .sidebar-icon-tooltip {
+  justify-content: center;
+  gap: 0;
+}
+
+/* Esconde texto no menu fechado */
+.sidebar.closed .sidebar-nav li a span {
+  display: none !important;
+}
+
+/* Esconde logo desktop no menu fechado */
+.sidebar.closed .logo-desktop {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+/* Ícones com tamanho consistente */
+.sidebar-nav li i {
+  font-size: 1.25rem;
+  min-width: 24px;
+  text-align: center;
+  transition: color 0.2s ease;
+}
+
+/* Texto dos links */
+.sidebar-nav li a span {
+  font-size: 0.95rem;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+/* Estados ativos/hover */
+.sidebar-nav li.active > a {
+  background: linear-gradient(90deg, #2463eb15 0%, #2463eb08 100%);
+  color: #2463eb;
+  font-weight: 600;
+  border-left: 3px solid #2463eb;
+}
+
+.sidebar-nav li.active > a i {
+  color: #2463eb;
+}
+
+.sidebar-nav li a:hover {
+  background: #f1f5f9;
+  color: #2463eb;
+}
+
+.sidebar-nav li a:hover i {
+  color: #2463eb;
+}
+
+/* Indicador ativo sutil */
+.sidebar-nav li.active > a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: #2463eb;
+  border-radius: 0 2px 2px 0;
+}
+
+
+
+.sidebar-hamburger:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 16px rgba(36, 99, 235, 0.15);
+}
+
+/* ========== OVERLAY MOBILE ========== */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+
+/* DESKTOP (acima de 768px) */
+@media (min-width: 769px) {
+
+  
+  .sidebar-overlay {
+    display: none !important;
+  }
+  
+  .sidebar-close-btn {
+    display: none !important;
+  }
+  
+  /* Sidebar fechada no desktop */
+  .sidebar.closed {
+    width: 62px;
+    transform: translateX(0) !important;
+  }
+  
+  /* Sidebar aberta no desktop */
+  .sidebar:not(.closed) {
+    width: 220px;
+    transform: translateX(0) !important;
+  }
+  
+  /* Tooltip para menu fechado */
+  .sidebar.closed .sidebar-nav li a:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1e293b;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    z-index: 1001;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    opacity: 0;
+    animation: fadeIn 0.2s ease forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-50%) translateX(-5px); }
+  to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+/* MOBILE (até 768px) */
+@media (max-width: 768px) {
+  /* Sidebar oculta por padrão no mobile */
+  .sidebar {
+    transform: translateX(-100%);
+    width: 280px !important;
+    z-index: 1000;
+    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  /* Botão X visível no mobile quando sidebar aberta */
+  .sidebar.open .sidebar-close-btn {
+    display: block;
+  }
+  
+  /* Overlay visível apenas quando sidebar aberta */
+  .sidebar-overlay {
+    display: block;
+  }
+  
+  /* Logotipos */
+  .logo-desktop {
+    display: none;
+  }
+  
+  .logo-mobile {
+    display: block;
+  }
+  
+  /* Menu sempre mostra texto no mobile quando aberto */
+  .sidebar.open .sidebar-nav li a {
+    justify-content: flex-start !important;
+    padding: 0.85rem 0.75rem !important;
+  }
+  
+  .sidebar.open .sidebar-nav li a span {
+    display: inline !important;
+  }
+  
+  /* Ajuste do alinhamento no mobile aberto */
+  .sidebar.open .sidebar-nav li a .sidebar-icon-tooltip {
+    justify-content: flex-start;
+    gap: 0.75rem;
+  }
+}
+
+/* MOBILE PEQUENO (até 480px) */
+@media (max-width: 480px) {
+  .sidebar {
+    width: 85vw !important;
+  }
+  
+  .sidebar-header {
+    height: 65px;
+    padding: 0 0.75rem;
+  }
+  
+  .sidebar-nav {
+    padding: 0.75rem 0.25rem;
+  }
+  
+  .sidebar-nav li a {
+    padding: 0.75rem 0.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+  }
+  
+  .sidebar-nav li i {
+    font-size: 1.15rem;
+  }
+
+}
+
+/* Suavizar transições */
+.sidebar,
+.sidebar-nav li a,
+.sidebar-hamburger,
+.sidebar-close-btn {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}

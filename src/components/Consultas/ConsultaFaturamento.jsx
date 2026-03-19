@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import "../styles/ConsultaFaturamento.css";
+import "../../styles/ConsultaFaturamento.css";
 
 import Loading from "../Loading/Loading";
 import AdministradoraAutocomplete from "../Adm/AdministradorasAutocomplete";
@@ -7,12 +7,13 @@ import AdministradoraAutocomplete from "../Adm/AdministradorasAutocomplete";
 import {
     exportarFaturasParaExcel,
     exportarFaturasParaPDF,
-    getFaturasComBoletos,
-    getFaturaPorNumero,
+    getFaturamentoGeral,
 } from "../../services/consultaFatura";
 
 import { getEmpresas } from "../../services/empresasService";
-import { getAdministradoraEspecificaPorCodigo } from "../../services/consultaAdmService";
+import { FaFileInvoiceDollar } from "react-icons/fa6";
+import PageTemplate from "../PageTemplate/PageTemplate";
+import { useGlobal } from "../../context/GlobalContext";
 
 function traduzirErroApi(mensagem) {
     if (!mensagem) return "Erro inesperado. Por favor, tente novamente.";
@@ -27,7 +28,7 @@ function traduzirErroApi(mensagem) {
     return "Erro ao consultar faturas. Por favor, tente novamente.";
 }
 
-const ConsultaFaturasUnificada = () => {
+const ConsultaFaturamento = () => {
     const [formData, setFormData] = useState({
         fatura: "",
         apolice: "",
@@ -38,7 +39,7 @@ const ConsultaFaturasUnificada = () => {
     });
 
     const [resultados, setResultados] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const { loading, setLoading, setLoadingMessage } = useGlobal();
     const [erro, setErro] = useState("");
 
     const [pagination, setPagination] = useState({
@@ -63,10 +64,6 @@ const ConsultaFaturasUnificada = () => {
     const [expandedRow, setExpandedRow] = useState(null);
 
     const [empresasMap, setEmpresasMap] = useState({});
-    const [administradorasMap, setAdministradorasMap] = useState({});
-
-    const [detalhesPorFatura, setDetalhesPorFatura] = useState({});
-    const [loadingDetalhe, setLoadingDetalhe] = useState({});
 
     const resultadosRef = useRef(null);
 
@@ -104,8 +101,10 @@ const ConsultaFaturasUnificada = () => {
 
     const formatarVigencia = (dataInicio, dataFim) => `${formatarData(dataInicio)} até ${formatarData(dataFim)}`;
 
-    const renderStatusBadge = (status, quitado) => {
-        if (quitado === "S") return <span className="status-badge status-quitada">Quitada</span>;
+    const renderStatusBadge = (status, boletos) => {
+        // Verifica se algum boleto está quitado
+        const temQuitado = boletos?.some(b => b.QUITADO === "S");
+        if (temQuitado) return <span className="status-badge status-quitada">Quitada</span>;
 
         const statusMap = {
             A: { label: "Ativa", className: "status-ativa" },
@@ -158,42 +157,10 @@ const ConsultaFaturasUnificada = () => {
 
     const obterNomeCedente = (codigo) => empresasMap[codigo] || codigo || "-";
 
-    const buscarAdministradorasEmLote = async (codigosUnicos) => {
-        try {
-            const promises = codigosUnicos.map(async (codigo) => {
-                try {
-                    const adm = await getAdministradoraEspecificaPorCodigo(codigo);
-                    if (adm?.sucesso && adm.data) {
-                        return { codigo, nome: adm.data.NOME_ADM || adm.data.nome_adm || adm.data.NOME || `Código: ${codigo}` };
-                    }
-                    return { codigo, nome: `Código: ${codigo}` };
-                } catch {
-                    return { codigo, nome: `Código: ${codigo}` };
-                }
-            });
-
-            const res = await Promise.all(promises);
-            const novoMapa = {};
-            res.forEach((r) => {
-                if (r.codigo) novoMapa[r.codigo] = r.nome;
-            });
-
-            setAdministradorasMap((prev) => ({ ...prev, ...novoMapa }));
-        } catch (e) {
-            console.error("Erro ao buscar administradoras em lote:", e);
-        }
-    };
-
-    useEffect(() => {
-        if (!resultados.length) return;
-        const codigos = [...new Set(resultados.filter((f) => f.ADMINISTRADORA).map((f) => f.ADMINISTRADORA))];
-        const faltando = codigos.filter((c) => !administradorasMap[c]);
-        if (faltando.length) buscarAdministradorasEmLote(faltando);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [resultados]);
-
     const carregarPagina = async (pageNumber = 1) => {
+        setLoadingMessage("Carregando dados...");
         setLoading(true);
+        
         setErro("");
         setTermoPesquisa("");
         setExpandedRow(null);
@@ -224,17 +191,11 @@ const ConsultaFaturasUnificada = () => {
                 page_size: pagination.page_size,
             };
 
-            const response = await getFaturasComBoletos(filtrosComPaginacao);
+            const response = await getFaturamentoGeral(filtrosComPaginacao);
+            console.log("response - pagina", response)
 
             if (response?.sucesso) {
                 const dados = response.resultado?.data || [];
-                const codigos = [...new Set(
-                    dados
-                    .filter(f => f.ADMINISTRADORA)
-                    .map(f => f.ADMINISTRADORA)
-                )];
-
-                await buscarAdministradorasEmLote(codigos);
                 setResultados(dados);
 
                 if (response.resultado?.pagination) {
@@ -325,10 +286,11 @@ const ConsultaFaturasUnificada = () => {
             const campos = [
                 f.FATURA || "",
                 f.APOLICE || "",
-                administradorasMap[f.ADMINISTRADORA] || "",
-                f.NOME_COBRADO || "",
-                f.CNPJ_COBRADO || "",
-                f.DOCUMENTO || "",
+                f.NOME_ADMINISTRADORA || "",
+                f.CNPJ_ADMINISTRADORA || "",
+                ...(f.BOLETOS?.map(b => b.NOME_COBRADO || "") || []),
+                ...(f.BOLETOS?.map(b => b.CNPJ_COBRADO || "") || []),
+                ...(f.BOLETOS?.map(b => b.DOCUMENTO || "") || []),
                 obterNomeCedente(f.CEDENTE) || "",
                 formatarData(f.DATA_FAT),
                 formatarData(f.VENCIMENTO),
@@ -338,7 +300,7 @@ const ConsultaFaturasUnificada = () => {
             return campos.some((c) => c.includes(termo));
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [resultados, termoPesquisa, administradorasMap, empresasMap]);
+    }, [resultados, termoPesquisa, empresasMap]);
 
     useEffect(() => {
         if (termoPesquisa.trim()) {
@@ -384,40 +346,13 @@ const ConsultaFaturasUnificada = () => {
 
     const filtrosAtivosCount = Object.values(formData).filter((v) => v && v.toString().trim() !== "").length;
 
-    const buscarDetalhePorFatura = async (numeroFatura) => {
-        const fat = String(numeroFatura || "").trim();
-        if (!fat) return;
-        if (detalhesPorFatura[fat]) return;
-
-        setLoadingDetalhe((p) => ({ ...p, [fat]: true }));
-        try {
-            const resposta = await getFaturaPorNumero(fat);
-
-            let detalhe = null;
-            if (resposta?.sucesso && Array.isArray(resposta.data) && resposta.data.length > 0) {
-                detalhe = resposta.data[0];
-            } else if (Array.isArray(resposta) && resposta.length > 0) {
-                detalhe = resposta[0];
-            } else if (resposta?.data && Array.isArray(resposta.data) && resposta.data.length > 0) {
-                detalhe = resposta.data[0];
-            }
-
-            if (detalhe) setDetalhesPorFatura((p) => ({ ...p, [fat]: detalhe }));
-        } catch (e) {
-            console.error("Erro ao buscar detalhe da fatura:", e);
-        } finally {
-            setLoadingDetalhe((p) => ({ ...p, [fat]: false }));
-        }
-    };
-
-    const toggleExpandRow = async (index, numeroFatura) => {
-        const vaiAbrir = expandedRow !== index;
-        setExpandedRow(vaiAbrir ? index : null);
-        if (vaiAbrir) await buscarDetalhePorFatura(numeroFatura);
+    const toggleExpandRow = (index) => {
+        setExpandedRow(expandedRow === index ? null : index);
     };
 
     const exportarParaExcel = async () => {
         try {
+            setLoadingMessage("Exportando Excel...");
             setLoading(true);
             const filtrosAtivos = Object.fromEntries(
                 Object.entries(formData).filter(([_, value]) => value && value.toString().trim() !== "")
@@ -434,6 +369,7 @@ const ConsultaFaturasUnificada = () => {
 
     const exportarParaPDF = async () => {
         try {
+            setLoadingMessage("Exportando PDF...");
             setLoading(true);
             const filtrosAtivos = Object.fromEntries(
                 Object.entries(formData).filter(([_, value]) => value && value.toString().trim() !== "")
@@ -551,13 +487,67 @@ const ConsultaFaturasUnificada = () => {
         );
     };
 
-    return (
-        <>
-            <div className="consulta-fatura-container">
-                <h1 className="consultas-title">
-                    <i className="bi-clipboard-data"></i> Consulta de Faturamento
-                </h1>
+    // Componente para renderizar a tabela de boletos dentro do detalhe expandido
+    const TabelaBoletos = ({ boletos }) => {
+        if (!boletos || boletos.length === 0) {
+            return <p className="text-muted">Nenhum boleto encontrado para esta fatura.</p>;
+        }
 
+        return (
+            <div className="boletos-table-container">
+                <table className="boletos-table">
+                    <thead>
+                        <tr>
+                            <th>Documento</th>
+                            <th>Nosso Número</th>
+                            <th>Nome Cobrado</th>
+                            <th>CNPJ/CPF</th>
+                            <th>Valor</th>
+                            <th>Vencimento</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {boletos.map((boleto, idx) => {
+                            const vencBoleto = verificarVencimento(boleto.DATA_VENCIMENTO);
+                            return (
+                                <tr key={idx} className={boleto.STATUS_BOLETO === "C" ? "boleto-cancelado" : ""}>
+                                    <td>{boleto.DOCUMENTO || "-"}</td>
+                                    <td>{boleto.NOSSO_NUMERO || "-"}</td>
+                                    <td>{boleto.NOME_COBRADO || "-"}</td>
+                                    <td className="font-monospace">{boleto.CNPJ_COBRADO || "-"}</td>
+                                    <td className="valor">{formatarValor(boleto.VALOR)}</td>
+                                    <td>
+                                        <span className={`vencimento ${vencBoleto.status}`}>
+                                            {formatarData(boleto.DATA_VENCIMENTO)}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {boleto.QUITADO === "S" ? (
+                                            <span className="status-badge status-quitada">Quitado</span>
+                                        ) : boleto.STATUS_BOLETO === "C" ? (
+                                            <span className="status-badge status-cancelada">Cancelado</span>
+                                        ) : (
+                                            <span className="status-badge status-pendente">Pendente</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
+
+    return (
+        <PageTemplate
+        title="Consulta de Faturamento"
+        subtitle="Consulte informações de faturamento"
+        icon={<FaFileInvoiceDollar />}
+        className="consulta-segurados-page"
+        >
+            <div className="consulta-fatura-container">
                 <form className="form-fatura" onSubmit={carregarFaturas}>
                     <div className="filtros-principais">
                         <div className="form-group">
@@ -687,21 +677,11 @@ const ConsultaFaturasUnificada = () => {
                                     >
                                         <i className="bi-file-excel me-1"></i> Excel
                                     </button>
-
-                                    {/* <button
-                    className="btn btn-danger btn-sm"
-                    onClick={exportarParaPDF}
-                    disabled={resultados.length === 0 || loading}
-                    title="Exportar dados do banco (ignora filtro local)"
-                    type="button"
-                  >
-                    <i className="bi-file-pdf me-1"></i> PDF
-                  </button> */}
                                 </div>
                             </div>
                         </div>
 
-                        {/* ✅ BARRA DE PESQUISA (SEM ABSOLUTE PRO ÍCONE) */}
+                        {/* BARRA DE PESQUISA LOCAL */}
                         <div className="barra-pesquisa-wrapper">
                             <div className="barra-pesquisa-resultados">
                                 <div className="input-group-pesquisa" role="search">
@@ -775,7 +755,6 @@ const ConsultaFaturasUnificada = () => {
                                         <th>Apólice</th>
                                         <th>Administradora</th>
                                         <th>Emissão</th>
-
                                         <th>Status</th>
                                         <th>Vencimento</th>
                                     </tr>
@@ -786,102 +765,93 @@ const ConsultaFaturasUnificada = () => {
                                         const venc = verificarVencimento(fatura.VENCIMENTO);
                                         const isExpanded = expandedRow === index;
 
-                                        const numeroFatura = fatura.FATURA;
-                                        const detalhe = detalhesPorFatura[String(numeroFatura || "").trim()];
-                                        const detalheCarregando = loadingDetalhe[String(numeroFatura || "").trim()] === true;
-
-                                        const dadosCompletos = { ...fatura, ...(detalhe || {}) };
-
                                         return (
                                             <React.Fragment key={`${fatura.FATURA}-${index}`}>
                                                 <tr
-                                                    onClick={() => toggleExpandRow(index, numeroFatura)}
+                                                    onClick={() => toggleExpandRow(index)}
                                                     className={`linha-clicavel ${isExpanded ? "expanded" : ""}`}
                                                 >
                                                     <td>
                                                         <i className={`bi bi-chevron-${isExpanded ? "up" : "down"}`}></i>
                                                     </td>
+                                                    
                                                     <td>
                                                         <strong className="numero-fatura">#{fatura.FATURA}</strong>
                                                     </td>
+                                                    
                                                     <td>{fatura.APOLICE || "-"}</td>
 
-                                                    <td>{administradorasMap[fatura.ADMINISTRADORA] || fatura.ADMINISTRADORA || "-"}</td>
+                                                    <td>
+                                                        <div className="adm-info">
+                                                            <span className="adm-nome">{fatura.NOME_ADMINISTRADORA || "-"}</span>
+                                                        </div>
+                                                    </td>
+                                                    
                                                     <td>{formatarData(fatura.DATA_FAT)}</td>
 
-
-                                                    <td>{renderStatusBadge(fatura.STATUS, fatura.QUITADO)}</td>
+                                                    <td>{renderStatusBadge(fatura.STATUS, fatura.BOLETOS)}</td>
+                                                    
                                                     <td>
                                                         <span className={`vencimento ${venc.status}`}>
                                                             {formatarData(fatura.VENCIMENTO)}
-
-
                                                         </span>
                                                     </td>
                                                 </tr>
 
                                                 {isExpanded && (
                                                     <tr className="expanded-details">
-                                                        <td colSpan="8">
+                                                        <td colSpan="7">
                                                             <div className="expansion-content">
-                                                                <h6 className="section-title">
-                                                                    <i className="bi-info-circle me-2"></i>Detalhes da Fatura
-                                                                </h6>
-
-                                                                {detalheCarregando && (
-                                                                    <div style={{ padding: "8px 0", display: "flex", gap: 8, alignItems: "center" }}>
-                                                                        <span className="spinner-border spinner-border-sm" />
-                                                                        <small>Carregando detalhes completos...</small>
-                                                                    </div>
-                                                                )}
+                                                                <div className="expansion-header">
+                                                                    <h6 className="section-title">
+                                                                        <i className="bi-info-circle me-2"></i>Detalhes da Fatura
+                                                                    </h6>
+                                                                    
+                                                                </div>
 
                                                                 <div className="info-grid">
-                                                                    <div className="info-item">
-                                                                        <strong>Tomador:</strong>
-                                                                        <span className="text-truncate">{dadosCompletos.NOME_COBRADO || "-"}</span>
-                                                                    </div>
-
-                                                                    <div className="info-item">
-                                                                        <strong>CNPJ:</strong>
-                                                                        <span className="font-monospace">{dadosCompletos.CNPJ_COBRADO || "-"}</span>
-                                                                    </div>
-
+                                        
                                                                     <div className="info-item">
                                                                         <strong>Prêmio Bruto:</strong>
-                                                                        <span className="valor">{formatarValor(dadosCompletos.PREMIO_BRUTO)}</span>
+                                                                        <span className="valor">{formatarValor(fatura.PREMIO_BRUTO)}</span>
+                                                                    </div>
+
+                                                                    <div className="info-item">
+                                                                        <strong>Prêmio Líquido:</strong>
+                                                                        <span className="valor">{formatarValor(fatura.PREMIO_LIQ)}</span>
                                                                     </div>
 
                                                                     <div className="info-item">
                                                                         <strong>Corretor:</strong>
-                                                                        <span className="text-truncate">{dadosCompletos.CORRETOR || "-"}</span>
+                                                                        <span className="text-truncate">{fatura.CORRETOR || "-"}</span>
+                                                                    </div>
+
+                                                                    <div className="info-item">
+                                                                        <strong>Corretor 2:</strong>
+                                                                        <span className="text-truncate">{fatura.CORRETOR2 || "-"}</span>
                                                                     </div>
 
                                                                     <div className="info-item">
                                                                         <strong>Comissão (%):</strong>
                                                                         <span className="valor">
-                                                                            {dadosCompletos.COMISSAO === null || dadosCompletos.COMISSAO === undefined
+                                                                            {fatura.COMISSAO === null || fatura.COMISSAO === undefined
                                                                                 ? "-"
-                                                                                : `${formatarValor(dadosCompletos.COMISSAO, false)}%`}
+                                                                                : `${formatarValor(fatura.COMISSAO, false)}%`}
                                                                         </span>
-                                                                    </div>
-
-                                                                    <div className="info-item">
-                                                                        <strong>Corretor 2:</strong>
-                                                                        <span className="text-truncate">{dadosCompletos.CORRETOR2 || "-"}</span>
                                                                     </div>
 
                                                                     <div className="info-item">
                                                                         <strong>Comissão 2 (%):</strong>
                                                                         <span className="valor">
-                                                                            {dadosCompletos.COMISSAO2 === null || dadosCompletos.COMISSAO2 === undefined
+                                                                            {fatura.COMISSAO2 === null || fatura.COMISSAO2 === undefined
                                                                                 ? "-"
-                                                                                : `${formatarValor(dadosCompletos.COMISSAO2, false)}%`}
+                                                                                : `${formatarValor(fatura.COMISSAO2, false)}%`}
                                                                         </span>
                                                                     </div>
 
                                                                     <div className="info-item">
                                                                         <strong>Data Baixa:</strong>
-                                                                        <span>{formatarData(dadosCompletos.DT_BAIXA)}</span>
+                                                                        <span>{formatarData(fatura.DT_BAIXA)}</span>
                                                                     </div>
 
                                                                     <div className="info-item">
@@ -889,20 +859,41 @@ const ConsultaFaturasUnificada = () => {
                                                                         <span>{formatarVigencia(fatura.DT_INI_VIG, fatura.DT_FIM_VIG)}</span>
                                                                     </div>
 
-                                                                    {!!dadosCompletos.DT_CANCEL && (
+                                                                    <div className="info-item">
+                                                                        <strong>Cedente:</strong>
+                                                                        <span>{obterNomeCedente(fatura.CEDENTE)}</span>
+                                                                    </div>
+
+                                                                    {!!fatura.DT_CANCEL && (
                                                                         <div className="info-item" style={{ gridColumn: "1 / -1" }}>
                                                                             <strong>Cancelamento:</strong>
                                                                             <span style={{ marginLeft: 8 }}>
-                                                                                {formatarData(dadosCompletos.DT_CANCEL)}
-                                                                                {!!dadosCompletos.OBS_CANCEL && (
+                                                                                {formatarData(fatura.DT_CANCEL)}
+                                                                                {!!fatura.OBS_CANCEL && (
                                                                                     <span style={{ marginLeft: 8, color: "#d21a1a" }}>
-                                                                                        ({dadosCompletos.OBS_CANCEL})
+                                                                                        ({fatura.OBS_CANCEL})
                                                                                     </span>
                                                                                 )}
                                                                             </span>
                                                                         </div>
                                                                     )}
                                                                 </div>
+
+                                                                {/* SEÇÃO DE BOLETOS */}
+                                                                {fatura.BOLETOS && fatura.BOLETOS.length > 0 && (
+                                                                    <div className="boletos-section">
+                                                                        <h6 className="section-title mt-3">
+                                                                            <i className="bi-receipt me-2"></i>
+                                                                            Boletos ({fatura.QTD_BOLETOS})
+                                                                            {fatura.VALOR_TOTAL_BOLETOS > 0 && (
+                                                                                <span className="valor-total-boletos ms-2">
+                                                                                    Total: {formatarValor(fatura.VALOR_TOTAL_BOLETOS)}
+                                                                                </span>
+                                                                            )}
+                                                                        </h6>
+                                                                        <TabelaBoletos boletos={fatura.BOLETOS} />
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -921,9 +912,8 @@ const ConsultaFaturasUnificada = () => {
                 )}
             </div>
 
-            {loading && <Loading fullScreen message="Buscando faturas..." size="large" />}
-        </>
+        </PageTemplate>
     );
 };
 
-export default ConsultaFaturasUnificada;
+export default ConsultaFaturamento;

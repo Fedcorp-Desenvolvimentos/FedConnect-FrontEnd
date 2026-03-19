@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import "../styles/AgendaComercial.css";
+import "../../styles/AgendaComercial.css";
 
 export default function ModalConfirmarVisita({ visita, onClose, onConfirm, onCancelar }) {
   const [comentario, setComentario] = useState("");

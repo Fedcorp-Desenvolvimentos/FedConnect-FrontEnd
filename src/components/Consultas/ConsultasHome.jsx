@@ -1,7 +1,7 @@
-import React from "react";
 import { Link } from "react-router-dom";
-import "../styles/ConsultasHome.css"
+import PageTemplate from "../PageTemplate/PageTemplate";
 import { useAuth } from "../../context/AuthContext";
+import "../../styles/ConsultasHome.css";
 
 const consultas = [
     {
@@ -30,73 +30,55 @@ const consultas = [
     },
     {
         key: "segurados",
-        icon:<i className="bi bi-shield-check" />,
+        icon: <i className="bi bi-shield-check" />,
         title: "Consulta Segurados",
         desc: "Localize informações sobre segurados com base nos registros disponíveis.",
         to: "/consultas/consulta-segurados",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     },
-    // {
-    //     key: "faturas",
-    //     icon: <i class="bi bi-file-earmark-text"></i>,
-    //     title: "Consultar Faturas",
-    //     desc: "Localize informações sobre faturamento com base nos registros disponíveis.",
-    //     to: "/consultas/consulta-faturas",
-    //     niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
-    // },
     {
         key: "faturas-dinamicas",
-        icon: <i class="bi bi-file-earmark-text"></i>,
+        icon: <i className="bi bi-file-earmark-text"></i>,
         title: "Consultar Faturamento",
-        desc: "Consulte faturamento de maneira detalhada com parâmetros de pesquisa..",
+        desc: "Consulte faturamento de maneira detalhada com parâmetros de pesquisa.",
         to: "/consultas/consulta-faturamento",
         niveis: ["admin", "usuario", "comercial", "ti"],
     },
-    
 ];
 
 const ConsultasHome = () => {
-    const { user, isAuthenticated, loading } = useAuth();
+    const { user, loading } = useAuth();
     const currentUserType = user?.nivel_acesso;
 
-    if (loading) {
-        return (
-            <div className="home-grid">
-                <p>Carregando informações do usuário...</p>
-            </div>
-        );
-    }
-
-    if (!isAuthenticated) {
-        return (
-            <div className="home-grid">
-                <p>Você precisa estar logado para acessar esta página.</p>
-            </div>
-        );
-    }
+    // Filtra consultas por nível de acesso
+    const consultasPermitidas = consultas.filter(c => 
+        c.niveis.includes(currentUserType)
+    );
 
     return (
-        <div className="home-grid">
-            <main>
-                <div className="container02">
-                    <h1 className="consultas-title">
-                        <i className="bi-clipboard-data"></i> Consultas Disponíveis
-                    </h1>
-                    <div className="cards-container">
-                        {consultas.filter((c) => c.niveis.includes(currentUserType)).map((consulta) => (
-                            <div className="card" key={consulta.key}>
-                                <div className="card-body">
-                                    <div className="feature-icon">{consulta.icon}</div>
-                                    <h2>{consulta.title}</h2>
-                                    <p>{consulta.desc}</p>
-                                    <Link to={consulta.to} className="btn-primary">Pesquisar</Link>
-                                </div>
-                            </div>
-                        ))}
+        <PageTemplate
+            title="Consultas Disponíveis"
+            subtitle="Consulte informações detalhadas"
+            icon={<i className="bi bi-clipboard-data"></i>}
+            loading={loading}
+            empty={consultasPermitidas.length === 0}
+            emptyMessage="Nenhuma consulta disponível para seu nível de acesso"
+        >
+            <div className="cards-grid">
+                {consultasPermitidas.map((consulta) => (
+                    <div className="card" key={consulta.key}>
+                        <div className="card-body">
+                            <div className="feature-icon">{consulta.icon}</div>
+                            <h2>{consulta.title}</h2>
+                            <p>{consulta.desc}</p>
+                            <Link to={consulta.to} className="btn-primary">
+                                Pesquisar
+                            </Link>
+                        </div>
                     </div>
-                </div>
-            </main>
-        </div>
+                ))}
+            </div>
+        </PageTemplate>
     );
 };
 

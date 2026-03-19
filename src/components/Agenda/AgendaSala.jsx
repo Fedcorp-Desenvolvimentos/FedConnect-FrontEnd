@@ -1,4 +1,4 @@
-import React, { useEffect, useState, forwardRef } from "react";
+import { useEffect, useState, forwardRef } from "react";
 import {
   FaPlus,
   FaChevronLeft,
@@ -18,11 +18,13 @@ import {
 import ptBR from "date-fns/locale/pt-BR";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "../styles/AgendaSala.css";
+import "../../styles/AgendaSala.css";
 import AgendaReservaForm from "./AgendaReservaForm";
 import AgendaDetalhe from "./AgendaDetalhe";
 import { useAuth } from "../../context/AuthContext";
 import { AgendaService } from "../../services/agendaService";
+import PageTemplate from "../PageTemplate/PageTemplate";
+import { CiCalendarDate } from "react-icons/ci";
 
 function getFirstMondayOfMonth(date) {
   const firstDay = startOfMonth(date);
@@ -226,74 +228,78 @@ export default function AgendaSala() {
   );
 
   return (
-    <div className="agenda-sala-page">
-      <h1 className="agenda-titulo">
-        <i className="bi bi-calendar-event" /> Agenda da Sala de Reunião
-      </h1>
+    <PageTemplate
+      title="Agenda"
+      subtitle="Gerencie as reservas da sala de reunião de forma fácil e rápida"
+      icon={<CiCalendarDate />}
+      className="agenda-page"
+      >
+      <div className="agenda-sala-page">
+      
+        <div className="agenda-toolbar">
+          <button className="agenda-week-btn" onClick={() => handleWeekChange(-1)}>
+            <FaChevronLeft />
+          </button>
+          <span className="agenda-semana">
+            Semana de {format(startDate, "dd/MM/yyyy")} a{" "}
+            {format(addDays(startDate, 4), "dd/MM/yyyy")}
+          </span>
+          <DatePicker
+            selected={startDate}
+            onChange={(date) => setStartDate(getFirstMondayOfMonth(date))}
+            dateFormat="MMMM/yyyy"
+            showMonthYearPicker
+            locale={ptBR}
+            customInput={<MonthButton />}
+          />
+          <button className="agenda-week-btn" onClick={() => handleWeekChange(1)}>
+            <FaChevronRight />
+          </button>
 
-      <div className="agenda-toolbar">
-        <button className="agenda-week-btn" onClick={() => handleWeekChange(-1)}>
-          <FaChevronLeft />
-        </button>
-        <span className="agenda-semana">
-          Semana de {format(startDate, "dd/MM/yyyy")} a{" "}
-          {format(addDays(startDate, 4), "dd/MM/yyyy")}
-        </span>
-        <DatePicker
-          selected={startDate}
-          onChange={(date) => setStartDate(getFirstMondayOfMonth(date))}
-          dateFormat="MMMM/yyyy"
-          showMonthYearPicker
-          locale={ptBR}
-          customInput={<MonthButton />}
-        />
-        <button className="agenda-week-btn" onClick={() => handleWeekChange(1)}>
-          <FaChevronRight />
-        </button>
+          <button
+            className="btn-primary agenda-nova-btn"
+            onClick={() => handleNewReserva(null, null)}
+          >
+            <FaPlus className="agenda-plus-icon" /> Nova Reserva
+          </button>
+        </div>
 
-        <button
-          className="btn-primary agenda-nova-btn"
-          onClick={() => handleNewReserva(null, null)}
-        >
-          <FaPlus className="agenda-plus-icon" /> Nova Reserva
-        </button>
-      </div>
+        <div className="agenda-grid-container">{renderGrid()}</div>
 
-      <div className="agenda-grid-container">{renderGrid()}</div>
-
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content agenda-modal-content">
-            <button className="modal-close" onClick={closeModal}>×</button>
-            <h2 className="agenda-modal-titulo">Nova Reserva</h2>
-            <AgendaReservaForm
-              initialData={{
-                data: selectedSlot?.dia || startDate,
-                horario: selectedSlot?.hora || "09:00",
-              }}
-              userRole={String(user?.nivel_acesso || "").toLowerCase()}
-              onSave={handleSaveReserva}
-              onCancel={closeModal}
-            />
+        {showModal && (
+          <div className="modal-overlay">
+            <div className="modal-content agenda-modal-content">
+              <button className="modal-close" onClick={closeModal}>×</button>
+              <h2 className="agenda-modal-titulo">Nova Reserva</h2>
+              <AgendaReservaForm
+                initialData={{
+                  data: selectedSlot?.dia || startDate,
+                  horario: selectedSlot?.hora || "09:00",
+                }}
+                userRole={String(user?.nivel_acesso || "").toLowerCase()}
+                onSave={handleSaveReserva}
+                onCancel={closeModal}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {reservaSelecionada && (
-        <AgendaDetalhe
-          reserva={reservaSelecionada}
-          onClose={() => setReservaSelecionada(null)}
-          onDelete={handleDeleteReserva}
-        />
-      )}
+        {reservaSelecionada && (
+          <AgendaDetalhe
+            reserva={reservaSelecionada}
+            onClose={() => setReservaSelecionada(null)}
+            onDelete={handleDeleteReserva}
+          />
+        )}
 
-      {showDeletedPopup && (
-        <div className="agenda-toast agenda-toast-sucesso">
-          Reserva excluída com sucesso!
-        </div>
-      )}
+        {showDeletedPopup && (
+          <div className="agenda-toast agenda-toast-sucesso">
+            Reserva excluída com sucesso!
+          </div>
+        )}
 
-      {!!toastMsg && <div className="agenda-toast">{toastMsg}</div>}
-    </div>
+        {!!toastMsg && <div className="agenda-toast">{toastMsg}</div>}
+      </div>
+    </PageTemplate>
   );
 }

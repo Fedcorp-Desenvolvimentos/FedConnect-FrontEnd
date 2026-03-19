@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import "../styles/AgendaComercial.css";
+import "../../styles/AgendaComercial.css";
 import { AgendaComercialService } from "../../services/agenda_comercial";
 import ModalConfirmarVisita from "./ModalConfirmarVisita";
 

@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as XLSX from "xlsx";
-import "../styles/Consulta.css";
+import "../../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react";
 import { FiCopy, FiCheck } from "react-icons/fi";
+import PageTemplate from "../PageTemplate/PageTemplate";
+import { IoMdBusiness } from "react-icons/io";
 
 function preencherZeros(valor, tamanho) {
   valor = String(valor).replace(/\D/g, "");
@@ -168,6 +170,7 @@ const ConsultaCNPJ = () => {
   };
 
   const getRoot = (res) => res?.resultado_api ?? res;
+  
   const getResultList = (res) => {
     if (!res) return [];
     const root = getRoot(res);
@@ -448,6 +451,12 @@ const ConsultaCNPJ = () => {
   };
 
   return (
+     <PageTemplate
+      title="Consulta por Pessoa Jurídica"
+      subtitle="Consulte informações de pessoas jurídicas"
+      icon={<IoMdBusiness />}
+      className="consulta-cnpj-page"
+    >
     <div className="consulta-container">
       {showPopup && (
         <div className="popup-copiado">
@@ -455,11 +464,6 @@ const ConsultaCNPJ = () => {
           Copiado para área de transferência!
         </div>
       )}
-
-      <h1 className="consultas-title">
-        <i className="bi-clipboard-data"></i> Consultas Disponíveis
-      </h1>
-
       <div className="card-options-wrapper">
         <div
           className={`card card-option ${activeForm === "cnpj" ? "active" : ""}`}
@@ -1026,6 +1030,7 @@ const ConsultaCNPJ = () => {
           </div>
         )}
     </div>
+    </PageTemplate>
   );
 };
 

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Download, DollarSign, TrendingUp, Users } from "lucide-react";
 import * as XLSX from "xlsx";
-import "../styles/Financeiro.css";
+import "../../styles/Financeiro.css";
 
 const CommissionControl = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("2025-10");

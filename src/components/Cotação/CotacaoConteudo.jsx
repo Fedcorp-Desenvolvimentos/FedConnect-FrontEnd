@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaHome } from "react-icons/fa";
-import "../styles/CotacaoConteudo.css";
+import "../../styles/CotacaoConteudo.css";
 import cotacaoService from "../../services/cotacaoService";
 
 const CotacaoConteudo = () => {

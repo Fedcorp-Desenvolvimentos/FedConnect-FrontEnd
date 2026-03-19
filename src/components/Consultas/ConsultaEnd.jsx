@@ -1,9 +1,11 @@
 import React, { useState, useRef } from "react";
 import * as XLSX from "xlsx";
-import "../styles/Consulta.css";
+import "../../styles/Consulta.css";
 import { ConsultaService } from "../../services/consultaService";
 import { FileSpreadsheet } from "lucide-react";
 import { FiCopy, FiCheck } from "react-icons/fi";
+import PageTemplate from "../PageTemplate/PageTemplate";
+import { FaAddressCard } from "react-icons/fa";
 
 const ConsultaEnd = () => {
   const [copiado, setCopiado] = useState({});
@@ -369,11 +371,13 @@ const ConsultaEnd = () => {
   }
 
   return (
+     <PageTemplate
+      title="Consulta CEP"
+      subtitle="Consulte informações de endereços"
+      icon={<FaAddressCard />}
+      className="consulta-cep-page"
+    >
     <div className="consulta-container">
-      <h1 className="consultas-title">
-        <i className="bi-clipboard-data"></i> Consultas Disponíveis
-      </h1>
-
       <div className="card-options-wrapper">
         <div
           className={`card card-option ${activeForm === "cep" ? "active" : ""}`}
@@ -724,6 +728,7 @@ const ConsultaEnd = () => {
           </div>
         )}
     </div>
+    </PageTemplate>
   );
 };
 

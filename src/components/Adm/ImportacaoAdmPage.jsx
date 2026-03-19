@@ -1,19 +1,11 @@
 import React from "react";
-import "../styles/AdminHome.css";
+import "../../styles/AdminHome.css";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const AdminHome = () => {
   const { user, isAuthenticated, loading } = useAuth();
   const currentUserType = user?.nivel_acesso;
-
-  if (loading) {
-    return (
-      <div className="home-container02">
-        <p>Carregando informações do usuário...</p>
-      </div>
-    );
-  }
 
   if (!isAuthenticated || (currentUserType !== "admin" && currentUserType !== "master")) {
     return (
