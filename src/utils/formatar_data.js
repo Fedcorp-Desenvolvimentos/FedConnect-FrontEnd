@@ -8,3 +8,7 @@ export const formatarData = (dataString) => {
             year: 'numeric'
         });
 };
+
+export const formatTempo = (date) => {
+  return date.toLocaleTimeString('pt-BR');
+};

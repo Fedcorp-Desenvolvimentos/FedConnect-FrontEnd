@@ -17,6 +17,7 @@ import { FaHistory, FaRegUser } from "react-icons/fa";
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/Breadcrumb.css';
 import { getAccessLevelLabel, getAccessLevelColor, ACCESS_LEVELS } from '../../utils/accessLevels';
+import { formatarData, formatTempo } from '../../utils/formatar_data';
 
 function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
   const navigate = useNavigate();
@@ -24,8 +25,18 @@ function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [currentTime, setCurrentTime] = useState(new Date());
   
   const dropdownRef = useRef(null);
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -284,6 +295,13 @@ function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
 
       <div className="breadcrumb-right">
         {/* Usuário */}
+
+        {!isMobile && (
+          <div className="datetime-container">
+            <span className="date">{formatarData(currentTime)}</span>
+            <span className="time">{formatTempo(currentTime)}</span>
+          </div>
+        )}
         <div className="user-container" ref={dropdownRef}>
           <button 
             className="user-btn"
