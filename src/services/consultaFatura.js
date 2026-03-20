@@ -50,8 +50,6 @@ export const getFaturamentoGeral = async (filtros = {}) => {
       }
     );
 
-    console.log("response", response);
-
     return response.data;
   } catch (error) {
     console.error(
@@ -74,8 +72,6 @@ export const getFaturasComBoletos = async (filtros = {}) => {
         },
       }
     );
-
-    console.log("response", response);
 
     return response.data;
   } catch (error) {

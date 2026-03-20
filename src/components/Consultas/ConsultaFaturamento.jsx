@@ -192,7 +192,6 @@ const ConsultaFaturamento = () => {
             };
 
             const response = await getFaturamentoGeral(filtrosComPaginacao);
-            console.log("response - pagina", response)
 
             if (response?.sucesso) {
                 const dados = response.resultado?.data || [];

@@ -1,3 +1,4 @@
+// PrivateRoute.jsx
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import api from '../services/api';
@@ -10,6 +11,7 @@ const PrivateRoute = () => {
   });
 
   useEffect(() => {
+    
     let isMounted = true;
 
     const verifyAuthentication = async () => {
@@ -19,7 +21,6 @@ const PrivateRoute = () => {
           setAuthState({ isAuthenticated: true, isLoading: false });
         }
       } catch (error) {
-        console.error("Erro na verificação da autenticação:", error);
         if (isMounted) {
           setAuthState({ isAuthenticated: false, isLoading: false });
         }
@@ -32,6 +33,7 @@ const PrivateRoute = () => {
       isMounted = false;
     };
   }, []);
+
 
   if (authState.isLoading) {
     return <Loading fullScreen message="Carregando..." />;
