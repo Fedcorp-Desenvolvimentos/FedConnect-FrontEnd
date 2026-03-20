@@ -129,7 +129,7 @@ const Loading = ({
       {message && (
         <div style={styles.message}>
           <p style={styles.text}>{message}</p>
-          <p style={styles.percentage}>{Math.round(progress)}%</p>
+          {/* <p style={styles.percentage}>{Math.round(progress)}%</p> */}
         </div>
       )}
     </div>

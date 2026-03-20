@@ -294,14 +294,14 @@ function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
       </div>
 
       <div className="breadcrumb-right">
-        {/* Usuário */}
-
         {!isMobile && (
           <div className="datetime-container">
             <span className="date">{formatarData(currentTime)}</span>
             <span className="time">{formatTempo(currentTime)}</span>
           </div>
         )}
+
+        {/* Usuário */}
         <div className="user-container" ref={dropdownRef}>
           <button 
             className="user-btn"
