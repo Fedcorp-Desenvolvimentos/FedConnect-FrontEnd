@@ -5,7 +5,7 @@ import { FaChartSimple } from "react-icons/fa6";
 const ferramentas = [
   {
     nome: "Dashboard Peaga",
-    url: "https://app.powerbi.com/view?r=eyJrIjoiNzQ2NzYxNDktNDQ5My00MWNiLWE0ZDUtOWQxMzMwMzkzNDUxIiwidCI6IjVhMjY0OWI1LTAzODMtNDA4Ni04MzYwLTJlNGI2YmZmMGEzZSJ9",
+    url: "https://app.powerbi.com/view?r=eyJrIjoiZjM2NjBmMDgtZDNiOS00ZmMwLWFlZDUtYjE5NDdhOTUyMjU4IiwidCI6IjVhMjY0OWI1LTAzODMtNDA4Ni04MzYwLTJlNGI2YmZmMGEzZSJ9",
     descricao: "Acompanhe as métricas da organização de forma única.",
     logo: "/imagens/Logo-Peaga.jpg",
   },

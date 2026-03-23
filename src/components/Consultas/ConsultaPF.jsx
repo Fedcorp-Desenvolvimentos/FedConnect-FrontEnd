@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { formatarData } from "../../utils/formatar_data";
 import { ConsultaService } from "../../services/consultaService";
 import preencherZeros from "../../utils/preencherZeros";
-
+import React from 'react'
 const ConsultaPF = () => {
   const [copiado, setCopiado] = useState({});
     const [showPopup, setShowPopup] = useState(false);
