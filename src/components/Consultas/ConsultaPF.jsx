@@ -6,6 +6,8 @@ import { formatarData } from "../../utils/formatar_data";
 import { ConsultaService } from "../../services/consultaService";
 import preencherZeros from "../../utils/preencherZeros";
 import React from 'react'
+import * as XLSX from "xlsx";
+
 const ConsultaPF = () => {
   const [copiado, setCopiado] = useState({});
     const [showPopup, setShowPopup] = useState(false);
