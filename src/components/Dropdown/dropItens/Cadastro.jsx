@@ -4,7 +4,6 @@ import { CompanyService } from '../../../services/companyService';
 import '../../../styles/Cadastro.css';
 
 function Cadastro() {
-    const [activeTab, setActiveTab] = useState('cadastro');
     const [novoUsuario, setNovoUsuario] = useState({
         nome_completo: '',
         email: '',
@@ -16,16 +15,18 @@ function Cadastro() {
     const [erroCadastro, setErroCadastro] = useState('');
     const [sucessoCadastro, setSucessoCadastro] = useState('');
 
+    console.log("Empresas carregadas:", empresas);
+
     useEffect(() => {
         const fetchCompanies = async () => {
             try {
                 const response = await CompanyService.getAllCompanies(); 
-                setEmpresas(response.results || response);
-                if (response.results && response.results.length > 0) {
-                    const fedcorp = response.results.find(emp => emp.nome === 'Fedcorp');
+                setEmpresas(response.data || response);
+                if (response.data && response.data.length > 0) {
+                    const fedcorp = response.data.find(emp => emp.nome === 'Fedcorp');
                     setNovoUsuario(prev => ({
                         ...prev,
-                        empresa: fedcorp ? fedcorp.id : response.results[0].id
+                        empresa: fedcorp ? fedcorp.id : response.data[0].id
                     }));
                 }
             } catch (error) {
@@ -177,7 +178,7 @@ function Cadastro() {
                                 <option value="">Selecione uma empresa</option>
                                 {empresas.map(emp => (
                                     <option key={emp.id} value={emp.id}>
-                                        {emp.nome}
+                                        {emp.CEDENTE}
                                     </option>
                                 ))}
                             </select>

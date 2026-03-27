@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "../../styles/ConsultaFaturamento.css";
 
-import Loading from "../Loading/Loading";
 import AdministradoraAutocomplete from "../Adm/AdministradorasAutocomplete";
 
 import {
@@ -41,6 +40,8 @@ const ConsultaFaturamento = () => {
     const [resultados, setResultados] = useState([]);
     const { loading, setLoading, setLoadingMessage } = useGlobal();
     const [erro, setErro] = useState("");
+
+    console.log("Dados de faturamento:", resultados);
 
     const [pagination, setPagination] = useState({
         current_page: 1,
