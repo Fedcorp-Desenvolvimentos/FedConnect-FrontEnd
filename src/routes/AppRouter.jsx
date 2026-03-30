@@ -19,7 +19,7 @@ import Comercial from '../components/Consultas/Comercial';
 import BuscaRegiao from '../components/Consultas/ComercialRegiao';
 import Segurados from '../components/Consultas/Segurados';
 import ConsultaFat from '../components/Consultas/ConsultaFat';
-import ConsultaFaturamento from '../components/Consultas/ConsultaFaturamento';
+import ConsultaFaturamento from '../components/Consultas/Faturamento';
 import ConsultaDetalhe from '../components/Detalhes/ConsultaDetalhe';
 import CotacaoConteudo from '../components/Cotação/CotacaoConteudo';
 

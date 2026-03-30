@@ -1,31 +1,26 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import "../../styles/ConsultaFaturamento.css";
-
-import AdministradoraAutocomplete from "../Adm/AdministradorasAutocomplete";
+import "../../../styles/ConsultaFaturamento.css";
 
 import {
-    exportarFaturasParaExcel,
-    exportarFaturasParaPDF,
     getFaturamentoGeral,
-} from "../../services/consultaFatura";
+} from "../../../services/consultaFatura";
 
-import { getEmpresas } from "../../services/empresasService";
+import { getEmpresas } from "../../../services/empresasService";
 import { FaFileInvoiceDollar } from "react-icons/fa6";
-import PageTemplate from "../PageTemplate/PageTemplate";
-import { useGlobal } from "../../context/GlobalContext";
+import PageTemplate from "../../PageTemplate/PageTemplate";
+import { useGlobal } from "../../../context/GlobalContext";
+import { traduzirErroApi } from "../../../utils/traduzir_erro_api";
+import { getCorretores } from "../../../services/corretoresService";
 
-function traduzirErroApi(mensagem) {
-    if (!mensagem) return "Erro inesperado. Por favor, tente novamente.";
-    if (typeof mensagem === "string" && mensagem.startsWith("<!DOCTYPE")) {
-        return "Erro temporário de conexão com o servidor. Tente novamente em instantes.";
-    }
-    const msg = (mensagem || "").toString().toLowerCase();
-    if (msg.includes("proxy error")) return "Serviço temporariamente indisponível. Tente novamente em alguns minutos.";
-    if (msg.includes("502") || msg.includes("bad gateway")) return "Não foi possível se conectar ao servidor. Tente novamente mais tarde.";
-    if (msg.includes("timeout")) return "A requisição demorou muito. Verifique sua conexão e tente novamente.";
-    if (msg.includes("network error")) return "Falha de comunicação com a API. Verifique sua conexão de internet.";
-    return "Erro ao consultar faturas. Por favor, tente novamente.";
-}
+// Componentes
+import { TabelaBoletos } from "./TabelaBoletos";
+import { TabelaBaixas } from "./TabelaBaixas";
+
+import { formatarData } from "../utils/Faturamento/formatarData";
+import { formatarVigencia } from "../../../utils/Faturamento/formatacao";
+import { formatarValor } from "../../../utils/Faturamento/formatarValor";
+import { verificarVencimento } from "../../../utils/Faturamento/verificarVencimento";
+import { FormularioHeader } from "./FormularioHeader";
 
 const ConsultaFaturamento = () => {
     const [formData, setFormData] = useState({
@@ -38,8 +33,12 @@ const ConsultaFaturamento = () => {
     });
 
     const [resultados, setResultados] = useState([]);
+    const [corretoresMap, setCorretoresMap] = useState({});
     const { loading, setLoading, setLoadingMessage } = useGlobal();
     const [erro, setErro] = useState("");
+
+    // console.log("Dados de faturamento:", resultados);
+    console.log("Dados de corretores:", corretoresMap);
 
     const [pagination, setPagination] = useState({
         current_page: 1,
@@ -70,35 +69,7 @@ const ConsultaFaturamento = () => {
         if (administradora) console.log("Administradora selecionada:", administradora);
     };
 
-    const formatarValor = (valor, asCurrency = true) => {
-        if (valor === null || valor === undefined || valor === "") return "-";
-        const num = Number(valor);
-        if (Number.isNaN(num)) return "-";
-        if (!asCurrency) {
-            return num.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-        return num.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    };
-
-    const formatarData = (dataString) => {
-        if (!dataString) return "-";
-        try {
-            let data;
-            if (String(dataString).includes("T")) {
-                data = new Date(dataString);
-            } else {
-                const [year, month, day] = String(dataString).split("-");
-                if (!year || !month || !day) return "-";
-                data = new Date(Number(year), Number(month) - 1, Number(day));
-            }
-            if (Number.isNaN(data.getTime())) return "-";
-            return data.toLocaleDateString("pt-BR");
-        } catch {
-            return "-";
-        }
-    };
-
-    const formatarVigencia = (dataInicio, dataFim) => `${formatarData(dataInicio)} até ${formatarData(dataFim)}`;
+    
 
     const renderStatusBadge = (status, boletos) => {
         // Verifica se algum boleto está quitado
@@ -117,24 +88,6 @@ const ConsultaFaturamento = () => {
         return <span className={`status-badge ${info.className}`}>{info.label}</span>;
     };
 
-    const verificarVencimento = (vencimento) => {
-        if (!vencimento) return { status: "desconhecido", label: "Data inválida" };
-        try {
-            const hoje = new Date();
-            hoje.setHours(0, 0, 0, 0);
-
-            const [ano, mes, dia] = String(vencimento).split("-").map(Number);
-            const dataVenc = new Date(ano, mes - 1, dia, 0, 0, 0, 0);
-
-            if (dataVenc < hoje) return { status: "vencido", label: "Vencido" };
-            if (dataVenc.getTime() === hoje.getTime()) return { status: "hoje", label: "Vence hoje" };
-
-            const diffDays = Math.ceil((dataVenc - hoje) / (1000 * 60 * 60 * 24));
-            return { status: "pendente", label: `Vence em ${diffDays} dias` };
-        } catch {
-            return { status: "desconhecido", label: "Data inválida" };
-        }
-    };
 
     useEffect(() => {
         const carregarEmpresas = async () => {
@@ -153,6 +106,37 @@ const ConsultaFaturamento = () => {
         };
         carregarEmpresas();
     }, []);
+
+    const buscarCorretor = async (codigo) => {
+        if (!codigo) return;
+
+        try {
+            const response = await getCorretores(codigo);
+
+            if (response?.status === "success") {
+                setCorretoresMap(prev => ({
+                    ...prev,
+                    [codigo]: response.data?.NOME || "-"
+                }));
+            }
+        } catch (e) {
+            console.error("Erro ao buscar corretor:", e);
+        }
+    };
+
+    useEffect(() => {
+        if (!resultados.length) return;
+
+        resultados.forEach((fatura) => {
+            if (fatura.CORRETOR && !corretoresMap[fatura.CORRETOR]) {
+                buscarCorretor(fatura.CORRETOR);
+            }
+
+            if (fatura.CORRETOR2 && !corretoresMap[fatura.CORRETOR2]) {
+                buscarCorretor(fatura.CORRETOR2);
+            }
+        });
+    }, [resultados]);
 
     const obterNomeCedente = (codigo) => empresasMap[codigo] || codigo || "-";
 
@@ -348,38 +332,6 @@ const ConsultaFaturamento = () => {
         setExpandedRow(expandedRow === index ? null : index);
     };
 
-    const exportarParaExcel = async () => {
-        try {
-            setLoadingMessage("Exportando Excel...");
-            setLoading(true);
-            const filtrosAtivos = Object.fromEntries(
-                Object.entries(formData).filter(([_, value]) => value && value.toString().trim() !== "")
-            );
-            await exportarFaturasParaExcel(filtrosAtivos);
-        } catch (error) {
-            console.error("Erro na exportação:", error);
-            setErro(`Erro ao exportar para Excel: ${error.message}`);
-            setTimeout(() => setErro(""), 5000);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const exportarParaPDF = async () => {
-        try {
-            setLoadingMessage("Exportando PDF...");
-            setLoading(true);
-            const filtrosAtivos = Object.fromEntries(
-                Object.entries(formData).filter(([_, value]) => value && value.toString().trim() !== "")
-            );
-            await exportarFaturasParaPDF(filtrosAtivos);
-        } catch (error) {
-            setErro(`Erro ao exportar PDF: ${error.message}`);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const PaginationControls = () => {
         const usandoFiltroLocal = termoPesquisa.trim() !== "";
         const pag = usandoFiltroLocal ? localPagination : pagination;
@@ -485,71 +437,6 @@ const ConsultaFaturamento = () => {
         );
     };
 
-    // Componente para renderizar a tabela de boletos dentro do detalhe expandido
-    const TabelaBoletos = ({ boletos, parcelas }) => {
-        if (!boletos || boletos.length === 0) {
-            return <p className="text-muted">Nenhum boleto encontrado para esta fatura.</p>;
-        }
-
-        return (
-            <div className="boletos-table-container">
-                <table className="boletos-table">
-                    <thead>
-                        <tr>
-                            <th>Documento</th>
-                            <th>Nosso Número</th>
-                            <th>Nome Cobrado</th>
-                            <th>CNPJ/CPF</th>
-                            <th>Valor</th>
-                            <th>Vencimento</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {boletos.map((boleto, idx) => {
-    const vencBoleto = verificarVencimento(boleto.DATA_VENCIMENTO);
-    
-    // Tenta encontrar a parcela correspondente no array 'parcelas'
-    // Se 'parcelas' não for passado como prop, ele evita o erro usando o encadeamento opcional
-    const parcelaCorrespondente = typeof parcelas !== 'undefined' 
-        ? parcelas.find(p => p.DOCUMENTO === boleto.DOCUMENTO) 
-        : null;
-
-    // Define o status de quitação baseado na DT_BAIXA da parcela
-    const estaQuitado = parcelaCorrespondente && parcelaCorrespondente.DT_BAIXA !== null;
-
-    return (
-        <tr key={idx} className={boleto.STATUS_BOLETO === "C" ? "boleto-cancelado" : ""}>
-            <td>{boleto.DOCUMENTO || "-"}</td>
-            <td>{boleto.NOSSO_NUMERO || "-"}</td>
-            <td>{boleto.NOME_COBRADO || "-"}</td>
-            <td className="font-monospace">{boleto.CNPJ_COBRADO || "-"}</td>
-            <td className="valor">{formatarValor(boleto.VALOR)}</td>
-            <td>
-                <span className={`vencimento ${vencBoleto.status}`}>
-                    {formatarData(boleto.DATA_VENCIMENTO)}
-                </span>
-            </td>
-            <td>
-                {estaQuitado ? (
-                    <span className="status-badge status-quitada">Quitado</span>
-                ) : boleto.STATUS_BOLETO === "C" ? (
-                    <span className="status-badge status-cancelada">Cancelado</span>
-                ) : (
-                    <span className={`status-badge status-${vencBoleto.status}`}>
-                        {vencBoleto.status === "vencido" ? "Vencido" : "Pendente"}
-                    </span>
-                )}
-            </td>
-        </tr>
-    );
-})}
-                    </tbody>
-                </table>
-            </div>
-        );
-    };
-
     return (
         <PageTemplate
         title="Consulta de Faturamento"
@@ -558,90 +445,14 @@ const ConsultaFaturamento = () => {
         className="consulta-segurados-page"
         >
             <div className="consulta-fatura-container">
-                <form className="form-fatura" onSubmit={carregarFaturas}>
-                    <div className="filtros-principais">
-                        <div className="form-group">
-                            <label htmlFor="fatura">Fatura:</label>
-                            <input
-                                type="text"
-                                id="fatura"
-                                name="fatura"
-                                value={formData.fatura}
-                                onChange={handleChange}
-                                placeholder="Número da fatura"
-                                className="form-control"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="apolice">Apólice:</label>
-                            <input
-                                type="text"
-                                id="apolice"
-                                name="apolice"
-                                value={formData.apolice}
-                                onChange={handleChange}
-                                placeholder="Número da apólice"
-                                className="form-control"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="status">Status:</label>
-                            <select id="status" name="status" value={formData.status} onChange={handleChange} className="form-control">
-                                <option value="">Todos</option>
-                                <option value="A">Ativa</option>
-                                <option value="C">Cancelada</option>
-                            </select>
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="data_ini">Data Inicial:</label>
-                            <input
-                                type="date"
-                                id="data_ini"
-                                name="data_ini"
-                                value={formData.data_ini}
-                                onChange={handleChange}
-                                className="form-control"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="data_fim">Data Final:</label>
-                            <input
-                                type="date"
-                                id="data_fim"
-                                name="data_fim"
-                                value={formData.data_fim}
-                                onChange={handleChange}
-                                className="form-control"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="administradora">Administradora:</label>
-                            <AdministradoraAutocomplete
-                                value={formData.administradora}
-                                onChange={handleChange}
-                                onSelect={handleAdministradoraSelect}
-                                placeholder="Digite o nome da administradora..."
-                                disabled={loading}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="botoes-acao">
-                        <button type="submit" className="btn btn-primary" disabled={loading}>
-                            {loading ? "Consultando..." : "Consultar"}
-                        </button>
-
-                        <button type="button" className="btn btn-primary" onClick={handleLimparFiltros} disabled={loading}>
-                            Limpar Filtros
-                        </button>
-                    </div>
-                </form>
-
+                <FormularioHeader 
+                    formData={formData}
+                    handleChange={handleChange}
+                    handleAdministradoraSelect={handleAdministradoraSelect}
+                    carregarFaturas={carregarFaturas}
+                    handleLimparFiltros={handleLimparFiltros}
+                    loading={loading}
+                />
                 {erro && <div className="erro-msg">{erro}</div>}
 
                 {loading || resultados.length > 0 ? (
@@ -677,7 +488,7 @@ const ConsultaFaturamento = () => {
                                     </small>
                                 )}
 
-                                <div className="export-buttons">
+                                {/* <div className="export-buttons">
                                     <button
                                         className="btn btn-secondary "
                                         onClick={exportarParaExcel}
@@ -687,7 +498,7 @@ const ConsultaFaturamento = () => {
                                     >
                                         <i className="bi-file-excel me-1"></i> Excel
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
 
@@ -814,7 +625,7 @@ const ConsultaFaturamento = () => {
                                                             <div className="expansion-content">
                                                                 <div className="expansion-header">
                                                                     <h6 className="section-title">
-                                                                        <i className="bi-info-circle me-2"></i>Detalhes da Fatura
+                                                                        <i className="bi-info-circle me-2"></i>FATURA
                                                                     </h6>
                                                                     
                                                                 </div>
@@ -833,12 +644,12 @@ const ConsultaFaturamento = () => {
 
                                                                     <div className="info-item">
                                                                         <strong>Corretor:</strong>
-                                                                        <span className="text-truncate">{fatura.CORRETOR || "-"}</span>
+                                                                        <span className="text-truncate">{corretoresMap[fatura.CORRETOR] || fatura.CORRETOR || "-"}</span>
                                                                     </div>
 
                                                                     <div className="info-item">
                                                                         <strong>Corretor 2:</strong>
-                                                                        <span className="text-truncate">{fatura.CORRETOR2 || "-"}</span>
+                                                                        <span className="text-truncate">{corretoresMap[fatura.CORRETOR2] || fatura.CORRETOR2 || "-"}</span>
                                                                     </div>
 
                                                                     <div className="info-item">
@@ -889,12 +700,34 @@ const ConsultaFaturamento = () => {
                                                                     )}
                                                                 </div>
 
+                                                                {/* SEÇÃO DE PARCELAS */}
+                                                                {/* {fatura.PARCELAS && fatura.PARCELAS.length > 0 && (
+                                                                    <div className="boletos-section">
+                                                                        <h6 className="section-title mt-3">
+                                                                            <i class="bi bi-wallet2"></i>
+                                                                            PARCELAS
+                                                                        </h6>
+                                                                        <TabelaParcelas parcelas={fatura.PARCELAS} />
+                                                                    </div>
+                                                                )} */}
+
+                                                                {/* SEÇÃO DE BAIXA */}
+                                                                {fatura.BAIXAS && fatura.BAIXAS.length > 0 && (
+                                                                    <div className="boletos-section">
+                                                                        <h6 className="section-title mt-3">
+                                                                            <i class="bi bi-check-circle"></i>
+                                                                            BAIXA
+                                                                        </h6>
+                                                                        <TabelaBaixas baixas={fatura.BAIXAS} />
+                                                                    </div>
+                                                                )}
+
                                                                 {/* SEÇÃO DE BOLETOS */}
                                                                 {fatura.BOLETOS && fatura.BOLETOS.length > 0 && (
                                                                     <div className="boletos-section">
                                                                         <h6 className="section-title mt-3">
                                                                             <i className="bi-receipt me-2"></i>
-                                                                            Boletos ({fatura.QTD_BOLETOS})
+                                                                            BOLETOS ({fatura.QTD_BOLETOS})
                                                                             {fatura.VALOR_TOTAL_BOLETOS > 0 && (
                                                                                 <span className="valor-total-boletos ms-2">
                                                                                     Total: {formatarValor(fatura.VALOR_TOTAL_BOLETOS)}

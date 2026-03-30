@@ -2,8 +2,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://fedconnect-backend-d6kgr.ondigitalocean.app/",
-  // baseURL: "http://localhost:8000/",
+  //baseURL: "https://fedconnect-backend-d6kgr.ondigitalocean.app/",
+  baseURL: "http://localhost:8000/",
 });
 
 // Intercepta todas as requisições Axios

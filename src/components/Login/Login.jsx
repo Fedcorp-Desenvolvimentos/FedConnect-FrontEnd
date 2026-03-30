@@ -23,6 +23,8 @@ const Login = () => {
 
             const result = await login({ email, password });
 
+            console.log("Resultado do login:", result);
+
             if (result.success) {
                 navigate('/Home');
             } else {

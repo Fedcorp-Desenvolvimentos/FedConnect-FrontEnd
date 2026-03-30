@@ -346,6 +346,8 @@
     border-radius: 10px;
 
     transition: border-color 0.2s, box-shadow 0.2s;
+    min-width: 300px;
+
 }
 
 .input-group-pesquisa:focus-within {
@@ -455,7 +457,6 @@
     border-spacing: 0;
     table-layout: fixed;
     min-width: 100%;    
-    
 }
 
 .tabela-faturas th {
@@ -547,8 +548,42 @@
 .info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
-    gap: 16px;
+    gap: 16px;   
 }
+
+
+.parcelas-table,
+.baixas-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.parcelas-table th,
+.parcelas-table td,
+.baixas-table th,
+.baixas-table td {
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    text-align: left;
+}
+
+.parcelas-table th,
+.baixas-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.parcela-cancelada {
+    background-color: #fff3f3;
+    opacity: 0.8;
+}
+
+.status-baixada {
+    background-color: #d4edda;
+    color: #155724;
+}
+
 
 .info-item {
     display: flex;
