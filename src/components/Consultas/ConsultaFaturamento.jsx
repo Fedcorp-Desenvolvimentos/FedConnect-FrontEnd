@@ -41,8 +41,6 @@ const ConsultaFaturamento = () => {
     const { loading, setLoading, setLoadingMessage } = useGlobal();
     const [erro, setErro] = useState("");
 
-    console.log("Dados de faturamento:", resultados);
-
     const [pagination, setPagination] = useState({
         current_page: 1,
         page_size: 10,
@@ -488,7 +486,7 @@ const ConsultaFaturamento = () => {
     };
 
     // Componente para renderizar a tabela de boletos dentro do detalhe expandido
-    const TabelaBoletos = ({ boletos }) => {
+    const TabelaBoletos = ({ boletos, parcelas }) => {
         if (!boletos || boletos.length === 0) {
             return <p className="text-muted">Nenhum boleto encontrado para esta fatura.</p>;
         }
@@ -509,31 +507,43 @@ const ConsultaFaturamento = () => {
                     </thead>
                     <tbody>
                         {boletos.map((boleto, idx) => {
-                            const vencBoleto = verificarVencimento(boleto.DATA_VENCIMENTO);
-                            return (
-                                <tr key={idx} className={boleto.STATUS_BOLETO === "C" ? "boleto-cancelado" : ""}>
-                                    <td>{boleto.DOCUMENTO || "-"}</td>
-                                    <td>{boleto.NOSSO_NUMERO || "-"}</td>
-                                    <td>{boleto.NOME_COBRADO || "-"}</td>
-                                    <td className="font-monospace">{boleto.CNPJ_COBRADO || "-"}</td>
-                                    <td className="valor">{formatarValor(boleto.VALOR)}</td>
-                                    <td>
-                                        <span className={`vencimento ${vencBoleto.status}`}>
-                                            {formatarData(boleto.DATA_VENCIMENTO)}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {boleto.QUITADO === "S" ? (
-                                            <span className="status-badge status-quitada">Quitado</span>
-                                        ) : boleto.STATUS_BOLETO === "C" ? (
-                                            <span className="status-badge status-cancelada">Cancelado</span>
-                                        ) : (
-                                            <span className="status-badge status-pendente">Pendente</span>
-                                        )}
-                                    </td>
-                                </tr>
-                            );
-                        })}
+    const vencBoleto = verificarVencimento(boleto.DATA_VENCIMENTO);
+    
+    // Tenta encontrar a parcela correspondente no array 'parcelas'
+    // Se 'parcelas' não for passado como prop, ele evita o erro usando o encadeamento opcional
+    const parcelaCorrespondente = typeof parcelas !== 'undefined' 
+        ? parcelas.find(p => p.DOCUMENTO === boleto.DOCUMENTO) 
+        : null;
+
+    // Define o status de quitação baseado na DT_BAIXA da parcela
+    const estaQuitado = parcelaCorrespondente && parcelaCorrespondente.DT_BAIXA !== null;
+
+    return (
+        <tr key={idx} className={boleto.STATUS_BOLETO === "C" ? "boleto-cancelado" : ""}>
+            <td>{boleto.DOCUMENTO || "-"}</td>
+            <td>{boleto.NOSSO_NUMERO || "-"}</td>
+            <td>{boleto.NOME_COBRADO || "-"}</td>
+            <td className="font-monospace">{boleto.CNPJ_COBRADO || "-"}</td>
+            <td className="valor">{formatarValor(boleto.VALOR)}</td>
+            <td>
+                <span className={`vencimento ${vencBoleto.status}`}>
+                    {formatarData(boleto.DATA_VENCIMENTO)}
+                </span>
+            </td>
+            <td>
+                {estaQuitado ? (
+                    <span className="status-badge status-quitada">Quitado</span>
+                ) : boleto.STATUS_BOLETO === "C" ? (
+                    <span className="status-badge status-cancelada">Cancelado</span>
+                ) : (
+                    <span className={`status-badge status-${vencBoleto.status}`}>
+                        {vencBoleto.status === "vencido" ? "Vencido" : "Pendente"}
+                    </span>
+                )}
+            </td>
+        </tr>
+    );
+})}
                     </tbody>
                 </table>
             </div>
@@ -891,7 +901,7 @@ const ConsultaFaturamento = () => {
                                                                                 </span>
                                                                             )}
                                                                         </h6>
-                                                                        <TabelaBoletos boletos={fatura.BOLETOS} />
+                                                                        <TabelaBoletos boletos={fatura.BOLETOS} parcelas={fatura.PARCELAS} />
                                                                     </div>
                                                                 )}
                                                             </div>
