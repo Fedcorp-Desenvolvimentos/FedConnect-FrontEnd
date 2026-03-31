@@ -2,15 +2,15 @@ import axios from 'axios';
 
 // 1. Criação da instância do Axios
 const apiClient = axios.create({
-  baseURL: 'https://nfsefedcorp-reese.ngrok-free.dev',
+  baseURL: 'https://fedhub-api-local.ngrok.app',
   headers: {
     'Content-Type': 'application/json'
   },
   timeout: 10000, 
 });
 
-const CANCEL_PATH = '/webhook/boletofedbnk/cancelamento/';
-const IMPRESS_PATH = '/webhook/boletofedbnk/impressao/';
+const CANCEL_PATH = '/api/fedbnk/cancelamento';
+
 
 /**
  * Envia dados para o Webhook.
@@ -19,23 +19,6 @@ const IMPRESS_PATH = '/webhook/boletofedbnk/impressao/';
 export const triggerWebhook = async (payload) => {
   try {
     const response = await apiClient.post(CANCEL_PATH, payload);
-    return response.data;
-  } catch (error) {
-    console.error('Erro ao chamar o webhook:', error);
-    throw error; 
-  }
-};
-
-/**
- * Envia dados para o Webhook.
- * @param {Object} payload - O objeto JSON a ser enviado no corpo da requisição.
- */
-export const impressWebhook = async (payload) => {
-  try {
-    const response = await apiClient.post(IMPRESS_PATH, payload, {
-      responseType: 'blob',
-      timeout: 60000
-    });
     return response.data;
   } catch (error) {
     console.error('Erro ao chamar o webhook:', error);
