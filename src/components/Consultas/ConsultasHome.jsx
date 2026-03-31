@@ -44,6 +44,14 @@ const consultas = [
         to: "/consultas/consulta-faturamento",
         niveis: ["admin", "usuario", "comercial", "ti"],
     },
+    // {
+    //     key: "notas-fiscais",
+    //     icon: <i className="bi bi-receipt"></i>,
+    //     title: "Consultar Notas Fiscais",
+    //     desc: "Consulte notas fiscais de maneira detalhada com parâmetros de pesquisa.",
+    //     to: "/consultas/consulta-notas-fiscais",
+    //     niveis: ["admin", "usuario", "comercial", "ti"],
+    // },
 ];
 
 const ConsultasHome = () => {

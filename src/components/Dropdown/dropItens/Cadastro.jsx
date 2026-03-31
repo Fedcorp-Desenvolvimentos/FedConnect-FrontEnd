@@ -15,7 +15,7 @@ function Cadastro() {
     const [erroCadastro, setErroCadastro] = useState('');
     const [sucessoCadastro, setSucessoCadastro] = useState('');
 
-    console.log("Empresas carregadas:", empresas);
+    // console.log("Empresas carregadas:", empresas);
 
     useEffect(() => {
         const fetchCompanies = async () => {

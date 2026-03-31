@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import "../../styles/ComercialRegiao.css";
 import * as XLSX from "xlsx";
 import { ConsultaService } from "../../services/consultaService";
@@ -17,6 +17,11 @@ const ComercialRegiao = () => {
     const [hasSearched, setHasSearched] = useState(false);
     const [paginaAtual, setPaginaAtual] = useState(1);
     const itensPorPagina = 4;
+
+    const [nextPageToken, setNextPageToken] = useState(null);
+    const [carregandoMais, setCarregandoMais] = useState(false);
+    const [todosResultados, setTodosResultados] = useState([]);
+    
 
     // Modal
     const [modalAberto, setModalAberto] = useState(false);
@@ -57,21 +62,58 @@ const ComercialRegiao = () => {
         }
 
         try {
-            const resp = await ConsultaService.consultaRegiao(form);
+            // Resetar estados para nova busca
+            setTodosResultados([]);
+            setNextPageToken(null);
+            
+            const resp = await ConsultaService.consultaRegiao({
+                ...form,
+                max_resultados: 20
+            });
 
             if (resp && Array.isArray(resp.resultados)) {
-                setResultados(resp.resultados);
+                setTodosResultados(resp.resultados);
+                setResultados(resp.resultados); // Para exibição imediata
+                setNextPageToken(resp.next_page_token);
             } else {
+                setTodosResultados([]);
                 setResultados([]);
             }
 
             setHasSearched(true);
         } catch (err) {
             console.error(err);
-            setErro("Erro ao buscar empresas. Tente novamente.");
+            setErro("Erro ao consultar a região. Tente novamente.");
+            setTodosResultados([]);
             setResultados([]);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const carregarMaisResultados = async () => {
+        if (!nextPageToken || carregandoMais) return;
+        
+        setCarregandoMais(true);
+        
+        try {
+            const resp = await ConsultaService.consultaRegiao({
+                ...form,
+                max_resultados: 20,
+                page_token: nextPageToken
+            });
+
+            if (resp && Array.isArray(resp.resultados)) {
+                const novosResultados = [...todosResultados, ...resp.resultados];
+                setTodosResultados(novosResultados);
+                setResultados(novosResultados); // Atualiza a lista exibida
+                setNextPageToken(resp.next_page_token);
+            }
+        } catch (err) {
+            console.error("Erro ao carregar mais resultados:", err);
+            setErro("Erro ao carregar mais resultados.");
+        } finally {
+            setCarregandoMais(false);
         }
     };
 
@@ -229,6 +271,8 @@ const ComercialRegiao = () => {
     const resultadosPaginados = resultados.slice(indexPrimeiro, indexUltimo);
     const totalPaginas = Math.ceil(resultados.length / itensPorPagina);
 
+    // console.log("Resultados paginados:", resultadosPaginados);
+
     const mudarPagina = (n) => {
         setPaginaAtual(n);
         resultadosRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -244,12 +288,12 @@ const ComercialRegiao = () => {
             <form className="regiao-form" onSubmit={handleSubmit}>
                 <div className="form-row">
                     <label>UF *</label>
-                    <input name="uf" value={form.uf} onChange={handleChange} maxLength={2} />
+                    <input name="uf" value={form.uf} onChange={handleChange} maxLength={2} required/>
                 </div>
 
                 <div className="form-row">
                     <label>Município *</label>
-                    <input name="municipio" value={form.municipio} onChange={handleChange} />
+                    <input name="municipio" value={form.municipio} onChange={handleChange} required />
                 </div>
 
                 <div className="form-row">
@@ -410,6 +454,30 @@ const ComercialRegiao = () => {
                             </div>
                         )}
                     </>
+                )}
+
+                {/* Após a lista de resultados */}
+                {nextPageToken && (
+                    <div className="carregar-mais-container">
+                        <button 
+                            className="btn-carregar-mais"
+                            onClick={carregarMaisResultados}
+                            disabled={carregandoMais}
+                        >
+                            {carregandoMais ? (
+                                <>
+                                    <i className="bi bi-hourglass-split"></i>
+                                    Carregando...
+                                </>
+                            ) : (
+                                <>
+                                    <i className="bi bi-plus-circle"></i>
+                                    Carregar mais resultados
+                                </>
+                            )}
+                        </button>
+                        {carregandoMais && <p className="info-text">Buscando mais empresas...</p>}
+                    </div>
                 )}
 
                 {!loading && hasSearched && resultados.length === 0 && (
