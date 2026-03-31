@@ -58,6 +58,7 @@ import Payxbox from '../components/Faturamento/Paybox';
 
 // Utils e Providers
 import PrivateRouter from './PrivateRouter';
+// import ConsultaNotasFiscais from '../components/Consultas/ConsultaNotasFiscais.JSX';
 
 const AppRouter = () => {
   return (
@@ -83,6 +84,7 @@ const AppRouter = () => {
           <Route path={ROUTES.CONSULTA_SEGURADOS} element={<Segurados />} />
           <Route path={ROUTES.CONSULTA_FATURAS} element={<ConsultaFat />} />
           <Route path={ROUTES.CONSULTA_FATURAMENTO} element={<ConsultaFaturamento />} />
+          {/* <Route path={ROUTES.CONSULTA_NOTAS_FISCAIS} element={<ConsultaNotasFiscais />} /> */}
           <Route path={ROUTES.CONSULTA_DETALHES} element={<ConsultaDetalhe />} />
           
           {/* Cotação */}

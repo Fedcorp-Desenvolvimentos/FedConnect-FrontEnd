@@ -23,6 +23,16 @@ export const DetalhesFatura = ({ fatura, obterNomeCedente, obterNomeCorretor }) 
                 </div>
 
                 <div className="info-item">
+                    <strong>Nome cobrado:</strong>
+                    <span className="text-truncate">{obterNomeCorretor(fatura.NOME_ADMINISTRADORA)}</span>
+                </div>
+
+                <div className="info-item">
+                    <strong>CNPJ Cobrado:</strong>
+                    <span className="text-truncate">{obterNomeCorretor(fatura.CNPJ_ADMINISTRADORA)}</span>
+                </div>
+
+                <div className="info-item">
                     <strong>Corretor:</strong>
                     <span className="text-truncate">{obterNomeCorretor(fatura.CORRETOR)}</span>
                 </div>
@@ -81,7 +91,7 @@ export const DetalhesFatura = ({ fatura, obterNomeCedente, obterNomeCorretor }) 
             </div>
 
             {/* SEÇÃO DE BAIXA */}
-            {fatura.BAIXAS && fatura.BAIXAS.length > 0 && (
+            {/* {fatura.BAIXAS && fatura.BAIXAS.length > 0 && (
                 <div className="boletos-section">
                     <h6 className="section-title mt-3">
                         <i className="bi bi-check-circle"></i>
@@ -89,7 +99,7 @@ export const DetalhesFatura = ({ fatura, obterNomeCedente, obterNomeCorretor }) 
                     </h6>
                     <TabelaBaixas baixas={fatura.BAIXAS} />
                 </div>
-            )}
+            )} */}
 
             {/* SEÇÃO DE BOLETOS */}
             {fatura.BOLETOS && fatura.BOLETOS.length > 0 && (

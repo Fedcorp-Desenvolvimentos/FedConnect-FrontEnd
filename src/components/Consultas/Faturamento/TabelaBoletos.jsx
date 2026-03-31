@@ -14,7 +14,9 @@ export const TabelaBoletos = ({ boletos, parcelas }) => {  // ← adicionar parc
                 <thead>
                     <tr>
                         <th>Documento</th>
-                        <th>Nosso Número</th>
+                        {/* <th>Nosso Número</th> */}
+                        <th>ID NFS-E</th>
+                        <th>Nº Nota Fiscal</th>
                         <th>Nome Cobrado</th>
                         <th>CNPJ/CPF</th>
                         <th>Valor</th>
@@ -32,10 +34,12 @@ export const TabelaBoletos = ({ boletos, parcelas }) => {  // ← adicionar parc
                         
                         return (
                             <tr key={idx} className={boleto.STATUS_BOLETO === "C" ? "boleto-cancelado" : ""}>
-                                <td>{boleto.DOCUMENTO || "-"}</td>
-                                <td>{boleto.NOSSO_NUMERO || "-"}</td>
-                                <td>{boleto.NOME_COBRADO || "-"}</td>
-                                <td className="font-monospace">{boleto.CNPJ_COBRADO || "-"}</td>
+                                <td>{boleto.DOCUMENTO || "N/A"}</td>
+                                {/* <td>{boleto.NOSSO_NUMERO || "N/A"}</td> */}
+                                <td>{boleto.ID_NFS_E || "N/A"}</td>
+                                <td>{boleto.NUMERO_NOTA || "N/A"}</td>
+                                <td>{boleto.NOME_COBRADO || "N/A"}</td>
+                                <td className="font-monospace">{boleto.CNPJ_COBRADO || "N/A"}</td>
                                 <td className="valor">{formatarValor(boleto.VALOR)}</td>
                                 <td>
                                     <span className={`vencimento ${vencBoleto.status}`}>

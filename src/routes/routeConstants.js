@@ -16,6 +16,7 @@ export const ROUTES = {
   CONSULTA_SEGURADOS: '/consultas/consulta-segurados',
   CONSULTA_FATURAS: '/consultas/consulta-faturas',
   CONSULTA_FATURAMENTO: '/consultas/consulta-faturamento',
+  CONSULTA_NOTAS_FISCAIS: '/consultas/consulta-notas-fiscais',
   CONSULTA_DETALHES: '/consultas/consulta-detalhes/:id',
   
   // Rotas de usuário
