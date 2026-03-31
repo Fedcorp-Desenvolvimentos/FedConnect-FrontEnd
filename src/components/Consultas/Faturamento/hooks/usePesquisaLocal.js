@@ -1,16 +1,18 @@
 import { useState, useMemo, useEffect } from "react";
 import { formatarData, formatarVigencia } from "../utils/formatacao";
 
+const initialState = {
+    current_page: 1,
+    page_size: 10,
+    total_records: 0,
+    total_pages: 1,
+    has_next: false,
+    has_previous: false,
+};
+
 export const usePesquisaLocal = (resultados, obterNomeCedente) => {
     const [termoPesquisa, setTermoPesquisa] = useState("");
-    const [localPagination, setLocalPagination] = useState({
-        current_page: 1,
-        page_size: 10,
-        total_records: 0,
-        total_pages: 1,
-        has_next: false,
-        has_previous: false,
-    });
+    const [localPagination, setLocalPagination] = useState(initialState);
 
     const resultadosFiltrados = useMemo(() => {
         if (!termoPesquisa.trim()) return resultados;
