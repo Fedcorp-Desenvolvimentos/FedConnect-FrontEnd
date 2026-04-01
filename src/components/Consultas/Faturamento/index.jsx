@@ -207,32 +207,32 @@ const ConsultaFaturamento = () => {
                         />
 
                         <div className="tabela-resultados">
-                            <table className="tabela-faturas">
-                                <thead>
-                                    <tr>
-                                        <th style={{ width: "40px" }}></th>
-                                        <th>Fatura</th>
-                                        <th>Apólice</th>
-                                        <th>Administradora</th>
-                                        <th>Emissão</th>
-                                        <th>Status</th>
-                                        <th>Vencimento</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {resultadosPaginados.map((fatura, index) => (
-                                        <LinhaFatura
-                                            key={`${fatura.FATURA}-${index}`}
-                                            fatura={fatura}
-                                            index={index}
-                                            isExpanded={expandedRow === index}
-                                            toggleExpandRow={toggleExpandRow}
-                                            obterNomeCedente={obterNomeCedente}
-                                            obterNomeCorretor={obterNomeCorretor}
-                                        />
-                                    ))}
-                                </tbody>
-                            </table>
+                          <table className="tabela-faturas">
+                            <thead>
+                                <tr>
+                                    <th style={{ width: "40px" }}></th>
+                                    <th>Fatura</th>
+                                    <th>Apólice</th>
+                                    <th>Administradora</th>
+                                    <th>Emissão</th>
+                                    <th>Status</th>
+                                    <th>Vencimento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {resultadosPaginados.map((fatura, index) => (
+                                    <LinhaFatura
+                                        key={`${fatura.FATURA}-${index}`}
+                                        fatura={fatura}
+                                        index={index}
+                                        isExpanded={expandedRow === index}
+                                        toggleExpandRow={toggleExpandRow}
+                                        obterNomeCedente={obterNomeCedente}
+                                        obterNomeCorretor={obterNomeCorretor}
+                                    />
+                                ))}
+                            </tbody>
+                        </table>
                         </div>
 
                         <PaginationControls 

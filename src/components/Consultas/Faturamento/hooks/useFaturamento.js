@@ -82,6 +82,7 @@ export const useFaturamento = () => {
 
             if (response?.sucesso) {
                 const dados = response.resultado?.data || [];
+                setLoadingMessage("Carregando informações...");
                 setResultados(dados);
                 
                 const pagination = response.resultado?.pagination || {

@@ -3,7 +3,7 @@ import { verificarVencimento } from "../../../utils/Faturamento/verificarVencime
 import { formatarValor } from "../../../utils/Faturamento/formatarValor";
 import { formatarData } from "../../../utils/Faturamento/formatarData";
 
-export const TabelaBoletos = ({ boletos, parcelas }) => {  // ← adicionar parcelas como prop
+export const TabelaBoletos = ({ boletos, parcelas }) => { 
     if (!boletos || boletos.length === 0) {
         return <p className="text-muted">Nenhum boleto encontrado para esta fatura.</p>;
     }
@@ -15,7 +15,7 @@ export const TabelaBoletos = ({ boletos, parcelas }) => {  // ← adicionar parc
                     <tr>
                         <th>Documento</th>
                         {/* <th>Nosso Número</th> */}
-                        <th>ID NFS-E</th>
+                        {/* <th>ID NFS-E</th> */}
                         <th>Nº Nota Fiscal</th>
                         <th>Nome Cobrado</th>
                         <th>CNPJ/CPF</th>
@@ -36,7 +36,7 @@ export const TabelaBoletos = ({ boletos, parcelas }) => {  // ← adicionar parc
                             <tr key={idx} className={boleto.STATUS_BOLETO === "C" ? "boleto-cancelado" : ""}>
                                 <td>{boleto.DOCUMENTO || "N/A"}</td>
                                 {/* <td>{boleto.NOSSO_NUMERO || "N/A"}</td> */}
-                                <td>{boleto.ID_NFS_E || "N/A"}</td>
+                                {/* <td>{boleto.ID_NFS_E || "N/A"}</td> */}
                                 <td>{boleto.NUMERO_NOTA || "N/A"}</td>
                                 <td>{boleto.NOME_COBRADO || "N/A"}</td>
                                 <td className="font-monospace">{boleto.CNPJ_COBRADO || "N/A"}</td>

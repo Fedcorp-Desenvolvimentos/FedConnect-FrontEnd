@@ -452,11 +452,12 @@
     width: 100%;
 }
 
+
 .tabela-faturas {
+    width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    table-layout: fixed;
-    min-width: 100%;    
+    table-layout: fixed;   
 }
 
 .tabela-faturas th {

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import "../../styles/ConsultasHome.css";
 import "../../styles/ReimpressaoBoleto.css";
 import { impressWebhook } from "../../services/boletofedbnk";

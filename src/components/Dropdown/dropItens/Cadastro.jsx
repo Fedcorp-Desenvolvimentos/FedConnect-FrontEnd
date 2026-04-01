@@ -26,7 +26,7 @@ function Cadastro() {
                     const fedcorp = response.data.find(emp => emp.nome === 'Fedcorp');
                     setNovoUsuario(prev => ({
                         ...prev,
-                        empresa: fedcorp ? fedcorp.id : response.data[0].id
+                        empresa: fedcorp ? fedcorp.CODIGO : response.data[0].CODIGO
                     }));
                 }
             } catch (error) {
@@ -66,7 +66,7 @@ function Cadastro() {
                 email: '',
                 nivelAcesso: '',
                 senha: '',
-                empresa: empresas.length > 0 ? empresas[0].id : ''
+                empresa: empresas.length > 0 ? empresas[0].CODIGO : ''
             });
 
             setTimeout(() => setSucessoCadastro(''), 5000);
@@ -177,7 +177,7 @@ function Cadastro() {
                             >
                                 <option value="">Selecione uma empresa</option>
                                 {empresas.map(emp => (
-                                    <option key={emp.id} value={emp.id}>
+                                    <option key={emp.CODIGO} value={emp.CODIGO}>
                                         {emp.CEDENTE}
                                     </option>
                                 ))}
