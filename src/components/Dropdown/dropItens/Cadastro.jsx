@@ -14,8 +14,7 @@ function Cadastro() {
     const [empresas, setEmpresas] = useState([]); 
     const [erroCadastro, setErroCadastro] = useState('');
     const [sucessoCadastro, setSucessoCadastro] = useState('');
-
-    // console.log("Empresas carregadas:", empresas);
+    const [empresaSelecionada, setEmpresaSelecionada] = useState(null);
 
     useEffect(() => {
         const fetchCompanies = async () => {
@@ -23,10 +22,9 @@ function Cadastro() {
                 const response = await CompanyService.getAllCompanies(); 
                 setEmpresas(response.data || response);
                 if (response.data && response.data.length > 0) {
-                    const fedcorp = response.data.find(emp => emp.nome === 'Fedcorp');
                     setNovoUsuario(prev => ({
                         ...prev,
-                        empresa: fedcorp ? fedcorp.CODIGO : response.data[0].CODIGO
+                        empresa: 0
                     }));
                 }
             } catch (error) {
@@ -40,6 +38,12 @@ function Cadastro() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        if (name === "empresa") {
+            const emp = empresas[value];
+            setEmpresaSelecionada(emp);
+        }
+
         setNovoUsuario(prev => ({ ...prev, [name]: value }));
     };
 
@@ -54,9 +58,12 @@ function Cadastro() {
                 email: novoUsuario.email,
                 nivel_acesso: novoUsuario.nivelAcesso,
                 password: novoUsuario.senha,
-                empresa: novoUsuario.empresa, 
+                empresa_nome: empresaSelecionada.CEDENTE,
+                empresa_cnpj: empresaSelecionada.CNPJ,
                 is_fed: true
             };
+
+            console.log("Payload para registro:", payload);
 
             const response = await UserService.registerUser(payload);
             setSucessoCadastro(`Usuário "${response.nome_completo || response.email}" cadastrado com sucesso!`);
@@ -176,9 +183,9 @@ function Cadastro() {
                                 required
                             >
                                 <option value="">Selecione uma empresa</option>
-                                {empresas.map(emp => (
-                                    <option key={emp.CODIGO} value={emp.CODIGO}>
-                                        {emp.CEDENTE}
+                                {empresas.map((emp, index) => (
+                                    <option key={index} value={index}>
+                                        {emp.CEDENTE} - {emp.CNPJ}
                                     </option>
                                 ))}
                             </select>
