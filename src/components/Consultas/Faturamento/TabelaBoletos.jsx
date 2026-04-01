@@ -39,7 +39,7 @@ export const TabelaBoletos = ({ boletos, parcelas }) => {
                                 {/* <td>{boleto.ID_NFS_E || "N/A"}</td> */}
                                 <td>{boleto.NUMERO_NOTA || "N/A"}</td>
                                 <td>{boleto.NOME_COBRADO || "N/A"}</td>
-                                <td className="font-monospace">{boleto.CNPJ_COBRADO || "N/A"}</td>
+                                <td className="cnpj">{boleto.CNPJ_COBRADO || "N/A"}</td>
                                 <td className="valor">{formatarValor(boleto.VALOR)}</td>
                                 <td>
                                     <span className={`vencimento ${vencBoleto.status}`}>
