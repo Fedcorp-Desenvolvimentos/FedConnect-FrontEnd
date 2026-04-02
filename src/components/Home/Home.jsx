@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import "../../styles/Home.css";
+import { FaHammer } from "react-icons/fa";
+import PageTemplate from "../PageTemplate/PageTemplate";
 
 function useIsMobile(breakpoint = 700) {
   const getIsMobile = () => window.innerWidth <= breakpoint;
@@ -79,7 +81,10 @@ const Home = () => {
   }, [isMobile, bannerSrc]);
 
   return (
-    <div className={`home-container${withSidebar ? " with-sidebar" : ""}`}>
+     <PageTemplate
+      className="home-container"
+      >
+    <div className={`home-wrapper`}>
       <div className="carousel-container">
         {bannerAtual.link ? (
           <a
@@ -116,6 +121,7 @@ const Home = () => {
         </div>
       </div>
     </div>
+    </PageTemplate>
   );
 };
 

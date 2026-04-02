@@ -54,9 +54,7 @@
   width: 100%;
 }
 
-.page-content {
-  width: 100%;
-}
+
 
 /* Telas médias (992px - 1200px) */
 @media (max-width: 1200px) {
