@@ -25,7 +25,7 @@ import CotacaoConteudo from '../components/Cotação/CotacaoConteudo';
 
 // Dropdown itens
 import GerenciarUsuarios from '../components/Dropdown/dropItens/GerenciarUsuarios';
-import MinhaConta from '../components/Dropdown/dropItens/MinhaConta';
+import MinhaConta from '../components/Dropdown/dropItens/MinhaConta/MinhaConta';
 import Cadastro from '../components/Dropdown/dropItens/Cadastro';
 import HistoricoPage from '../components/Dropdown/dropItens/HistoricoPage';
 
