@@ -42,7 +42,7 @@ const consultas = [
         title: "Consultar Faturamento",
         desc: "Consulte faturamento de maneira detalhada com parâmetros de pesquisa.",
         to: "/consultas/consulta-faturamento",
-        niveis: ["admin", "usuario", "comercial", "ti"],
+        niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     },
     // {
     //     key: "notas-fiscais",
