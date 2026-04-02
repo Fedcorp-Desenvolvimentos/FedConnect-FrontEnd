@@ -34,7 +34,7 @@ const operacionais = [
     icon: <i className="bi bi-file-earmark-bar-graph-fill" />,
     title: "Sistema de NF",
     desc: "Solicite e acompanhe emissão e cancelamento de Nota Fiscal.",
-    to: "https://fedcorp.com.br/suporte/nota/", 
+    to: "https://emissaodenotas.grupofedcorp.com.br/", 
     external: true,
      niveis: ["admin", "faturamento"]
   },
