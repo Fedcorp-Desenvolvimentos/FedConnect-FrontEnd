@@ -19,7 +19,7 @@ const IMPRESS_PATH = '/webhook/boletofedbnk/impressao/';
  */
 export const triggerWebhook = async (payload) => {
   try {
-    const response = await api.post(CANCEL_PATH, payload);
+    const response = await apiClient.post(CANCEL_PATH, payload);
     return response.data;
   } catch (error) {
     console.error('Erro ao chamar o webhook:', error);
