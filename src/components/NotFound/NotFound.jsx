@@ -1,6 +1,4 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { ROUTES } from '../../routes/routeConstants';
 import '../../styles/NotFound.css';
 
 const NotFound = () => {
@@ -20,7 +18,7 @@ const NotFound = () => {
           A página que você está procurando não existe ou foi movida.
         </p>
         
-        <Link to={ROUTES.HOME} className="not-found-button">
+        <Link to="/" className="not-found-button">
           Voltar para o início
         </Link>
       </div>

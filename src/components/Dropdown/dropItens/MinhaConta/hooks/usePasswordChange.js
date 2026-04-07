@@ -15,13 +15,14 @@ export const usePasswordChange = (userId) => {
     setPasswordData(prev => ({ ...prev, [field]: value }));
   };
 
-  const changePassword = async () => {
-    if (passwordData.novaSenha !== passwordData.confirmarSenha) {
+  const changePassword = async (senhaAtual, novaSenha, confirmarSenha) => {
+    if (novaSenha !== confirmarSenha) {
       setError('As senhas não coincidem');
       return false;
     }
 
-    if (passwordData.novaSenha.length < 6) {
+    if (novaSenha.length < 6) {
+      console.log("Quantidade de caracteres da senha:", novaSenha.length);
       setError('A nova senha deve ter pelo menos 6 caracteres');
       return false;
     }
@@ -29,17 +30,10 @@ export const usePasswordChange = (userId) => {
     try {
       setLoading(true);
       await UserService.changePassword({
-        old_password: passwordData.senhaAtual,
-        new_password: passwordData.novaSenha
+        old_password: senhaAtual,
+        new_password: novaSenha
       });
-      
-      // Reset form
-      setPasswordData({
-        senhaAtual: '',
-        novaSenha: '',
-        confirmarSenha: ''
-      });
-      
+
       return true;
     } catch (err) {
       setError(err.response?.data?.detail || 'Erro ao alterar senha');

@@ -1,12 +1,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { ROUTES } from './routeConstants';
 
 // Layouts
 import DashboardLayout from '../Layouts/DashboardLayout';
 
 // Componentes públicos
 import Login from '../components/Login/Login';
-import RecuperarSenha from '../components/Login/EsqueciSenha';
 import NotFound from '../components/NotFound/NotFound';
 
 // Componentes protegidos
@@ -58,76 +56,82 @@ import Payxbox from '../components/Faturamento/Paybox';
 
 // Utils e Providers
 import PrivateRouter from './PrivateRouter';
-// import ConsultaNotasFiscais from '../components/Consultas/ConsultaNotasFiscais.JSX';
+import ResetarSenha from '../components/Login/ResetarSenha';
+import EsqueciSenha from '../components/Login/EsqueciSenha';
+import { useAuth } from '../context/AuthContext';
+
 
 const AppRouter = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <Routes>
       {/* Rotas Públicas */}
-      <Route path={ROUTES.LOGIN} element={<Login />} />
-      <Route path={ROUTES.LOGIN_ALT} element={<Login />} />
-      <Route path={ROUTES.ESQUECI_SENHA} element={<RecuperarSenha />} />
+      <Route path="/" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
+      <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
+      
+      <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+      <Route path="/resetar-senha/:token" element={<ResetarSenha />} />
 
       {/* Rotas Protegidas */}
       <Route element={<PrivateRouter />}>
         <Route element={<DashboardLayout />}>
           {/* Home */}
-          <Route path={ROUTES.HOME} element={<Home />} />
+          <Route path="/home" element={<Home />} />
           
           {/* Consultas */}
-          <Route path={ROUTES.CONSULTAS} element={<ConsultasHome />} />
-          <Route path={ROUTES.CONSULTA_PF} element={<ConsultaPF />} />
-          <Route path={ROUTES.CONSULTA_END} element={<ConsultaEnd />} />
-          <Route path={ROUTES.CONSULTA_CNPJ} element={<ConsultaCNPJ />} />
-          <Route path={ROUTES.CONSULTA_COMERCIAL} element={<Comercial />} />
-          <Route path={ROUTES.COMERCIAL_REGIAO} element={<BuscaRegiao />} />
-          <Route path={ROUTES.CONSULTA_SEGURADOS} element={<Segurados />} />
-          <Route path={ROUTES.CONSULTA_FATURAS} element={<ConsultaFat />} />
-          <Route path={ROUTES.CONSULTA_FATURAMENTO} element={<ConsultaFaturamento />} />
-          {/* <Route path={ROUTES.CONSULTA_NOTAS_FISCAIS} element={<ConsultaNotasFiscais />} /> */}
-          <Route path={ROUTES.CONSULTA_DETALHES} element={<ConsultaDetalhe />} />
+          <Route path="/consultas" element={<ConsultasHome />} />
+          <Route path="/consultas/consulta-pf" element={<ConsultaPF />} />
+          <Route path="/consultas/consulta-end" element={<ConsultaEnd />} />
+          <Route path="/consultas/consulta-cnpj" element={<ConsultaCNPJ />} />
+          <Route path="/consulta-comercial" element={<Comercial />} />
+          <Route path="/consultas/comercial-regiao" element={<BuscaRegiao />} />
+          <Route path="/consultas/consulta-segurados" element={<Segurados />} />
+          <Route path="/consultas/consulta-faturas" element={<ConsultaFat />} />
+          <Route path="/consultas/consulta-faturamento" element={<ConsultaFaturamento />} />
+          <Route path="/consultas/consulta-detalhes/:id" element={<ConsultaDetalhe />} />
           
           {/* Cotação */}
-          <Route path={ROUTES.COTACAO_CONTEUDO} element={<CotacaoConteudo />} />
+          <Route path="/cotacao-conteudo" element={<CotacaoConteudo />} />
           
           {/* Usuário */}
-          <Route path={ROUTES.GERENCIAR_USUARIOS} element={<GerenciarUsuarios />} />
-          <Route path={ROUTES.MINHA_CONTA} element={<MinhaConta />} />
-          <Route path={ROUTES.CADASTRO} element={<Cadastro />} />
-          <Route path={ROUTES.HISTORICO} element={<HistoricoPage />} />
+          <Route path="/gerenciar-usuarios" element={<GerenciarUsuarios />} />
+          <Route path="/minha-conta" element={<MinhaConta />} />
+          <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/historico" element={<HistoricoPage />} />
           
           {/* Administrativo */}
-          <Route path={ROUTES.HOME_ADM} element={<HomeAdm />} />
-          <Route path={ROUTES.UPLOAD} element={<Upload />} />
-          <Route path={ROUTES.IMPORTACAO_VIDA} element={<ImportVida />} />
+          <Route path="/home-adm" element={<HomeAdm />} />
+          <Route path="/upload" element={<Upload />} />
+          <Route path="/importacao-vida" element={<ImportVida />} />
           
           {/* Ferramentas e Views */}
-          <Route path={ROUTES.FERRAMENTAS} element={<Ferramentas />} />
-          <Route path={ROUTES.METRICAS} element={<Metricas />} />
-          <Route path={ROUTES.ENVIO_EMAIL} element={<EnvEmail />} />
-          <Route path={ROUTES.CONFIG_EMAIL} element={<ConfigEmail />} />
+          <Route path="/ferramentas" element={<Ferramentas />} />
+          <Route path="/metricas" element={<Metricas />} />
+          <Route path="/envio-email" element={<EnvEmail />} />
+          <Route path="/config-email" element={<ConfigEmail />} />
           
           {/* Agenda */}
-          <Route path={ROUTES.AGENDA} element={<AgendaSala />} />
-          <Route path={ROUTES.AGENDA_COMERCIAL} element={<AgendaComercial />} />
+          <Route path="/agenda" element={<AgendaSala />} />
+          <Route path="/agenda-comercial" element={<AgendaComercial />} />
           
           {/* Comercial e Financeiro */}
-          <Route path={ROUTES.ACOMPANHAMENTO} element={<Acompanhamento />} />
-          <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />
-          <Route path={ROUTES.PRODUTOS} element={<Produtos />} />
+          <Route path="/acompanhamento" element={<Acompanhamento />} />
+          <Route path="/financeiro" element={<Financeiro />} />
+          <Route path="/produtos" element={<Produtos />} />
           
           {/* Faturamento */}
-          <Route path={ROUTES.FATURAMENTO} element={<OperacionalHome />} />
-          <Route path={ROUTES.PDF_AUTOMATION} element={<PdfAutomation />} />
-          <Route path={ROUTES.CANCELAMENTO} element={<OperacionalCancelamento />} />
-          <Route path={ROUTES.REIMPRESSAO_BOLETO} element={<ReimpressaoBoleto />} />
-          <Route path={ROUTES.PAYBOX} element={<Payxbox />} />
+          <Route path="/faturamento" element={<OperacionalHome />} />
+          <Route path="/faturamento/pdf-automation" element={<PdfAutomation />} />
+          <Route path="/faturamento/cancelamento" element={<OperacionalCancelamento />} />
+          <Route path="/faturamento/reimpressao-boleto" element={<ReimpressaoBoleto />} />
+          <Route path="/faturamento/paybox" element={<Payxbox />} />
         </Route>
       </Route>
 
-      {/* Rota 404 */}
-      <Route path={ROUTES.NAO_ENCONTRADO} element={<NotFound />} />
-      <Route path={ROUTES.ALL} element={<Navigate to={ROUTES.NAO_ENCONTRADO} replace />} />
+      {/* Rota 404 - SEMPRE no final */}
+      <Route path="/404" element={<NotFound />} />
+      <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   );
 };

@@ -67,7 +67,12 @@ const MinhaConta = () => {
       confirmarSenha: ''
     },
     async (data) => {
-      const success = await changePassword(data.senhaAtual, data.novaSenha);
+      const success = await changePassword(
+        data.senhaAtual,
+        data.novaSenha,
+        data.confirmarSenha
+      );
+      
       if (success) {
         setSuccessMessage('Senha alterada com sucesso!');
         setTimeout(() => setSuccessMessage(''), 3000);

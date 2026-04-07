@@ -1,5 +1,5 @@
 // src/contexts/AuthContext.js
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api.js';
 import { useGlobal } from './GlobalContext.jsx';
@@ -63,14 +63,16 @@ export const AuthProvider = ({ children }) => {
         const checkAuthStatus = async () => {
             // Tenta obter o token do localStorage
             const token = localStorage.getItem('accessToken');
-            const publicRoutes = ["/", "/login", "/esqueci-senha", "/404"];
+            const publicRoutes = ["/", "/login", "/esqueci-senha", "/resetar-senha", "/404"];
 
             // Se não houver token, o usuário não está autenticado
            if (!token) {
                 setLoading(false);
                 setIsAuthenticated(false);
 
-                const isPublicRoute = publicRoutes.includes(window.location.pathname);
+                const isPublicRoute = publicRoutes.some((route) =>
+                    window.location.pathname.startsWith(route)
+                );
 
                 if (!isPublicRoute) {
                     navigate("/login");
@@ -102,12 +104,15 @@ export const AuthProvider = ({ children }) => {
         checkAuthStatus();
     }, [navigate]);
 
+    const isAuthenticatedCheck = () => isAuthenticated;
+
     const authContextValue = useMemo(() => ({
         user,
         isAuthenticated,
         loading,
         login,
         logout,
+        isAuthenticatedCheck
     }), [user, isAuthenticated, loading, login, logout]);
 
     return (

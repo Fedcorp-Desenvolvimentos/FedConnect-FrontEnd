@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Login.css';
 import { useAuth } from '../../context/AuthContext'
@@ -22,8 +22,6 @@ const Login = () => {
         try {
 
             const result = await login({ email, password });
-
-            // console.log("Resultado do login:", result);
 
             if (result.success) {
                 navigate('/Home');
@@ -99,9 +97,9 @@ const Login = () => {
                                 {loading ? 'Entrando...' : 'Entrar'}
                             </button>
 
-                            {/* <a href="/esqueci-senha" className="forgot-password">
+                            <a href="/esqueci-senha" className="forgot-password">
                                 Esqueceu sua senha?
-                            </a> */}
+                            </a>
                         </form>
                     </div>
                 </div>

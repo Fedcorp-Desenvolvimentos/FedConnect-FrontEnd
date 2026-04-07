@@ -1,45 +1,28 @@
 // PrivateRoute.jsx
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import api from '../services/api';
 import Loading from '../components/Loading/Loading';
+import { useAuth } from '../context/AuthContext';
 
 const PrivateRoute = () => {
-  const [authState, setAuthState] = useState({
-    isAuthenticated: false,
-    isLoading: true
-  });
+  const { isAuthenticated, isAuthenticatedCheck } = useAuth();
+  const [ isAuthChecked, setIsAuthChecked] = useState(false);
 
-  useEffect(() => {
-    
-    let isMounted = true;
-
-    const verifyAuthentication = async () => {
-      try {
-        await api.get('users/me/');
-        if (isMounted) {
-          setAuthState({ isAuthenticated: true, isLoading: false });
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            isAuthenticatedCheck();
         }
-      } catch (error) {
-        if (isMounted) {
-          setAuthState({ isAuthenticated: false, isLoading: false });
-        }
-      }
-    };
+        setIsAuthChecked(true);
+    }, [isAuthenticated]);
 
-    verifyAuthentication();
+    if (!isAuthChecked) {
+        return <Loading fullScreen message="Carregando..." />;
+    }
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-
-  if (authState.isLoading) {
-    return <Loading fullScreen message="Carregando..." />;
-  }
-
-  return authState.isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+    if (isAuthenticated) {
+        return <Outlet />;
+    }
 };
 
 export default PrivateRoute;

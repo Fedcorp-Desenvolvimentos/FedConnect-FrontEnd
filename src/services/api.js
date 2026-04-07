@@ -23,20 +23,18 @@ api.interceptors.request.use(
   }
 );
 
-const publicRoutes = ["/login", "/", "/esqueci-senha", "/404"];
+const publicRoutes = ["/", "/login", "/esqueci-senha", "/resetar-senha", "/404"];
+
+const isPublic = publicRoutes.some((route) =>
+  window.location.pathname.startsWith(route)
+);
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !publicRoutes.includes(window.location.pathname)
-    ) {
+    if (error.response?.status === 401 && !isPublic) {
       localStorage.removeItem("accessToken");
-      window.location.href = "/login";
     }
-
     return Promise.reject(error);
   }
 )
