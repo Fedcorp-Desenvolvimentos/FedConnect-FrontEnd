@@ -10,7 +10,7 @@ const apiClient = axios.create({
   timeout: 10000, 
 });
 
-const CANCEL_PATH = '/api/fedbnk/cancelamento/';
+const CANCEL_PATH = '/cancelar-boletofedbnk/';
 const IMPRESS_PATH = '/webhook/boletofedbnk/impressao/';
 
 /**
