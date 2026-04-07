@@ -18,7 +18,7 @@
 }
 
 .account-container {
-  min-width: 800px;
+  max-width: 800px;
   margin: 2rem auto;
   padding: 0 1rem;
 }
@@ -420,4 +420,47 @@
 .custom-btn i {
   display: flex;
   align-items: center;
+}
+
+/* styles/MinhaConta.css */
+.custom-btn.danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+}
+
+.custom-btn.danger:hover {
+  background-color: #c82333;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Animação suave para os botões */
+.custom-btn {
+  transition: all 0.3s ease;
+}
+
+/* Estilo para campos em modo de edição */
+.editing-mode {
+  background-color: #fff9c4;
+  border: 1px solid #ffd54f;
+}
+
+/* Opcional: Adicionar um indicador visual de edição */
+.form-field {
+  position: relative;
+}
+
+.form-field.editing::after {
+  content: "✏️";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  opacity: 0.6;
 }

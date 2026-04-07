@@ -24,10 +24,10 @@ import ConsultaDetalhe from '../components/Detalhes/ConsultaDetalhe';
 import CotacaoConteudo from '../components/Cotação/CotacaoConteudo';
 
 // Dropdown itens
-import GerenciarUsuarios from '../components/Dropdown/dropItens/GerenciarUsuarios';
+import GerenciarUsuarios from '../components/Dropdown/dropItens/GerenciarUsuarios/GerenciarUsuarios';
 import MinhaConta from '../components/Dropdown/dropItens/MinhaConta/MinhaConta';
-import Cadastro from '../components/Dropdown/dropItens/Cadastro';
-import HistoricoPage from '../components/Dropdown/dropItens/HistoricoPage';
+import Cadastro from '../components/Dropdown/dropItens/Cadastro/Cadastro';
+import HistoricoPage from '../components/Dropdown/dropItens/Historico/Historico';
 
 // Administrativo
 import HomeAdm from '../components/Adm/ImportacaoAdmPage';

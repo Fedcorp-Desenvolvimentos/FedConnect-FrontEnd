@@ -2,9 +2,9 @@
   padding: 0;
   animation: fadeIn 0.3s ease;
   width: 100%;
-  max-width: 100%;
   padding: 20px;
   margin: 0;
+  min-width: 1200px;
 }
 
 /* Cabeçalho */
@@ -98,6 +98,14 @@
   width: 100%;
 }
 
+.content-wrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-md);
+}
+
 /* Loading */
 .loading-spinner {
   width: 40px;
@@ -162,6 +170,10 @@
 }
 
 @media (max-width: 768px) {
+  .page-template {
+    min-width: none;
+  }
+
   .page-template-header {
     flex-direction: column;
     align-items: flex-start;

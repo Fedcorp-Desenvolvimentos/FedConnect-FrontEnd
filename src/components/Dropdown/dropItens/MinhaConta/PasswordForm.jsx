@@ -9,7 +9,8 @@ const PasswordForm = ({
   confirmarSenha, 
   setConfirmarSenha, 
   editandoSenha,
-  onEditClick,  // Nova prop
+  onEditClick,
+  onCancelClick,  // Nova prop para cancelar
   onSubmit 
 }) => {
   return (
@@ -21,6 +22,7 @@ const PasswordForm = ({
         onChange={(e) => setSenhaAtual(e.target.value)}
         disabled={!editandoSenha}
         placeholder="Digite sua senha atual"
+        required={editandoSenha}
       />
 
       <PasswordField
@@ -30,6 +32,7 @@ const PasswordForm = ({
         onChange={(e) => setNovaSenha(e.target.value)}
         disabled={!editandoSenha}
         placeholder="Digite sua nova senha"
+        required={editandoSenha}
       />
 
       <PasswordField
@@ -39,20 +42,31 @@ const PasswordForm = ({
         onChange={(e) => setConfirmarSenha(e.target.value)}
         disabled={!editandoSenha}
         placeholder="Confirme sua nova senha"
+        required={editandoSenha}
       />
 
       <div className="form-actions">
-        <button 
-          type="button" 
-          className="custom-btn secondary"
-          onClick={onEditClick}  // Adicionar onClick
-        >
-          <i className="bi bi-pencil"></i> Editar
-        </button>
-        {editandoSenha && (
-          <button type="submit" className="custom-btn primary">
-            <i className="bi bi-check-lg"></i> Alterar Senha
+        {!editandoSenha ? (
+          <button 
+            type="button" 
+            className="custom-btn secondary"
+            onClick={onEditClick}
+          >
+            <i className="bi bi-pencil"></i> Editar
           </button>
+        ) : (
+          <>
+            <button 
+              type="button" 
+              className="custom-btn danger"
+              onClick={onCancelClick}
+            >
+              <i className="bi bi-x-lg"></i> Cancelar
+            </button>
+            <button type="submit" className="custom-btn primary">
+              <i className="bi bi-check-lg"></i> Alterar Senha
+            </button>
+          </>
         )}
       </div>
     </form>

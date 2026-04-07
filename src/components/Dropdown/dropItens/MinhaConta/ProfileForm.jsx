@@ -7,7 +7,8 @@ const ProfileForm = ({
   email, 
   setEmail, 
   editandoPerfil,
-  onEditClick,  // Nova prop
+  onEditClick,
+  onCancelClick,  // Nova prop para cancelar
   onSubmit 
 }) => {
   return (
@@ -55,20 +56,29 @@ const ProfileForm = ({
       </div>
 
       <div className="form-actions">
-      <button 
-        type="button" 
-        className="custom-btn secondary"
-        onClick={onEditClick}
-      >
-        <i className="bi bi-pencil"></i> Editar
-      </button>
-
-      {editandoPerfil && (
-        <button type="submit" className="custom-btn primary">
-          <i className="bi bi-check-lg"></i> Salvar Alterações
-        </button>
-      )}
-    </div>
+        {!editandoPerfil ? (
+          <button 
+            type="button" 
+            className="custom-btn secondary"
+            onClick={onEditClick}
+          >
+            <i className="bi bi-pencil"></i> Editar
+          </button>
+        ) : (
+          <>
+            <button 
+              type="button" 
+              className="custom-btn danger"
+              onClick={onCancelClick}
+            >
+              <i className="bi bi-x-lg"></i> Cancelar
+            </button>
+            <button type="submit" className="custom-btn primary">
+              <i className="bi bi-check-lg"></i> Salvar Alterações
+            </button>
+          </>
+        )}
+      </div>
     </form>
   );
 };

@@ -6,19 +6,18 @@ import PasswordForm from './PasswordForm';
 import Messages from './Messages';
 import { useUserData } from './hooks/useUserData';
 import { usePasswordChange } from './hooks/usePasswordChange';
+import { useEditMode } from './hooks/useEditMode';
 import { IoIosBusiness } from 'react-icons/io';
 import './styles/MinhaConta.css';
 import PageTemplate from '../../../PageTemplate/PageTemplate';
-import { UserService } from '../../../../services/userService';
+import { UserService } from '../../../../services/UserService';
 
 const MinhaConta = () => {
   const [activeTab, setActiveTab] = useState('perfil');
-  const [editandoPerfil, setEditandoPerfil] = useState(false);
-  const [editandoSenha, setEditandoSenha] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const { userData, updateUserData, loading: userLoading } = useUserData();
+  const { userData, updateUserData, loading: userLoading, refreshUserData } = useUserData();
   const { 
     passwordData, 
     updatePasswordField, 
@@ -28,69 +27,91 @@ const MinhaConta = () => {
     setError: setPasswordError
   } = usePasswordChange(userData.userId);
 
+  // Configurar modo de edição para perfil
+  const profileEdit = useEditMode(
+    {
+      nomeCompleto: userData.nomeCompleto,
+      cpf: userData.cpf,
+      email: userData.email
+    },
+    async (data) => {
+      try {
+        await UserService.updateUser(userData.userId, {
+          nome_completo: data.nomeCompleto,
+          cpf: data.cpf,
+          email: data.email
+        });
+        setSuccessMessage('Perfil atualizado com sucesso!');
+        setTimeout(() => setSuccessMessage(''), 3000);
+        await refreshUserData(); // Recarregar dados atualizados
+        return true;
+      } catch (err) {
+        setErrorMessage(err.response?.data?.detail || 'Erro ao atualizar perfil');
+        setTimeout(() => setErrorMessage(''), 5000);
+        return false;
+      }
+    },
+    (originalData) => {
+      // Resetar dados no componente pai se necessário
+      updateUserData('nomeCompleto', originalData.nomeCompleto);
+      updateUserData('cpf', originalData.cpf);
+      updateUserData('email', originalData.email);
+    }
+  );
+
+  // Configurar modo de edição para senha
+  const passwordEdit = useEditMode(
+    {
+      senhaAtual: '',
+      novaSenha: '',
+      confirmarSenha: ''
+    },
+    async (data) => {
+      const success = await changePassword(data.senhaAtual, data.novaSenha);
+      if (success) {
+        setSuccessMessage('Senha alterada com sucesso!');
+        setTimeout(() => setSuccessMessage(''), 3000);
+        return true;
+      } else if (passwordError) {
+        setErrorMessage(passwordError);
+        setTimeout(() => setErrorMessage(''), 5000);
+        return false;
+      }
+      return false;
+    },
+    () => {
+      // Limpar campos de senha ao cancelar
+      updatePasswordField('senhaAtual', '');
+      updatePasswordField('novaSenha', '');
+      updatePasswordField('confirmarSenha', '');
+      setPasswordError(null);
+    }
+  );
+
   const clearMessages = () => {
     setSuccessMessage('');
     setErrorMessage('');
     setPasswordError(null);
   };
 
-  // Funções para ativar modo de edição
-  const handleEditPerfil = () => {
-    setEditandoPerfil(true);
-    clearMessages();
-  };
-
-  const handleEditSenha = () => {
-    setEditandoSenha(true);
-    clearMessages();
-  };
-
+  // Handler para salvar perfil
   const handleSalvarPerfil = async (e) => {
     e.preventDefault();
     clearMessages();
-
+    
     if (!userData.userId) {
       setErrorMessage('Usuário não identificado');
       return;
     }
-
-    try {
-      const updatedData = {
-        nome_completo: userData.nomeCompleto,
-        cpf: userData.cpf,
-        email: userData.email,
-      };
-      
-      await UserService.updateUser(userData.userId, updatedData);
-      setSuccessMessage('Perfil atualizado com sucesso!');
-      setEditandoPerfil(false);
-      
-      setTimeout(() => setSuccessMessage(''), 3000);
-    } catch (err) {
-      setErrorMessage(err.response?.data?.detail || 'Erro ao atualizar perfil');
-      setTimeout(() => setErrorMessage(''), 5000);
-    }
+    
+    await profileEdit.saveEditing();
   };
 
+  // Handler para salvar senha
   const handleSalvarSenha = async (e) => {
     e.preventDefault();
     clearMessages();
-
-    const success = await changePassword();
-    if (success) {
-      setSuccessMessage('Senha alterada com sucesso!');
-      setEditandoSenha(false);
-      setTimeout(() => setSuccessMessage(''), 3000);
-    } else if (passwordError) {
-      setErrorMessage(passwordError);
-      setTimeout(() => setErrorMessage(''), 5000);
-    }
-  };
-
-  // Função para cancelar edição (opcional, mas útil)
-  const handleCancelarPerfil = () => {
-    // Recarregar dados originais
-    window.location.reload(); // Ou recarregar os dados via API
+    await passwordEdit.saveEditing();
   };
 
   if (userLoading) {
@@ -117,15 +138,6 @@ const MinhaConta = () => {
     >
       <div className="account-container">
         <div className="account-card">
-          <div className="account-header">
-            <h1>
-              <i className="bi bi-sliders2"></i>
-              Preferências da Conta
-            </h1>
-            <p className="account-subtitle">
-              Mantenha seus dados sempre atualizados
-            </p>
-          </div>
 
           <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
 
@@ -138,26 +150,28 @@ const MinhaConta = () => {
           <div className="account-content">
             {activeTab === 'perfil' ? (
               <ProfileForm
-                nomeCompleto={userData.nomeCompleto}
-                setNomeCompleto={(value) => updateUserData('nomeCompleto', value)}
-                cpf={userData.cpf}
-                setCpf={(value) => updateUserData('cpf', value)}
-                email={userData.email}
-                setEmail={(value) => updateUserData('email', value)}
-                editandoPerfil={editandoPerfil}
-                onEditClick={handleEditPerfil} 
+                nomeCompleto={profileEdit.editedData.nomeCompleto}
+                setNomeCompleto={(value) => profileEdit.updateField('nomeCompleto', value)}
+                cpf={profileEdit.editedData.cpf}
+                setCpf={(value) => profileEdit.updateField('cpf', value)}
+                email={profileEdit.editedData.email}
+                setEmail={(value) => profileEdit.updateField('email', value)}
+                editandoPerfil={profileEdit.isEditing}
+                onEditClick={profileEdit.startEditing}
+                onCancelClick={profileEdit.cancelEditing}
                 onSubmit={handleSalvarPerfil}
               />
             ) : (
               <PasswordForm
-                senhaAtual={passwordData.senhaAtual}
-                setSenhaAtual={(value) => updatePasswordField('senhaAtual', value)}
-                novaSenha={passwordData.novaSenha}
-                setNovaSenha={(value) => updatePasswordField('novaSenha', value)}
-                confirmarSenha={passwordData.confirmarSenha}
-                setConfirmarSenha={(value) => updatePasswordField('confirmarSenha', value)}
-                editandoSenha={editandoSenha}
-                onEditClick={handleEditSenha} 
+                senhaAtual={passwordEdit.editedData.senhaAtual}
+                setSenhaAtual={(value) => passwordEdit.updateField('senhaAtual', value)}
+                novaSenha={passwordEdit.editedData.novaSenha}
+                setNovaSenha={(value) => passwordEdit.updateField('novaSenha', value)}
+                confirmarSenha={passwordEdit.editedData.confirmarSenha}
+                setConfirmarSenha={(value) => passwordEdit.updateField('confirmarSenha', value)}
+                editandoSenha={passwordEdit.isEditing}
+                onEditClick={passwordEdit.startEditing}
+                onCancelClick={passwordEdit.cancelEditing}
                 onSubmit={handleSalvarSenha}
               />
             )}
