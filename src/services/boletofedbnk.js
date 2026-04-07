@@ -1,15 +1,16 @@
 import axios from 'axios';
+import api from "./api"; 
 
 // 1. Criação da instância do Axios
 const apiClient = axios.create({
-  baseURL: 'https://nfsefedcorp-reese.ngrok-free.dev',
+  baseURL: 'https://fedhub-api-local.ngrok.app/api',
   headers: {
     'Content-Type': 'application/json'
   },
   timeout: 10000, 
 });
 
-const CANCEL_PATH = '/webhook/boletofedbnk/cancelamento/';
+const CANCEL_PATH = '/fedbnk/cancelamento/';
 const IMPRESS_PATH = '/webhook/boletofedbnk/impressao/';
 
 /**

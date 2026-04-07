@@ -72,11 +72,11 @@ const OperacionalCancelamento = () => {
 
     try {
       setSending(true);
-      await triggerWebhook(payload);
+      const response = await triggerWebhook(payload);
 
       setStatus({
-        type: "success",
-        message: "Cancelamento registrado com sucesso!",
+        type: response.type === "success" ? "success" : "error",
+        message: response.message,
       });
 
       setConfirmOpen(false);
