@@ -1,4 +1,5 @@
 import axios from 'axios';
+import api from "./api"; 
 
 // 1. Criação da instância do Axios
 const apiClient = axios.create({
@@ -9,7 +10,7 @@ const apiClient = axios.create({
   timeout: 10000, 
 });
 
-const CANCEL_PATH = '/webhook/boletofedbnk/cancelamento/';
+const CANCEL_PATH = '/api/fedbnk/cancelamento/';
 const IMPRESS_PATH = '/webhook/boletofedbnk/impressao/';
 
 /**
@@ -18,7 +19,7 @@ const IMPRESS_PATH = '/webhook/boletofedbnk/impressao/';
  */
 export const triggerWebhook = async (payload) => {
   try {
-    const response = await apiClient.post(CANCEL_PATH, payload);
+    const response = await api.post(CANCEL_PATH, payload);
     return response.data;
   } catch (error) {
     console.error('Erro ao chamar o webhook:', error);
