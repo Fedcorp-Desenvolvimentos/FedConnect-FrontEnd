@@ -10,7 +10,7 @@ import { useEditMode } from './hooks/useEditMode';
 import { IoIosBusiness } from 'react-icons/io';
 import './styles/MinhaConta.css';
 import PageTemplate from '../../../PageTemplate/PageTemplate';
-import { UserService } from '../../../../services/UserService';
+import { UserService } from '../../../../services/userService';
 
 const MinhaConta = () => {
   const [activeTab, setActiveTab] = useState('perfil');

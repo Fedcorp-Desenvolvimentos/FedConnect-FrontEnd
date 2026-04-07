@@ -1,7 +1,7 @@
 // pages/Cadastro/hooks/useCadastro.js
 import { useState, useCallback } from 'react';
-import { UserService } from '../../../../../services/userService';
 import { FORM_FIELDS, MESSAGES } from '../constants/cadastroConstants';
+import { UserService } from '../../../../../services/userService';
 
 export const useCadastro = (empresas) => {
   const [formData, setFormData] = useState({

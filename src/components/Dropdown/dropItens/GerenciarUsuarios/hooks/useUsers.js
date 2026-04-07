@@ -1,6 +1,6 @@
 // pages/GerenciarUsuarios/hooks/useUsers.js
 import { useState, useEffect, useCallback } from 'react';
-import { UserService } from '../../../../../services/UserService';
+import { UserService } from '../../../../../services/userService';
 
 export const useUsers = () => {
   const [usuarios, setUsuarios] = useState([]);
