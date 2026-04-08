@@ -396,3 +396,27 @@
     padding: 0.72rem 0.8rem;
   }
 }
+
+@media (min-width: 901px) {
+  .cotacao-container {
+    width: min(
+      var(--max-container),
+      calc(100% - var(--sidebar-width) - (var(--gutter) * 2))
+    );
+
+    margin: 24px var(--gutter) 24px calc(var(--sidebar-width) + var(--gutter));
+    padding: 32px 28px;
+  }
+}
+
+@media (min-width: 1500px) {
+  .cotacao-container {
+    width: min(
+      var(--max-container-lg),
+      calc(100% - var(--sidebar-width) - (var(--gutter) * 2))
+    );
+
+    margin-left: calc(var(--sidebar-width) + (var(--gutter) * 1.5));
+    padding: 40px 44px;
+  }
+}

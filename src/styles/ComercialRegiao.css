@@ -326,13 +326,13 @@
 .btn-maps:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(24, 88, 214, 0.35);
+  color: #fff;
 }
 
 .btn-maps i {
   font-size: 1.1rem;
 }
 
-/* Paginação */
 .pagination {
   display: flex;
   justify-content: center;
@@ -418,7 +418,6 @@
   margin: 0;
 }
 
-/* Modal Overlay + Content */
 .modal-overlay {
   position: fixed;
   inset: 0;
