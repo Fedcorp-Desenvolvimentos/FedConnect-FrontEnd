@@ -17,7 +17,7 @@ const operacionais = [
     key: "cancelamento-fatura",
     icon: <i className="bi bi-x-octagon-fill" />,
     title: "Cancelamentos FedBnk",
-    desc: "Solicite e acompanhe cancelamentos de faturas ou boletos com validações e registro interno.",
+    desc: "Solicite e acompanhe cancelamentos de faturas ou boletos.",
     to: "/faturamento/cancelamento",
     niveis: ["admin", "faturamento", "ti"],
   },
