@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/EsqueciSenha.css";
 import api from "../../services/api";
+import { useSnackbar } from "notistack";
 
 const EsqueciSenha = () => {
   const [email, setEmail] = useState("");
@@ -10,6 +11,7 @@ const EsqueciSenha = () => {
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleVoltarLogin = () => {
     navigate("/login");
@@ -33,17 +35,15 @@ const EsqueciSenha = () => {
 
     setLoading(true);
     try {
-      await api.post("solicitar-reset-senha/", { email });
-      setMensagem(
-        "Enviamos um link de recuperação para o seu e-mail. Verifique sua caixa de entrada e spam."
-      );
+      const res = await api.post("solicitar-reset-senha/", { email });
+      enqueueSnackbar(res?.message || "Enviamos um link de recuperação para o seu e-mail. Verifique sua caixa de entrada e spam.", {
+        variant: "success",
+      });
       setEmail("");
     } catch (err) {
-      // Por segurança, não informamos se o e-mail existe ou não
-      setMensagem(
-        "Se o e-mail estiver cadastrado em nosso sistema, você receberá as instruções de recuperação em breve."
-      );
-      console.error("Erro ao solicitar recuperação de senha:", err);
+      enqueueSnackbar(res?.message || "Falha ao solicitar recuperação de senha. Tente novamente mais tarde.", {
+        variant: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -91,13 +91,6 @@ const EsqueciSenha = () => {
               className={erro ? "error" : ""}
             />
           </div>
-
-          {erro && (
-            <div className="error-message">
-              <i className="bi bi-exclamation-circle-fill"></i>
-              <span>{erro}</span>
-            </div>
-          )}
 
           {mensagem && (
             <div className="success-message">
