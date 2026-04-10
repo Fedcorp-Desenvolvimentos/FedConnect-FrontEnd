@@ -12,6 +12,10 @@ export const ModalBoleto = ({ isOpen, onClose, boleto, parcela }) => {
     const vencBoleto = verificarVencimento(boleto.DATA_VENCIMENTO);
     const estaQuitado = parcela && parcela.DT_BAIXA !== null;
 
+
+    console.log("Dados do boleto no modal:", boleto);
+    console.log("Dados da parcela no modal:", parcela);
+
     return (
         <Dialog.Root open={isOpen} onOpenChange={onClose}>
             <Dialog.Portal>

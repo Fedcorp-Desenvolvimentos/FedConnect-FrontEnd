@@ -29,7 +29,7 @@ const DashboardLayout = () => {
 
   return (
     <div className="dashboard-layout">
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} toggleSidebar={toggleSidebar} />
       <div className="dashboard-main">
         <Breadcrumb 
           onToggleSidebar={toggleSidebar}
