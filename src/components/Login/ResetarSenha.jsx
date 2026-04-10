@@ -14,12 +14,12 @@ const ResetarSenha = () => {
   const [validandoToken, setValidandoToken] = useState(true);
   
   const { token } = useParams();
-  console.log(token);
+  // console.log(token);
   const navigate = useNavigate();
 
   useEffect(() => {
     const validarToken = async () => {
-      console.log("🔍 Validando token:", token);
+      // console.log("🔍 Validando token:", token);
       
       if (!token) {
         console.error("❌ Token não fornecido");
@@ -30,16 +30,16 @@ const ResetarSenha = () => {
       }
       
       try {
-        console.log(`📡 Chamando API: /validar-token-reset/${token}/`);
+        // console.log(`📡 Chamando API: /validar-token-reset/${token}/`);
         const response = await api.get(`/validar-token-reset/${token}/`);
         
-        console.log("✅ Resposta da API:", response.data);
+        // console.log("✅ Resposta da API:", response.data);
         
         if (response.data.valid === true) {
-          console.log("🎉 Token válido! Mostrando formulário.");
+          // console.log("🎉 Token válido! Mostrando formulário.");
           setTokenValido(true);
         } else {
-          console.log("❌ Token inválido:", response.data.detail);
+          // console.log("❌ Token inválido:", response.data.detail);
           setTokenValido(false);
           setErro(response.data.detail || "Link de recuperação inválido ou expirado.");
         }
@@ -61,7 +61,7 @@ const ResetarSenha = () => {
     setErro("");
     setMensagem("");
 
-    console.log("📝 Enviando formulário...");
+    // console.log("📝 Enviando formulário...");
 
     if (!novaSenha || novaSenha.length < 6) {
       setErro("A senha deve ter no mínimo 6 caracteres.");
@@ -75,14 +75,14 @@ const ResetarSenha = () => {
 
     setLoading(true);
     try {
-      console.log("📡 Enviando nova senha para:", token);
+      // console.log("📡 Enviando nova senha para:", token);
       
       const response = await api.post("/resetar-senha/", {
         token: token,
         nova_senha: novaSenha
       });
       
-      console.log("✅ Resposta:", response.data);
+      // console.log("✅ Resposta:", response.data);
       
       setMensagem("Senha redefinida com sucesso! Redirecionando para o login...");
       

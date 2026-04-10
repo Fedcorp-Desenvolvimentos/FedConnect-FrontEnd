@@ -12,8 +12,6 @@ export const ModalBoleto = ({ isOpen, onClose, boleto, parcela }) => {
     const vencBoleto = verificarVencimento(boleto.DATA_VENCIMENTO);
     const estaQuitado = parcela && parcela.DT_BAIXA !== null;
 
-    console.log("Boleto selecionado:", boleto);
-
     return (
         <Dialog.Root open={isOpen} onOpenChange={onClose}>
             <Dialog.Portal>
@@ -93,7 +91,7 @@ export const ModalBoleto = ({ isOpen, onClose, boleto, parcela }) => {
                                 </div>
                                 <div className="info-item">
                                     <label>Data Baixa:</label>
-                                    <span>{boleto.DT_CANCEL ? formatarData(boleto.DT_CANCEL) : parcela?.DT_BAIXA ? formatarData(parcela.DT_BAIXA) : "Não baixado"}</span>
+                                    <span>{parcela?.DT_BAIXA ? formatarData(parcela.DT_BAIXA) : boleto.DT_CANCEL ? formatarData(boleto.DT_CANCEL) : "Não baixado"}</span>
                                 </div>
                                 <div className="info-item">
                                     <label>Status:</label>

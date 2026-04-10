@@ -59,7 +59,7 @@ const ComercialRegiao = () => {
         setLoading(true);
         setErro(null);
 
-        console.log("Dados do formulário sendo enviados:", form);
+        // console.log("Dados do formulário sendo enviados:", form);
 
         if (!form.uf || !form.municipio) {
             setErro("UF e município são obrigatórios.");
@@ -76,7 +76,7 @@ const ComercialRegiao = () => {
                 ...form
             });
 
-            console.log("Resposta da API:", resp);
+            // console.log("Resposta da API:", resp);
 
             if (resp && Array.isArray(resp.resultados)) {
                 setTodosResultados(resp.resultados);

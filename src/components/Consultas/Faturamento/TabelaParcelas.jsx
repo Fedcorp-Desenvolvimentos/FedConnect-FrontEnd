@@ -23,8 +23,8 @@ export const TabelaParcelas = ({ parcelas }) => {
                 <tbody>
                     {parcelas.map((parcela, idx) => {
                         const vencParcela = verificarVencimento(parcela.VENCIMENTO);
-                        console.log("vencParcela", vencParcela)
-                        console.log("VENCIMENTO", parcela.VENCIMENTO)
+                        // console.log("vencParcela", vencParcela)
+                        // console.log("VENCIMENTO", parcela.VENCIMENTO)
                         return (
                             <tr key={idx} className={parcela.STATUS === "C" ? "parcela-cancelada" : ""}>
                                 <td className="text-center">{parcela.NUMERO_PARCELA || "-"}</td>
