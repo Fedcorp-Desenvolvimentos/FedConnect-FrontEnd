@@ -1,14 +1,17 @@
 import { TabelaBoletos } from "./TabelaBoletos";
-import { TabelaBaixas } from "./TabelaBaixas";
+// import { TabelaBaixas } from "./TabelaBaixas";
 import { formatarData, formatarValor, formatarVigencia } from "./utils/formatacao";
 
 export const DetalhesFatura = ({ fatura, obterNomeCedente, obterNomeCorretor }) => {
     return (
         <div className="expansion-content">
             <div className="expansion-header">
-                <h6 className="section-title">
-                    <i className="bi-info-circle me-2"></i>FATURA
-                </h6>
+                <div className="fatura-section">
+                    <h6 className="section-title">
+                        <i className="bi-info-circle me-2"></i>FATURA
+                        {/* <FaFileInvoiceDollar className="me-2" />FATURA */}
+                    </h6>
+                </div>
             </div>
 
             <div className="info-grid">
@@ -60,10 +63,13 @@ export const DetalhesFatura = ({ fatura, obterNomeCedente, obterNomeCorretor }) 
                     </span>
                 </div>
 
-                <div className="info-item">
+                {/* <div className="info-item">
                     <strong>Data Baixa:</strong>
                     <span>{formatarData(fatura.DT_BAIXA)}</span>
-                </div>
+                    <span>
+                        {formatarData(obterDataBaixaOuCancelamento(fatura))}
+                    </span>
+                </div> */}
 
                 <div className="info-item">
                     <strong>Vigência:</strong>

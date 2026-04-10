@@ -59,6 +59,8 @@ import PrivateRouter from './PrivateRouter';
 import ResetarSenha from '../components/Login/ResetarSenha';
 import EsqueciSenha from '../components/Login/EsqueciSenha';
 import { useAuth } from '../context/AuthContext';
+import RioMapa from '../components/Mapa/RioMapa';
+import Mapa from '../components/Mapa/Mapa';
 
 
 const AppRouter = () => {
@@ -126,6 +128,9 @@ const AppRouter = () => {
           <Route path="/faturamento/cancelamento" element={<OperacionalCancelamento />} />
           <Route path="/faturamento/reimpressao-boleto" element={<ReimpressaoBoleto />} />
           <Route path="/faturamento/paybox" element={<Payxbox />} />
+
+          <Route path="/mapa" element={<Mapa />} />
+
         </Route>
       </Route>
 

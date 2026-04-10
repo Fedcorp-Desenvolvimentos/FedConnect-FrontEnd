@@ -3,6 +3,8 @@ import "../../styles/ComercialRegiao.css";
 import * as XLSX from "xlsx";
 import { ConsultaService } from "../../services/consultaService";
 import { FiCopy, FiCheck, FiX } from "react-icons/fi";
+import { bairrosRioCoordenadas } from "../../utils/bairrosRioCoordenadas";
+import RioMap from "../Mapa/RioMapa";
 
 const ComercialRegiao = () => {
     const [form, setForm] = useState({
@@ -31,6 +33,8 @@ const ComercialRegiao = () => {
     const [copiado, setCopiado] = useState({});
     const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState("");
 
+    const [bairros, setBairros] = useState([]);
+
     const resultadosRef = useRef(null);
 
     useEffect(() => {
@@ -55,6 +59,8 @@ const ComercialRegiao = () => {
         setLoading(true);
         setErro(null);
 
+        console.log("Dados do formulário sendo enviados:", form);
+
         if (!form.uf || !form.municipio) {
             setErro("UF e município são obrigatórios.");
             setLoading(false);
@@ -67,13 +73,14 @@ const ComercialRegiao = () => {
             setNextPageToken(null);
             
             const resp = await ConsultaService.consultaRegiao({
-                ...form,
-                max_resultados: 20
+                ...form
             });
+
+            console.log("Resposta da API:", resp);
 
             if (resp && Array.isArray(resp.resultados)) {
                 setTodosResultados(resp.resultados);
-                setResultados(resp.resultados); // Para exibição imediata
+                setResultados(resp.resultados);
                 setNextPageToken(resp.next_page_token);
             } else {
                 setTodosResultados([]);
@@ -99,7 +106,6 @@ const ComercialRegiao = () => {
         try {
             const resp = await ConsultaService.consultaRegiao({
                 ...form,
-                max_resultados: 20,
                 page_token: nextPageToken
             });
 
@@ -278,6 +284,13 @@ const ComercialRegiao = () => {
         resultadosRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    useEffect(() => {
+        if (form.municipio?.toLowerCase() === 'rio de janeiro') {
+            const nomesBairros = Object.keys(bairrosRioCoordenadas).sort();
+            setBairros(nomesBairros);
+        }
+    }, [form.municipio]);
+
     return (
         <div className="comercial-regiao-container">
             <h2 className="comercial-title">
@@ -298,7 +311,12 @@ const ComercialRegiao = () => {
 
                 <div className="form-row">
                     <label>Bairro</label>
-                    <input name="bairro" value={form.bairro} onChange={handleChange} />
+                    <select name="bairro" value={form.bairro} onChange={handleChange}>
+                        <option value="">Selecione um bairro</option>
+                        {bairros.map(bairro => (
+                            <option key={bairro} value={bairro}>{bairro}</option>
+                        ))}
+                    </select>
                 </div>
 
                 <button type="submit" className="consulta-btn" disabled={loading}>
@@ -339,8 +357,6 @@ const ComercialRegiao = () => {
                                 <li
                                     key={i}
                                     className="regiao-card-modern"
-                                    /* card deixou de ser clicável,
-                                       modal agora é pelo botão "Ver Detalhes" */
                                 >
                                     <div className="card-header">
                                         <h4 className="card-title">{item.displayName?.text}</h4>
@@ -547,6 +563,8 @@ const ComercialRegiao = () => {
                             )}
 
                             {!loadingModal && dadosModal && (
+                                <>
+                                <RioMap />
                                 <div className="modal-dados">
                                     <CampoCopiavel
                                         label="Razão Social"
@@ -658,6 +676,7 @@ const ComercialRegiao = () => {
                                         </div>
                                     )}
                                 </div>
+                                </>
                             )}
                         </div>
                     </div>
