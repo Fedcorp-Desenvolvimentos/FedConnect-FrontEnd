@@ -4,11 +4,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import DashboardLayout from '../Layouts/DashboardLayout';
 
 // Componentes públicos
-import Login from '../components/Login/Login';
 import NotFound from '../components/NotFound/NotFound';
 
 // Componentes protegidos
-import Home from '../components/Home/Home';
 import ConsultasHome from '../components/Consultas/ConsultasHome';
 import ConsultaPF from '../components/Consultas/ConsultaPF';
 import ConsultaEnd from '../components/Consultas/ConsultaEnd';
@@ -59,8 +57,9 @@ import PrivateRouter from './PrivateRouter';
 import ResetarSenha from '../components/Login/ResetarSenha';
 import EsqueciSenha from '../components/Login/EsqueciSenha';
 import { useAuth } from '../context/AuthContext';
-import RioMapa from '../components/Mapa/RioMapa';
 import Mapa from '../components/Mapa/Mapa';
+import Login from '../pages/Login/Login';
+import HomePage from '../pages/Home/Home';
 
 
 const AppRouter = () => {
@@ -79,14 +78,15 @@ const AppRouter = () => {
       <Route element={<PrivateRouter />}>
         <Route element={<DashboardLayout />}>
           {/* Home */}
-          <Route path="/home" element={<Home />} />
+          <Route path="/home" element={<HomePage />} />
           
           {/* Consultas */}
           <Route path="/consultas" element={<ConsultasHome />} />
+          <Route path="/consulta-comercial" element={<Comercial />} />
+          
           <Route path="/consultas/consulta-pf" element={<ConsultaPF />} />
           <Route path="/consultas/consulta-end" element={<ConsultaEnd />} />
           <Route path="/consultas/consulta-cnpj" element={<ConsultaCNPJ />} />
-          <Route path="/consulta-comercial" element={<Comercial />} />
           <Route path="/consultas/comercial-regiao" element={<BuscaRegiao />} />
           <Route path="/consultas/consulta-segurados" element={<Segurados />} />
           <Route path="/consultas/consulta-faturas" element={<ConsultaFat />} />

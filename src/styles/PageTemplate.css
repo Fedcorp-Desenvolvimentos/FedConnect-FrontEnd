@@ -172,12 +172,17 @@
 @media (max-width: 768px) {
   .page-template {
     min-width: none;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    
   }
 
   .page-template-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--spacing-md);
+    
   }
 
   .page-template-header-left {
@@ -191,8 +196,7 @@
   }
 
   .page-template-subtitle {
-    white-space: normal;
-    word-wrap: break-word;
+    display: none;
   }
 
   .page-template-actions {

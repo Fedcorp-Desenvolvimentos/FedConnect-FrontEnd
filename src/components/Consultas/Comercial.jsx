@@ -55,13 +55,6 @@ const ConsultaComercial = () => {
     }
   }, [result]);
 
-  const handleCardClick = (option) => {
-    setActiveCard(option);
-    if (option === "conteudo") {
-      navigate("/cotacao-conteudo");
-    }
-  };
-
   const handleCnpjChange = (e) => {
     const onlyDigits = e.target.value.replace(/\D/g, "");
     setForm({ cnpj: onlyDigits.slice(0, 14) });
@@ -157,12 +150,6 @@ const ConsultaComercial = () => {
         </ul>
       </>
     );
-  };
-
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0] || null);
-    setBulkResults([]);
-    setMassConsultaMessage("");
   };
 
   const handleImportFile = async (event) => {

@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import "../../styles/Home.css";
-import { FaHammer } from "react-icons/fa";
-import PageTemplate from "../PageTemplate/PageTemplate";
+import PageTemplate from "../../components/PageTemplate/PageTemplate";
 
 function useIsMobile(breakpoint = 700) {
   const getIsMobile = () => window.innerWidth <= breakpoint;
@@ -60,7 +59,7 @@ const imagensCarrossel = [
   },
 ];
 
-const Home = () => {
+const HomePage = () => {
   const { withSidebar } = useOutletContext();
   const [index, setIndex] = useState(0);
   const isMobile = useIsMobile(700);
@@ -125,4 +124,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomePage;

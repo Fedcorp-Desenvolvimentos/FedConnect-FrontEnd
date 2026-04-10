@@ -4,7 +4,7 @@ import "../../styles/Sidebar.css";
 import { useAuth } from "../../context/AuthContext";
 
 function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [_dropdownOpen, setDropdownOpen] = useState(false);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const sidebarRef = useRef(null);

@@ -23,10 +23,9 @@
 /* ========== HEADER ========== */
 .sidebar-header {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
   height: 70px;
   border-bottom: 1px solid #e8edf5;
-  justify-content: center;
   position: relative;
   background: white;
   margin: 10px;
@@ -53,12 +52,7 @@
 }
 
 .logo-mobile {
-  display: none;
-  width: 200px;
-  padding: 10px;
-  height: 200px;
-  object-fit: contain;
-
+  display: none;  
 }
 
 .sidebar-close-btn {
@@ -329,6 +323,10 @@
   
   .logo-mobile {
     display: block;
+
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
   }
   
   /* Menu sempre mostra texto no mobile quando aberto */

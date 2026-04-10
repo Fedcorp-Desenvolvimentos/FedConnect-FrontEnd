@@ -100,7 +100,7 @@ export const FormularioHeader = ({
                     onClick={handleLimparFiltros} 
                     disabled={loading}
                 >
-                    Limpar Filtros
+                    Limpar
                 </button>
             </div>
         </form>
