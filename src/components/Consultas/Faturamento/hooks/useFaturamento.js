@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { getFaturamentoGeral } from "../../../../services/consultaFatura";
+import { getFaturamento } from "../../../../services/consultaFatura";
 import { getCorretores } from "../../../../services/corretoresService";
 import { traduzirErroApi } from "../../../../utils/traduzir_erro_api";
 import { getEmpresas } from "../../../../services/empresasService";
@@ -74,7 +74,7 @@ export const useFaturamento = () => {
                 if (ini > fim) throw new Error("Data inicial não pode ser maior que data final");
             }
 
-            const response = await getFaturamentoGeral({
+            const response = await getFaturamento({
                 ...filtrosAtivos,
                 page: pageNumber,
                 page_size: pageSize,

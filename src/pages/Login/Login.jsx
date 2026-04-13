@@ -97,7 +97,7 @@ const Login = () => {
                                 {loading ? 'Entrando...' : 'Entrar'}
                             </button>
 
-                            <a href="/esqueci-senha" className="forgot-password">
+                            <a href="/recuperar-senha" className="forgot-password">
                                 Esqueceu sua senha?
                             </a>
                         </form>

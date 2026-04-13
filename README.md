@@ -50,9 +50,9 @@ Capacita consultores e administradores a buscar dados específicos ou em massa (
 
 ✅ Feedbacks visuais de sucesso ou erro.
 
-🔗 Navegação com Sidebar/Dropdown — incluindo páginas de cadastro, login, esqueci senha, etc.
+🔗 Navegação com Sidebar/Dropdown — incluindo páginas de cadastro, login, recuperar senha, etc.
 
-🔐 Login e esqueci senha estruturados, prontos para integração com API de autenticação.
+🔐 Login e recuperar senha estruturados, prontos para integração com API de autenticação.
 
 📦 Front-end puro com React e CSS customizado.
 
@@ -92,8 +92,8 @@ Capacita consultores e administradores a buscar dados específicos ou em massa (
 │ ├── home/ # Página Home
 │ ├── Login/ (Página de login e página de redefinição de senha)
 │   ├── Login.jsx
-│  ├── EsqueciSenha/ 
-│    ├── EsqueciSenha.jsx/ 
+│  ├── RecuperarSenha/ 
+│    ├── RecuperarSenha.jsx/ 
 │ ├── Navbar/ (componente reutilizável)
 │ ├── Cotação/ 
 │   ├── CotacaoConteudo.jsx
@@ -127,7 +127,7 @@ Em seguida, abra http://localhost:3000 no navegador.
 
 Acesse a tela de Login — insira e-mail e senha (fluxo mock já implementado).
 
-Na tela Esqueci senha, solicita suporte por cartão informativo.
+Na tela Recuperar senha, solicita suporte por cartão informativo.
 
 Burger/Sidebar acessa as páginas de Consulta de dados, Cadastro de usuários e Configurações.
 

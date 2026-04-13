@@ -55,7 +55,7 @@ import Payxbox from '../components/Faturamento/Paybox';
 // Utils e Providers
 import PrivateRouter from './PrivateRouter';
 import ResetarSenha from '../components/Login/ResetarSenha';
-import EsqueciSenha from '../components/Login/EsqueciSenha';
+import RecuperarSenha from '../components/Login/RecuperarSenha';
 import { useAuth } from '../context/AuthContext';
 import Mapa from '../components/Mapa/Mapa';
 import Login from '../pages/Login/Login';
@@ -69,9 +69,9 @@ const AppRouter = () => {
     <Routes>
       {/* Rotas Públicas */}
       <Route path="/" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
-      <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
       
-      <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+      <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
+      <Route path="/recuperar-senha" element={<RecuperarSenha />} />
       <Route path="/resetar-senha/:token" element={<ResetarSenha />} />
 
       {/* Rotas Protegidas */}

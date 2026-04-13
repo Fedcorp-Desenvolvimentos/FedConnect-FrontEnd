@@ -23,7 +23,7 @@ api.interceptors.request.use(
   }
 );
 
-const publicRoutes = ["/", "/login", "/esqueci-senha", "/resetar-senha", "/404"];
+const publicRoutes = ["/", "/login", "/recuperar-senha", "/resetar-senha", "/404"];
 
 const isPublic = publicRoutes.some((route) =>
   window.location.pathname.startsWith(route)

@@ -141,7 +141,7 @@ const ResetarSenha = () => {
             <p>{erro || "O link de recuperação de senha que você acessou é inválido ou já expirou."}</p>
             <button 
               className="btn-primary"
-              onClick={() => navigate("/esqueci-senha")}
+              onClick={() => navigate("/recuperar-senha")}
             >
               Solicitar novo link
             </button>

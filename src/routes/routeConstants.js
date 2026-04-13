@@ -2,7 +2,7 @@
 //   // Rotas públicas
 //   LOGIN: '/',
 //   LOGIN_ALT: '/login',
-//   ESQUECI_SENHA: '/esqueci-senha',
+//   RECUPERAR_SENHA: '/recuperar-senha',
 //   RESETAR_SENHA: '/resetar-senha/:token/*',
 //   NAO_ENCONTRADO: '/404',
   

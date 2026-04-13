@@ -14,30 +14,7 @@ export const getFaturaPorNumero = async (numero_fatura) => {
   }
 };
 
-export const getFaturaDinamicamente = async (filtros = {}) => {
-  try {
-    const token = localStorage.getItem("accessToken", "");
-    const response = await api.get(
-      "consultas/faturas/fatura-dinamica/",
-      {
-        params: filtros,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Erro de endpoint ao consultar faturas dinamicamente",
-      error
-    );
-    throw error;
-  }
-};
-
-export const getFaturamentoGeral = async (filtros = {}) => {
+export const getFaturamento = async (filtros = {}) => {
   try {
     const token = localStorage.getItem("accessToken", "");
     const response = await api.get(
@@ -54,52 +31,6 @@ export const getFaturamentoGeral = async (filtros = {}) => {
   } catch (error) {
     console.error(
       "Erro de endpoint ao consultar faturamento geral",
-      error
-    );
-    throw error;
-  }
-};
-
-export const getFaturasComBoletos = async (filtros = {}) => {
-  try {
-    const token = localStorage.getItem("accessToken", "");
-    const response = await api.get(
-      "consultas/faturas/com-boletos/",
-      {
-        params: filtros,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Erro de endpoint ao consultar faturas com boletos",
-      error
-    );
-    throw error;
-  }
-};
-
-export const getFaturasComBoletosESegurados = async (filtros = {}) => {
-  try {
-    const token = localStorage.getItem("accessToken", "");
-    const response = await api.get(
-      "consultas/faturas/com-boletos-e-segurados/",
-      {
-        params: filtros,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Erro de endpoint ao consultar faturas com boletos",
       error
     );
     throw error;

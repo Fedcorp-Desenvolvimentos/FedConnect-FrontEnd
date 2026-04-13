@@ -1,11 +1,11 @@
-// src/pages/EsqueciSenha/EsqueciSenha.jsx
+// src/pages/RecuperarSenha/RecuperarSenha.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/EsqueciSenha.css";
+import "../../styles/RecuperarSenha.css";
 import api from "../../services/api";
 import { useSnackbar } from "notistack";
 
-const EsqueciSenha = () => {
+const RecuperarSenha = () => {
   const [email, setEmail] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
@@ -50,9 +50,9 @@ const EsqueciSenha = () => {
   };
 
   return (
-    <div className="esqueci-senha-container">
-      <div className="esqueci-senha-card">
-        <div className="esqueci-senha-logo">
+    <div className="recuperar-senha-container">
+      <div className="recuperar-senha-card">
+        <div className="recuperar-senha-logo">
           <img
               src="../../imagens/LOGO.png"
               alt="Fedcorp Logo"
@@ -60,19 +60,19 @@ const EsqueciSenha = () => {
           />
         </div>
 
-        <h1 className="esqueci-senha-title">Esqueceu sua senha?</h1>
-        <p className="esqueci-senha-subtitle">
+        <h1 className="recuperar-senha-title">Esqueceu sua senha?</h1>
+        <p className="recuperar-senha-subtitle">
           Recupere o acesso à sua conta
         </p>
 
-        <div className="esqueci-senha-info-box">
+        <div className="recuperar-senha-info-box">
           <i className="bi bi-info-circle-fill"></i>
           <p>
             Digite seu e-mail cadastrado e enviaremos um link para redefinir sua senha.
           </p>
         </div>
 
-        <form className="esqueci-senha-form" onSubmit={handleSubmit}>
+        <form className="recuperar-senha-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">
               <i className="bi bi-envelope-fill"></i>
@@ -131,4 +131,4 @@ const EsqueciSenha = () => {
   );
 };
 
-export default EsqueciSenha;
+export default RecuperarSenha;

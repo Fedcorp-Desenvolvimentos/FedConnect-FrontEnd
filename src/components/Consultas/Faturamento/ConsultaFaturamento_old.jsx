@@ -2,7 +2,7 @@
 // import "../../../styles/ConsultaFaturamento.css";
 
 // import {
-//     getFaturamentoGeral,
+//     getFaturamento,
 // } from "../../../services/consultaFatura";
 
 // import { getEmpresas } from "../../../services/empresasService";

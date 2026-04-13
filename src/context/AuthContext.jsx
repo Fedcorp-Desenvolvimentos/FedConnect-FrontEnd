@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
         const checkAuthStatus = async () => {
             // Tenta obter o token do localStorage
             const token = localStorage.getItem('accessToken');
-            const publicRoutes = ["/", "/login", "/esqueci-senha", "/resetar-senha", "/404"];
+            const publicRoutes = ["/", "/login", "/recuperar-senha", "/resetar-senha", "/404"];
 
             // Se não houver token, o usuário não está autenticado
            if (!token) {
