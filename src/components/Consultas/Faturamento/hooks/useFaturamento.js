@@ -59,7 +59,7 @@ export const useFaturamento = () => {
 
     // Carregar página de resultados
     const carregarPagina = useCallback(async (formData, pageNumber = 1, pageSize = 10) => {
-        setLoadingMessage("Carregando dados...");
+        setLoadingMessage("Carregando Faturas...");
         setLoading(true);
         setErro("");
 

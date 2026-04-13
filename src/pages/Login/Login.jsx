@@ -3,14 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/Login.css';
 import { useAuth } from '../../context/AuthContext'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { useGlobal } from '../../context/GlobalContext';
 
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false)
+
+    const { loading, setLoading } = useGlobal();
 
     const { login } = useAuth();
     const navigate = useNavigate();
