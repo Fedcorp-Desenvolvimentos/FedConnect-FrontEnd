@@ -78,7 +78,7 @@
 
 /* Conteúdo */
 .page-template-content {
-  min-width: 1200px;
+  min-width: 1000px;
 }
 
 /* Estados */
@@ -182,7 +182,7 @@
   }
 
   .page-template-content {
-    min-width: 600px;
+    min-width: 500px;
   }
 
   .page-template-header {
