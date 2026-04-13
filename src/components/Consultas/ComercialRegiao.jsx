@@ -311,7 +311,12 @@ const ComercialRegiao = () => {
 
                 <div className="form-row">
                     <label>Bairro</label>
-                    <select name="bairro" value={form.bairro} onChange={handleChange}>
+                    <select 
+                    name="bairro" 
+                    value={form.bairro} 
+                    onChange={handleChange}
+                    disabled={!form.uf || !form.municipio}
+                    >
                         <option value="">Selecione um bairro</option>
                         {bairros.map(bairro => (
                             <option key={bairro} value={bairro}>{bairro}</option>
