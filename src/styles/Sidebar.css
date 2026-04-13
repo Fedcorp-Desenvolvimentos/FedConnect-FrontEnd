@@ -3,7 +3,7 @@
   position: fixed;
   left: 0;
   top: 0;
-  width: 220px;
+  width: 240px;
   height: 100vh;
   background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
   box-shadow: 3px 0 20px rgba(36, 99, 235, 0.1);
@@ -13,7 +13,7 @@
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
   overflow-y: auto;
   border-right: 1px solid #e8edf5;
-  
+  padding: 5px;
 }
 
 .sidebar.closed {
@@ -29,6 +29,7 @@
   position: relative;
   background: white;
   margin: 10px;
+  margin-top: 20px;
 }
 
 .logo-link {
@@ -45,8 +46,8 @@
 
 .logo-desktop {
   display: block;
-  width: 240px;
-  padding: 10px;
+  width: 230px;
+  padding: 5px;
   height: auto;
   transition: all 0.3s ease;
 }
@@ -262,7 +263,7 @@
   
   /* Sidebar aberta no desktop */
   .sidebar:not(.closed) {
-    width: 220px;
+    width: 240px;
     transform: translateX(0) !important;
   }
   

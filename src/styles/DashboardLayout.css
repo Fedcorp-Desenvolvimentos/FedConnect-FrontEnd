@@ -21,8 +21,8 @@
 
 /* DESKTOP: Sidebar aberta */
 .dashboard-main .breadcrumb-nav.with-sidebar-open {
-  margin-left: 220px; /* mesma largura da sidebar */
-  width: calc(100% - 220px);
+  margin-left: 240px; /* mesma largura da sidebar */
+  width: calc(100% - 240px);
 }
 
 /* DESKTOP: Sidebar fechada */
@@ -42,7 +42,7 @@
 
 /* DESKTOP: Sidebar aberta */
 .dashboard-content.with-sidebar {
-  padding-left: calc(220px + 1.5rem);
+  padding-left: calc(240px + 1.5rem);
 }
 
 /* DESKTOP: Sidebar fechada */
@@ -53,8 +53,6 @@
 .page-container {
   width: 100%;
 }
-
-
 
 /* Telas médias (992px - 1200px) */
 @media (max-width: 1200px) {
