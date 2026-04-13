@@ -161,5 +161,14 @@ export const ConsultaService = {
     const response = await api.get(`consultar-boletosfedbnk/?numero=${payload}`)
     return response.data;
 
+  },
+  buscarCidadesAutocomplete: async (params) => {
+      try {
+          const response = await api.get("/cidades/autocomplete/", { params });
+          return response.data;
+      } catch (error) {
+          console.error("Erro no autocomplete de cidades:", error);
+          throw error;
+      }
   }
 };

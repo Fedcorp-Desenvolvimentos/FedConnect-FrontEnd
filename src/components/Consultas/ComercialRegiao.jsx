@@ -5,13 +5,16 @@ import { ConsultaService } from "../../services/consultaService";
 import { FiCopy, FiCheck, FiX } from "react-icons/fi";
 import { bairrosRioCoordenadas } from "../../utils/bairrosRioCoordenadas";
 import RioMap from "../Mapa/RioMapa";
+import AutocompleteCidades from "../../components/Comercial/AutoCompleteCidades";
 
 const ComercialRegiao = () => {
     const [form, setForm] = useState({
-        uf: "",
+        uf: "RJ",
         municipio: "",
         bairro: "",
     });
+
+    console.log("Formulário estado:", form);
 
     const [loading, setLoading] = useState(false);
     const [erro, setErro] = useState(null);
@@ -34,7 +37,7 @@ const ComercialRegiao = () => {
     const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState("");
 
     const [bairros, setBairros] = useState([]);
-
+    
     const resultadosRef = useRef(null);
 
     useEffect(() => {
@@ -53,6 +56,7 @@ const ComercialRegiao = () => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -285,6 +289,21 @@ const ComercialRegiao = () => {
     };
 
     useEffect(() => {
+        const handleCidadeSelecionada = (event) => {
+            if (event.detail.cidade.toLowerCase() === "rio de janeiro") {
+                const nomesBairros = Object.keys(bairrosRioCoordenadas).sort();
+                setBairros(nomesBairros);
+            } else {
+                setBairros([]);
+                setForm(prev => ({ ...prev, bairro: "" }));
+            }
+        };
+        
+        window.addEventListener("cidadeSelecionada", handleCidadeSelecionada);
+        return () => window.removeEventListener("cidadeSelecionada", handleCidadeSelecionada);
+    }, []);
+
+    useEffect(() => {
         if (form.municipio?.toLowerCase() === 'rio de janeiro') {
             const nomesBairros = Object.keys(bairrosRioCoordenadas).sort();
             setBairros(nomesBairros);
@@ -300,29 +319,35 @@ const ComercialRegiao = () => {
 
             <form className="regiao-form" onSubmit={handleSubmit}>
                 <div className="form-row">
-                    <label>UF *</label>
-                    <input name="uf" value={form.uf} onChange={handleChange} maxLength={2} required/>
+                    <label>RJ *</label>
+                    <input name="uf" value={form.uf} onChange={handleChange} maxLength={2} disabled/>
                 </div>
 
                 <div className="form-row">
                     <label>Município *</label>
-                    <input name="municipio" value={form.municipio} onChange={handleChange} required />
+                    <AutocompleteCidades
+                        uf={form.uf}
+                        value={form.municipio}
+                        onChange={handleChange}
+                        placeholder="Digite o nome da cidade..."
+                    />
                 </div>
 
-                <div className="form-row">
-                    <label>Bairro</label>
-                    <select 
-                    name="bairro" 
-                    value={form.bairro} 
-                    onChange={handleChange}
-                    // disabled={!form.uf || !form.municipio}
-                    >
-                        <option value="">Selecione um bairro</option>
-                        {bairros.map(bairro => (
-                            <option key={bairro} value={bairro}>{bairro}</option>
-                        ))}
-                    </select>
-                </div>
+                {form.municipio.toLowerCase() === "rio de janeiro" && (
+                    <div className="form-row">
+                        <label>Bairro</label>
+                        <select 
+                        name="bairro" 
+                        value={form.bairro} 
+                        onChange={handleChange}
+                        >
+                            <option value="">Selecione um bairro</option>
+                            {bairros.map(bairro => (
+                                <option key={bairro} value={bairro}>{bairro}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
                 <button type="submit" className="consulta-btn" disabled={loading}>
                     {loading ? (
