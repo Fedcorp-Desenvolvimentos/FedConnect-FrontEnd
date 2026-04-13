@@ -371,18 +371,19 @@ const ComercialRegiao = () => {
                                     </div>
 
                                     <div className="card-body">
+                                        
                                         <div className="info-item">
                                             <i className="bi bi-geo-alt-fill"></i>
-                                            <span>{item.formattedAddress}</span>
+                                            <span className="info-text">
+                                                {item.formattedAddress || "Endereço não informado"}
+                                            </span>
                                         </div>
-
+                                        
                                         {item.nationalPhoneNumber && (
                                             <div className="info-item">
                                                 <i className="bi bi-telephone-fill"></i>
                                                 <a
-                                                    href={criarLinkWhatsApp(
-                                                        item.nationalPhoneNumber
-                                                    )}
+                                                    href={criarLinkWhatsApp(item.nationalPhoneNumber)}
                                                     target="_blank"
                                                     rel="noreferrer"
                                                     className="phone-link"
@@ -396,12 +397,16 @@ const ComercialRegiao = () => {
                                             <div className="info-item">
                                                 <i className="bi bi-globe"></i>
                                                 <a
-                                                    href={item.websiteUri}
+                                                    href={
+                                                        item.websiteUri.startsWith("http")
+                                                            ? item.websiteUri
+                                                            : `https://${item.websiteUri}`
+                                                    }
                                                     target="_blank"
                                                     rel="noreferrer"
                                                     className="site-link"
                                                 >
-                                                    Visitar site
+                                                    {item.websiteUri.replace(/^https?:\/\//, "")}
                                                 </a>
                                             </div>
                                         )}
