@@ -60,6 +60,7 @@ import { useAuth } from '../context/AuthContext';
 import Mapa from '../components/Mapa/Mapa';
 import Login from '../pages/Login/Login';
 import HomePage from '../pages/Home/Home';
+import AutomacaoPage from '../components/Automacao/Automacao';
 
 
 const AppRouter = () => {
@@ -128,6 +129,8 @@ const AppRouter = () => {
           <Route path="/faturamento/cancelamento" element={<OperacionalCancelamento />} />
           <Route path="/faturamento/reimpressao-boleto" element={<ReimpressaoBoleto />} />
           <Route path="/faturamento/paybox" element={<Payxbox />} />
+
+          <Route path="/automacao" element={<AutomacaoPage />} />
 
           <Route path="/mapa" element={<Mapa />} />
 

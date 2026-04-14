@@ -12,6 +12,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
   const { user } = useAuth();
 
   const nivelAcesso = user?.nivel_acesso;
+  const emailUsuario = user?.email;
 
   // Detecta mudança de tamanho da tela
   useEffect(() => {
@@ -65,6 +66,13 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
       setOverlayVisible(false);
     }
   };
+
+  const emailsPermitidosAutomacao = [
+    "leonan.thomaz@gmail.com",
+    "operacional@grupofedcorp.com.br",
+    "danielmello0110@gmail.com",
+    "ingrydaylana@gmail.com"
+  ];
 
   return (
     <>
@@ -218,6 +226,24 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
                 </Link>
               </li>
             )}
+
+
+            {/* {emailUsuario === "operacional@grupofedcorp.com.br" && ( */}
+            {emailsPermitidosAutomacao.includes(emailUsuario) && (
+              <li className={location.pathname === "/automacao" ? "active" : ""}>
+                <Link 
+                  to="/automacao"
+                  data-tooltip="Automação"
+                  onClick={handleLinkClick}
+                >
+                  <div className="sidebar-icon-tooltip">
+                    <i className="bi bi-gear-fill"></i>
+                    <span>Automação</span>
+                  </div>
+                </Link>
+              </li>
+            )}
+
           </ul>
         </nav>
       </aside>
