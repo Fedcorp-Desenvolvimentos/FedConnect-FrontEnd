@@ -3,20 +3,19 @@ import "../../styles/ComercialRegiao.css";
 import * as XLSX from "xlsx";
 import { ConsultaService } from "../../services/consultaService";
 import { FiCopy, FiCheck, FiX } from "react-icons/fi";
-import { bairrosRioCoordenadas } from "../../utils/bairrosRioCoordenadas";
-import RioMap from "../Mapa/RioMapa";
-import AutocompleteCidades from "../../components/Comercial/AutoCompleteCidades";
+import { ConsultaRegiaoService } from "../../services/consultaRegiao";
+
+import { useGlobal } from "../../context/GlobalContext";
 
 const ComercialRegiao = () => {
     const [form, setForm] = useState({
-        uf: "RJ",
+        uf: "",
         municipio: "",
         bairro: "",
     });
 
-    console.log("Formulário estado:", form);
+    const { loading, setLoading, setLoadingMessage} = useGlobal();
 
-    const [loading, setLoading] = useState(false);
     const [erro, setErro] = useState(null);
     const [resultados, setResultados] = useState([]);
     const [hasSearched, setHasSearched] = useState(false);
@@ -26,7 +25,6 @@ const ComercialRegiao = () => {
     const [nextPageToken, setNextPageToken] = useState(null);
     const [carregandoMais, setCarregandoMais] = useState(false);
     const [todosResultados, setTodosResultados] = useState([]);
-    
 
     // Modal
     const [modalAberto, setModalAberto] = useState(false);
@@ -36,9 +34,63 @@ const ComercialRegiao = () => {
     const [copiado, setCopiado] = useState({});
     const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState("");
 
+    // Dados de localidades
+    const [localidades, setLocalidades] = useState({});
+    const [municipios, setMunicipios] = useState([]);
     const [bairros, setBairros] = useState([]);
-    
+
     const resultadosRef = useRef(null);
+
+    // Carregar localidades
+    useEffect(() => {
+        const fetchLocalidades = async () => {
+            setLoadingMessage("Carregando localidades...");
+            setLoading(true);
+            try {
+
+                const data = await ConsultaRegiaoService.getLocalidades();
+                setLocalidades(data.data || {});
+                console.log("Localidades carregadas:", data.data);
+            } catch (err) {
+                console.error("Erro ao buscar localidades:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchLocalidades();
+    }, []);
+
+    // Quando UF mudar, atualizar municípios
+    useEffect(() => {
+        if (form.uf && localidades[form.uf]) {
+            const municipiosList = Object.keys(localidades[form.uf].municipios).map(nome => ({
+                nome: nome,
+                total_bairros: localidades[form.uf].municipios[nome].total_bairros
+            }));
+            setMunicipios(municipiosList.sort((a, b) => a.nome.localeCompare(b.nome)));
+            setForm(prev => ({ ...prev, municipio: "", bairro: "" }));
+            setBairros([]);
+        } else {
+            setMunicipios([]);
+            setBairros([]);
+        }
+    }, [form.uf, localidades]);
+
+    // Quando município mudar, atualizar bairros
+    useEffect(() => {
+        if (form.uf && form.municipio && localidades[form.uf]) {
+            const municipioData = localidades[form.uf].municipios[form.municipio];
+            if (municipioData && municipioData.bairros) {
+                setBairros(municipioData.bairros || []);
+                setForm(prev => ({ ...prev, bairro: "" }));
+            } else {
+                setBairros([]);
+            }
+        } else {
+            setBairros([]);
+        }
+    }, [form.uf, form.municipio, localidades]);
 
     useEffect(() => {
         if (resultados.length > 0 && resultadosRef.current) {
@@ -57,17 +109,14 @@ const ComercialRegiao = () => {
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoadingMessage("Carregando dados, por favor aguarde...");
         setLoading(true);
         setErro(null);
 
-        // console.log("Dados do formulário sendo enviados:", form);
-
         if (!form.uf || !form.municipio) {
             setErro("UF e município são obrigatórios.");
-            setLoading(false);
             return;
         }
 
@@ -76,11 +125,14 @@ const ComercialRegiao = () => {
             setTodosResultados([]);
             setNextPageToken(null);
             
-            const resp = await ConsultaService.consultaRegiao({
-                ...form
-            });
-
-            // console.log("Resposta da API:", resp);
+            // Montar payload
+            const payload = {
+                uf: form.uf,
+                municipio: form.municipio,
+                ...(form.bairro && { bairro: form.bairro })
+            };
+            
+            const resp = await ConsultaService.consultaRegiao(payload);
 
             if (resp && Array.isArray(resp.resultados)) {
                 setTodosResultados(resp.resultados);
@@ -108,15 +160,19 @@ const ComercialRegiao = () => {
         setCarregandoMais(true);
         
         try {
-            const resp = await ConsultaService.consultaRegiao({
-                ...form,
+            const payload = {
+                uf: form.uf,
+                municipio: form.municipio,
+                ...(form.bairro && { bairro: form.bairro }),
                 page_token: nextPageToken
-            });
+            };
+            
+            const resp = await ConsultaService.consultaRegiao(payload);
 
             if (resp && Array.isArray(resp.resultados)) {
                 const novosResultados = [...todosResultados, ...resp.resultados];
                 setTodosResultados(novosResultados);
-                setResultados(novosResultados); // Atualiza a lista exibida
+                setResultados(novosResultados);
                 setNextPageToken(resp.next_page_token);
             }
         } catch (err) {
@@ -148,21 +204,15 @@ const ComercialRegiao = () => {
         return `https://google.com/maps/search/${query}`;
     };
 
-    // telefone -> link direto pro WhatsApp
     const criarLinkWhatsApp = (phoneRaw) => {
         if (!phoneRaw) return "#";
         let digits = phoneRaw.toString().replace(/\D/g, "");
-
-        // remove zero à esquerda se vier tipo 061...
         if (digits.length === 11 && digits.startsWith("0")) {
             digits = digits.slice(1);
         }
-
-        // garante DDI BR
         if (!digits.startsWith("55")) {
             digits = "55" + digits;
         }
-
         return `https://wa.me/${digits}`;
     };
 
@@ -184,7 +234,6 @@ const ComercialRegiao = () => {
         return data;
     };
 
-    // Consulta Razão Social
     const buscarDetalhesPorRazaoSocial = async (razaoSocial) => {
         if (!razaoSocial) return;
 
@@ -206,7 +255,6 @@ const ComercialRegiao = () => {
             };
 
             const resp = await ConsultaService.realizarConsulta(payload);
-
             const data = resp?.resultado_api ?? resp?.resultado ?? null;
 
             if (data && typeof data === "object") {
@@ -230,7 +278,6 @@ const ComercialRegiao = () => {
         setEmpresaSelecionadaNome("");
     };
 
-    // Excel só da empresa selecionada (modal)
     const exportarExcelDetalhes = () => {
         if (!dadosModal) return;
 
@@ -250,9 +297,7 @@ const ComercialRegiao = () => {
                 "Nome Fantasia": dadosModal.nome_fantasia || "",
                 CNPJ: dadosModal.cnpj || "",
                 "Situação Cadastral": dadosModal.descricao_situacao_cadastral || "",
-                "Data Início Atividade": formatarDataBrasileira(
-                    dadosModal.data_inicio_atividade
-                ),
+                "Data Início Atividade": formatarDataBrasileira(dadosModal.data_inicio_atividade),
                 Telefone: dadosModal.ddd_telefone_1 || "",
                 Email: dadosModal.email || "",
                 Endereço: enderecoCompleto,
@@ -281,34 +326,10 @@ const ComercialRegiao = () => {
     const resultadosPaginados = resultados.slice(indexPrimeiro, indexUltimo);
     const totalPaginas = Math.ceil(resultados.length / itensPorPagina);
 
-    // console.log("Resultados paginados:", resultadosPaginados);
-
     const mudarPagina = (n) => {
         setPaginaAtual(n);
         resultadosRef.current?.scrollIntoView({ behavior: "smooth" });
     };
-
-    useEffect(() => {
-        const handleCidadeSelecionada = (event) => {
-            if (event.detail.cidade.toLowerCase() === "rio de janeiro") {
-                const nomesBairros = Object.keys(bairrosRioCoordenadas).sort();
-                setBairros(nomesBairros);
-            } else {
-                setBairros([]);
-                setForm(prev => ({ ...prev, bairro: "" }));
-            }
-        };
-        
-        window.addEventListener("cidadeSelecionada", handleCidadeSelecionada);
-        return () => window.removeEventListener("cidadeSelecionada", handleCidadeSelecionada);
-    }, []);
-
-    useEffect(() => {
-        if (form.municipio?.toLowerCase() === 'rio de janeiro') {
-            const nomesBairros = Object.keys(bairrosRioCoordenadas).sort();
-            setBairros(nomesBairros);
-        }
-    }, [form.municipio]);
 
     return (
         <div className="comercial-regiao-container">
@@ -319,31 +340,45 @@ const ComercialRegiao = () => {
 
             <form className="regiao-form" onSubmit={handleSubmit}>
                 <div className="form-row">
-                    <label>RJ *</label>
-                    <input name="uf" value={form.uf} onChange={handleChange} maxLength={2} disabled/>
+                    <label>Estado *</label>
+                    <select name="uf" value={form.uf} onChange={handleChange}>
+                        <option value="">{Object.keys(localidades).length > 0 ? "Selecione um estado" : "Carregando estados..."}</option>
+                        {Object.keys(localidades).sort().map(sigla => (
+                            <option key={sigla} value={sigla}>
+                                {/* {sigla} - Cerca de {localidades[sigla].total_municipios} municípios */}
+                                {sigla}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="form-row">
                     <label>Município *</label>
-                    <AutocompleteCidades
-                        uf={form.uf}
-                        value={form.municipio}
+                    <select 
+                        name="municipio" 
+                        value={form.municipio} 
                         onChange={handleChange}
-                        placeholder="Digite o nome da cidade..."
-                    />
+                        disabled={!form.uf || municipios.length === 0}
+                    >
+                        <option value="">Selecione um município</option>
+                        {municipios.map(m => (
+                            <option key={m.nome} value={m.nome}>
+                                {/* {m.nome} ({m.total_bairros} bairros) */}
+                                {m.nome}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
-                {form.municipio.toLowerCase() === "rio de janeiro" && (
+                {bairros.length > 0 && (
                     <div className="form-row">
-                        <label>Bairro</label>
-                        <select 
-                        name="bairro" 
-                        value={form.bairro} 
-                        onChange={handleChange}
-                        >
-                            <option value="">Selecione um bairro</option>
-                            {bairros.map(bairro => (
-                                <option key={bairro} value={bairro}>{bairro}</option>
+                        <label>Bairro (opcional)</label>
+                        <select name="bairro" value={form.bairro} onChange={handleChange}>
+                            <option value="">Todos os bairros</option>
+                            {bairros.map(b => (
+                                <option key={b.nome} value={b.nome}>
+                                    {b.nome}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -384,10 +419,7 @@ const ComercialRegiao = () => {
 
                         <ul className="regiao-list">
                             {resultadosPaginados.map((item, i) => (
-                                <li
-                                    key={i}
-                                    className="regiao-card-modern"
-                                >
+                                <li key={i} className="regiao-card-modern">
                                     <div className="card-header">
                                         <h4 className="card-title">{item.displayName?.text}</h4>
                                         <div className="card-icon">
@@ -396,7 +428,6 @@ const ComercialRegiao = () => {
                                     </div>
 
                                     <div className="card-body">
-                                        
                                         <div className="info-item">
                                             <i className="bi bi-geo-alt-fill"></i>
                                             <span className="info-text">
@@ -422,11 +453,7 @@ const ComercialRegiao = () => {
                                             <div className="info-item">
                                                 <i className="bi bi-globe"></i>
                                                 <a
-                                                    href={
-                                                        item.websiteUri.startsWith("http")
-                                                            ? item.websiteUri
-                                                            : `https://${item.websiteUri}`
-                                                    }
+                                                    href={item.websiteUri.startsWith("http") ? item.websiteUri : `https://${item.websiteUri}`}
                                                     target="_blank"
                                                     rel="noreferrer"
                                                     className="site-link"
@@ -439,10 +466,7 @@ const ComercialRegiao = () => {
 
                                     <div className="card-footer">
                                         <a
-                                            href={criarLinkMaps(
-                                                item.displayName?.text,
-                                                item.formattedAddress
-                                            )}
+                                            href={criarLinkMaps(item.displayName?.text, item.formattedAddress)}
                                             target="_blank"
                                             rel="noreferrer"
                                             className="btn-maps"
@@ -484,9 +508,7 @@ const ComercialRegiao = () => {
                                     {[...Array(totalPaginas)].map((_, index) => (
                                         <button
                                             key={index}
-                                            className={`pagination-number ${
-                                                paginaAtual === index + 1 ? "active" : ""
-                                            }`}
+                                            className={`pagination-number ${paginaAtual === index + 1 ? "active" : ""}`}
                                             onClick={() => mudarPagina(index + 1)}
                                         >
                                             {index + 1}
@@ -507,7 +529,6 @@ const ComercialRegiao = () => {
                     </>
                 )}
 
-                {/* Após a lista de resultados */}
                 {nextPageToken && (
                     <div className="carregar-mais-container">
                         <button 
@@ -556,33 +577,17 @@ const ComercialRegiao = () => {
                                 <FiX size={24} />
                             </button>
 
-                             {!loadingModal && !erroModal && dadosModal && (
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "flex-end",
-                                        gap: "0.5rem",
-                                        marginBottom: "0.1rem",
-                                        marginLeft: "1rem"
-                                    }}
-                                >
-                                    <button
-                                        type="button"
-                                        className="btn-exportar-excel"
-                                        onClick={exportarExcelDetalhes}
-                                    >
+                            {!loadingModal && !erroModal && dadosModal && (
+                                <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginBottom: "0.1rem", marginLeft: "1rem" }}>
+                                    <button type="button" className="btn-exportar-excel" onClick={exportarExcelDetalhes}>
                                         <i className="bi bi-file-earmark-excel"></i>
                                         Baixar Excel
                                     </button>
-
                                 </div>
                             )}
                         </div>
 
                         <div className="modal-body">
-                            
-                           
-
                             {loadingModal && (
                                 <div className="modal-loading">
                                     <div className="spinner-modal"></div>
@@ -599,118 +604,113 @@ const ComercialRegiao = () => {
 
                             {!loadingModal && dadosModal && (
                                 <>
-                                <RioMap />
-                                <div className="modal-dados">
-                                    <CampoCopiavel
-                                        label="Razão Social"
-                                        valor={dadosModal.razao_social}
-                                        campo="razao"
-                                        copiar={copiarParaClipboard}
-                                        copiado={copiado}
-                                    />
-
-                                    <CampoCopiavel
-                                        label="CNPJ"
-                                        valor={dadosModal.cnpj}
-                                        campo="cnpj"
-                                        copiar={copiarParaClipboard}
-                                        copiado={copiado}
-                                    />
-
-                                    <CampoCopiavel
-                                        label="Situação Cadastral"
-                                        valor={dadosModal.descricao_situacao_cadastral}
-                                        campo="situacao"
-                                        copiar={copiarParaClipboard}
-                                        copiado={copiado}
-                                    />
-
-                                    {dadosModal.ddd_telefone_1 && (
+                                    <div className="modal-dados">
                                         <CampoCopiavel
-                                            label="Telefone"
-                                            valor={dadosModal.ddd_telefone_1}
-                                            campo="telefone"
+                                            label="Razão Social"
+                                            valor={dadosModal.razao_social}
+                                            campo="razao"
                                             copiar={copiarParaClipboard}
                                             copiado={copiado}
                                         />
-                                    )}
 
-                                    {dadosModal.email && (
                                         <CampoCopiavel
-                                            label="Email"
-                                            valor={dadosModal.email}
-                                            campo="email"
+                                            label="CNPJ"
+                                            valor={dadosModal.cnpj}
+                                            campo="cnpj"
                                             copiar={copiarParaClipboard}
                                             copiado={copiado}
                                         />
-                                    )}
 
-                                    <CampoCopiavel
-                                        label="Endereço"
-                                        valor={`${dadosModal.descricao_tipo_de_logradouro || ""} ${
-                                            dadosModal.logradouro || ""
-                                        }, ${dadosModal.numero || ""} ${
-                                            dadosModal.complemento || ""
-                                        }`.trim()}
-                                        campo="endereco"
-                                        copiar={copiarParaClipboard}
-                                        copiado={copiado}
-                                    />
-
-                                    <CampoCopiavel
-                                        label="Bairro"
-                                        valor={dadosModal.bairro}
-                                        campo="bairro"
-                                        copiar={copiarParaClipboard}
-                                        copiado={copiado}
-                                    />
-
-                                    <CampoCopiavel
-                                        label="Cidade / UF"
-                                        valor={`${dadosModal.municipio} - ${dadosModal.uf}`}
-                                        campo="cidade_uf"
-                                        copiar={copiarParaClipboard}
-                                        copiado={copiado}
-                                    />
-
-                                    <div className="modal-field">
-                                        <label>CNAE Principal:</label>
-                                        <input
-                                            readOnly
-                                            value={dadosModal.cnae_fiscal_descricao || "N/A"}
+                                        <CampoCopiavel
+                                            label="Situação Cadastral"
+                                            valor={dadosModal.descricao_situacao_cadastral}
+                                            campo="situacao"
+                                            copiar={copiarParaClipboard}
+                                            copiado={copiado}
                                         />
-                                    </div>
 
-                                    {dadosModal.cnaes_secundarios?.length > 0 && (
+                                        {dadosModal.ddd_telefone_1 && (
+                                            <CampoCopiavel
+                                                label="Telefone"
+                                                valor={dadosModal.ddd_telefone_1}
+                                                campo="telefone"
+                                                copiar={copiarParaClipboard}
+                                                copiado={copiado}
+                                            />
+                                        )}
+
+                                        {dadosModal.email && (
+                                            <CampoCopiavel
+                                                label="Email"
+                                                valor={dadosModal.email}
+                                                campo="email"
+                                                copiar={copiarParaClipboard}
+                                                copiado={copiado}
+                                            />
+                                        )}
+
+                                        <CampoCopiavel
+                                            label="Endereço"
+                                            valor={`${dadosModal.descricao_tipo_de_logradouro || ""} ${
+                                                dadosModal.logradouro || ""
+                                            }, ${dadosModal.numero || ""} ${
+                                                dadosModal.complemento || ""
+                                            }`.trim()}
+                                            campo="endereco"
+                                            copiar={copiarParaClipboard}
+                                            copiado={copiado}
+                                        />
+
+                                        <CampoCopiavel
+                                            label="Bairro"
+                                            valor={dadosModal.bairro}
+                                            campo="bairro"
+                                            copiar={copiarParaClipboard}
+                                            copiado={copiado}
+                                        />
+
+                                        <CampoCopiavel
+                                            label="Cidade / UF"
+                                            valor={`${dadosModal.municipio} - ${dadosModal.uf}`}
+                                            campo="cidade_uf"
+                                            copiar={copiarParaClipboard}
+                                            copiado={copiado}
+                                        />
+
                                         <div className="modal-field">
-                                            <label>CNAEs Secundários:</label>
-                                            <ul className="lista-secundarios">
-                                                {dadosModal.cnaes_secundarios.map((c, i) => (
-                                                    <li key={i}>{c.descricao}</li>
-                                                ))}
-                                            </ul>
+                                            <label>CNAE Principal:</label>
+                                            <input readOnly value={dadosModal.cnae_fiscal_descricao || "N/A"} />
                                         </div>
-                                    )}
 
-                                    <div className="modal-field">
-                                        <label>Porte:</label>
-                                        <input readOnly value={dadosModal.porte || "N/A"} />
-                                    </div>
+                                        {dadosModal.cnaes_secundarios?.length > 0 && (
+                                            <div className="modal-field">
+                                                <label>CNAEs Secundários:</label>
+                                                <ul className="lista-secundarios">
+                                                    {dadosModal.cnaes_secundarios.map((c, i) => (
+                                                        <li key={i}>{c.descricao}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
 
-                                    {dadosModal.qsa?.length > 0 && (
                                         <div className="modal-field">
-                                            <label>Quadro Societário (QSA):</label>
-                                            <ul className="lista-qsa">
-                                                {dadosModal.qsa.map((socio, i) => (
-                                                    <li key={i}>
-                                                        <strong>{socio.nome_socio}</strong> —{" "}
-                                                        {socio.qualificacao_socio}
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                            <label>Porte:</label>
+                                            <input readOnly value={dadosModal.porte || "N/A"} />
                                         </div>
-                                    )}
-                                </div>
+
+                                        {dadosModal.qsa?.length > 0 && (
+                                            <div className="modal-field">
+                                                <label>Quadro Societário (QSA):</label>
+                                                <ul className="lista-qsa">
+                                                    {dadosModal.qsa.map((socio, i) => (
+                                                        <li key={i}>
+                                                            <strong>{socio.nome_socio}</strong> — {socio.qualificacao_socio}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
                                 </>
                             )}
                         </div>
