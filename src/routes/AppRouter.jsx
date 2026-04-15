@@ -1,10 +1,19 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 // Layouts
 import DashboardLayout from '../Layouts/DashboardLayout';
 
 // Componentes públicos
 import NotFound from '../components/NotFound/NotFound';
+
+// Login e Recuperação de Senha
+import Login from '../pages/Login/Login';
+import ResetarSenha from '../pages/ResetarSenha/ResetarSenha';
+import RecuperarSenha from '../pages/RecuperarSenha/RecuperarSenha';
+
+// Home
+import HomePage from '../pages/Home/Home';
 
 // Componentes protegidos
 import ConsultasHome from '../components/Consultas/ConsultasHome';
@@ -37,7 +46,7 @@ import EnvEmail from '../components/Views/EnvEmail';
 import ConfigEmail from '../components/Views/ConfigEmail';
 
 // Agenda
-import AgendaSala from '../components/Agenda/AgendaSala';
+import AgendaSala from '../pages/Agenda/AgendaSala';
 
 // Comercial
 import Acompanhamento from '../components/Comercial/DashboardComercial';
@@ -54,18 +63,15 @@ import Payxbox from '../components/Faturamento/Paybox';
 
 // Utils e Providers
 import PrivateRouter from './PrivateRouter';
-import ResetarSenha from '../components/Login/ResetarSenha';
-import RecuperarSenha from '../components/Login/RecuperarSenha';
-import { useAuth } from '../context/AuthContext';
-import Mapa from '../components/Mapa/Mapa';
-import Login from '../pages/Login/Login';
-import HomePage from '../pages/Home/Home';
 
+// Automação
 import AutomacaoHome from '../components/Automacao/AutomacaoHome';
 import PDFAutomacao from '../components/Automacao/PDF/PDFAutomacao';
 import BBZAutomacao from '../components/Automacao/Faturamento/BBZAutomacao';
 import EmailAutomacao from '../components/Automacao/Email/EmailAutomacao';
 
+// Teste renderização Mapa
+import Mapa from '../components/Mapa/Mapa';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -76,8 +82,8 @@ const AppRouter = () => {
       <Route path="/" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
       
       <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
-      <Route path="/recuperar-senha" element={<RecuperarSenha />} />
-      <Route path="/resetar-senha/:token" element={<ResetarSenha />} />
+      <Route path="/recuperar-senha" element={isAuthenticated ? <Navigate to="/home" /> : <RecuperarSenha />} />
+      <Route path="/resetar-senha/:token" element={isAuthenticated ? <Navigate to="/home" /> : <ResetarSenha />} />
 
       {/* Rotas Protegidas */}
       <Route element={<PrivateRouter />}>

@@ -27,6 +27,41 @@ export const triggerWebhook = async (payload) => {
   }
 };
 
+export const cancelarBoletoFedBNK = async (payload) => {
+  try {
+    const token = localStorage.getItem("accessToken");
+    const fatura = payload.number;
+    
+    const webhookPayload = {
+      method: payload.method,
+      numero: payload.number,
+      motivo: payload.motivo,
+      mail: payload.mail
+    };
+    
+    // await triggerWebhook(webhookPayload, fatura);
+    
+    // Depois, chamar a API do Django para atualizar o banco local
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    };
+    
+    const response = await axios.post(
+      `http://localhost:8000/boletofedbnk/cancelar/${fatura}/`, 
+      payload, 
+      config
+    );
+    
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao cancelar boleto:', error);
+    throw error;
+  }
+};
+
 /**
  * Envia dados para o Webhook.
  * @param {Object} payload - O objeto JSON a ser enviado no corpo da requisição.

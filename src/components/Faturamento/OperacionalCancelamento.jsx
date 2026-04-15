@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import "../../styles/ConsultasHome.css";
 import "../../styles/OperacionalCancelamento.css";
 import { useAuth } from "../../context/AuthContext";
-import { triggerWebhook } from "../../services/boletofedbnk";
+import { cancelarBoletoFedBNK } from "../../services/boletofedbnk";
 
 const OperacionalCancelamento = () => {
   const { user, isAuthenticated, loading } = useAuth();
@@ -72,10 +72,10 @@ const OperacionalCancelamento = () => {
 
     try {
       setSending(true);
-      const response = await triggerWebhook(payload);
+      const response = await cancelarBoletoFedBNK(payload);
 
       setStatus({
-        type: response.type === "success" ? "success" : "error",
+        type: response.type === "sucesso" ? "success" : "error",
         message: response.message,
       });
 

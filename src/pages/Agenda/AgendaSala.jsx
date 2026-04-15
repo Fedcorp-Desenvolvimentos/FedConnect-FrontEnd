@@ -19,11 +19,11 @@ import ptBR from "date-fns/locale/pt-BR";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../styles/AgendaSala.css";
-import AgendaReservaForm from "./AgendaReservaForm";
-import AgendaDetalhe from "./AgendaDetalhe";
+import AgendaReservaForm from "../../components/Agenda/AgendaReservaForm";
+import AgendaDetalhe from "../../components/Agenda/AgendaDetalhe";
 import { useAuth } from "../../context/AuthContext";
 import { AgendaService } from "../../services/agendaService";
-import PageTemplate from "../PageTemplate/PageTemplate";
+import PageTemplate from "../../components/PageTemplate/PageTemplate";
 import { CiCalendarDate } from "react-icons/ci";
 
 function getFirstMondayOfMonth(date) {
