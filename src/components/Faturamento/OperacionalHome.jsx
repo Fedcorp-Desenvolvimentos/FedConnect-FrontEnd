@@ -5,14 +5,14 @@ import PageTemplate from "../PageTemplate/PageTemplate";
 import { FaHammer } from "react-icons/fa";
  
 const operacionais = [
-  {
-    key: "pdf-automation",
-    icon: <i className="bi bi-file-earmark-pdf-fill" />,
-    title: "PDF Automation",
-    desc: "Renomear, separar e automatizar processos com PDFs usando regras e arquivos modelo.",
-    to: "/faturamento/pdf-automation",
-    niveis: ["admin", "faturamento"]
-  },
+  // {
+  //   key: "pdf-automation",
+  //   icon: <i className="bi bi-file-earmark-pdf-fill" />,
+  //   title: "PDF Automation",
+  //   desc: "Renomear, separar e automatizar processos com PDFs usando regras e arquivos modelo.",
+  //   to: "/faturamento/pdf-automation",
+  //   niveis: ["admin", "faturamento"]
+  // },
   {
     key: "cancelamento-fatura",
     icon: <i className="bi bi-x-octagon-fill" />,
