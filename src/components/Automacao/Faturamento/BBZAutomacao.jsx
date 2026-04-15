@@ -1,14 +1,13 @@
 // AutomacaoPage.jsx
 
 import { useState } from "react";
-import "../../styles/ConsultasHome.css";
-import "./AutomacaoPage.css";
-import { useAuth } from "../../context/AuthContext";
-import PageTemplate from "../PageTemplate/PageTemplate";
+import "./BBZAutomacao.css";
+import { useAuth } from "../../../context/AuthContext";
+import PageTemplate from "../../PageTemplate/PageTemplate";
 import { TbAutomation, TbUpload, TbRefresh, TbCheck } from "react-icons/tb";
 import { FaFilePdf } from "react-icons/fa6";
 
-import { AutomacaoService } from "../../services/automacaoService";
+import { AutomacaoService } from "../../../services/automacaoService";
 import { useSnackbar } from "notistack";
 
 const BBZAutomacao = () => {

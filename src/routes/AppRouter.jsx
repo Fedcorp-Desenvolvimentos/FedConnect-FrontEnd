@@ -62,9 +62,9 @@ import Login from '../pages/Login/Login';
 import HomePage from '../pages/Home/Home';
 
 import AutomacaoHome from '../components/Automacao/AutomacaoHome';
-import PDFAutomacao from '../components/Automacao/PDFAutomacao';
-import BBZAutomacao from '../components/Automacao/BBZAutomacao';
-import EmailAutomacao from '../components/Automacao/EmailAutomacao';
+import PDFAutomacao from '../components/Automacao/PDF/PDFAutomacao';
+import BBZAutomacao from '../components/Automacao/Faturamento/BBZAutomacao';
+import EmailAutomacao from '../components/Automacao/Email/EmailAutomacao';
 
 
 const AppRouter = () => {

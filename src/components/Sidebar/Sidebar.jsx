@@ -67,12 +67,12 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
     }
   };
 
-  const emailsPermitidosAutomacao = [
-    "leonan.thomaz@gmail.com",
-    "operacional@grupofedcorp.com.br",
-    "danielmello0110@gmail.com",
-    "ingrydaylana@gmail.com"
-  ];
+  // const emailsPermitidosAutomacao = [
+  //   "leonan.thomaz@gmail.com",
+  //   "operacional@grupofedcorp.com.br",
+  //   "danielmello0110@gmail.com",
+  //   "ingrydaylana@gmail.com"
+  // ];
 
   return (
     <>
@@ -229,7 +229,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
 
 
             {/* {emailUsuario === "operacional@grupofedcorp.com.br" && ( */}
-            {emailsPermitidosAutomacao.includes(emailUsuario) && (
+            {/* {emailsPermitidosAutomacao.includes(emailUsuario) && (
               <li className={location.pathname === "/automacao" ? "active" : ""}>
                 <Link 
                   to="/automacao"
@@ -242,7 +242,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
                   </div>
                 </Link>
               </li>
-            )}
+            )} */}
 
           </ul>
         </nav>

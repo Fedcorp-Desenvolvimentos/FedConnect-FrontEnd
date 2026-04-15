@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { FileText, Upload, Zap, CheckCircle, AlertCircle, Info } from 'lucide-react';
-import '../../styles/PdfAutomation.css';
-import { AutomacaoService } from '../../services/automacaoService';
-import PageTemplate from '../PageTemplate/PageTemplate';
-import { useGlobal } from '../../context/GlobalContext';
+import { Upload, Zap, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import './PDFAutomacao.css';
+import { AutomacaoService } from '../../../services/automacaoService';
+import PageTemplate from '../../PageTemplate/PageTemplate';
+import { useGlobal } from '../../../context/GlobalContext';
+import { useAuth } from '../../../context/AuthContext';
+import { TbPdf, TbTrash } from 'react-icons/tb';
 
 const PDFAutomacao = () => {
+    const { user } = useAuth();
     const { loading } = useGlobal();
 
     const [separatorFile, setSeparatorFile] = useState(null);
@@ -13,6 +16,24 @@ const PDFAutomacao = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
+
+    const admin = user?.nivel_acesso === "admin";
+
+    if(!admin) {
+        return (
+        <PageTemplate
+            title="Acesso Negado"
+            subtitle="Você não tem permissão para acessar esta página"
+            icon={<TbPdf />}
+        >
+            <div className="access-denied">
+            <TbTrash size={48} />
+            <p>Ops! Parece que você não tem acesso a esta funcionalidade.</p>
+            <p>Se você acha que isso é um erro, entre em contato com o administrador do sistema.</p>
+            </div>
+        </PageTemplate>
+        );
+    }
 
     const resetFeedback = () => {
         setErrorMsg('');
