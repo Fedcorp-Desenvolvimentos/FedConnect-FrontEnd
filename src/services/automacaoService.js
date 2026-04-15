@@ -23,4 +23,20 @@ export const AutomacaoService = {
     });
     return response.data;
   },
+
+  separar_pdf: async (file, nomeBase = '') => {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (nomeBase) {
+          formData.append('nome_base', nomeBase);
+      }
+      
+      const response = await api.post(`automacao/separar-pdf/`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          timeout: 300000,
+          responseType: 'blob'
+      });
+      
+      return response.data;
+  },
 };

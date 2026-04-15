@@ -60,7 +60,11 @@ import { useAuth } from '../context/AuthContext';
 import Mapa from '../components/Mapa/Mapa';
 import Login from '../pages/Login/Login';
 import HomePage from '../pages/Home/Home';
-import AutomacaoPage from '../components/Automacao/Automacao';
+
+import AutomacaoHome from '../components/Automacao/AutomacaoHome';
+import PDFAutomacao from '../components/Automacao/PDFAutomacao';
+import BBZAutomacao from '../components/Automacao/BBZAutomacao';
+import EmailAutomacao from '../components/Automacao/EmailAutomacao';
 
 
 const AppRouter = () => {
@@ -130,7 +134,11 @@ const AppRouter = () => {
           <Route path="/faturamento/reimpressao-boleto" element={<ReimpressaoBoleto />} />
           <Route path="/faturamento/paybox" element={<Payxbox />} />
 
-          <Route path="/automacao" element={<AutomacaoPage />} />
+          {/* Automação */}
+          <Route path="/automacao" element={<AutomacaoHome />} />
+          <Route path="/automacao/bbz" element={<BBZAutomacao />} />
+          <Route path="/automacao/pdf" element={<PDFAutomacao />} />
+          <Route path="/automacao/email" element={<EmailAutomacao />} />
 
           <Route path="/mapa" element={<Mapa />} />
 

@@ -145,67 +145,6 @@
   flex-wrap: wrap;
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-}
-
-.btn-primary {
-  background: #4c9aff;
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #3a7bc7;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(76, 154, 255, 0.3);
-}
-
-.btn-secondary {
-  background: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: #5a6268;
-  transform: translateY(-1px);
-}
-
-.btn-success {
-  background: #28a745;
-  color: white;
-}
-
-.btn-success:hover:not(:disabled) {
-  background: #218838;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-}
-
-.btn-outline {
-  background: transparent;
-  border: 1px solid #4c9aff;
-  color: #4c9aff;
-}
-
-.btn-outline:hover:not(:disabled) {
-  background: #4c9aff;
-  color: white;
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
 
 /* Badge de estatísticas */
 .stats-badge {
@@ -305,10 +244,6 @@
   
   .button-group {
     flex-direction: column;
-  }
-  
-  .btn {
-    justify-content: center;
   }
   
   .files-list li {

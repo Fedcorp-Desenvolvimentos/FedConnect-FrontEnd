@@ -11,7 +11,7 @@ import { FaFilePdf } from "react-icons/fa6";
 import { AutomacaoService } from "../../services/automacaoService";
 import { useSnackbar } from "notistack";
 
-const AutomacaoPage = () => {
+const BBZAutomacao = () => {
     const { user } = useAuth();
     const nivelAcesso = user?.nivel_acesso || 0;
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -104,7 +104,7 @@ const AutomacaoPage = () => {
 
     return (
         <PageTemplate
-            title="Automação de processos"
+            title="Automação da BBZ"
             subtitle="Gerencie e monitore suas automações de forma eficiente"
             icon={<TbAutomation />}
             className="automacao-page"
@@ -209,7 +209,7 @@ const AutomacaoPage = () => {
                 </div>
                 
                 {/* Seção de Informações */}
-                <div className="info-section">
+                {/* <div className="info-section">
                     <h3>📌 Como funciona o fluxo completo</h3>
                     <ul>
                         <li><strong>1. Upload:</strong> Selecione os PDFs e clique em "Enviar para o servidor" - os arquivos vão para a pasta de origem</li>
@@ -218,10 +218,10 @@ const AutomacaoPage = () => {
                         <li><strong>4. Backup:</strong> Arquivos existentes são automaticamente movidos para pasta "old" como backup</li>
                         <li><strong>💡 Dica:</strong> Você pode fazer upload de vários arquivos de uma vez e depois processar tudo junto</li>
                     </ul>
-                </div>
+                </div> */}
             </div>
         </PageTemplate>
     );
 };
 
-export default AutomacaoPage;
+export default BBZAutomacao;
