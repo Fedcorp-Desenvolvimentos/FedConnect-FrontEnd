@@ -50,9 +50,10 @@ const ComercialRegiao = () => {
 
                 const data = await ConsultaRegiaoService.getLocalidades();
                 setLocalidades(data.data || {});
-                console.log("Localidades carregadas:", data.data);
+                // console.log("Localidades carregadas:", data.data);
             } catch (err) {
-                console.error("Erro ao buscar localidades:", err);
+                // console.error("Erro ao buscar localidades:", err);
+                setErro("Erro ao carregar localidades. Tente novamente mais tarde.");
             } finally {
                 setLoading(false);
             }

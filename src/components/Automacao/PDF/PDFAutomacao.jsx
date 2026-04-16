@@ -53,7 +53,7 @@ const PDFAutomacao = () => {
     const handleSepararSubmit = async () => {
         resetFeedback();
 
-        console.log('Iniciando separação de PDF:', separatorFile, 'Nome base:', separatorNomeBase);
+        // console.log('Iniciando separação de PDF:', separatorFile, 'Nome base:', separatorNomeBase);
         
         if (!separatorFile) {
             setErrorMsg('Selecione um arquivo PDF para separar.');
@@ -65,7 +65,7 @@ const PDFAutomacao = () => {
         try {
             const zipBlob = await AutomacaoService.separar_pdf(separatorFile, separatorNomeBase);
 
-            console.log('PDF separado com sucesso, iniciando download');
+            // console.log('PDF separado com sucesso, iniciando download');
             
             // Criar link para download
             const url = window.URL.createObjectURL(zipBlob);
@@ -78,7 +78,7 @@ const PDFAutomacao = () => {
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
 
-            console.log('Download iniciado');
+            // console.log('Download iniciado');
             
             setSuccessMsg('PDF separado com sucesso! O download foi iniciado.');
             setSeparatorFile(null);
@@ -86,7 +86,7 @@ const PDFAutomacao = () => {
             
             // Resetar o input file
             const fileInput = document.getElementById('separator-file-input');
-            console.log('Resetando input file:', fileInput);
+            // console.log('Resetando input file:', fileInput);
             
             if (fileInput) fileInput.value = '';
             

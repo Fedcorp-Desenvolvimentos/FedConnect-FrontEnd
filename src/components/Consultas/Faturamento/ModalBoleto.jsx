@@ -5,17 +5,13 @@ import { verificarVencimento } from "../../../utils/Faturamento/verificarVencime
 import { formatarValor } from "../../../utils/Faturamento/formatarValor";
 import { formatarData } from "../../../utils/Faturamento/formatarData";
 import './styles/ModalBoleto.css';
+import { renderStatusBadge } from './utils/constants';
 
 export const ModalBoleto = ({ isOpen, onClose, boleto, parcela }) => {
     if (!boleto) return null;
 
     const vencBoleto = verificarVencimento(boleto.DATA_VENCIMENTO);
-    const estaQuitado = parcela && parcela.DT_BAIXA !== null;
-
-
-    console.log("Dados do boleto no modal:", boleto);
-    console.log("Dados da parcela no modal:", parcela);
-
+    
     return (
         <Dialog.Root open={isOpen} onOpenChange={onClose}>
             <Dialog.Portal>
@@ -99,9 +95,7 @@ export const ModalBoleto = ({ isOpen, onClose, boleto, parcela }) => {
                                 </div>
                                 <div className="info-item">
                                     <label>Status:</label>
-                                    <span className={`status-badge ${estaQuitado ? 'status-quitado' : boleto.STATUS_BOLETO === "C" ? 'status-cancelado' : 'status-pendente'}`}>
-                                        {estaQuitado ? "Quitado" : boleto.STATUS_BOLETO === "C" ? "Cancelado" : "Pendente"}
-                                    </span>
+                                    {renderStatusBadge([boleto], parcela ? [parcela] : [], boleto.STATUS_BOLETO)}
                                 </div>
                                 <div className="info-item">
                                     <label>Data de Emissão:</label>

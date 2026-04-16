@@ -22,7 +22,6 @@ export const usePasswordChange = (userId) => {
     }
 
     if (novaSenha.length < 6) {
-      console.log("Quantidade de caracteres da senha:", novaSenha.length);
       setError('A nova senha deve ter pelo menos 6 caracteres');
       return false;
     }

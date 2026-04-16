@@ -69,7 +69,8 @@ const GerenciarUsuarios = () => {
 
   const handleCreateConfirm = async () => {
     // Implementar criação de usuário se necessário
-    console.log('Criar usuário:', formData);
+    // console.log('Criar usuário:', formData);
+    showMessage('success', 'Usuário criado com sucesso! (Funcionalidade a ser implementada)');
   };
 
   const getModalProps = () => {

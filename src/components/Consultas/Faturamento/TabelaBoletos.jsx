@@ -4,6 +4,7 @@ import { verificarVencimento } from "../../../utils/Faturamento/verificarVencime
 import { formatarValor } from "../../../utils/Faturamento/formatarValor";
 import { formatarData } from "../../../utils/Faturamento/formatarData";
 import { ModalBoleto } from './ModalBoleto';
+import { renderStatusBadge } from './utils/constants';
 
 export const TabelaBoletos = ({ boletos, parcelas }) => {
     const [selectedBoleto, setSelectedBoleto] = useState(null);
@@ -35,12 +36,15 @@ export const TabelaBoletos = ({ boletos, parcelas }) => {
                         {boletos.map((boleto, idx) => {
                             const vencBoleto = verificarVencimento(boleto.DATA_VENCIMENTO);
                             const parcelaCorrespondente = parcelas?.find(p => p.DOCUMENTO === boleto.DOCUMENTO);
-                            const estaQuitado = parcelaCorrespondente && parcelaCorrespondente.DT_BAIXA !== null;
+                            
+                            const estaQuitado = boleto.QUITADO === "S" || (parcelaCorrespondente?.DT_BAIXA != null && boleto.STATUS_BOLETO === "A" && boleto.STATUS_BOLETO !== "C");
+                            const estaCancelado = boleto.STATUS_BOLETO === "C";
+                            const estaPendente = !estaQuitado && !estaCancelado && boleto.STATUS_BOLETO === "A";
                             
                             return (
                                 <tr 
                                     key={idx} 
-                                    className={boleto.STATUS_BOLETO === "C" ? "boleto-cancelado" : "boleto-linha"}
+                                    className={estaCancelado ? "boleto-cancelado" : "boleto-linha"}
                                     onClick={() => handleRowClick(boleto, parcelaCorrespondente)}
                                     style={{ cursor: 'pointer' }}
                                 >
@@ -53,13 +57,7 @@ export const TabelaBoletos = ({ boletos, parcelas }) => {
                                         </span>
                                     </td>
                                     <td>
-                                        {estaQuitado ? (
-                                            <span className="status-badge status-quitado">Quitado</span>
-                                        ) : boleto.STATUS_BOLETO === "C" ? (
-                                            <span className="status-badge status-cancelado">Cancelado</span>
-                                        ) : boleto.STATUS_BOLETO === "A" ? (
-                                            <span className="status-badge status-pendente">Pendente</span>
-                                        ) : null}
+                                        {renderStatusBadge([boleto], parcelaCorrespondente ? [parcelaCorrespondente] : [], boleto.STATUS_BOLETO)}
                                     </td>
                                 </tr>
                             );

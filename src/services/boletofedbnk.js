@@ -27,41 +27,6 @@ export const triggerWebhook = async (payload) => {
   }
 };
 
-export const cancelarBoletoFedBNK = async (payload) => {
-  try {
-    const token = localStorage.getItem("accessToken");
-    const fatura = payload.number;
-    
-    const webhookPayload = {
-      method: payload.method,
-      numero: payload.number,
-      motivo: payload.motivo,
-      mail: payload.mail
-    };
-    
-    // await triggerWebhook(webhookPayload, fatura);
-    
-    // Depois, chamar a API do Django para atualizar o banco local
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    };
-    
-    const response = await axios.post(
-      `http://localhost:8000/boletofedbnk/cancelar/${fatura}/`, 
-      payload, 
-      config
-    );
-    
-    return response.data;
-  } catch (error) {
-    console.error('Erro ao cancelar boleto:', error);
-    throw error;
-  }
-};
-
 /**
  * Envia dados para o Webhook.
  * @param {Object} payload - O objeto JSON a ser enviado no corpo da requisição.
@@ -76,5 +41,41 @@ export const impressWebhook = async (payload) => {
   } catch (error) {
     console.error('Erro ao chamar o webhook:', error);
     throw error; 
+  }
+};
+
+// services/boletofedbnk.js
+export const cancelarBoletoFedBNK = async (payload) => {
+  try {
+    const token = localStorage.getItem("accessToken");
+    
+    if (!token) {
+      throw new Error("Usuário não autenticado");
+    }
+    
+    // Payload: sempre com metodo, fatura e documento (documento pode ser null)
+    const requestPayload = {
+      metodo: payload.metodo,      // "INDIVIDUAL" ou "TODOS"
+      fatura: payload.fatura,      // número da fatura
+      documento: payload.documento || null,
+      motivo: payload.motivo,
+      mail: payload.mail
+    };
+    
+    const response = await axios.post(
+      `http://localhost:8000/boletofedbnk/cancelar/`,
+      requestPayload,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao cancelar boleto:', error);
+    throw error;
   }
 };
