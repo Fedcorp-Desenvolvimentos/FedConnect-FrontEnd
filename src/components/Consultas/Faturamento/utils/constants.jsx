@@ -7,17 +7,17 @@ export const STATUS_MAP = {
 };
 
 const getStatusBoleto = (boleto, parcela) => {
-    const cancelado =
-        boleto.STATUS_BOLETO === "C" ||
-        boleto.DT_CANCEL != null;
-
-    if (cancelado) return "cancelado";
-
     const quitado =
         boleto.QUITADO === "S" ||
         parcela?.DT_BAIXA != null;
 
     if (quitado) return "quitado";
+
+    const cancelado =
+        boleto.STATUS_BOLETO === "C" ||
+        boleto.DT_CANCEL != null;
+
+    if (cancelado) return "cancelado";
 
     return "pendente";
 };
@@ -41,8 +41,6 @@ export const getStatusFatura = (boletos, parcelas) => {
     const qtdQuitados = statusBoletos.filter(s => s === "quitado").length;
     const qtdPendentes = statusBoletos.filter(s => s === "pendente").length;
 
-    // 🔥 regras determinísticas
-
     if (qtdCancelados === total) {
         return { label: "Cancelada", className: "status-cancelada" };
     }
@@ -60,8 +58,8 @@ export const getStatusFatura = (boletos, parcelas) => {
         return { label: "Pendente", className: "status-pendente" };
     }
 
-    // fallback (não deveria acontecer)
-    return { label: "Ativa", className: "status-ativa" };
+    // 🔥 aqui é o ponto importante
+    return { label: "Processada", className: "status-processada" };
 };
 
 export const renderStatusBadge = (boletos, parcelas, statusFaturaOriginal) => {
