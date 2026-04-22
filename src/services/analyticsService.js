@@ -2,7 +2,8 @@
 
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8090/api/analytics";
+// const BASE_URL = "http://localhost:8090/api/analytics";
+const BASE_URL = "https://fedhub-api-local.ngrok.app/api/analytics";
 
 /**
  * Serviço de Analytics - Métricas e análises de negócio

@@ -1,52 +1,46 @@
+// Layouts/DashboardLayout.js
 import { useState, useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar/Sidebar';
 import Breadcrumb from '../components/Breadcrumb/Breadcrumb';
-import { Outlet } from 'react-router-dom';
-import '../styles/DashboardLayout.css';
+import * as S from './DashboardLayoutStyles';
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
 
   useEffect(() => {
     function handleResize() {
-      const newState = window.innerWidth > 768;
-      setSidebarOpen(newState);
+      const desktop = window.innerWidth > 768;
+      setIsDesktop(desktop);
+      setSidebarOpen(desktop);
     }
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(prev => !prev);
-  };
-
-  const breadcrumbClass = `breadcrumb-nav ${
-    window.innerWidth > 768 
-      ? sidebarOpen ? 'with-sidebar-open' : 'with-sidebar-closed'
-      : ''
-  }`;
+  const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
   return (
-    <div className="dashboard-layout">
+    <S.Layout>
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} toggleSidebar={toggleSidebar} />
-      <div className="dashboard-main">
-        <Breadcrumb 
-          onToggleSidebar={toggleSidebar}
-          sidebarOpen={sidebarOpen}
-          className={breadcrumbClass}
-        />
-        <div className={`dashboard-content ${sidebarOpen ? 'with-sidebar' : 'without-sidebar'}`}>
-          <div className="content-wrapper">
-            <div className="page-container">
-              <div className="page-content">
-                <Outlet context={{ withSidebar: sidebarOpen }} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <S.Main>
+        <S.BreadcrumbNav $sidebarOpen={sidebarOpen} $isDesktop={isDesktop}>
+          <Breadcrumb 
+            onToggleSidebar={toggleSidebar}
+            sidebarOpen={sidebarOpen}
+          />
+        </S.BreadcrumbNav>
+        <S.Content $withSidebar={sidebarOpen} $isDesktop={isDesktop}>
+          <S.PageContainer>
+            <S.ContentWrapper>
+              <Outlet context={{ withSidebar: sidebarOpen }} />
+            </S.ContentWrapper>
+          </S.PageContainer>
+        </S.Content>
+      </S.Main>
+    </S.Layout>
   );
 };
 

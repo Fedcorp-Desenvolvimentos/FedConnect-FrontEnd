@@ -1,10 +1,10 @@
+// components/Sidebar/Sidebar.js
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import "../../styles/Sidebar.css";
 import { useAuth } from "../../context/AuthContext";
+import * as S from "./SidebarStyles";
 
 function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
-  const [_dropdownOpen, setDropdownOpen] = useState(false);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const sidebarRef = useRef(null);
@@ -14,42 +14,26 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
   const nivelAcesso = user?.nivel_acesso;
   const emailUsuario = user?.email;
 
-  // Detecta mudança de tamanho da tela
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
-      
-      // Se for desktop, força sidebar aberta
-      if (!mobile) {
-        setSidebarOpen(true);
-      }
+      if (!mobile) setSidebarOpen(true);
     };
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [setSidebarOpen]);
 
-  // Fecha dropdown quando muda de rota
-  useEffect(() => setDropdownOpen(false), [location.pathname]);
-
-  // Mostra overlay no mobile quando sidebar abre
   useEffect(() => {
-    if (isMobile) {
-      setOverlayVisible(sidebarOpen);
-    }
+    if (isMobile) setOverlayVisible(sidebarOpen);
   }, [sidebarOpen, isMobile]);
 
-  // Fecha sidebar no mobile quando clica fora
   useEffect(() => {
     if (!isMobile) return;
     
     function handleClickOutside(e) {
-      if (
-        sidebarOpen && 
-        sidebarRef.current &&
-        !sidebarRef.current.contains(e.target)
-      ) {
+      if (sidebarOpen && sidebarRef.current && !sidebarRef.current.contains(e.target)) {
         setSidebarOpen(false);
         setOverlayVisible(false);
       }
@@ -59,7 +43,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [sidebarOpen, setSidebarOpen, isMobile]);
 
-  // Handler para clique no link - só fecha no mobile
   const handleLinkClick = () => {
     if (isMobile) {
       setSidebarOpen(false);
@@ -74,43 +57,45 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
     "ingrydaylana@gmail.com"
   ];
 
+  const navItems = [
+    { path: "/home", label: "Início", icon: "bi-house-door-fill", allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
+    { path: "/consultas", label: "Consultas", icon: "bi-clipboard2-minus-fill", allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
+    { path: "/consulta-comercial", label: "Comercial", icon: "bi-ui-checks-grid", allowed: ["admin", "comercial"] },
+    { path: "/ferramentas", label: "Ferramentas", icon: "bi-tools", allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
+    { path: "/faturamento", label: "Faturamento", icon: "bi-wallet2", allowed: ["admin", "faturamento", "ti"] },
+    { path: "/metricas", label: "Métricas", icon: "bi-bar-chart-fill", allowed: ["admin"] },
+    { path: "/agenda", label: "Agenda", icon: "bi-calendar-event", allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
+    { path: "/automacao", label: "Automação", icon: "bi-gear-fill", allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin"] : [] },
+    { path: "/analytics", label: "Estatísticas", icon: "bi-bar-chart-fill", allowed: ["admin"] }
+  ];
+
   return (
     <>
-      {/* Overlay (só mobile quando sidebar aberta) */}
       {isMobile && overlayVisible && (
-        <div 
-          className="sidebar-overlay"
-          onClick={() => {
-            setSidebarOpen(false);
-            setOverlayVisible(false);
-          }}
-        />
+        <S.Overlay onClick={() => {
+          setSidebarOpen(false);
+          setOverlayVisible(false);
+        }} />
       )}
 
-      {/* Sidebar */}
-      <aside
-        className={`sidebar ${sidebarOpen ? "open" : "closed"}`}
-        aria-label="Menu lateral principal"
+      <S.SidebarContainer 
         ref={sidebarRef}
+        $isOpen={sidebarOpen}
+        aria-label="Menu lateral principal"
       >
-        <div className="sidebar-header">
-          <Link to="/home" className="logo-link" onClick={handleLinkClick}>
-            <img
-              src="/imagens/LOGO.png"
-              alt="Logo"
-              className="logo-desktop"
+        <S.SidebarHeader>
+          <S.LogoLink href="/home" onClick={handleLinkClick}>
+            <S.Logo 
+              src="/imagens/LOGO.png" 
+              alt="Fedcorp Logo"
+              $isClosed={!sidebarOpen}
+              $isMobile={isMobile}
             />
-            <img
-              src="/imagens/LOGO.png"
-              alt="Ícone Fedcorp"
-              className="logo-mobile"
-            />
-          </Link>
+          </S.LogoLink>
           
-          {/* Botão X para fechar (DENTRO do sidebar, só mobile) */}
           {isMobile && (
-            <button 
-              className="sidebar-close-btn" 
+            <S.CloseButton 
+              $isOpen={sidebarOpen}
               onClick={() => {
                 setSidebarOpen(false);
                 setOverlayVisible(false);
@@ -118,151 +103,40 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
               aria-label="Fechar menu"
             >
               <i className="bi bi-x-lg"></i>
-            </button>
+            </S.CloseButton>
           )}
-        </div>
+        </S.SidebarHeader>
 
-        <nav className="sidebar-nav">
+        <S.Nav>
           <ul>
-            <li className={location.pathname === "/home" ? "active" : ""}>
-              <Link 
-                to="/home"
-                data-tooltip="Início"
-                onClick={handleLinkClick}
-              >
-                <div className="sidebar-icon-tooltip">
-                  <i className="bi bi-house-door-fill"></i>
-                  <span>Início</span>
-                </div>
-              </Link>
-            </li>
-
-            {["admin", "usuario", "comercial", "faturamento", "ti"].includes(nivelAcesso) && (
-              <li className={location.pathname.startsWith("/consultas") ? "active" : ""}>
-                <Link 
-                  to="/consultas"
-                  data-tooltip="Consultas"
-                  onClick={handleLinkClick}
-                >
-                  <div className="sidebar-icon-tooltip">
-                    <i className="bi bi-clipboard2-minus-fill"></i>
-                    <span>Consultas</span>
-                  </div>
-                </Link>
-              </li>
-            )}
-
-            {["admin", "comercial"].includes(nivelAcesso) && (
-              <li className={location.pathname === "/consulta-comercial" ? "active" : ""}>
-                <Link 
-                  to="/consulta-comercial"
-                  data-tooltip="Comercial"
-                  onClick={handleLinkClick}
-                >
-                  <div className="sidebar-icon-tooltip">
-                    <i className="bi bi-ui-checks-grid"></i>
-                    <span>Comercial</span>
-                  </div>
-                </Link>
-              </li>
-            )}
-
-            {["admin", "usuario", "comercial", "faturamento", "ti"].includes(nivelAcesso) && (
-              <li className={location.pathname === "/ferramentas" ? "active" : ""}>
-                <Link 
-                  to="/ferramentas"
-                  data-tooltip="Ferramentas"
-                  onClick={handleLinkClick}
-                >
-                  <div className="sidebar-icon-tooltip">
-                    <i className="bi bi-tools"></i>
-                    <span>Ferramentas</span>
-                  </div>
-                </Link>
-              </li>
-            )}
-
-            {["admin", "faturamento", "ti"].includes(nivelAcesso) && (
-              <li className={location.pathname.startsWith("/faturamento") ? "active" : ""}>
-                <Link 
-                  to="/faturamento"
-                  data-tooltip="Faturamento"
-                  onClick={handleLinkClick}
-                >
-                  <div className="sidebar-icon-tooltip">
-                    <i className="bi bi-wallet2"></i>
-                    <span>Faturamento</span>
-                  </div>
-                </Link>
-              </li>
-            )}
-
-            {["admin"].includes(nivelAcesso) && (
-              <li className={location.pathname === "/metricas" ? "active" : ""}>
-                <Link 
-                  to="/metricas"
-                  data-tooltip="Métricas"
-                  onClick={handleLinkClick}
-                >
-                  <div className="sidebar-icon-tooltip">
-                    <i className="bi bi-bar-chart-fill"></i>
-                    <span>Métricas</span>
-                  </div>
-                </Link>
-              </li>
-            )}
-
-            {["admin", "usuario", "comercial", "faturamento", "ti"].includes(nivelAcesso) && (
-              <li className={location.pathname === "/agenda" ? "active" : ""}>
-                <Link 
-                  to="/agenda"
-                  data-tooltip="Agenda"
-                  onClick={handleLinkClick}
-                >
-                  <div className="sidebar-icon-tooltip">
-                    <i className="bi bi-calendar-event"></i>
-                    <span>Agenda</span>
-                  </div>
-                </Link>
-              </li>
-            )}
-
-
-            {/* {emailUsuario === "operacional@grupofedcorp.com.br" && ( */}
-            {emailsPermitidosAutomacao.includes(emailUsuario) && (
-              <li className={location.pathname === "/automacao" ? "active" : ""}>
-                <Link 
-                  to="/automacao"
-                  data-tooltip="Automação"
-                  onClick={handleLinkClick}
-                >
-                  <div className="sidebar-icon-tooltip">
-                    <i className="bi bi-gear-fill"></i>
-                    <span>Automação</span>
-                  </div>
-                </Link>
-              </li>
-            )}
-
-            {/* {emailUsuario === "operacional@grupofedcorp.com.br" && ( */}
-            {["admin"].includes(nivelAcesso) && (
-              <li className={location.pathname === "/analytics" ? "active" : ""}>
-                <Link 
-                  to="/analytics"
-                  data-tooltip="Analytics"
-                  onClick={handleLinkClick}
-                >
-                  <div className="sidebar-icon-tooltip">
-                    <i className="bi bi-bar-chart-fill"></i>
-                    <span>Estatísticas</span>
-                  </div>
-                </Link>
-              </li>
-            )}
-
+            {navItems.map((item) => {
+              if (!item.allowed.includes(nivelAcesso)) return null;
+              const isActive = location.pathname === item.path || 
+                              (item.path === "/consultas" && location.pathname.startsWith("/consultas")) ||
+                              (item.path === "/faturamento" && location.pathname.startsWith("/faturamento"));
+              
+              return (
+                <li key={item.path} className={isActive ? "active" : ""}>
+                  <S.NavLink
+                    as={Link}
+                    to={item.path}
+                    $isActive={isActive}
+                    $isClosed={!sidebarOpen}
+                    $isOpen={sidebarOpen}
+                    data-tooltip={item.label}
+                    onClick={handleLinkClick}
+                  >
+                    <S.IconTooltip $isClosed={!sidebarOpen} $isOpen={sidebarOpen}>
+                      <S.Icon className={`bi ${item.icon}`} />
+                      <S.LinkText>{item.label}</S.LinkText>
+                    </S.IconTooltip>
+                  </S.NavLink>
+                </li>
+              );
+            })}
           </ul>
-        </nav>
-      </aside>
+        </S.Nav>
+      </S.SidebarContainer>
     </>
   );
 }

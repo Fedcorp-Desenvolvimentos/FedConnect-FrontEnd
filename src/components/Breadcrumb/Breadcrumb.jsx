@@ -1,23 +1,12 @@
+// components/Breadcrumb/Breadcrumb.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
-  FiMenu,
-  FiChevronDown, 
-  FiLogOut, 
-  FiHome,
-  FiChevronRight,
-  FiUser,
-  FiUsers,
-  FiUserPlus,
-  FiShield,
-  FiKey,
-  FiAward
-} from 'react-icons/fi';
+import { FiMenu, FiChevronDown, FiLogOut, FiHome, FiChevronRight, FiUsers, FiUserPlus } from 'react-icons/fi';
 import { FaHistory, FaRegUser } from "react-icons/fa";
 import { useAuth } from '../../context/AuthContext';
-import '../../styles/Breadcrumb.css';
 import { getAccessLevelLabel, getAccessLevelColor, ACCESS_LEVELS } from '../../utils/accessLevels';
 import { formatarData, formatTempo } from '../../utils/formatar_data';
+import * as S from './BreadcrumbStyles';
 
 function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
   const navigate = useNavigate();
@@ -26,178 +15,66 @@ function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [currentTime, setCurrentTime] = useState(new Date());
-  
   const dropdownRef = useRef(null);
 
-
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
+    const interval = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowUserMenu(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Atualiza isMobile no resize
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Mapeamento de rotas para nomes amigáveis
   const routeNames = {
     '/home': 'Dashboard',
-    
-    // Consultas
     '/consultas': 'Consultas',
     '/consultas/consulta-pf': 'Consulta PF',
-    '/consultas/consulta-end': 'Consulta Endereço',
-    '/consultas/consulta-cnpj': 'Consulta CNPJ',
     '/consulta-comercial': 'Comercial',
-    '/consultas/comercial-regiao': 'Busca por Região',
-    '/consultas/consulta-segurados': 'Segurados',
-    '/consultas/consulta-faturas': 'Faturas',
-    '/consultas/consulta-faturamento': 'Consulta Faturamento',
-    '/consultas/consulta-detalhes/:id': 'Detalhes da Consulta',
-    
-    // Comercial
-    '/acompanhamento': 'Acompanhamento Comercial',
-    '/agenda-comercial': 'Agenda Comercial',
-    '/financeiro': 'Financeiro',
-    
-    // Ferramentas
     '/ferramentas': 'Ferramentas',
-    '/cotacao-conteudo': 'Cotação de Conteúdo',
-    
-    // Faturamento
     '/faturamento': 'Faturamento',
-    '/faturamento/pdf-automation': 'Automação PDF',
-    '/faturamento/cancelamento': 'Cancelamento',
-    '/faturamento/reimpressao-boleto': 'Reimpressão de Boleto',
-    '/faturamento/paybox': 'Paybox',
-    
-    // Métricas
     '/metricas': 'Métricas',
-    
-    // E-mail
-    '/envio-email': 'Envio de E-mail',
-    '/config-email': 'Configuração de E-mail',
-    
-    // Agenda
     '/agenda': 'Agenda de Salas',
-    
-    // Produtos
-    '/produtos': 'Produtos',
-    
-    // Administração
-    '/home-adm': 'Administração',
-    '/upload': 'Upload',
-    '/importacao-vida': 'Importação Vida',
-    
-    // Conta do usuário
     '/gerenciar-usuarios': 'Gerenciar Usuários',
     '/minha-conta': 'Minha Conta',
     '/cadastro': 'Cadastro',
     '/historico': 'Histórico'
   };
 
-  // Função para gerar o breadcrumb
   const getBreadcrumb = () => {
     const pathSegments = location.pathname.split('/').filter(segment => segment);
-    
     let breadcrumbItems = [];
     let currentPath = '';
     
-    // Adiciona "Home" como primeiro item se não estiver na raiz
     if (location.pathname !== '/home') {
-      breadcrumbItems.push({
-        label: 'Home',
-        icon: <FiHome size={14} />,
-        path: '/home'
-      });
+      breadcrumbItems.push({ label: 'Home', icon: <FiHome size={14} />, path: '/home' });
     }
     
-    // Para cada segmento da rota
     pathSegments.forEach((segment, index) => {
       currentPath += `/${segment}`;
-      
-      // Pula se for 'home' e já adicionamos
       if (segment === 'home' && index === 0) return;
-      
-      // Tenta encontrar no mapeamento exato, depois tenta com wildcard
-      let label = routeNames[currentPath];
-      
-      // Se não achou exato, tenta encontrar rota com parâmetro
-      if (!label) {
-        // Procura rotas que tenham :id no lugar do segmento atual
-        const possibleRoute = Object.keys(routeNames).find(route => {
-          const routeParts = route.split('/');
-          const currentParts = currentPath.split('/');
-          
-          if (routeParts.length !== currentParts.length) return false;
-          
-          return routeParts.every((part, i) => 
-            part.startsWith(':') || part === currentParts[i]
-          );
-        });
-        
-        label = possibleRoute ? routeNames[possibleRoute] : formatSegment(segment);
-      }
-      
-      breadcrumbItems.push({
-        label: label,
-        path: currentPath
-      });
+      let label = routeNames[currentPath] || segment.replace(/-/g, ' ').replace(/^\w/, c => c.toUpperCase());
+      breadcrumbItems.push({ label, path: currentPath });
     });
     
     return breadcrumbItems;
   };
 
-  // Formata segmentos de rota para nomes legíveis
-  const formatSegment = (segment) => {
-    return segment
-      .replace(/-/g, ' ')
-      .replace(/^\w/, c => c.toUpperCase());
-  };
-
-  // Funções de verificação de permissão
-  const canManageUsers = () => {
-    return user?.nivel_acesso === ACCESS_LEVELS.ADMIN || 
-           user?.nivel_acesso === ACCESS_LEVELS.MASTER;
-  };
-
-  const canRegisterUsers = () => {
-    return user?.nivel_acesso === ACCESS_LEVELS.ADMIN || 
-           user?.nivel_acesso === ACCESS_LEVELS.MASTER;
-  };
-
-  const canViewHistory = () => {
-    // Ajuste conforme sua lógica de negócio
-    return user?.nivel_acesso === ACCESS_LEVELS.ADMIN || 
-           user?.nivel_acesso === ACCESS_LEVELS.MASTER ||
-           user?.nivel_acesso === ACCESS_LEVELS.USER;
-  };
+  const canManageUsers = () => user?.nivel_acesso === ACCESS_LEVELS.ADMIN || user?.nivel_acesso === ACCESS_LEVELS.MASTER;
+  const canRegisterUsers = () => user?.nivel_acesso === ACCESS_LEVELS.ADMIN || user?.nivel_acesso === ACCESS_LEVELS.MASTER;
+  const canViewHistory = () => user?.nivel_acesso === ACCESS_LEVELS.ADMIN || user?.nivel_acesso === ACCESS_LEVELS.MASTER || user?.nivel_acesso === ACCESS_LEVELS.USER;
 
   const handleLogout = () => {
     logout();
@@ -206,225 +83,114 @@ function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
   };
 
   const breadcrumbItems = getBreadcrumb();
-
-  // Extrai informações do usuário com fallbacks
   const getUserInitials = () => {
     if (user?.nome_completo) {
       const names = user.nome_completo.split(' ');
-      if (names.length > 1) {
-        return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
-      }
-      return user.nome_completo.charAt(0).toUpperCase();
+      return names.length > 1 ? (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase() : user.nome_completo.charAt(0).toUpperCase();
     }
-    if (user?.nome) return user.nome.charAt(0).toUpperCase();
-    if (user?.username) return user.username.charAt(0).toUpperCase();
-    if (user?.email) return user.email.charAt(0).toUpperCase();
-    return 'U';
+    return user?.nome?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U';
   };
 
-  const getUserName = () => {
-    if (user?.nome_completo) {
-      return user.nome_completo.split(' ')[0];
-    }
-    if (user?.nome) {
-      return user.nome.split(' ')[0];
-    }
-    if (user?.username) {
-      return user.username.split(' ')[0];
-    }
-    if (user?.email) {
-      return user.email.split('@')[0].split(' ')[0];
-    }
-    return 'Usuário';
-  };
-
-  const getUserEmail = () => {
-    return user?.email || 'usuario@email.com';
-  };
-
-  // Ícone baseado no nível de acesso
-  const getAccessLevelIcon = () => {
-    switch(user?.nivel_acesso) {
-      case ACCESS_LEVELS.MASTER:
-        return <FiAward className="access-icon master" />;
-      case ACCESS_LEVELS.ADMIN:
-        return <FiShield className="access-icon admin" />;
-      case ACCESS_LEVELS.USER:
-        return <FiUser className="access-icon user" />;
-      default:
-        return <FiKey className="access-icon default" />;
-    }
-  };
-
+  const getUserName = () => user?.nome_completo?.split(' ')[0] || user?.nome?.split(' ')[0] || user?.username?.split(' ')[0] || user?.email?.split('@')[0].split(' ')[0] || 'Usuário';
+  const getUserEmail = () => user?.email || 'usuario@email.com';
   const accessLevelLabel = getAccessLevelLabel(user?.nivel_acesso);
   const accessLevelColor = getAccessLevelColor(user?.nivel_acesso);
 
   return (
-    <nav className={className || "breadcrumb-nav"}>
-      <div className="breadcrumb-left">
-        {/* Botão de menu hambúrguer */}
-        <button 
-          className={`menu-button ${!sidebarOpen && isMobile ? 'menu-closed' : ''}`}
-          onClick={onToggleSidebar}
-          aria-label={sidebarOpen ? "Fechar menu" : "Abrir menu"}
-        >
+    <S.Nav className={className}>
+      <S.LeftSection>
+        <S.MenuButton onClick={onToggleSidebar} aria-label={sidebarOpen ? "Fechar menu" : "Abrir menu"}>
           <FiMenu size={20} />
-        </button>
+        </S.MenuButton>
 
-        {/* Breadcrumb */}
-        <div className="breadcrumb-container">
+        <S.BreadcrumbContainer>
           {breadcrumbItems.map((item, index) => (
-            <div key={index} className="breadcrumb-item">
-              {index > 0 && <FiChevronRight className="breadcrumb-separator" />}
-              <button
-                className={`breadcrumb-link ${index === breadcrumbItems.length - 1 ? 'active' : ''}`}
-                onClick={() => {
-                  if (index < breadcrumbItems.length - 1) {
-                    navigate(item.path);
-                  }
-                }}
+            <S.BreadcrumbItem key={index}>
+              {index > 0 && <S.Separator><FiChevronRight /></S.Separator>}
+              <S.BreadcrumbLink
+                $active={index === breadcrumbItems.length - 1}
+                onClick={() => index < breadcrumbItems.length - 1 && navigate(item.path)}
                 disabled={index === breadcrumbItems.length - 1}
               >
-                {item.icon && <span className="breadcrumb-icon">{item.icon}</span>}
-                <span className="breadcrumb-label">{item.label}</span>
-              </button>
-            </div>
+                {item.icon && <span>{item.icon}</span>}
+                <span>{item.label}</span>
+              </S.BreadcrumbLink>
+            </S.BreadcrumbItem>
           ))}
-        </div>
-      </div>
+        </S.BreadcrumbContainer>
+      </S.LeftSection>
 
-      <div className="breadcrumb-right">
-        {!isMobile && (
-          <div className="datetime-container">
-            <span className="date">{formatarData(currentTime)}</span>
-            <span className="time">{formatTempo(currentTime)}</span>
-          </div>
-        )}
+      <S.RightSection>
+        <S.DateTimeContainer>
+          <S.Date>{formatarData(currentTime)}</S.Date>
+          <S.Time>{formatTempo(currentTime)}</S.Time>
+        </S.DateTimeContainer>
 
-        {/* Usuário */}
-        <div className="user-container" ref={dropdownRef}>
-          <button 
-            className="user-btn"
-            onClick={() => setShowUserMenu(!showUserMenu)}
-          >
-            <div className="user-avatar">
-              {getUserInitials()}
-            </div>
+        <S.UserContainer ref={dropdownRef}>
+          <S.UserButton onClick={() => setShowUserMenu(!showUserMenu)}>
+            <S.UserAvatar>{getUserInitials()}</S.UserAvatar>
             {!isMobile && (
-              <div className="user-info">
-                <span className="user-name">
-                  {getUserName()}
-                </span>
-                <span className="user-role" style={{ color: accessLevelColor }}>
-                  {accessLevelLabel}
-                </span>
-              </div>
+              <S.UserInfo>
+                <S.UserName>{getUserName()}</S.UserName>
+                <S.UserRole $color={accessLevelColor}>{accessLevelLabel}</S.UserRole>
+              </S.UserInfo>
             )}
-            <FiChevronDown className={`dropdown-arrow ${showUserMenu ? 'rotated' : ''}`} />
-          </button>
+            <S.DropdownArrow $rotated={showUserMenu}>
+              <FiChevronDown />
+            </S.DropdownArrow>
+          </S.UserButton>
 
           {showUserMenu && (
-            <div className="user-dropdown">
-              <div className="user-dropdown-header">
-                <div className="dropdown-user-info">
-                  <div className="dropdown-avatar-wrapper">
-                    <div className="dropdown-avatar">
-                      {getUserInitials()}
-                    </div>
-                  </div>
+            <S.Dropdown>
+              <S.DropdownHeader>
+                <S.DropdownUserInfo>
+                  <S.DropdownAvatar>{getUserInitials()}</S.DropdownAvatar>
                   <div>
-                    <p className="dropdown-name">{getUserName()}</p>
-                    <p className="dropdown-email">{getUserEmail()}</p>
-                    {user?.nivel_acesso && (
-                      <p className="dropdown-nivel">
-                        <span 
-                          className="access-badge"
-                          style={{ 
-                            color: accessLevelColor,
-                            borderColor: accessLevelColor
-                          }}
-                        >
-                          {accessLevelLabel}
-                        </span>
-                      </p>
-                    )}
+                    <S.DropdownName>{getUserName()}</S.DropdownName>
+                    <S.DropdownEmail>{getUserEmail()}</S.DropdownEmail>
+                    <S.DropdownNivel>
+                      <S.AccessBadge $color={accessLevelColor}>{accessLevelLabel}</S.AccessBadge>
+                    </S.DropdownNivel>
                   </div>
-                </div>
-              </div>
+                </S.DropdownUserInfo>
+              </S.DropdownHeader>
               
-              <div className="dropdown-divider"></div>
+              <S.Divider />
               
-              {/* Menu - Minha Conta (sempre visível) */}
-              <button 
-                className="dropdown-item"
-                onClick={() => {
-                  navigate('/minha-conta');
-                  setShowUserMenu(false);
-                }}
-              >
-                <FaRegUser className="dropdown-icon" /> Minha Conta
-              </button>
+              <S.DropdownItem onClick={() => { navigate('/minha-conta'); setShowUserMenu(false); }}>
+                <S.DropdownIcon><FaRegUser /></S.DropdownIcon> Minha Conta
+              </S.DropdownItem>
 
-              {/* Menu - Gerenciar Usuários (apenas admin/master) */}
               {canManageUsers() && (
-                <button 
-                  className="dropdown-item"
-                  onClick={() => {
-                    navigate('/gerenciar-usuarios');
-                    setShowUserMenu(false);
-                  }}
-                >
-                  <FiUsers className="dropdown-icon" /> Gerenciar Usuários
-                </button>
+                <S.DropdownItem onClick={() => { navigate('/gerenciar-usuarios'); setShowUserMenu(false); }}>
+                  <S.DropdownIcon><FiUsers /></S.DropdownIcon> Gerenciar Usuários
+                </S.DropdownItem>
               )}
 
-              {/* Menu - Cadastrar Usuários (apenas admin/master) */}
               {canRegisterUsers() && (
-                <button 
-                  className="dropdown-item"
-                  onClick={() => {
-                    navigate('/cadastro');
-                    setShowUserMenu(false);
-                  }}
-                >
-                  <FiUserPlus className="dropdown-icon" /> Cadastrar Usuários
-                </button>
+                <S.DropdownItem onClick={() => { navigate('/cadastro'); setShowUserMenu(false); }}>
+                  <S.DropdownIcon><FiUserPlus /></S.DropdownIcon> Cadastrar Usuários
+                </S.DropdownItem>
               )}
 
-              {/* Menu - Histórico (se tiver permissão) */}
               {canViewHistory() && (
-                <button 
-                  className="dropdown-item"
-                  onClick={() => {
-                    navigate('/historico');
-                    setShowUserMenu(false);
-                  }}
-                >
-                  <FaHistory className="dropdown-icon" /> Histórico
-                </button>
+                <S.DropdownItem onClick={() => { navigate('/historico'); setShowUserMenu(false); }}>
+                  <S.DropdownIcon><FaHistory /></S.DropdownIcon> Histórico
+                </S.DropdownItem>
               )}
               
-              <div className="dropdown-divider"></div>
+              <S.Divider />
               
-              <button 
-                className="dropdown-item logout"
-                onClick={handleLogout}
-              >
-                <FiLogOut className="dropdown-icon" /> Sair
-              </button>
-            </div>
+              <S.DropdownItem $logout onClick={handleLogout}>
+                <S.DropdownIcon><FiLogOut /></S.DropdownIcon> Sair
+              </S.DropdownItem>
+            </S.Dropdown>
           )}
-        </div>
-      </div>
+        </S.UserContainer>
+      </S.RightSection>
 
-      {/* Overlay para fechar menus ao clicar fora */}
-      {showUserMenu && (
-        <div 
-          className="menu-overlay"
-          onClick={() => setShowUserMenu(false)}
-        />
-      )}
-    </nav>
+      {showUserMenu && <S.MenuOverlay onClick={() => setShowUserMenu(false)} />}
+    </S.Nav>
   );
 }
 

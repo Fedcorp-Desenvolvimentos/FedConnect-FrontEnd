@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import "../../styles/Home.css";
-import PageTemplate from "../../components/PageTemplate/PageTemplate";
+import * as S from "./HomeStyles";
 
 function useIsMobile(breakpoint = 700) {
   const getIsMobile = () => window.innerWidth <= breakpoint;
@@ -76,51 +75,45 @@ const HomePage = () => {
     ? bannerAtual.src.mobile
     : bannerAtual.src.desktop;
 
-  useEffect(() => {
-  }, [isMobile, bannerSrc]);
-
   return (
-     <PageTemplate
-      className="home-container"
-      >
-    <div className={`home-wrapper`}>
-      <div className="carousel-container">
-        {bannerAtual.link ? (
-          <a
-            href={bannerAtual.link}
-            className="carousel-link"
-            {...(bannerAtual.download ? { download: true } : {})}
-            target={bannerAtual.link.startsWith("http") ? "_blank" : undefined}
-            rel="noopener noreferrer"
-            tabIndex={-1}
-          >
-            <img
+    <S.HomeContainer>
+      <S.HomeWrapper>
+        <S.CarouselContainer>
+          {bannerAtual.link ? (
+            <S.CarouselLink
+              href={bannerAtual.link}
+              {...(bannerAtual.download ? { download: true } : {})}
+              target={bannerAtual.link.startsWith("http") ? "_blank" : undefined}
+              rel="noopener noreferrer"
+              tabIndex={-1}
+            >
+              <S.CarouselImage
+                src={bannerSrc}
+                alt={bannerAtual.alt || `Banner ${index + 1}`}
+                className={bannerAtual.name || ""}
+                draggable="false"
+              />
+            </S.CarouselLink>
+          ) : (
+            <S.CarouselImage
               src={bannerSrc}
               alt={bannerAtual.alt || `Banner ${index + 1}`}
-              className={`carousel-image${bannerAtual.name ? " " + bannerAtual.name : ""}`}
-              draggable="false"
+              className={bannerAtual.name || ""}
             />
-          </a>
-        ) : (
-          <img
-            src={bannerSrc}
-            alt={bannerAtual.alt || `Banner ${index + 1}`}
-            className={`carousel-image${bannerAtual.name ? " " + bannerAtual.name : ""}`}
-          />
-        )}
-        <div className="carousel-indicators">
-          {imagensCarrossel.map((_, i) => (
-            <button
-              key={i}
-              className={`carousel-dot${i === index ? " active" : ""}`}
-              onClick={() => setIndex(i)}
-              aria-label={`Ir para imagem ${i + 1}`}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-    </PageTemplate>
+          )}
+          <S.Indicators>
+            {imagensCarrossel.map((_, i) => (
+              <S.Dot
+                key={i}
+                $active={i === index}
+                onClick={() => setIndex(i)}
+                aria-label={`Ir para imagem ${i + 1}`}
+              />
+            ))}
+          </S.Indicators>
+        </S.CarouselContainer>
+      </S.HomeWrapper>
+    </S.HomeContainer>
   );
 };
 

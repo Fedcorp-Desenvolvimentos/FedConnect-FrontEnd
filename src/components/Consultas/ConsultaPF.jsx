@@ -1,5 +1,5 @@
 import "../../styles/Consulta.css";
-import { FiCopy, FiCheck, FiUser, FiFileText, FiUsers } from "react-icons/fi";
+import { FiCopy, FiCheck, FiUser, FiFileText, FiUsers, FiUserPlus } from "react-icons/fi";
 import PageTemplate from "../PageTemplate/PageTemplate";
 import { useEffect, useRef, useState } from "react";
 import { formatarData } from "../../utils/formatar_data";
@@ -432,7 +432,7 @@ const ConsultaPF = () => {
             }}
           >
             <div className="icon-container">
-              <FiUsers size={25} />
+              <FiUserPlus size={25} />
             </div>
             <h5>Consulta em Massa</h5>
           </div>
