@@ -244,6 +244,22 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
               </li>
             )}
 
+            {/* {emailUsuario === "operacional@grupofedcorp.com.br" && ( */}
+            {["admin"].includes(nivelAcesso) && (
+              <li className={location.pathname === "/analytics" ? "active" : ""}>
+                <Link 
+                  to="/analytics"
+                  data-tooltip="Analytics"
+                  onClick={handleLinkClick}
+                >
+                  <div className="sidebar-icon-tooltip">
+                    <i className="bi bi-bar-chart-fill"></i>
+                    <span>Estatísticas</span>
+                  </div>
+                </Link>
+              </li>
+            )}
+
           </ul>
         </nav>
       </aside>

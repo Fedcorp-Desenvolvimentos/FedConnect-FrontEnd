@@ -72,6 +72,7 @@ import EmailAutomacao from '../components/Automacao/Email/EmailAutomacao';
 
 // Teste renderização Mapa
 import Mapa from '../components/Mapa/Mapa';
+import { Analytics } from '../pages/Analytics/Analytics';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -147,6 +148,8 @@ const AppRouter = () => {
           <Route path="/automacao/email" element={<EmailAutomacao />} />
 
           <Route path="/mapa" element={<Mapa />} />
+
+          <Route path="/analytics" element={<Analytics/>} />
 
         </Route>
       </Route>
