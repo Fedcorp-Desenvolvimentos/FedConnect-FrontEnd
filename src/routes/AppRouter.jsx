@@ -16,7 +16,7 @@ import RecuperarSenha from '../pages/RecuperarSenha/RecuperarSenha';
 import HomePage from '../pages/Home/Home';
 
 // Componentes protegidos
-import ConsultasHome from '../components/Consultas/ConsultasHome';
+import ConsultasHome from '../pages/Consultas/ConsultasHome';
 import ConsultaPF from '../components/Consultas/ConsultaPF';
 import ConsultaEnd from '../components/Consultas/ConsultaEnd';
 import ConsultaCNPJ from '../components/Consultas/ConsultaCNPJ';

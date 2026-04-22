@@ -148,8 +148,6 @@ const ConsultaFaturamento = () => {
         }
     }, [localPagination.has_previous]);
 
-    console.log("resultadosPaginados", resultadosPaginados);
-
     return (
         <PageTemplate
             title="Consulta de Faturamento"
