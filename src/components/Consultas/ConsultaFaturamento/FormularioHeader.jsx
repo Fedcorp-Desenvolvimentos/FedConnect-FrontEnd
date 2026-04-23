@@ -1,4 +1,7 @@
-// FormularioHeader.js
+// components/Faturamento/FormularioHeader.jsx
+import React from 'react';
+import { FaSearch, FaTrash } from 'react-icons/fa';
+import * as S from "./ConsultaFaturamentoStyles";
 import AdministradoraAutocomplete from "../../Adm/AdministradorasAutocomplete";
 
 export const FormularioHeader = ({ 
@@ -10,75 +13,75 @@ export const FormularioHeader = ({
     loading 
 }) => {
     return (
-        <form className="form-fatura" onSubmit={carregarFaturas}>
-            <div className="filtros-principais">
-                <div className="form-group">
-                    <label htmlFor="fatura">Fatura:</label>
-                    <input
+        <S.Form onSubmit={carregarFaturas}>
+            <S.FiltrosGrid>
+                <S.FormGroup>
+                    <S.Label htmlFor="fatura">Fatura:</S.Label>
+                    <S.Input
                         type="text"
                         id="fatura"
                         name="fatura"
                         value={formData.fatura}
                         onChange={handleChange}
                         placeholder="Número da fatura"
-                        className="form-control"
+                        disabled={loading}
                     />
-                </div>
+                </S.FormGroup>
 
-                <div className="form-group">
-                    <label htmlFor="apolice">Apólice:</label>
-                    <input
+                <S.FormGroup>
+                    <S.Label htmlFor="apolice">Apólice:</S.Label>
+                    <S.Input
                         type="text"
                         id="apolice"
                         name="apolice"
                         value={formData.apolice}
                         onChange={handleChange}
                         placeholder="Número da apólice"
-                        className="form-control"
+                        disabled={loading}
                     />
-                </div>
+                </S.FormGroup>
 
-                <div className="form-group">
-                    <label htmlFor="status">Status:</label>
-                    <select 
+                <S.FormGroup>
+                    <S.Label htmlFor="status">Status:</S.Label>
+                    <S.Select 
                         id="status" 
                         name="status" 
                         value={formData.status} 
-                        onChange={handleChange} 
-                        className="form-control"
+                        onChange={handleChange}
+                        disabled={loading}
                     >
                         <option value="">Todos</option>
                         <option value="A">Ativa</option>
                         <option value="C">Cancelada</option>
-                    </select>
-                </div>
+                    </S.Select>
+                </S.FormGroup>
 
-                <div className="form-group">
-                    <label htmlFor="data_ini">Data Inicial:</label>
-                    <input
+                <S.FormGroup>
+                    <S.Label htmlFor="data_ini">Data Inicial:</S.Label>
+                    <S.Input
                         type="date"
                         id="data_ini"
                         name="data_ini"
                         value={formData.data_ini}
                         onChange={handleChange}
-                        className="form-control"
+                        disabled={loading}
                     />
-                </div>
+                </S.FormGroup>
 
-                <div className="form-group">
-                    <label htmlFor="data_fim">Data Final:</label>
-                    <input
+                <S.FormGroup>
+                    <S.Label htmlFor="data_fim">Data Final:</S.Label>
+                    <S.Input
                         type="date"
                         id="data_fim"
                         name="data_fim"
                         value={formData.data_fim}
                         onChange={handleChange}
-                        className="form-control"
+                        disabled={loading}
                     />
-                </div>
+                </S.FormGroup>
 
-                <div className="form-group">
-                    <label htmlFor="administradora">Administradora:</label>
+                <S.FormGroup>
+                    <S.Label htmlFor="administradora">Administradora:</S.Label>
                     <AdministradoraAutocomplete
                         value={formData.administradora}
                         onChange={handleChange}
@@ -86,23 +89,22 @@ export const FormularioHeader = ({
                         placeholder="Digite o nome da administradora..."
                         disabled={loading}
                     />
-                </div>
-            </div>
+                </S.FormGroup>
+            </S.FiltrosGrid>
 
-            <div className="botoes-acao">
-                <button type="submit" className="btn btn-primary" disabled={loading}>
-                    {loading ? "Consultando..." : "Consultar"}
-                </button>
-
-                <button 
+            <S.ButtonGroup>
+                <S.Button type="submit" disabled={loading}>
+                    <FaSearch /> {loading ? "Consultando..." : "Consultar"}
+                </S.Button>
+                <S.Button 
                     type="button" 
-                    className="btn btn-primary" 
+                    $secondary 
                     onClick={handleLimparFiltros} 
                     disabled={loading}
                 >
-                    Limpar
-                </button>
-            </div>
-        </form>
+                    <FaTrash /> Limpar
+                </S.Button>
+            </S.ButtonGroup>
+        </S.Form>
     );
 };

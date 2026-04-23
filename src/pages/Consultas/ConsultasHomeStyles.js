@@ -178,44 +178,46 @@ export const Button = styled(Link)`
   justify-content: center;
   gap: 0.5rem;
   padding: 0.625rem 1.5rem;
-  background: ${props => props.$color || 'var(--color-primary, #2463eb)'};
-  color: white;
-  border: none;
+
+  background: ${({ $color }) => $color || 'var(--color-primary)'};
+  color: #fff;
+
+  border: 1px solid transparent;
   border-radius: 12px;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
   text-decoration: none;
-  width: auto;
+
+  transition: all 0.2s ease;
   min-width: 140px;
 
   svg {
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, color 0.2s ease;
   }
 
   &:hover {
-    background: ${props => {
-      const color = props.$color || 'var(--color-primary, #2463eb)';
-      // Escurece a cor em 10%
-      return color;
-    }};
+    background: #fff;
+    color: ${({ $color }) => $color || 'var(--color-primary)'};
+    border-color: ${({ $color }) => $color || 'var(--color-primary)'};
+
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    
+    box-shadow: var(--shadow-md);
+
     svg {
       transform: translateX(2px);
+      color: ${({ $color }) => $color || 'var(--color-primary)'};
     }
   }
 
   &:active {
     transform: translateY(0);
+    box-shadow: var(--shadow-sm);
   }
 
-  @media (max-width: 768px) {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    min-width: auto;
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-primary-light);
   }
 `;
 

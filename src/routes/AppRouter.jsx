@@ -17,14 +17,15 @@ import HomePage from '../pages/Home/Home';
 
 // Componentes protegidos
 import ConsultasHome from '../pages/Consultas/ConsultasHome';
-import ConsultaPF from '../components/Consultas/ConsultaPF';
-import ConsultaEnd from '../components/Consultas/ConsultaEnd';
-import ConsultaCNPJ from '../components/Consultas/ConsultaCNPJ';
+import ConsultaPF from '../components/Consultas/ConsultaPF/ConsultaPF';
+import ConsultaEnd from '../components/Consultas/ConsultaEnd/ConsultaEnd';
+import ConsultaCNPJ from '../components/Consultas/ConsultaCNPJ/ConsultaCNPJ';
 import Comercial from '../components/Consultas/Comercial';
 import BuscaRegiao from '../components/Consultas/ComercialRegiao';
-import Segurados from '../components/Consultas/Segurados';
+// import Segurados from '../components/Consultas/Segurados';
+import ConsultaSegurados from '../components/Consultas/ConsultaSegurados/ConsultaSegurados';
 import ConsultaFat from '../components/Consultas/ConsultaFat';
-import ConsultaFaturamento from '../components/Consultas/Faturamento';
+import ConsultaFaturamento from '../components/Consultas/ConsultaFaturamento';
 import ConsultaDetalhe from '../components/Detalhes/ConsultaDetalhe';
 import CotacaoConteudo from '../components/Cotação/CotacaoConteudo';
 
@@ -100,7 +101,7 @@ const AppRouter = () => {
           <Route path="/consultas/consulta-end" element={<ConsultaEnd />} />
           <Route path="/consultas/consulta-cnpj" element={<ConsultaCNPJ />} />
           <Route path="/consultas/comercial-regiao" element={<BuscaRegiao />} />
-          <Route path="/consultas/consulta-segurados" element={<Segurados />} />
+          <Route path="/consultas/consulta-segurados" element={<ConsultaSegurados />} />
           <Route path="/consultas/consulta-faturas" element={<ConsultaFat />} />
           <Route path="/consultas/consulta-faturamento" element={<ConsultaFaturamento />} />
           <Route path="/consultas/consulta-detalhes/:id" element={<ConsultaDetalhe />} />

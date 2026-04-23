@@ -1,14 +1,19 @@
+// components/Faturamento/TabelaBaixas.jsx
+import React from 'react';
+import * as S from "./ConsultaFaturamentoStyles";
 import { formatarValor } from "../../../utils/Faturamento/formatarValor";
 import { formatarData } from "../../../utils/Faturamento/formatarData";
 
 export const TabelaBaixas = ({ baixas }) => {
     if (!baixas || baixas.length === 0) {
-        return <p className="text-muted">Nenhuma baixa encontrada para esta fatura.</p>;
+        return <p style={{ color: "#64748b", fontSize: "0.75rem", textAlign: "center", padding: "1rem" }}>
+            Nenhuma baixa encontrada para esta fatura.
+        </p>;
     }
 
     return (
-        <div className="baixas-table-container">
-            <table className="baixas-table">
+        <S.SubTable>
+            <table>
                 <thead>
                     <tr>
                         <th>Documento</th>
@@ -30,16 +35,14 @@ export const TabelaBaixas = ({ baixas }) => {
                             <td className="valor">{formatarValor(baixa.VALOR_PGTO)}</td>
                             <td>{baixa.DEPOSITO_CC === "N" ? "Não" : "Sim"}</td>
                             <td>
-                                {baixa.STATUS === "B" ? (
-                                    <span className="status-badge status-baixada">Baixada</span>
-                                ) : (
-                                    <span className="status-badge status-pendente">Pendente</span>
-                                )}
+                                <S.StatusBadge $status={baixa.STATUS === "B" ? "A" : "C"}>
+                                    {baixa.STATUS === "B" ? "Baixada" : "Pendente"}
+                                </S.StatusBadge>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-        </div>
+        </S.SubTable>
     );
 };

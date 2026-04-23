@@ -1,7 +1,8 @@
+// components/Faturamento/ConsultaFaturamento.jsx
 import { useEffect, useRef, useCallback, useState } from "react";
-import "../../../styles/ConsultaFaturamento.css";
-import { FaFileInvoiceDollar } from "react-icons/fa6";
-import PageTemplate from "../../PageTemplate/PageTemplate";
+import { FaFileInvoiceDollar, FaSearch, FaTrash, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import * as S from "./ConsultaFaturamentoStyles";
+import PageTemplate from "../PageTemplate/PageTemplate";
 
 // Hooks
 import { useFaturamento } from "./hooks/useFaturamento";
@@ -10,10 +11,10 @@ import { usePaginacao } from "./hooks/usePaginacao";
 import { usePesquisaLocal } from "./hooks/usePesquisaLocal";
 
 // Componentes
-import { FormularioHeader } from "./FormularioHeader";
-import { BarraPesquisaLocal } from "./BarraPesquisaLocal";
-import { PaginationControls } from "./PaginationControls";
-import { LinhaFatura } from "./LinhaFatura";
+import { FormularioHeader } from "./components/FormularioHeader";
+import { BarraPesquisaLocal } from "./components/BarraPesquisaLocal";
+import { PaginationControls } from "./components/PaginationControls";
+import { LinhaFatura } from "./components/LinhaFatura";
 
 const ConsultaFaturamento = () => {
     const resultadosRef = useRef(null);
@@ -153,9 +154,8 @@ const ConsultaFaturamento = () => {
             title="Consulta de Faturamento"
             subtitle="Consulte informações de faturamento"
             icon={<FaFileInvoiceDollar />}
-            className="consulta-segurados-page"
         >
-            <div className="consulta-fatura-container">
+            <S.Container>
                 <FormularioHeader 
                     formData={formData}
                     handleChange={handleChange}
@@ -165,37 +165,35 @@ const ConsultaFaturamento = () => {
                     loading={loading}
                 />
                 
-                {erro && <div className="erro-msg">{erro}</div>}
+                {erro && <S.ErrorMessage>{erro}</S.ErrorMessage>}
 
-                {loading || resultados.length > 0 ? (
-                    <div className="resultado-fatura" ref={resultadosRef}>
-                        <div className="resultados-header">
-                            <h3 className="title-consulta">
-                                <i className="bi-list-check"></i> Resultados
-                                <span className="ms-2 total-badge">
+                {(loading || resultados.length > 0) && (
+                    <S.ResultContainer ref={resultadosRef}>
+                        <S.ResultHeader>
+                            <h3>
+                                Resultados
+                                <S.TotalBadge>
                                     {termoPesquisa.trim() ? localPagination.total_records : pagination.total_records}{" "}
                                     {termoPesquisa.trim()
                                         ? localPagination.total_records === 1 ? "registro filtrado" : "registros filtrados"
                                         : pagination.total_records === 1 ? "registro" : "registros"}
                                     {termoPesquisa.trim() && ` (de ${pagination.total_records})`}
-                                </span>
+                                </S.TotalBadge>
                             </h3>
 
-                            <div className="total-info">
+                            <S.FiltrosInfo>
                                 {filtrosAtivosCount > 0 && (
-                                    <small className="filtros-ativos">
-                                        <i className="bi-funnel"></i>
+                                    <S.FiltroBadge>
                                         {filtrosAtivosCount} filtro(s) ativo(s)
-                                    </small>
+                                    </S.FiltroBadge>
                                 )}
                                 {termoPesquisa.trim() && (
-                                    <small className="filtro-local-info">
-                                        <i className="bi-search"></i>
+                                    <S.FiltroBadge>
                                         Filtro local ativo
-                                    </small>
+                                    </S.FiltroBadge>
                                 )}
-                            </div>
-                        </div>
+                            </S.FiltrosInfo>
+                        </S.ResultHeader>
 
                         <BarraPesquisaLocal 
                             termoPesquisa={termoPesquisa}
@@ -206,34 +204,34 @@ const ConsultaFaturamento = () => {
                             loading={loading}
                         />
 
-                        <div className="tabela-resultados">
-                          <table className="tabela-faturas">
-                            <thead>
-                                <tr>
-                                    <th style={{ width: "40px" }}></th>
-                                    <th>Fatura</th>
-                                    <th>Apólice</th>
-                                    <th>Administradora</th>
-                                    <th>Emissão</th>
-                                    <th>Status</th>
-                                    <th>Vencimento</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {resultadosPaginados.map((fatura, index) => (
-                                    <LinhaFatura
-                                        key={`${fatura.FATURA}-${index}`}
-                                        fatura={fatura}
-                                        index={index}
-                                        isExpanded={expandedRow === index}
-                                        toggleExpandRow={toggleExpandRow}
-                                        obterNomeCedente={obterNomeCedente}
-                                        obterNomeCorretor={obterNomeCorretor}
-                                    />
-                                ))}
-                            </tbody>
-                        </table>
-                        </div>
+                        <S.TableWrapper>
+                            <S.Table>
+                                <thead>
+                                    <tr>
+                                        <th style={{ width: "40px" }}></th>
+                                        <th>Fatura</th>
+                                        <th>Apólice</th>
+                                        <th>Administradora</th>
+                                        <th>Emissão</th>
+                                        <th>Status</th>
+                                        <th>Vencimento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {resultadosPaginados.map((fatura, index) => (
+                                        <LinhaFatura
+                                            key={`${fatura.FATURA}-${index}`}
+                                            fatura={fatura}
+                                            index={index}
+                                            isExpanded={expandedRow === index}
+                                            toggleExpandRow={toggleExpandRow}
+                                            obterNomeCedente={obterNomeCedente}
+                                            obterNomeCorretor={obterNomeCorretor}
+                                        />
+                                    ))}
+                                </tbody>
+                            </S.Table>
+                        </S.TableWrapper>
 
                         <PaginationControls 
                             pagination={pagination}
@@ -247,11 +245,9 @@ const ConsultaFaturamento = () => {
                             irParaPaginaAnteriorLocal={irParaPaginaAnteriorLocal}
                             irParaProximaPaginaLocal={irParaProximaPaginaLocal}
                         />
-                    </div>
-                ) : (
-                    ""
+                    </S.ResultContainer>
                 )}
-            </div>
+            </S.Container>
         </PageTemplate>
     );
 };

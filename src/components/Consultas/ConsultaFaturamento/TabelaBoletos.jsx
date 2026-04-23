@@ -1,5 +1,6 @@
-// TabelaBoletos.js
-import { useState } from 'react';
+// components/Faturamento/TabelaBoletos.jsx
+import React, { useState } from 'react';
+import * as S from "./ConsultaFaturamentoStyles";
 import { verificarVencimento } from "../../../utils/Faturamento/verificarVencimento";
 import { formatarValor } from "../../../utils/Faturamento/formatarValor";
 import { formatarData } from "../../../utils/Faturamento/formatarData";
@@ -16,13 +17,15 @@ export const TabelaBoletos = ({ boletos, parcelas }) => {
     };
 
     if (!boletos || boletos.length === 0) {
-        return <p className="text-muted">Nenhum boleto encontrado para esta fatura.</p>;
+        return <p style={{ color: "#64748b", fontSize: "0.75rem", textAlign: "center", padding: "1rem" }}>
+            Nenhum boleto encontrado para esta fatura.
+        </p>;
     }
 
     return (
         <>
-            <div className="boletos-table-container">
-                <table className="boletos-table">
+            <S.SubTable>
+                <table>
                     <thead>
                         <tr>
                             <th>Documento</th>
@@ -37,24 +40,23 @@ export const TabelaBoletos = ({ boletos, parcelas }) => {
                             const vencBoleto = verificarVencimento(boleto.DATA_VENCIMENTO);
                             const parcelaCorrespondente = parcelas?.find(p => p.DOCUMENTO === boleto.DOCUMENTO);
                             
-                            const estaQuitado = boleto.QUITADO === "S" || (parcelaCorrespondente?.DT_BAIXA != null && boleto.STATUS_BOLETO === "A" && boleto.STATUS_BOLETO !== "C");
-                            const estaCancelado = boleto.STATUS_BOLETO === "C";
-                            const estaPendente = !estaQuitado && !estaCancelado && boleto.STATUS_BOLETO === "A";
-                            
                             return (
                                 <tr 
                                     key={idx} 
-                                    className={estaCancelado ? "boleto-cancelado" : "boleto-linha"}
                                     onClick={() => handleRowClick(boleto, parcelaCorrespondente)}
                                     style={{ cursor: 'pointer' }}
                                 >
-                                    <td className="documento-link">{boleto.DOCUMENTO || "N/A"}</td>
-                                    <td>{boleto.NOME_COBRADO || "N/A"}</td>
+                                    <td style={{ fontWeight: "500", color: "#0F3D5D" }}>
+                                        {boleto.DOCUMENTO || "N/A"}
+                                    </td>
+                                    <td style={{ maxWidth: "180px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                        {boleto.NOME_COBRADO || "N/A"}
+                                    </td>
                                     <td className="valor">{formatarValor(boleto.VALOR)}</td>
                                     <td>
-                                        <span className={`vencimento ${vencBoleto.status}`}>
+                                        <S.VencimentoSpan className={vencBoleto.status}>
                                             {formatarData(boleto.DATA_VENCIMENTO)}
-                                        </span>
+                                        </S.VencimentoSpan>
                                     </td>
                                     <td>
                                         {renderStatusBadge([boleto], parcelaCorrespondente ? [parcelaCorrespondente] : [], boleto.STATUS_BOLETO)}
@@ -64,7 +66,7 @@ export const TabelaBoletos = ({ boletos, parcelas }) => {
                         })}
                     </tbody>
                 </table>
-            </div>
+            </S.SubTable>
 
             <ModalBoleto 
                 isOpen={isModalOpen}

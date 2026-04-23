@@ -1,4 +1,6 @@
-import React from "react";
+// components/Faturamento/PaginationControls.jsx
+import React from 'react';
+import * as S from "./ConsultaFaturamentoStyles";
 
 export const PaginationControls = ({ 
     pagination, 
@@ -27,44 +29,42 @@ export const PaginationControls = ({
 
         if (start > 1) {
             pages.push(
-                <button
+                <S.PageButton
                     key="first"
                     onClick={() => (usandoFiltroLocal ? irParaPaginaLocal(1) : irParaPagina(1))}
-                    className="pagination-btn"
                     disabled={loading}
                     title="Primeira página"
                 >
                     1
-                </button>
+                </S.PageButton>
             );
-            if (start > 2) pages.push(<span key="e1" className="pagination-ellipsis">...</span>);
+            if (start > 2) pages.push(<S.Ellipsis key="e1">...</S.Ellipsis>);
         }
 
         for (let i = start; i <= end; i++) {
             pages.push(
-                <button
+                <S.PageButton
                     key={i}
+                    $active={pag.current_page === i}
                     onClick={() => (usandoFiltroLocal ? irParaPaginaLocal(i) : irParaPagina(i))}
-                    className={`pagination-btn ${pag.current_page === i ? "active" : ""}`}
                     disabled={loading}
                 >
                     {i}
-                </button>
+                </S.PageButton>
             );
         }
 
         if (end < pag.total_pages) {
-            if (end < pag.total_pages - 1) pages.push(<span key="e2" className="pagination-ellipsis">...</span>);
+            if (end < pag.total_pages - 1) pages.push(<S.Ellipsis key="e2">...</S.Ellipsis>);
             pages.push(
-                <button
+                <S.PageButton
                     key="last"
                     onClick={() => (usandoFiltroLocal ? irParaPaginaLocal(pag.total_pages) : irParaPagina(pag.total_pages))}
-                    className="pagination-btn"
                     disabled={loading}
                     title="Última página"
                 >
                     {pag.total_pages}
-                </button>
+                </S.PageButton>
             );
         }
 
@@ -72,15 +72,17 @@ export const PaginationControls = ({
     };
 
     return (
-        <div className="pagination-container">
-            <div className="pagination-info">
+        <S.PaginationContainer>
+            <S.PaginationInfo>
                 {usandoFiltroLocal ? (
                     <>
                         Mostrando <strong>{(localPagination.current_page - 1) * localPagination.page_size + 1}</strong> –{" "}
                         <strong>{Math.min(localPagination.current_page * localPagination.page_size, localPagination.total_records)}</strong>{" "}
                         de <strong>{localPagination.total_records}</strong> registros filtrados
                         <br />
-                        <small className="text-muted">(Total: {pagination.total_records} registros da consulta)</small>
+                        <small style={{ fontSize: "0.7rem", color: "#64748b" }}>
+                            (Total: {pagination.total_records} registros da consulta)
+                        </small>
                     </>
                 ) : (
                     <>
@@ -89,27 +91,25 @@ export const PaginationControls = ({
                         <strong>{pagination.total_records}</strong> registros
                     </>
                 )}
-            </div>
+            </S.PaginationInfo>
 
-            <div className="pagination-controls">
-                <button
+            <S.PaginationControls>
+                <S.PageButton
                     onClick={usandoFiltroLocal ? irParaPaginaAnteriorLocal : irParaPaginaAnterior}
                     disabled={usandoFiltroLocal ? !localPagination.has_previous : !pagination.has_previous || loading}
-                    className="pagination-btn nav"
                     title="Página anterior"
                 >
                     ‹
-                </button>
+                </S.PageButton>
                 {renderPageNumbers()}
-                <button
+                <S.PageButton
                     onClick={usandoFiltroLocal ? irParaProximaPaginaLocal : irParaProximaPagina}
                     disabled={usandoFiltroLocal ? !localPagination.has_next : !pagination.has_next || loading}
-                    className="pagination-btn nav"
                     title="Próxima página"
                 >
                     ›
-                </button>
-            </div>
-        </div>
+                </S.PageButton>
+            </S.PaginationControls>
+        </S.PaginationContainer>
     );
 };

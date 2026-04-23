@@ -1,15 +1,20 @@
+// components/Faturamento/TabelaParcelas.jsx
+import React from 'react';
+import * as S from "./ConsultaFaturamentoStyles";
 import { verificarVencimento } from "../../../utils/Faturamento/verificarVencimento";
 import { formatarValor } from "../../../utils/Faturamento/formatarValor";
 import { formatarData } from "../../../utils/Faturamento/formatarData";
 
 export const TabelaParcelas = ({ parcelas }) => {
     if (!parcelas || parcelas.length === 0) {
-        return <p className="text-muted">Nenhuma parcela encontrada para esta fatura.</p>;
+        return <p style={{ color: "#64748b", fontSize: "0.75rem", textAlign: "center", padding: "1rem" }}>
+            Nenhuma parcela encontrada para esta fatura.
+        </p>;
     }
 
     return (
-        <div className="parcelas-table-container">
-            <table className="parcelas-table">
+        <S.SubTable>
+            <table>
                 <thead>
                     <tr>
                         <th>Nº Parcela</th>
@@ -23,21 +28,18 @@ export const TabelaParcelas = ({ parcelas }) => {
                 <tbody>
                     {parcelas.map((parcela, idx) => {
                         const vencParcela = verificarVencimento(parcela.VENCIMENTO);
-                        // console.log("vencParcela", vencParcela)
-                        // console.log("VENCIMENTO", parcela.VENCIMENTO)
                         return (
-                            <tr key={idx} className={parcela.STATUS === "C" ? "parcela-cancelada" : ""}>
-                                <td className="text-center">{parcela.NUMERO_PARCELA || "-"}</td>
+                            <tr key={idx}>
+                                <td style={{ textAlign: "center" }}>{parcela.NUMERO_PARCELA || "-"}</td>
                                 <td>{parcela.DOCUMENTO || "-"}</td>
                                 <td className="valor">{formatarValor(parcela.VALOR)}</td>
                                 <td>
-                                    <span className={`vencimento ${vencParcela.status}`}>
+                                    <S.VencimentoSpan className={vencParcela.status}>
                                         {formatarData(parcela.VENCIMENTO)}
-                                    </span>
+                                    </S.VencimentoSpan>
                                 </td>
-                                
                                 <td>{formatarData(parcela.DT_BAIXA)}</td>
-                                <td className="text-truncate" style={{ maxWidth: "150px" }}>
+                                <td style={{ maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                     {parcela.OBS || "-"}
                                 </td>
                             </tr>
@@ -45,6 +47,6 @@ export const TabelaParcelas = ({ parcelas }) => {
                     })}
                 </tbody>
             </table>
-        </div>
+        </S.SubTable>
     );
 };
