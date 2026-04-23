@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../styles/Login.css';
-import { useAuth } from '../../context/AuthContext'
-import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { useAuth } from '../../context/AuthContext';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useGlobal } from '../../context/GlobalContext';
-
+import * as S from './LoginStyles';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [showPassword, setShowPassword] = useState(false)
+    const [showPassword, setShowPassword] = useState(false);
 
     const { loading, setLoading } = useGlobal();
-
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -21,12 +19,12 @@ const Login = () => {
         event.preventDefault();
         setLoading(true);
         setError(null);
+        
         try {
-
             const result = await login({ email, password });
 
             if (result.success) {
-                navigate('/Home');
+                navigate('/home');
             } else {
                 setError(result.error || 'Falha no login. Verifique suas credenciais.');
             }
@@ -40,24 +38,23 @@ const Login = () => {
 
     return (
         <>
-            <div className="gradient-bg"></div>
-
-            <div className="login-wrapper">
-                <div className="loginContainer">
-                    <div className="loginBox">
-                        <img
-                            src="../../imagens/LOGO.png"
+            <S.GradientBg />
+            
+            <S.LoginWrapper>
+                <S.LoginContainer>
+                    <S.LoginBox>
+                        <S.LogoImg 
+                            src="/imagens/LOGO.png"
                             alt="Fedcorp Logo"
-                            className="logoImg"
                         />
+                        
+                        <S.Title>FedConnect</S.Title>
+                        <S.Subtitle>Insira seus dados para acessar a plataforma</S.Subtitle>
 
-                        <h2 className="titlePortal">FedConnect</h2>
-                        <p className="pPortal">Insira seus dados para acessar a plataforma</p>
-
-                        <form onSubmit={handleSubmit}>
-                            <div className="inputGroup">
-                                <label htmlFor="email">E-mail:</label>
-                                <input
+                        <S.Form onSubmit={handleSubmit}>
+                            <S.InputGroup>
+                                <S.Label htmlFor="email">E-mail:</S.Label>
+                                <S.Input
                                     type="email"
                                     id="email"
                                     placeholder="Digite seu e-mail"
@@ -65,47 +62,45 @@ const Login = () => {
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
                                 />
-                            </div>
+                            </S.InputGroup>
 
-                            <div className="inputGroup senhaGroup">
-                                <label htmlFor="senha">Senha:</label>
-                                <div className="senhaWrapper">
-                                    <input type={showPassword ? "text" : "password"}
-                                        id='senha'
-                                        placeholder='Digite sua senha'
+                            <S.InputGroup>
+                                <S.Label htmlFor="senha">Senha:</S.Label>
+                                <S.PasswordWrapper>
+                                    <S.Input
+                                        type={showPassword ? "text" : "password"}
+                                        id="senha"
+                                        placeholder="Digite sua senha"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
                                     />
-
-                                    <button
-                                        type='button'
-                                        className='togglePassword'
+                                    <S.TogglePasswordButton
+                                        type="button"
                                         onClick={() => setShowPassword(!showPassword)}
                                     >
                                         {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </button>
-                                </div>
-
-                            </div>
+                                    </S.TogglePasswordButton>
+                                </S.PasswordWrapper>
+                            </S.InputGroup>
 
                             {error && (
-                                <p className="error-message">
+                                <S.ErrorMessage>
                                     {error}
-                                </p>
+                                </S.ErrorMessage>
                             )}
 
-                            <button type="submit" className="loginButton" disabled={loading}>
+                            <S.LoginButton type="submit" disabled={loading}>
                                 {loading ? 'Entrando...' : 'Entrar'}
-                            </button>
+                            </S.LoginButton>
 
-                            <a href="/recuperar-senha" className="forgot-password">
+                            <S.ForgotPassword href="/recuperar-senha">
                                 Esqueceu sua senha?
-                            </a>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                            </S.ForgotPassword>
+                        </S.Form>
+                    </S.LoginBox>
+                </S.LoginContainer>
+            </S.LoginWrapper>
         </>
     );
 };

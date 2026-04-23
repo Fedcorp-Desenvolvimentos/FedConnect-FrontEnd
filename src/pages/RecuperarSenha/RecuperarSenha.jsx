@@ -1,14 +1,18 @@
-// src/pages/RecuperarSenha/RecuperarSenha.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/RecuperarSenha.css";
 import api from "../../services/api";
 import { useSnackbar } from "notistack";
+import * as S from "./RecuperarSenhaStyles";
+import { 
+  FaEnvelope, 
+  FaInfoCircle, 
+  FaPaperPlane, 
+  FaArrowLeft,
+  FaSpinner
+} from "react-icons/fa";
 
 const RecuperarSenha = () => {
   const [email, setEmail] = useState("");
-  const [mensagem, setMensagem] = useState("");
-  const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -19,115 +23,97 @@ const RecuperarSenha = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErro("");
-    setMensagem("");
 
     if (!email) {
-      setErro("Por favor, informe seu e-mail.");
+      enqueueSnackbar("Por favor, informe seu e-mail.", { variant: "error" });
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setErro("Por favor, informe um e-mail válido.");
+      enqueueSnackbar("Por favor, informe um e-mail válido.", { variant: "error" });
       return;
     }
 
     setLoading(true);
     try {
       const res = await api.post("solicitar-reset-senha/", { email });
-      enqueueSnackbar(res?.message || "Enviamos um link de recuperação para o seu e-mail. Verifique sua caixa de entrada e spam.", {
-        variant: "success",
-      });
+      // await new Promise(resolve => setTimeout(resolve, 2000));
+      enqueueSnackbar(
+        res?.message || "Enviamos um link de recuperação para o seu e-mail. Verifique sua caixa de entrada e spam.",
+        { variant: "success" }
+      );
       setEmail("");
     } catch (err) {
-      enqueueSnackbar(res?.message || "Falha ao solicitar recuperação de senha. Tente novamente mais tarde.", {
-        variant: "error",
-      });
+      enqueueSnackbar(
+        err?.response?.data?.message || "Falha ao solicitar recuperação de senha. Tente novamente mais tarde.",
+        { variant: "error" }
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="recuperar-senha-container">
-      <div className="recuperar-senha-card">
-        <div className="recuperar-senha-logo">
-          <img
-              src="../../imagens/LOGO.png"
-              alt="Fedcorp Logo"
-              className="logoImg"
-          />
-        </div>
+    <>
+      <S.GradientBg />
+      
+      <S.Container>
+        <S.Card>
+          <S.LogoWrapper>
+            <S.LogoImg src="/imagens/LOGO.png" alt="Fedcorp Logo" />
+          </S.LogoWrapper>
 
-        <h1 className="recuperar-senha-title">Esqueceu sua senha?</h1>
-        <p className="recuperar-senha-subtitle">
-          Recupere o acesso à sua conta
-        </p>
+          <S.Title>Esqueceu sua senha?</S.Title>
+          <S.Subtitle>Recupere o acesso à sua conta</S.Subtitle>
 
-        <div className="recuperar-senha-info-box">
-          <i className="bi bi-info-circle-fill"></i>
-          <p>
-            Digite seu e-mail cadastrado e enviaremos um link para redefinir sua senha.
-          </p>
-        </div>
+          <S.InfoBox>
+            <FaInfoCircle />
+            <p>
+              Digite seu e-mail cadastrado e enviaremos um link para redefinir sua senha.
+            </p>
+          </S.InfoBox>
 
-        <form className="recuperar-senha-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">
-              <i className="bi bi-envelope-fill"></i>
-              E-mail
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoFocus
-              disabled={loading}
-              className={erro ? "error" : ""}
-            />
-          </div>
+          <S.Form onSubmit={handleSubmit}>
+            <S.InputGroup>
+              <S.Label htmlFor="email">
+                <FaEnvelope />
+                E-mail
+              </S.Label>
+              <S.Input
+                type="email"
+                id="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+                disabled={loading}
+              />
+            </S.InputGroup>
 
-          {mensagem && (
-            <div className="success-message">
-              <i className="bi bi-check-circle-fill"></i>
-              <span>{mensagem}</span>
-            </div>
-          )}
+            <S.SubmitButton type="submit" disabled={loading}>
+              {loading ? (
+                <>
+                  <FaSpinner style={{ animation: 'spin 0.8s linear infinite' }} />
+                  Enviando...
+                </>
+              ) : (
+                <>
+                  <FaPaperPlane />
+                  Enviar link de recuperação
+                </>
+              )}
+            </S.SubmitButton>
+          </S.Form>
 
-          <button
-            type="submit"
-            className="btn-submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <i className="bi bi-arrow-repeat spinner"></i>
-                Enviando...
-              </>
-            ) : (
-              <>
-                <i className="bi bi-envelope-paper-fill"></i>
-                Enviar link de recuperação
-              </>
-            )}
-          </button>
-        </form>
-
-        <button
-          type="button"
-          className="btn-back"
-          onClick={handleVoltarLogin}
-        >
-          <i className="bi bi-arrow-left"></i>
-          Voltar para o login
-        </button>
-      </div>
-    </div>
+          <S.BackButton type="button" onClick={handleVoltarLogin}>
+            <FaArrowLeft />
+            Voltar para o login
+          </S.BackButton>
+        </S.Card>
+      </S.Container>
+    </>
   );
 };
 

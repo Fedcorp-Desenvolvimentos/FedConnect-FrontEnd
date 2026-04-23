@@ -75,6 +75,16 @@ const ConsultasHome = () => {
             loading={loading}
             empty={consultasPermitidas.length === 0}
             emptyMessage="Nenhuma consulta disponível para seu nível de acesso"
+            helpContent={
+                <div>
+                    <p><strong>O que fazer aqui:</strong></p>
+                    <ul>
+                        <li>Clique em "Pesquisar" para consultar</li>
+                        <li>Use os filtros disponíveis</li>
+                        <li>Exporte resultados quando necessário</li>
+                    </ul>
+                </div>
+            }
         >
             <S.CardsGrid>
                 {consultasPermitidas.map((consulta) => (

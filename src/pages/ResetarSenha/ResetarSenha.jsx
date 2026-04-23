@@ -1,247 +1,236 @@
-// src/components/Login/ResetarSenha.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/api";
-import "../../styles/ResetarSenha.css";
+import { useSnackbar } from "notistack";
+import * as S from "./ResetarSenhaStyles";
+import { 
+  FaLock, 
+  FaEye, 
+  FaEyeSlash, 
+  FaKey,
+  FaShieldAlt,
+  FaHourglassHalf,
+  FaExclamationTriangle,
+  FaCheckCircle
+} from "react-icons/fa";
 
 const ResetarSenha = () => {
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [mensagem, setMensagem] = useState("");
-  const [erro, setErro] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tokenValido, setTokenValido] = useState(false);
   const [validandoToken, setValidandoToken] = useState(true);
   
   const { token } = useParams();
-  // console.log(token);
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     const validarToken = async () => {
-      // console.log("🔍 Validando token:", token);
-      
       if (!token) {
-        console.error("❌ Token não fornecido");
         setTokenValido(false);
         setValidandoToken(false);
-        setErro("Link de recuperação inválido.");
+        enqueueSnackbar("Link de recuperação inválido.", { variant: "error" });
         return;
       }
       
       try {
-        // console.log(`📡 Chamando API: /validar-token-reset/${token}/`);
         const response = await api.get(`/validar-token-reset/${token}/`);
         
-        // console.log("✅ Resposta da API:", response.data);
-        
         if (response.data.valid === true) {
-          // console.log("🎉 Token válido! Mostrando formulário.");
           setTokenValido(true);
         } else {
-          // console.log("❌ Token inválido:", response.data.detail);
           setTokenValido(false);
-          setErro(response.data.detail || "Link de recuperação inválido ou expirado.");
+          enqueueSnackbar(response.data.detail || "Link de recuperação inválido ou expirado.", { variant: "error" });
         }
       } catch (err) {
-        console.error("❌ Erro na requisição:", err);
-        console.error("Detalhes do erro:", err.response?.data);
         setTokenValido(false);
-        setErro(err.response?.data?.detail || "Link de recuperação inválido ou expirado.");
+        enqueueSnackbar(err.response?.data?.detail || "Link de recuperação inválido ou expirado.", { variant: "error" });
       } finally {
         setValidandoToken(false);
       }
     };
 
     validarToken();
-  }, [token]);
+  }, [token, enqueueSnackbar]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErro("");
-    setMensagem("");
-
-    // console.log("📝 Enviando formulário...");
 
     if (!novaSenha || novaSenha.length < 6) {
-      setErro("A senha deve ter no mínimo 6 caracteres.");
+      enqueueSnackbar("A senha deve ter no mínimo 6 caracteres.", { variant: "error" });
       return;
     }
 
     if (novaSenha !== confirmarSenha) {
-      setErro("As senhas não coincidem.");
+      enqueueSnackbar("As senhas não coincidem.", { variant: "error" });
       return;
     }
 
     setLoading(true);
     try {
-      // console.log("📡 Enviando nova senha para:", token);
-      
       const response = await api.post("/resetar-senha/", {
         token: token,
         nova_senha: novaSenha
       });
       
-      // console.log("✅ Resposta:", response.data);
-      
-      setMensagem("Senha redefinida com sucesso! Redirecionando para o login...");
+      enqueueSnackbar("Senha redefinida com sucesso! Redirecionando para o login...", { variant: "success" });
       
       setTimeout(() => {
         navigate("/login");
       }, 3000);
     } catch (err) {
-      console.error("❌ Erro ao redefinir senha:", err);
-      console.error("Detalhes:", err.response?.data);
-      setErro(err.response?.data?.detail || "Erro ao redefinir senha.");
+      enqueueSnackbar(err.response?.data?.detail || "Erro ao redefinir senha.", { variant: "error" });
     } finally {
       setLoading(false);
     }
   };
 
-  // Estado de carregamento
+  // Estado de carregamento - validando token
   if (validandoToken) {
     return (
-      <div className="resetar-senha-container">
-        <div className="resetar-senha-card">
-          <div className="verificando-container">
-            <div className="verificando-animation">
-              <div className="circle-check">
-                <svg className="checkmark-svg" viewBox="0 0 52 52">
-                  <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
-                  <path className="checkmark-check" fill="none" d="M14 27l7 7 16-16" />
-                </svg>
-              </div>
-              <div className="pulse-ring"></div>
-            </div>
-            <h3 className="verificando-title">Validando link de recuperação</h3>
-            <div className="verificando-steps">
-              <div className="step">
-                <i className="bi bi-shield-lock-fill"></i>
-                <span>Verificando token...</span>
-              </div>
-              <div className="step">
-                <i className="bi bi-hourglass-split"></i>
-                <span>Checando expiração...</span>
-              </div>
-            </div>
-            <p className="verificando-text">Por favor, aguarde um momento</p>
-          </div>
-        </div>
-      </div>
+      <>
+        <S.GradientBg />
+        <S.Container>
+          <S.Card>
+            <S.VerificandoContainer>
+              <S.VerificandoAnimation>
+                <S.CircleCheck>
+                  <S.CheckmarkSvg viewBox="0 0 52 52">
+                    <S.CheckmarkCircle cx="26" cy="26" r="25" fill="none" />
+                    <S.CheckmarkCheck fill="none" d="M14 27l7 7 16-16" />
+                  </S.CheckmarkSvg>
+                  <S.PulseRing />
+                </S.CircleCheck>
+              </S.VerificandoAnimation>
+              
+              <S.VerificandoTitle>Validando link de recuperação</S.VerificandoTitle>
+              
+              <S.VerificandoSteps>
+                <S.Step $delay="0.2s">
+                  <FaShieldAlt />
+                  <span>Verificando token...</span>
+                </S.Step>
+                <S.Step $delay="0.6s">
+                  <FaHourglassHalf />
+                  <span>Checando expiração...</span>
+                </S.Step>
+              </S.VerificandoSteps>
+              
+              <S.VerificandoText>Por favor, aguarde um momento</S.VerificandoText>
+            </S.VerificandoContainer>
+          </S.Card>
+        </S.Container>
+      </>
     );
   }
+
   // Token inválido
   if (!tokenValido) {
     return (
-      <div className="resetar-senha-container">
-        <div className="resetar-senha-card">
-          <div className="error-state">
-            <i className="bi bi-exclamation-triangle-fill"></i>
-            <h2>Link inválido ou expirado</h2>
-            <p>{erro || "O link de recuperação de senha que você acessou é inválido ou já expirou."}</p>
-            <button 
-              className="btn-primary"
-              onClick={() => navigate("/recuperar-senha")}
-            >
-              Solicitar novo link
-            </button>
-            <button 
-              className="btn-secondary"
-              onClick={() => navigate("/login")}
-            >
-              Voltar para o login
-            </button>
-          </div>
-        </div>
-      </div>
+      <>
+        <S.GradientBg />
+        <S.Container>
+          <S.Card>
+            <S.ErrorState>
+              <FaExclamationTriangle />
+              <h2>Link inválido ou expirado</h2>
+              <p>O link de recuperação de senha que você acessou é inválido ou já expirou.</p>
+              <S.ButtonGroup>
+                <S.PrimaryButton onClick={() => navigate("/recuperar-senha")}>
+                  Solicitar novo link
+                </S.PrimaryButton>
+                <S.SecondaryButton onClick={() => navigate("/login")}>
+                  Voltar para o login
+                </S.SecondaryButton>
+              </S.ButtonGroup>
+            </S.ErrorState>
+          </S.Card>
+        </S.Container>
+      </>
     );
   }
 
   // Token válido - mostrar formulário
   return (
-    <div className="resetar-senha-container">
-      <div className="resetar-senha-card">
-        <div className="resetar-senha-logo">
-          <img src="../../imagens/LOGO.png" alt="Fedcorp Logo" className="logoImg" />
-        </div>
+    <>
+      <S.GradientBg />
+      
+      <S.Container>
+        <S.Card>
+          <S.LogoWrapper>
+            <S.LogoImg src="/imagens/LOGO.png" alt="Fedcorp Logo" />
+          </S.LogoWrapper>
 
-        <h1 className="resetar-senha-title">Redefinir Senha</h1>
-        <p className="resetar-senha-subtitle">
-          Digite sua nova senha abaixo
-        </p>
+          <S.Title>Redefinir Senha</S.Title>
+          <S.Subtitle>Digite sua nova senha abaixo</S.Subtitle>
 
-        <form className="resetar-senha-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="novaSenha">
-              <i className="bi bi-lock-fill"></i>
-              Nova senha
-            </label>
-            <input
-              type="password"
-              id="novaSenha"
-              placeholder="Digite sua nova senha"
-              value={novaSenha}
-              onChange={(e) => setNovaSenha(e.target.value)}
-              required
-              disabled={loading}
-              className={erro ? "error" : ""}
-            />
-            <small className="password-hint">
-              Mínimo de 6 caracteres
-            </small>
-          </div>
+          <S.InfoBox>
+            <FaCheckCircle />
+            <p>
+              Crie uma senha forte e segura para sua conta.
+            </p>
+          </S.InfoBox>
 
-          <div className="form-group">
-            <label htmlFor="confirmarSenha">
-              <i className="bi bi-check-circle-fill"></i>
-              Confirmar nova senha
-            </label>
-            <input
-              type="password"
-              id="confirmarSenha"
-              placeholder="Confirme sua nova senha"
-              value={confirmarSenha}
-              onChange={(e) => setConfirmarSenha(e.target.value)}
-              required
-              disabled={loading}
-              className={erro ? "error" : ""}
-            />
-          </div>
+          <S.Form onSubmit={handleSubmit}>
+            <S.InputGroup>
+              <S.Label htmlFor="novaSenha">
+                <FaLock />
+                Nova senha
+              </S.Label>
+              <S.PasswordWrapper>
+                <S.Input
+                  type={showPassword ? "text" : "password"}
+                  id="novaSenha"
+                  placeholder="Digite sua nova senha"
+                  value={novaSenha}
+                  onChange={(e) => setNovaSenha(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+                <S.ToggleButton
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </S.ToggleButton>
+              </S.PasswordWrapper>
+              <S.PasswordHint>Mínimo de 6 caracteres</S.PasswordHint>
+            </S.InputGroup>
 
-          {erro && (
-            <div className="error-message">
-              <i className="bi bi-exclamation-circle-fill"></i>
-              <span>{erro}</span>
-            </div>
-          )}
+            <S.InputGroup>
+              <S.Label htmlFor="confirmarSenha">
+                <FaKey />
+                Confirmar nova senha
+              </S.Label>
+              <S.PasswordWrapper>
+                <S.Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmarSenha"
+                  placeholder="Confirme sua nova senha"
+                  value={confirmarSenha}
+                  onChange={(e) => setConfirmarSenha(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+                <S.ToggleButton
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </S.ToggleButton>
+              </S.PasswordWrapper>
+            </S.InputGroup>
 
-          {mensagem && (
-            <div className="success-message">
-              <i className="bi bi-check-circle-fill"></i>
-              <span>{mensagem}</span>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="btn-submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <i className="bi bi-arrow-repeat spinner"></i>
-                Redefinindo...
-              </>
-            ) : (
-              <>
-                <i className="bi bi-check-lg"></i>
-                Redefinir senha
-              </>
-            )}
-          </button>
-        </form>
-      </div>
-    </div>
+            <S.SubmitButton type="submit" disabled={loading}>
+              {loading ? "Redefinindo, aguarde..." : "Redefinir senha"}
+            </S.SubmitButton>
+          </S.Form>
+        </S.Card>
+      </S.Container>
+    </>
   );
 };
 

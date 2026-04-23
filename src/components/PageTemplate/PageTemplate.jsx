@@ -1,4 +1,11 @@
-import '../../styles/PageTemplate.css';
+import React, { useState } from 'react';
+import * as S from './PageTemplateStyles';
+import { 
+  FaExclamationTriangle, 
+  FaInbox, 
+  FaSpinner,
+  FaQuestionCircle
+} from 'react-icons/fa';
 
 const PageTemplate = ({ 
   children, 
@@ -6,6 +13,7 @@ const PageTemplate = ({
   subtitle,
   icon,
   actions,
+  helpContent,
   loading = false,
   error = null,
   empty = false,
@@ -13,54 +21,91 @@ const PageTemplate = ({
   className = "",
   ...props 
 }) => {
-  
-  // Renderiza estado de erro
-  if (error) {
+  const [showHelp, setShowHelp] = useState(false);
+
+  if (loading) {
     return (
-      <div className="page-template page-template-error">
-        <i className="bi bi-exclamation-triangle"></i>
-        <h3>Ops! Algo deu errado</h3>
-        <p>{error}</p>
-      </div>
+      <S.Container className={className} {...props}>
+        <S.StateContainer>
+          <S.SpinnerWrapper>
+            <FaSpinner />
+          </S.SpinnerWrapper>
+          <S.StateTitle>Carregando...</S.StateTitle>
+        </S.StateContainer>
+      </S.Container>
     );
   }
 
-  // Renderiza estado vazio
+  if (error) {
+    return (
+      <S.Container className={className} {...props}>
+        <S.StateContainer>
+          <S.ErrorIcon>
+            <FaExclamationTriangle />
+          </S.ErrorIcon>
+          <S.StateTitle>Ops! Algo deu errado</S.StateTitle>
+          <S.StateMessage>{error}</S.StateMessage>
+        </S.StateContainer>
+      </S.Container>
+    );
+  }
+
   if (empty) {
     return (
-      <div className="page-template page-template-empty">
-        <i className="bi bi-inbox"></i>
-        <h3>{emptyMessage}</h3>
-      </div>
+      <S.Container className={className} {...props}>
+        <S.StateContainer>
+          <S.EmptyIcon>
+            <FaInbox />
+          </S.EmptyIcon>
+          <S.StateTitle>{emptyMessage}</S.StateTitle>
+        </S.StateContainer>
+      </S.Container>
     );
   }
 
   return (
-    <div className={`page-template ${className}`} {...props}>
-      {/* Cabeçalho da página */}
-      {(title || subtitle || actions) && (
-        <header className="page-template-header">
-          <div className="page-template-wrapper">
-            {icon && <div className="page-template-icon">{icon}</div>}
-            <div className="page-template-titles">
-              {title && <h1 className="page-template-title">{title}</h1>}
-              {subtitle && <p className="page-template-subtitle">{subtitle}</p>}
-            </div>
-          </div>
+    <>
+      <S.Container className={className} {...props}>
+        <S.Header>
+          <S.HeaderLeft>
+            {icon && <S.IconWrapper>{icon}</S.IconWrapper>}
+            <S.TitlesWrapper>
+              {title && <S.Title>{title}</S.Title>}
+              {subtitle && <S.Subtitle>{subtitle}</S.Subtitle>}
+            </S.TitlesWrapper>
+          </S.HeaderLeft>
           
-          {actions && (
-            <div className="page-template-actions">
-              {actions}
-            </div>
-          )}
-        </header>
-      )}
+          <S.HeaderRight>
+            {helpContent && (
+              <S.HelpButton onClick={() => setShowHelp(true)}>
+                <FaQuestionCircle />
+                <span>Ajuda</span>
+              </S.HelpButton>
+            )}
+            {actions && actions}
+          </S.HeaderRight>
+        </S.Header>
 
-      {/* Conteúdo principal */}
-      <div className="page-template-content">
-        {children}
-      </div>
-    </div>
+        <S.Content>
+          {children}
+        </S.Content>
+      </S.Container>
+
+      {/* Modal simples */}
+      {showHelp && helpContent && (
+        <S.ModalOverlay onClick={() => setShowHelp(false)}>
+          <S.ModalContent onClick={(e) => e.stopPropagation()}>
+            <S.ModalHeader>
+              <S.ModalTitle>Ajuda</S.ModalTitle>
+              <S.ModalClose onClick={() => setShowHelp(false)}>&times;</S.ModalClose>
+            </S.ModalHeader>
+            <S.ModalBody>
+              {typeof helpContent === 'string' ? <p>{helpContent}</p> : helpContent}
+            </S.ModalBody>
+          </S.ModalContent>
+        </S.ModalOverlay>
+      )}
+    </>
   );
 };
 
