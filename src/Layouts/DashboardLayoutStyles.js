@@ -1,4 +1,3 @@
-// Layouts/DashboardLayout/styles.js
 import styled, { css } from 'styled-components';
 
 export const Layout = styled.div`
@@ -16,30 +15,7 @@ export const Main = styled.div`
   width: 100%;
 `;
 
-export const BreadcrumbNav = styled.nav`
-  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 100%;
-  
-  /* Desktop: Sidebar aberta */
-  ${props => props.$sidebarOpen && props.$isDesktop && css`
-    margin-left: 240px;
-    width: calc(100% - 240px);
-  `}
-  
-  /* Desktop: Sidebar fechada */
-  ${props => !props.$sidebarOpen && props.$isDesktop && css`
-    margin-left: 62px;
-    width: calc(100% - 62px);
-  `}
-  
-  /* Mobile */
-  @media (max-width: 768px) {
-    margin-left: 0 !important;
-    width: 100% !important;
-  }
-`;
-
+// Removemos o wrapper que interfere no sticky
 export const Content = styled.div`
   flex: 1;
   padding: 0 1.5rem 1.5rem;

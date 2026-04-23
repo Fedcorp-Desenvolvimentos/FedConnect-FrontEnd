@@ -1,4 +1,3 @@
-// Layouts/DashboardLayout.js
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar/Sidebar';
@@ -26,12 +25,10 @@ const DashboardLayout = () => {
     <S.Layout>
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} toggleSidebar={toggleSidebar} />
       <S.Main>
-        <S.BreadcrumbNav $sidebarOpen={sidebarOpen} $isDesktop={isDesktop}>
-          <Breadcrumb 
-            onToggleSidebar={toggleSidebar}
-            sidebarOpen={sidebarOpen}
-          />
-        </S.BreadcrumbNav>
+        <Breadcrumb 
+          onToggleSidebar={toggleSidebar}
+          sidebarOpen={sidebarOpen}
+        />
         <S.Content $withSidebar={sidebarOpen} $isDesktop={isDesktop}>
           <S.PageContainer>
             <S.ContentWrapper>

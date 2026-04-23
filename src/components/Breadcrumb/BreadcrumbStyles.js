@@ -1,4 +1,3 @@
-// components/Breadcrumb/styles.js
 import styled, { css, keyframes } from 'styled-components';
 
 const slideDown = keyframes`
@@ -26,8 +25,16 @@ export const Nav = styled.nav`
   top: 0;
   z-index: 100;
   
+  /* Ajuste para sidebar aberta/fechada no desktop */
+  @media (min-width: 769px) {
+    width: ${props => props.$sidebarOpen ? 'calc(100% - 240px)' : 'calc(100% - 62px)'};
+    margin-left: ${props => props.$sidebarOpen ? '240px' : '62px'};
+  }
+  
   @media (max-width: 768px) {
     padding: 0 16px;
+    width: 100%;
+    margin-left: 0 !important;
   }
 `;
 
@@ -129,7 +136,7 @@ export const BreadcrumbLink = styled.button`
 export const RightSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 `;
 
 export const DateTimeContainer = styled.div`
@@ -137,20 +144,44 @@ export const DateTimeContainer = styled.div`
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
-  padding-right: 12px;
+  padding-right: 16px;
   border-right: 1px solid #e2e8f0;
   margin-right: 4px;
+  gap: 4px;
   
   @media (max-width: 768px) {
     display: none;
   }
 `;
 
-export const Date = styled.span`
-  font-size: 11px;
+export const DateWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
   color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  
+  svg {
+    color: #2463eb;
+  }
+`;
+
+export const Date = styled.span`
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+`;
+
+export const TimeWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  
+  svg {
+    color: #2463eb;
+  }
 `;
 
 export const Time = styled.span`
@@ -158,6 +189,7 @@ export const Time = styled.span`
   font-weight: 600;
   color: #1e293b;
   font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
 `;
 
 export const UserContainer = styled.div`

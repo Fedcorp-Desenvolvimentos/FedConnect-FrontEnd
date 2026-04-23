@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import * as S from './PageTemplateStyles';
+import HelpModal from '../HelpModal/HelpModal';
 import { 
   FaExclamationTriangle, 
   FaInbox, 
@@ -63,6 +64,12 @@ const PageTemplate = ({
     );
   }
 
+  // Determina se deve mostrar o botão de ajuda
+  const hasHelp = helpContent && (
+    typeof helpContent === 'string' || 
+    (typeof helpContent === 'object' && helpContent !== null)
+  );
+
   return (
     <>
       <S.Container className={className} {...props}>
@@ -76,13 +83,13 @@ const PageTemplate = ({
           </S.HeaderLeft>
           
           <S.HeaderRight>
-            {helpContent && (
+            {hasHelp && (
               <S.HelpButton onClick={() => setShowHelp(true)}>
                 <FaQuestionCircle />
-                <span>Ajuda</span>
+                <span>Guia Rápido</span>
               </S.HelpButton>
             )}
-            {actions && actions}
+            {actions && <S.ActionsWrapper>{actions}</S.ActionsWrapper>}
           </S.HeaderRight>
         </S.Header>
 
@@ -91,19 +98,13 @@ const PageTemplate = ({
         </S.Content>
       </S.Container>
 
-      {/* Modal simples */}
-      {showHelp && helpContent && (
-        <S.ModalOverlay onClick={() => setShowHelp(false)}>
-          <S.ModalContent onClick={(e) => e.stopPropagation()}>
-            <S.ModalHeader>
-              <S.ModalTitle>Ajuda</S.ModalTitle>
-              <S.ModalClose onClick={() => setShowHelp(false)}>&times;</S.ModalClose>
-            </S.ModalHeader>
-            <S.ModalBody>
-              {typeof helpContent === 'string' ? <p>{helpContent}</p> : helpContent}
-            </S.ModalBody>
-          </S.ModalContent>
-        </S.ModalOverlay>
+      {/* Modal de ajuda componentizado */}
+      {showHelp && hasHelp && (
+        <HelpModal 
+          isOpen={showHelp}
+          onClose={() => setShowHelp(false)}
+          content={helpContent}
+        />
       )}
     </>
   );

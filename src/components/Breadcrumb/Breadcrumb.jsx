@@ -1,7 +1,6 @@
-// components/Breadcrumb/Breadcrumb.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FiMenu, FiChevronDown, FiLogOut, FiHome, FiChevronRight, FiUsers, FiUserPlus } from 'react-icons/fi';
+import { FiMenu, FiChevronDown, FiLogOut, FiHome, FiChevronRight, FiUsers, FiUserPlus, FiClock, FiCalendar } from 'react-icons/fi';
 import { FaHistory, FaRegUser } from "react-icons/fa";
 import { useAuth } from '../../context/AuthContext';
 import { getAccessLevelLabel, getAccessLevelColor, ACCESS_LEVELS } from '../../utils/accessLevels';
@@ -50,7 +49,9 @@ function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
     '/gerenciar-usuarios': 'Gerenciar Usuários',
     '/minha-conta': 'Minha Conta',
     '/cadastro': 'Cadastro',
-    '/historico': 'Histórico'
+    '/historico': 'Histórico',
+    '/workflow': 'Workflow Hub',
+    '/rh': 'RH Hub'
   };
 
   const getBreadcrumb = () => {
@@ -96,8 +97,26 @@ function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
   const accessLevelLabel = getAccessLevelLabel(user?.nivel_acesso);
   const accessLevelColor = getAccessLevelColor(user?.nivel_acesso);
 
+  // Formatação melhorada para data e hora
+  const formatDateDetailed = (date) => {
+    const options = { 
+      weekday: 'short', 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    };
+    return date.toLocaleDateString('pt-BR', options);
+  };
+
+  const formatTimeDetailed = (date) => {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
   return (
-    <S.Nav className={className}>
+    <S.Nav className={className} $sidebarOpen={sidebarOpen}>
       <S.LeftSection>
         <S.MenuButton onClick={onToggleSidebar} aria-label={sidebarOpen ? "Fechar menu" : "Abrir menu"}>
           <FiMenu size={20} />
@@ -122,8 +141,14 @@ function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
 
       <S.RightSection>
         <S.DateTimeContainer>
-          <S.Date>{formatarData(currentTime)}</S.Date>
-          <S.Time>{formatTempo(currentTime)}</S.Time>
+          <S.DateWrapper>
+            <FiCalendar size={12} />
+            <S.Date>{formatDateDetailed(currentTime)}</S.Date>
+          </S.DateWrapper>
+          <S.TimeWrapper>
+            <FiClock size={12} />
+            <S.Time>{formatTimeDetailed(currentTime)}</S.Time>
+          </S.TimeWrapper>
         </S.DateTimeContainer>
 
         <S.UserContainer ref={dropdownRef}>
