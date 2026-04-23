@@ -32,10 +32,16 @@ import ConsultaDetalhe from '../components/Detalhes/ConsultaDetalhe';
 import CotacaoConteudo from '../components/Cotação/CotacaoConteudo';
 
 // Dropdown itens
-import GerenciarUsuarios from '../components/Dropdown/dropItens/GerenciarUsuarios/GerenciarUsuarios';
-import MinhaConta from '../components/Dropdown/dropItens/MinhaConta/MinhaConta';
-import Cadastro from '../components/Dropdown/dropItens/Cadastro/Cadastro';
-import HistoricoPage from '../components/Dropdown/dropItens/Historico/Historico';
+// import GerenciarUsuarios from '../components/Dropdown/dropItens/GerenciarUsuarios/GerenciarUsuarios';
+// import MinhaConta from '../components/Dropdown/dropItens/MinhaConta/MinhaConta';
+// import Cadastro from '../components/Dropdown/dropItens/Cadastro/Cadastro';
+// import HistoricoPage from '../components/Dropdown/dropItens/Historico/Historico';
+
+// Novas páginas de usuario e conta
+import MinhaConta from '../pages/MinhaConta/MinhaConta';
+import GerenciarUsuarios from '../pages/GerenciarUsuarios/GerenciarUsuarios';
+import Cadastro from '../pages/Cadastro/Cadastro';
+import HistoricoPage from '../pages/Historico/Historico';
 
 // Administrativo
 import HomeAdm from '../components/Adm/ImportacaoAdmPage';
