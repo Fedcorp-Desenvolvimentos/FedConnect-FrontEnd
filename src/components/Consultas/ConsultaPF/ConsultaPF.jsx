@@ -16,7 +16,7 @@ import {
 import { FaSpinner } from "react-icons/fa";
 import PageTemplate from "../../PageTemplate/PageTemplate";
 import { formatarData } from "../../../utils/formatar_data";
-import { ConsultaService } from "../../../services/ConsultaService";
+import { ConsultaService } from "../../../services/consultaService";
 import preencherZeros from "../../../utils/preencherZeros";
 import * as XLSX from "xlsx";
 
