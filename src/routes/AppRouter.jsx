@@ -43,14 +43,16 @@ import Upload from '../components/Adm/Upload';
 import ImportVida from '../components/Adm/ImportVida';
 
 // Views
-import Metricas from '../components/Views/Metricas';
+// import Metricas from '../components/Views/Metricas';
+import Metricas from '../pages/Metricas/Metricas';
 // import Ferramentas from '../components/Views/Ferramentas';
 
 import EnvEmail from '../components/Views/EnvEmail';
 import ConfigEmail from '../components/Views/ConfigEmail';
 
 // Agenda
-import AgendaSala from '../pages/Agenda/AgendaSala';
+// import AgendaSala from '../pages/Agenda/AgendaSala';
+import Agenda from '../pages/Agenda/Agenda';
 
 // Comercial
 import Acompanhamento from '../components/Comercial/DashboardComercial';
@@ -80,6 +82,10 @@ import EmailAutomacao from '../components/Automacao/Email/EmailAutomacao';
 import Mapa from '../components/Mapa/Mapa';
 import { Analytics } from '../pages/Analytics/Analytics';
 import Ferramentas from '../pages/Ferramentas/Ferramentas';
+
+// Testes de novas paginas
+import WorkflowHub from '../pages/Workflow/WorkflowHub';
+import RHHub from '../pages/RH/RHHub';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -133,7 +139,7 @@ const AppRouter = () => {
           <Route path="/config-email" element={<ConfigEmail />} />
           
           {/* Agenda */}
-          <Route path="/agenda" element={<AgendaSala />} />
+          <Route path="/agenda" element={<Agenda />} />
           <Route path="/agenda-comercial" element={<AgendaComercial />} />
           
           {/* Comercial e Financeiro */}
@@ -157,6 +163,10 @@ const AppRouter = () => {
           <Route path="/mapa" element={<Mapa />} />
 
           <Route path="/analytics" element={<Analytics/>} />
+
+          <Route path="/workflow" element={< WorkflowHub />} />
+
+          <Route path="/rh" element={<RHHub />} />
 
         </Route>
       </Route>

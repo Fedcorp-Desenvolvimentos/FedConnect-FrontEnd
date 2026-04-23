@@ -65,8 +65,10 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
     { path: "/faturamento", label: "Faturamento", icon: "bi-wallet2", allowed: ["admin", "faturamento", "ti"] },
     { path: "/metricas", label: "Métricas", icon: "bi-bar-chart-fill", allowed: ["admin"] },
     { path: "/agenda", label: "Agenda", icon: "bi-calendar-event", allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
-    { path: "/automacao", label: "Automação", icon: "bi-gear-fill", allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin"] : [] },
-    { path: "/analytics", label: "Estatísticas", icon: "bi-bar-chart-fill", allowed: ["admin"] }
+    // { path: "/automacao", label: "Automação", icon: "bi-gear-fill", allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin"] : [] },
+    { path: "/analytics", label: "Estatísticas", icon: "bi-bar-chart-fill", allowed: ["admin"] },
+    // { path: "/workflow", label: "Workflow", icon: "bi-kanban-fill", allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
+    // { path: "/rh", label: "Recursos Humanos", icon: "bi-people-fill", allowed: ["admin"] },
   ];
 
   return (
