@@ -119,7 +119,7 @@ const FaturamentoHome = () => {
               </S.Title>
               <S.Description>{item.desc}</S.Description>
               {item.external ? (
-                <S.Button 
+                <S.ExternalButton 
                   href={item.to} 
                   target="_blank" 
                   rel="noopener noreferrer"
@@ -127,7 +127,7 @@ const FaturamentoHome = () => {
                 >
                   <FaExternalLinkAlt size={12} />
                   <span>Acessar</span>
-                </S.Button>
+                </S.ExternalButton>
               ) : (
                 <S.Button to={item.to} $color={item.color}>
                   <span>Acessar</span>
