@@ -1,4 +1,4 @@
-// services/consultaRegiao.js
+// services/consultaRegiaoService.js
 
 import api from "./api"; 
 

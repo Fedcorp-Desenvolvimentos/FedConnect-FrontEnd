@@ -20,8 +20,10 @@ import ConsultasHome from '../pages/Consultas/ConsultasHome';
 import ConsultaPF from '../components/Consultas/ConsultaPF/ConsultaPF';
 import ConsultaEnd from '../components/Consultas/ConsultaEnd/ConsultaEnd';
 import ConsultaCNPJ from '../components/Consultas/ConsultaCNPJ/ConsultaCNPJ';
-import Comercial from '../components/Consultas/Comercial';
-import BuscaRegiao from '../components/Consultas/ComercialRegiao';
+// import Comercial from '../components/Consultas/Comercial';
+import ConsultaComercial from '../components/Consultas/ConsultaComercial/ConsultaComercial';
+// import BuscaRegiao from '../components/Consultas/ComercialRegiao';
+import ComercialRegiao from '../components/Consultas/ComercialRegiao/ComercialRegiao';
 // import Segurados from '../components/Consultas/Segurados';
 import ConsultaSegurados from '../components/Consultas/ConsultaSegurados/ConsultaSegurados';
 import ConsultaFat from '../components/Consultas/ConsultaFat';
@@ -42,7 +44,8 @@ import ImportVida from '../components/Adm/ImportVida';
 
 // Views
 import Metricas from '../components/Views/Metricas';
-import Ferramentas from '../components/Views/Ferramentas';
+// import Ferramentas from '../components/Views/Ferramentas';
+
 import EnvEmail from '../components/Views/EnvEmail';
 import ConfigEmail from '../components/Views/ConfigEmail';
 
@@ -56,9 +59,11 @@ import Financeiro from '../components/Comercial/Financeiro';
 import Produtos from '../components/Produtos/Produtos';
 
 // Faturamento
-import OperacionalHome from '../components/Faturamento/OperacionalHome';
+// import OperacionalHome from '../components/Faturamento/OperacionalHome';
+import FaturamentoHome from '../pages/Faturamento/FaturamentoHome';
 import PdfAutomation from '../components/Faturamento/PdfAutomation';
-import OperacionalCancelamento from '../components/Faturamento/OperacionalCancelamento';
+// import OperacionalCancelamento from '../components/Faturamento/OperacionalCancelamento';
+import FaturamentoCancelamentoFedBnk from '../components/Faturamento/FaturamentoCancelamentoFedBnk/FaturamentoCancelamentoFedBnk';
 import ReimpressaoBoleto from '../components/Faturamento/ReimpressaoBoleto';
 import Payxbox from '../components/Faturamento/Paybox';
 
@@ -74,6 +79,7 @@ import EmailAutomacao from '../components/Automacao/Email/EmailAutomacao';
 // Teste renderização Mapa
 import Mapa from '../components/Mapa/Mapa';
 import { Analytics } from '../pages/Analytics/Analytics';
+import Ferramentas from '../pages/Ferramentas/Ferramentas';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -95,12 +101,12 @@ const AppRouter = () => {
           
           {/* Consultas */}
           <Route path="/consultas" element={<ConsultasHome />} />
-          <Route path="/consulta-comercial" element={<Comercial />} />
+          <Route path="/consulta-comercial" element={<ConsultaComercial />} />
           
           <Route path="/consultas/consulta-pf" element={<ConsultaPF />} />
           <Route path="/consultas/consulta-end" element={<ConsultaEnd />} />
           <Route path="/consultas/consulta-cnpj" element={<ConsultaCNPJ />} />
-          <Route path="/consultas/comercial-regiao" element={<BuscaRegiao />} />
+          <Route path="/consultas/comercial-regiao" element={<ComercialRegiao />} />
           <Route path="/consultas/consulta-segurados" element={<ConsultaSegurados />} />
           <Route path="/consultas/consulta-faturas" element={<ConsultaFat />} />
           <Route path="/consultas/consulta-faturamento" element={<ConsultaFaturamento />} />
@@ -136,9 +142,9 @@ const AppRouter = () => {
           <Route path="/produtos" element={<Produtos />} />
           
           {/* Faturamento */}
-          <Route path="/faturamento" element={<OperacionalHome />} />
+          <Route path="/faturamento" element={<FaturamentoHome />} />
           <Route path="/faturamento/pdf-automation" element={<PdfAutomation />} />
-          <Route path="/faturamento/cancelamento" element={<OperacionalCancelamento />} />
+          <Route path="/faturamento/cancelamento" element={<FaturamentoCancelamentoFedBnk />} />
           <Route path="/faturamento/reimpressao-boleto" element={<ReimpressaoBoleto />} />
           <Route path="/faturamento/paybox" element={<Payxbox />} />
 
