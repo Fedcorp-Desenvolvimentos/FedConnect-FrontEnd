@@ -577,16 +577,6 @@ const ConsultaCNPJ = () => {
             </S.ResultField>
 
             <S.ResultField>
-              <S.ResultLabel>UF (Sede)</S.ResultLabel>
-              <S.ResultValue>
-                <span>{cnpjDataFlat.HeadquarterState || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.HeadquarterState, "uf")}>
-                  {copiado.uf ? <FiCheck /> : <FiCopy />}
-                </S.CopyButton>
-              </S.ResultValue>
-            </S.ResultField>
-
-            <S.ResultField>
               <S.ResultLabel>Bairro</S.ResultLabel>
               <S.ResultValue>
                 <span>{cnpjDataFlat.Address?.Neighborhood || "N/A"}</span>
@@ -641,6 +631,16 @@ const ConsultaCNPJ = () => {
                 <span>{cnpjDataFlat.Address?.City || "N/A"}</span>
                 <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.Address?.City, "municipio")}>
                   {copiado.municipio ? <FiCheck /> : <FiCopy />}
+                </S.CopyButton>
+              </S.ResultValue>
+            </S.ResultField>
+
+            <S.ResultField>
+              <S.ResultLabel>UF</S.ResultLabel>
+              <S.ResultValue>
+                <span>{cnpjDataFlat.HeadquarterState || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.HeadquarterState, "uf")}>
+                  {copiado.uf ? <FiCheck /> : <FiCopy />}
                 </S.CopyButton>
               </S.ResultValue>
             </S.ResultField>
@@ -732,15 +732,23 @@ const ConsultaCNPJ = () => {
                         </S.DetailRow>
                       )}
                       
-                      {podeAbrirMapaChaves && (
+                      {podeAbrirMapa(cnpjDataFlat) && (
                         <S.MapsButtonFull
-                          style={{ marginTop: 12 }}
                           onClick={() => {
-                            window.open(`https://www.google.com/maps/place/${encodeURIComponent(enderecoMaps)}`, "_blank");
+                            const endereco = montarEnderecoParaMaps({
+                              cep: cnpjDataFlat.Address?.ZipCode,
+                              tipo: cnpjDataFlat.Address?.StreetType,
+                              logradouro: cnpjDataFlat.Address?.Street,
+                              numero: cnpjDataFlat.Address?.Number,
+                              cidade: cnpjDataFlat.Address?.City,
+                              uf: cnpjDataFlat.Address?.State,
+                              complemento: cnpjDataFlat.Address?.Complement,
+                            });
+                            window.open(`https://www.google.com/maps/place/${encodeURIComponent(endereco)}`, "_blank");
                           }}
                         >
                           <FiMapPin size={18} />
-                          Ver endereço no maps
+                          Ver endereço no Google Maps
                         </S.MapsButtonFull>
                       )}
                     </S.ResultDetails>

@@ -460,6 +460,8 @@ export const SubTable = styled.div`
   }
 `;
 
+// Substitua a definição de StatusBadge por esta:
+
 export const StatusBadge = styled.span`
   display: inline-flex;
   align-items: center;
@@ -468,15 +470,50 @@ export const StatusBadge = styled.span`
   border-radius: 20px;
   font-size: 0.7rem;
   font-weight: 600;
+  white-space: nowrap;
 
   ${props => {
     switch (props.$status) {
       case 'A':
-        return css`background: #dcfce7; color: #16a34a;`;
+        return css`
+          background: #dcfce7;
+          color: #16a34a;
+        `;
       case 'C':
-        return css`background: #fee2e2; color: #dc2626;`;
+        return css`
+          background: #fee2e2;
+          color: #dc2626;
+        `;
+      case 'P':
+        return css`
+          background: #fef3c7;
+          color: #d97706;
+        `;
+      case 'Q':
+        return css`
+          background: #dbeafe;
+          color: #1e40af;
+        `;
+      case 'parcial':
+        return css`
+          background: #fff3cd;
+          color: #856404;
+        `;
+      case 'processada':
+        return css`
+          background: #e0f2fe;
+          color: #0369a1;
+        `;
+      case 'sem-boletos':
+        return css`
+          background: #f1f5f9;
+          color: #475569;
+        `;
       default:
-        return css`background: #f1f5f9; color: #475569;`;
+        return css`
+          background: #f1f5f9;
+          color: #475569;
+        `;
     }
   }}
 `;

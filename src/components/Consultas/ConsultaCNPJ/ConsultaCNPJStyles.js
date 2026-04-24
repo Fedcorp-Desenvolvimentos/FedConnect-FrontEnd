@@ -37,23 +37,25 @@ export const MapsButtonFull = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
-  gap: 8px;
-  width: 50%;
-  margin-top: 16px;
-  padding: 10px 16px;
-  background: #4285f4;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, #0F3D5D 0%, #1a5a7a 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 
+  width: 50%;
+  margin: 0 auto;
+
   &:hover {
-    background: #3367d6;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(15, 61, 93, 0.3);
   }
 
   &:active {

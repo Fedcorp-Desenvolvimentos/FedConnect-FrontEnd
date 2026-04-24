@@ -1,9 +1,12 @@
+import React from 'react';
+import * as S from "../ConsultaFaturamentoStyles";
+
 export const STATUS_MAP = {
-    A: { label: "Ativa", className: "status-ativa" },
-    C: { label: "Cancelada", className: "status-cancelada" },
-    P: { label: "Pendente", className: "status-pendente" },
-    Q: { label: "Quitada", className: "status-quitada" },
-    N: { label: "Inativa", className: "status-inativa" },
+    A: { label: "Ativa", status: "A" },
+    C: { label: "Cancelada", status: "C" },
+    P: { label: "Pendente", status: "P" },
+    Q: { label: "Quitada", status: "Q" },
+    N: { label: "Inativa", status: "N" },
 };
 
 const getStatusBoleto = (boleto, parcela) => {
@@ -24,7 +27,7 @@ const getStatusBoleto = (boleto, parcela) => {
 
 export const getStatusFatura = (boletos, parcelas) => {
     if (!boletos || boletos.length === 0) {
-        return { label: "Sem Boletos", className: "status-sem-boletos" };
+        return { label: "Sem Boletos", status: "sem-boletos" };
     }
 
     const statusBoletos = boletos.map((boleto) => {
@@ -42,44 +45,41 @@ export const getStatusFatura = (boletos, parcelas) => {
     const qtdPendentes = statusBoletos.filter(s => s === "pendente").length;
 
     if (qtdCancelados === total) {
-        return { label: "Cancelada", className: "status-cancelada" };
+        return { label: "Cancelada", status: "C" };
     }
 
     if (qtdQuitados === total) {
-        return { label: "Quitada", className: "status-quitada" };
+        return { label: "Quitada", status: "Q" };
     }
 
-    // mistura (cenário real do teu exemplo)
     if (qtdPendentes > 0 && (qtdQuitados > 0 || qtdCancelados > 0)) {
-        return { label: "Parcial", className: "status-parcial" };
+        return { label: "Parcial", status: "parcial" };
     }
 
     if (qtdPendentes > 0) {
-        return { label: "Pendente", className: "status-pendente" };
+        return { label: "Pendente", status: "P" };
     }
 
-    // 🔥 aqui é o ponto importante
-    return { label: "Processada", className: "status-processada" };
+    return { label: "Processada", status: "processada" };
 };
 
+// Componente de badge estilizado
 export const renderStatusBadge = (boletos, parcelas, statusFaturaOriginal) => {
     if (boletos && boletos.length > 0) {
         const status = getStatusFatura(boletos, parcelas);
-
+        
         return (
-            <span className={`status-badge ${status.className}`}>
+            <S.StatusBadge $status={status.status}>
                 {status.label}
-            </span>
+            </S.StatusBadge>
         );
     }
 
-    const info =
-        STATUS_MAP[statusFaturaOriginal] ||
-        { label: "Desconhecido", className: "status-desconhecida" };
+    const status = STATUS_MAP[statusFaturaOriginal] || { label: "Desconhecido", status: "desconhecida" };
 
     return (
-        <span className={`status-badge ${info.className}`}>
-            {info.label}
-        </span>
+        <S.StatusBadge $status={status.status}>
+            {status.label}
+        </S.StatusBadge>
     );
 };
