@@ -1,12 +1,9 @@
 // src/services/analyticsService.js
-
-import axios from "axios";
-
-// const BASE_URL = "http://localhost:8090/api/analytics";
-const BASE_URL = "https://fedhub-api-local.ngrok.app/api/analytics";
+import api from "./api";
 
 /**
  * Serviço de Analytics - Métricas e análises de negócio
+ * Agora passando pelo Django (middleware de segurança, rate limiting, etc)
  */
 const analyticsService = {
   /**
@@ -16,7 +13,7 @@ const analyticsService = {
    */
   getFaturamentoPeriodo: async (params) => {
     try {
-      const token = localStorage.getItem("accessToken", "");
+      const token = localStorage.getItem("accessToken");
 
       if (!token) {
         throw new Error("Token de autenticação não encontrado");
@@ -24,10 +21,12 @@ const analyticsService = {
 
       const headers = {
         "Authorization": `Bearer ${token}`,
-        "X-Application": "LVF5OXMUBTUT2C3SYI2IODW3P3AHFMMI"
+        "Content-Type": "application/json"
+        // O Django vai gerenciar a comunicação com o FastAPI internamente
+        // Não precisa mais enviar X-Application (isso fica no backend)
       };
       
-      const response = await axios.get(`${BASE_URL}/faturamento`, {
+      const response = await api.get(`/analytics/faturamento/`, {  // Note a barra no final
         headers,
         params: {
           data_ini: params.data_ini,
@@ -48,7 +47,7 @@ const analyticsService = {
    */
   getTopAdministradoras: async (limit = 10) => {
     try {
-      const token = localStorage.getItem("accessToken", "");
+      const token = localStorage.getItem("accessToken");
 
       if (!token) {
         throw new Error("Token de autenticação não encontrado");
@@ -56,10 +55,10 @@ const analyticsService = {
 
       const headers = {
         "Authorization": `Bearer ${token}`,
-        "X-Application": "LVF5OXMUBTUT2C3SYI2IODW3P3AHFMMI"
+        "Content-Type": "application/json"
       };
 
-      const response = await axios.get(`${BASE_URL}/administradoras/top`, {
+      const response = await api.get(`/analytics/administradoras/top/`, {
         headers,
         params: { limit }
       });
@@ -76,7 +75,7 @@ const analyticsService = {
    */
   getInadimplencia: async () => {
     try {
-      const token = localStorage.getItem("accessToken", "");
+      const token = localStorage.getItem("accessToken");
 
       if (!token) {
         throw new Error("Token de autenticação não encontrado");
@@ -84,10 +83,10 @@ const analyticsService = {
 
       const headers = {
         "Authorization": `Bearer ${token}`,
-        "X-Application": "LVF5OXMUBTUT2C3SYI2IODW3P3AHFMMI"
+        "Content-Type": "application/json"
       };
 
-      const response = await axios.get(`${BASE_URL}/inadimplencia`, { headers });
+      const response = await api.get(`/analytics/inadimplencia/`, { headers });
       return response.data;
     } catch (error) {
       console.error("Erro ao buscar inadimplência:", error);
@@ -102,7 +101,7 @@ const analyticsService = {
    */
   getFaturamentoPorAdministradora: async (params) => {
     try {
-      const token = localStorage.getItem("accessToken", "");
+      const token = localStorage.getItem("accessToken");
 
       if (!token) {
         throw new Error("Token de autenticação não encontrado");
@@ -110,10 +109,10 @@ const analyticsService = {
 
       const headers = {
         "Authorization": `Bearer ${token}`,
-        "X-Application": "LVF5OXMUBTUT2C3SYI2IODW3P3AHFMMI"
+        "Content-Type": "application/json"
       };
 
-      const response = await axios.get(`${BASE_URL}/administradoras/faturamento`, {
+      const response = await api.get(`/analytics/administradoras/faturamento/`, {
         headers,
         params: {
           data_ini: params.data_ini,
@@ -133,7 +132,7 @@ const analyticsService = {
    */
   getStatusFaturas: async () => {
     try {
-      const token = localStorage.getItem("accessToken", "");
+      const token = localStorage.getItem("accessToken");
 
       if (!token) {
         throw new Error("Token de autenticação não encontrado");
@@ -141,10 +140,10 @@ const analyticsService = {
 
       const headers = {
         "Authorization": `Bearer ${token}`,
-        "X-Application": "LVF5OXMUBTUT2C3SYI2IODW3P3AHFMMI"
+        "Content-Type": "application/json"
       };
 
-      const response = await axios.get(`${BASE_URL}/faturas/status`, { headers });
+      const response = await api.get(`/analytics/faturas/status/`, { headers });
       return response.data;
     } catch (error) {
       console.error("Erro ao buscar status das faturas:", error);
@@ -154,12 +153,13 @@ const analyticsService = {
 
   /**
    * 6. Dashboard completo (junção de várias métricas)
+   * Agora o Django chama o FastAPI que já busca em paralelo
    * @param {Object} params - { data_ini, data_fim }
    * @returns {Promise}
    */
   getDashboardCompleto: async (params) => {
     try {
-      const token = localStorage.getItem("accessToken", "");
+      const token = localStorage.getItem("accessToken");
 
       if (!token) {
         throw new Error("Token de autenticação não encontrado");
@@ -167,31 +167,21 @@ const analyticsService = {
 
       const headers = {
         "Authorization": `Bearer ${token}`,
-        "X-Application": "LVF5OXMUBTUT2C3SYI2IODW3P3AHFMMI"
+        "Content-Type": "application/json"
       };
 
-
-      // Busca todas as métricas em paralelo
-      const [faturamento, topAdms, inadimplencia, faturamentoPorAdm, statusFaturas] = await Promise.all([
-        analyticsService.getFaturamentoPeriodo(params),
-        analyticsService.getTopAdministradoras(10),
-        analyticsService.getInadimplencia(),
-        analyticsService.getFaturamentoPorAdministradora(params),
-        analyticsService.getStatusFaturas()
-      ]);
-
-      return {
-        periodo: {
+      // AGORA: O Django chama o endpoint /dashboard do FastAPI
+      // O FastAPI ainda faz o Promise.all internamente
+      const response = await api.get(`/analytics/dashboard/`, {
+        headers,
+        params: {
           data_ini: params.data_ini,
           data_fim: params.data_fim
-        },
-        faturamento: faturamento,
-        ranking_administradoras: topAdms,
-        inadimplencia: inadimplencia,
-        faturamento_por_administradora: faturamentoPorAdm,
-        status_faturas: statusFaturas,
-        timestamp: new Date().toISOString()
-      };
+        }
+      });
+      
+      // O retorno já vem completo do Django (que pegou do FastAPI)
+      return response.data;
     } catch (error) {
       console.error("Erro ao buscar dashboard completo:", error);
       throw error;

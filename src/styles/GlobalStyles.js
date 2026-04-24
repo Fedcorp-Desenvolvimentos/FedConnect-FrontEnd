@@ -5,7 +5,7 @@ export const GlobalStyles = createGlobalStyle`
   /* ===== VARIÁVEIS GLOBAIS ===== */
   :root {
     /* Cores principais - Tema corporativo azul */
-    --color-primary: #2463eb;
+    --color-primary: #0F3D5D;
     --color-primary-dark: #1e4fbd;
     --color-primary-light: #e8f0fe;
     --color-primary-bg: #f0f7ff;

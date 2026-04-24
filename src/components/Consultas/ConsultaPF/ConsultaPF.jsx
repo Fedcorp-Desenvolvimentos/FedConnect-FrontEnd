@@ -19,11 +19,12 @@ import { formatarData } from "../../../utils/formatar_data";
 import { ConsultaService } from "../../../services/consultaService";
 import preencherZeros from "../../../utils/preencherZeros";
 import * as XLSX from "xlsx";
+import { useLoading } from "../../../hooks/useLoading";
 
 const ConsultaPF = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const { startLoading, stopLoading, withLoading } = useLoading();
   const [activeTab, setActiveTab] = useState("cpf");
-  const [loading, setLoading] = useState(false);
   const [resultado, setResultado] = useState(null);
   const [copiado, setCopiado] = useState({});
   const [selectedResultIndex, setSelectedResultIndex] = useState(null);
@@ -41,7 +42,6 @@ const ConsultaPF = () => {
   });
 
   const handleFormChange = (e) => {
-    console.log("value", e.target.value);
     const { name, value } = e.target;
     let formattedValue = value;
     if (name === "cpf") {
@@ -62,7 +62,6 @@ const ConsultaPF = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true);
     setResultado(null);
     setSelectedResultIndex(null);
 
@@ -98,9 +97,10 @@ const ConsultaPF = () => {
     }
 
     if (!isValid) {
-      setLoading(false);
       return;
     }
+
+    startLoading("Realizando consulta...");
 
     try {
       const response = await ConsultaService.realizarConsulta(payload);
@@ -118,7 +118,7 @@ const ConsultaPF = () => {
     } catch (err) {
       enqueueSnackbar(err?.response?.data?.detail || err?.message || "Erro ao realizar consulta.", { variant: "error" });
     } finally {
-      setLoading(false);
+      stopLoading();
     }
   };
 
@@ -126,8 +126,8 @@ const ConsultaPF = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    setLoading(true);
     setMassConsultaMessage("Lendo planilha...");
+    startLoading("Processando planilha...");
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -143,13 +143,13 @@ const ConsultaPF = () => {
 
         if (cpfsValidos.length === 0) {
           setMassConsultaMessage("Nenhum CPF válido encontrado.");
-          setLoading(false);
+          stopLoading();
           return;
         }
 
         if (cpfsValidos.length > 250) {
           setMassConsultaMessage("Limite máximo de 250 CPFs por planilha.");
-          setLoading(false);
+          stopLoading();
           return;
         }
 
@@ -193,7 +193,7 @@ const ConsultaPF = () => {
         setMassConsultaMessage("Erro ao processar planilha.");
         enqueueSnackbar("Erro ao processar arquivo.", { variant: "error" });
       } finally {
-        setLoading(false);
+        stopLoading();
         event.target.value = null;
       }
     };
@@ -201,6 +201,7 @@ const ConsultaPF = () => {
   };
 
   const handleDownloadModel = async () => {
+    startLoading("Baixando modelo...");
     try {
       const response = await ConsultaService.baixarPlanilhaModeloCPF();
       const url = window.URL.createObjectURL(new Blob([response]));
@@ -213,6 +214,8 @@ const ConsultaPF = () => {
       enqueueSnackbar("Download do modelo iniciado!", { variant: "success" });
     } catch (err) {
       enqueueSnackbar("Erro ao baixar modelo.", { variant: "error" });
+    } finally {
+      stopLoading();
     }
   };
 
@@ -222,6 +225,7 @@ const ConsultaPF = () => {
     { id: "massa", label: "Consulta em Massa", icon: <FiUsers /> },
   ];
 
+  // Remove o loading local da UI - o global cuida disso
   return (
     <PageTemplate
       title="Consulta por Pessoa Física"
@@ -247,7 +251,7 @@ const ConsultaPF = () => {
           ))}
         </S.TabsContainer>
 
-        {/* Formulário CPF */}
+        {/* Formulário CPF - removido disabled do botão baseado no loading global */}
         {activeTab === "cpf" && (
           <S.Form onSubmit={handleSubmit}>
             <S.FormGroup>
@@ -258,13 +262,11 @@ const ConsultaPF = () => {
                 placeholder="Digite apenas números"
                 value={formData.cpf}
                 onChange={handleFormChange}
-                disabled={loading}
                 maxLength={14}
               />
             </S.FormGroup>
-            <S.Button type="submit" disabled={loading}>
-              {loading ? <FaSpinner className="spinner" /> : <FiSearch />}
-              {loading ? "Consultando..." : "Consultar"}
+            <S.Button type="submit">
+              <FiSearch /> Consultar
             </S.Button>
           </S.Form>
         )}
@@ -280,7 +282,6 @@ const ConsultaPF = () => {
                 placeholder="Digite o nome completo"
                 value={formData.nome}
                 onChange={handleFormChange}
-                disabled={loading}
               />
             </S.FormGroup>
             
@@ -292,7 +293,6 @@ const ConsultaPF = () => {
                   name="dataNascimento"
                   value={formData.dataNascimento}
                   onChange={handleFormChange}
-                  disabled={loading}
                 />
               </S.FormGroup>
               <S.FormGroup>
@@ -301,7 +301,6 @@ const ConsultaPF = () => {
                   name="estado"
                   value={formData.estado}
                   onChange={handleFormChange}
-                  disabled={loading}
                 >
                   <option value="">Selecione</option>
                   <option value="DF-GO-MS-MT-TO">Centro-Oeste</option>
@@ -327,7 +326,6 @@ const ConsultaPF = () => {
                   placeholder="Nome da mãe"
                   value={formData.motherName}
                   onChange={handleFormChange}
-                  disabled={loading}
                 />
               </S.FormGroup>
               <S.FormGroup>
@@ -338,14 +336,12 @@ const ConsultaPF = () => {
                   placeholder="Nome do pai"
                   value={formData.fatherName}
                   onChange={handleFormChange}
-                  disabled={loading}
                 />
               </S.FormGroup>
             </S.Row>
 
-            <S.Button type="submit" disabled={loading || !formData.nome.trim()}>
-              {loading ? <FaSpinner className="spinner" /> : <FiSearch />}
-              {loading ? "Consultando..." : "Consultar"}
+            <S.Button type="submit" disabled={!formData.nome.trim()}>
+              <FiSearch /> Consultar
             </S.Button>
           </S.Form>
         )}
@@ -369,15 +365,8 @@ const ConsultaPF = () => {
               accept=".xlsx, .xls"
               style={{ display: "none" }}
               onChange={handleMassFileUpload}
-              disabled={loading}
             />
-            {loading && (
-              <S.LoadingMessage>
-                <FaSpinner className="spinner" />
-                {massConsultaMessage || "Processando..."}
-              </S.LoadingMessage>
-            )}
-            {!loading && massConsultaMessage && (
+            {massConsultaMessage && (
               <S.InfoMessage $isError={massConsultaMessage.includes("erro") || massConsultaMessage.includes("inválido")}>
                 {massConsultaMessage}
               </S.InfoMessage>
@@ -449,7 +438,7 @@ const ConsultaPF = () => {
         )}
 
         {/* Sem resultados */}
-        {activeTab !== "massa" && resultado?.resultado_api?.Result?.length === 0 && !loading && (
+        {activeTab !== "massa" && resultado?.resultado_api?.Result?.length === 0 && (
           <S.NoResults>Nenhum resultado encontrado.</S.NoResults>
         )}
       </S.Container>
