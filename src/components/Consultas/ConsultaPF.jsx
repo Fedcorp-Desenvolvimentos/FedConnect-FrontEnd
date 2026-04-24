@@ -41,6 +41,7 @@ const ConsultaPF = () => {
     });
   
     const [massConsultaMessage, setMassConsultaMessage] = useState("");
+    
     const handleFormChange = (e) => {
       const { name, value } = e.target;
       let formattedValue = value;
@@ -448,7 +449,7 @@ const ConsultaPF = () => {
               name="cpf"
               value={formData.cpf}
               onChange={handleFormChange}
-              placeholder="Digite o CPF (apenas números)"
+              placeholder="Digite o CPF"
               required
               disabled={loading}
             />

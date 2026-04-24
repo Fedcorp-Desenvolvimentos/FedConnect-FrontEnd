@@ -102,7 +102,7 @@ const ConsultaCNPJ = () => {
   };
 
   const copiarParaClipboard = (texto, campo) => {
-    if (!texto) return;
+    if (!texto || texto === "N/A") return;
     navigator.clipboard.writeText(texto);
     setCopiado((prev) => ({ ...prev, [campo]: true }));
     enqueueSnackbar("Copiado para área de transferência!", { variant: "success" });
@@ -125,8 +125,42 @@ const ConsultaCNPJ = () => {
     return [];
   };
 
+  const flatToBasicData = (flat) => {
+    if (!flat) return null;
+    return {
+      OfficialName: flat.razao_social ?? null,
+      TradeName: flat.nome_fantasia ?? null,
+      TaxIdNumber: flat.cnpj ?? null,
+      HeadquarterState: flat.uf ?? null,
+      TaxIdStatus: flat.descricao_situacao_cadastral ?? null,
+      FoundedDate: flat.data_inicio_atividade ?? null,
+      CnaePrincipal: flat.cnae_fiscal_descricao ?? null,
+      CnaeFiscal: flat.cnae_fiscal ?? null,
+      Porte: flat.porte ?? null,
+      NaturezaJuridica: flat.natureza_juridica ?? null,
+      MatrizFilial: flat.descricao_identificador_matriz_filial ?? null,
+      AtividadesSecundarias: flat.cnaes_secundarios ?? [],
+      Contact: {
+        Phone1: flat.ddd_telefone_1 ?? null,
+        Phone2: flat.ddd_telefone_2 ?? null,
+        Email: flat.email ?? null,
+      },
+      Address: {
+        Neighborhood: flat.bairro ?? null,
+        ZipCode: flat.cep ?? null,
+        StreetType: flat.descricao_tipo_de_logradouro ?? null,
+        Street: flat.logradouro ?? null,
+        Complement: flat.complemento ?? null,
+        Number: flat.numero ?? null,
+        City: flat.municipio ?? null,
+        State: flat.uf ?? null,
+      },
+    };
+  };
+
   const cnpjData = getResultData(resultado);
   const resultList = getResultList(resultado);
+  const cnpjDataFlat = flatToBasicData(cnpjData);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -235,9 +269,15 @@ const ConsultaCNPJ = () => {
               "Nome Fantasia": data.nome_fantasia || "N/A",
               "Situação Cadastral": data.descricao_situacao_cadastral || "N/A",
               "Atividade Principal": data.cnae_fiscal_descricao || "N/A",
+              "Atividades Secundárias": Array.isArray(data.cnaes_secundarios)
+                ? data.cnaes_secundarios.map(c => c.descricao).filter(d => d).join(", ")
+                : "N/A",
               "UF": data.uf || "N/A",
               "Município": data.municipio || "N/A",
               "Telefone": data.ddd_telefone_1 || data.ddd_telefone_2 || "N/A",
+              "Porte": data.porte || "N/A",
+              "Matriz/Filial": data.descricao_identificador_matriz_filial || "N/A",
+              "Data Início": formatarDataBrasileira(data.data_inicio_atividade) || "N/A",
             });
           });
           
@@ -284,6 +324,10 @@ const ConsultaCNPJ = () => {
     { id: "massa", label: "Consulta em Massa", icon: <FiUsers /> },
   ];
 
+  const podeAbrirMapa = (dados) => {
+    return dados?.Address?.ZipCode && (dados?.Address?.Street || dados?.Address?.StreetType);
+  };
+
   return (
     <PageTemplate
       title="Consulta por Pessoa Jurídica"
@@ -323,7 +367,7 @@ const ConsultaCNPJ = () => {
                 value={cnpj}
                 onChange={handleCnpjChange}
                 disabled={loading}
-                maxLength={14}
+                maxLength={18}
               />
             </S.FormGroup>
             <S.Button type="submit" disabled={loading}>
@@ -390,16 +434,16 @@ const ConsultaCNPJ = () => {
           </S.MassContainer>
         )}
 
-        {/* Resultado CNPJ */}
-        {activeTab === "cnpj" && cnpjData && (
+        {/* Resultado CNPJ - COMPLETO com todos os campos do antigo */}
+        {activeTab === "cnpj" && cnpjDataFlat && (
           <S.ResultCard ref={resultadoRef}>
             <S.ResultTitle>Resultado da Consulta</S.ResultTitle>
             
             <S.ResultField>
               <S.ResultLabel>Razão Social</S.ResultLabel>
               <S.ResultValue>
-                <span>{cnpjData.razao_social || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cnpjData.razao_social || "N/A", "razao_social")}>
+                <span>{cnpjDataFlat.OfficialName || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.OfficialName, "razao_social")}>
                   {copiado.razao_social ? <FiCheck /> : <FiCopy />}
                 </S.CopyButton>
               </S.ResultValue>
@@ -408,8 +452,8 @@ const ConsultaCNPJ = () => {
             <S.ResultField>
               <S.ResultLabel>Nome Fantasia</S.ResultLabel>
               <S.ResultValue>
-                <span>{cnpjData.nome_fantasia || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cnpjData.nome_fantasia || "N/A", "nome_fantasia")}>
+                <span>{cnpjDataFlat.TradeName || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.TradeName, "nome_fantasia")}>
                   {copiado.nome_fantasia ? <FiCheck /> : <FiCopy />}
                 </S.CopyButton>
               </S.ResultValue>
@@ -418,19 +462,9 @@ const ConsultaCNPJ = () => {
             <S.ResultField>
               <S.ResultLabel>CNPJ</S.ResultLabel>
               <S.ResultValue>
-                <span>{cnpjData.cnpj || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cnpjData.cnpj || "N/A", "cnpj")}>
+                <span>{cnpjDataFlat.TaxIdNumber || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.TaxIdNumber, "cnpj")}>
                   {copiado.cnpj ? <FiCheck /> : <FiCopy />}
-                </S.CopyButton>
-              </S.ResultValue>
-            </S.ResultField>
-
-            <S.ResultField>
-              <S.ResultLabel>Situação Cadastral</S.ResultLabel>
-              <S.ResultValue>
-                <span>{cnpjData.descricao_situacao_cadastral || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cnpjData.descricao_situacao_cadastral || "N/A", "situacao")}>
-                  {copiado.situacao ? <FiCheck /> : <FiCopy />}
                 </S.CopyButton>
               </S.ResultValue>
             </S.ResultField>
@@ -438,29 +472,76 @@ const ConsultaCNPJ = () => {
             <S.ResultField>
               <S.ResultLabel>Atividade Principal</S.ResultLabel>
               <S.ResultValue>
-                <span>{cnpjData.cnae_fiscal_descricao || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cnpjData.cnae_fiscal_descricao || "N/A", "atividade")}>
-                  {copiado.atividade ? <FiCheck /> : <FiCopy />}
+                <span>{cnpjDataFlat.CnaePrincipal || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.CnaePrincipal, "atividade_principal")}>
+                  {copiado.atividade_principal ? <FiCheck /> : <FiCopy />}
+                </S.CopyButton>
+              </S.ResultValue>
+            </S.ResultField>
+
+            {/* Atividades Secundárias */}
+            <S.ResultField>
+              <S.ResultLabel>Atividades Secundárias</S.ResultLabel>
+              <S.ResultValue>
+                <S.AtividadesSecundariasList>
+                  {Array.isArray(cnpjDataFlat.AtividadesSecundarias) && cnpjDataFlat.AtividadesSecundarias.length > 0 ? (
+                    cnpjDataFlat.AtividadesSecundarias
+                      .filter(c => c.descricao && c.descricao.trim())
+                      .map((c, idx) => <li key={idx}>{c.descricao}</li>)
+                  ) : (
+                    <span>Nenhuma atividade secundária</span>
+                  )}
+                </S.AtividadesSecundariasList>
+                <S.CopyButton onClick={() => copiarParaClipboard(
+                  Array.isArray(cnpjDataFlat.AtividadesSecundarias)
+                    ? cnpjDataFlat.AtividadesSecundarias.filter(c => c.descricao).map(c => c.descricao).join("\n")
+                    : "Nenhuma",
+                  "atividades_secundarias"
+                )}>
+                  {copiado.atividades_secundarias ? <FiCheck /> : <FiCopy />}
+                </S.CopyButton>
+              </S.ResultValue>
+            </S.ResultField>
+
+            {/* CNAE Fiscal */}
+            <S.ResultField>
+              <S.ResultLabel>CNAE Fiscal</S.ResultLabel>
+              <S.ResultValue>
+                <span>{cnpjDataFlat.CnaeFiscal || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.CnaeFiscal, "cnae_fiscal")}>
+                  {copiado.cnae_fiscal ? <FiCheck /> : <FiCopy />}
+                </S.CopyButton>
+              </S.ResultValue>
+            </S.ResultField>
+
+            {/* Porte */}
+            <S.ResultField>
+              <S.ResultLabel>Porte</S.ResultLabel>
+              <S.ResultValue>
+                <span>{cnpjDataFlat.Porte || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.Porte, "porte")}>
+                  {copiado.porte ? <FiCheck /> : <FiCopy />}
+                </S.CopyButton>
+              </S.ResultValue>
+            </S.ResultField>
+
+            {/* Natureza Jurídica */}
+            <S.ResultField>
+              <S.ResultLabel>Natureza Jurídica</S.ResultLabel>
+              <S.ResultValue>
+                <span>{cnpjDataFlat.NaturezaJuridica || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.NaturezaJuridica, "natureza_juridica")}>
+                  {copiado.natureza_juridica ? <FiCheck /> : <FiCopy />}
                 </S.CopyButton>
               </S.ResultValue>
             </S.ResultField>
 
             <S.ResultField>
-              <S.ResultLabel>Matriz/Filial</S.ResultLabel>
+              <S.ResultLabel>Matriz / Filial</S.ResultLabel>
               <S.ResultValue>
-                <span>{cnpjData.descricao_identificador_matriz_filial || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cnpjData.descricao_identificador_matriz_filial || "N/A", "matriz")}>
-                  {copiado.matriz ? <FiCheck /> : <FiCopy />}
-                </S.CopyButton>
-              </S.ResultValue>
-            </S.ResultField>
-
-            <S.ResultField>
-              <S.ResultLabel>Data de Início</S.ResultLabel>
-              <S.ResultValue>
-                <span>{formatarDataBrasileira(cnpjData.data_inicio_atividade) || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(formatarDataBrasileira(cnpjData.data_inicio_atividade) || "N/A", "data_inicio")}>
-                  {copiado.data_inicio ? <FiCheck /> : <FiCopy />}
+                <span>{cnpjDataFlat.MatrizFilial || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.MatrizFilial, "matriz_filial")}>
+                  {copiado.matriz_filial ? <FiCheck /> : <FiCopy />}
                 </S.CopyButton>
               </S.ResultValue>
             </S.ResultField>
@@ -468,58 +549,49 @@ const ConsultaCNPJ = () => {
             <S.ResultField>
               <S.ResultLabel>Telefone</S.ResultLabel>
               <S.ResultValue>
-                <span>{cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cnpjData.ddd_telefone_1 || cnpjData.ddd_telefone_2 || "N/A", "telefone")}>
+                <span>{cnpjDataFlat.Contact?.Phone1 || cnpjDataFlat.Contact?.Phone2 || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.Contact?.Phone1 || cnpjDataFlat.Contact?.Phone2, "telefone")}>
                   {copiado.telefone ? <FiCheck /> : <FiCopy />}
                 </S.CopyButton>
               </S.ResultValue>
             </S.ResultField>
 
             <S.ResultField>
-              <S.ResultLabel>Endereço</S.ResultLabel>
+              <S.ResultLabel>Situação Cadastral</S.ResultLabel>
               <S.ResultValue>
-                <span>
-                  {cnpjData.logradouro ? 
-                    `${cnpjData.descricao_tipo_de_logradouro || ""} ${cnpjData.logradouro || ""}${cnpjData.numero ? `, ${cnpjData.numero}` : ""}`.trim() 
-                    : "N/A"}
-                </span>
-                {cnpjData.cep && (cnpjData.logradouro || cnpjData.descricao_tipo_de_logradouro) && (
-                  <S.MapsButton
-                    onClick={() => {
-                      const endereco = montarEnderecoParaMaps({
-                        cep: cnpjData.cep,
-                        tipo: cnpjData.descricao_tipo_de_logradouro,
-                        logradouro: cnpjData.logradouro,
-                        numero: cnpjData.numero,
-                        cidade: cnpjData.municipio,
-                        uf: cnpjData.uf,
-                        complemento: cnpjData.complemento,
-                      });
-                      window.open(`https://www.google.com/maps/place/${encodeURIComponent(endereco)}`, "_blank");
-                    }}
-                  >
-                    <FiMapPin />
-                  </S.MapsButton>
-                )}
+                <span>{cnpjDataFlat.TaxIdStatus || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.TaxIdStatus, "situacao_cadastral")}>
+                  {copiado.situacao_cadastral ? <FiCheck /> : <FiCopy />}
+                </S.CopyButton>
+              </S.ResultValue>
+            </S.ResultField>
+
+            <S.ResultField>
+              <S.ResultLabel>Data de Início de Atividade</S.ResultLabel>
+              <S.ResultValue>
+                <span>{formatarDataBrasileira(cnpjDataFlat.FoundedDate) || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(formatarDataBrasileira(cnpjDataFlat.FoundedDate), "data_inicio")}>
+                  {copiado.data_inicio ? <FiCheck /> : <FiCopy />}
+                </S.CopyButton>
+              </S.ResultValue>
+            </S.ResultField>
+
+            <S.ResultField>
+              <S.ResultLabel>UF (Sede)</S.ResultLabel>
+              <S.ResultValue>
+                <span>{cnpjDataFlat.HeadquarterState || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.HeadquarterState, "uf")}>
+                  {copiado.uf ? <FiCheck /> : <FiCopy />}
+                </S.CopyButton>
               </S.ResultValue>
             </S.ResultField>
 
             <S.ResultField>
               <S.ResultLabel>Bairro</S.ResultLabel>
               <S.ResultValue>
-                <span>{cnpjData.bairro || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cnpjData.bairro || "N/A", "bairro")}>
+                <span>{cnpjDataFlat.Address?.Neighborhood || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.Address?.Neighborhood, "bairro")}>
                   {copiado.bairro ? <FiCheck /> : <FiCopy />}
-                </S.CopyButton>
-              </S.ResultValue>
-            </S.ResultField>
-
-            <S.ResultField>
-              <S.ResultLabel>Município/UF</S.ResultLabel>
-              <S.ResultValue>
-                <span>{cnpjData.municipio || "N/A"} / {cnpjData.uf || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(`${cnpjData.municipio || "N/A"} / ${cnpjData.uf || "N/A"}`, "municipio")}>
-                  {copiado.municipio ? <FiCheck /> : <FiCopy />}
                 </S.CopyButton>
               </S.ResultValue>
             </S.ResultField>
@@ -527,12 +599,72 @@ const ConsultaCNPJ = () => {
             <S.ResultField>
               <S.ResultLabel>CEP</S.ResultLabel>
               <S.ResultValue>
-                <span>{cnpjData.cep || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cnpjData.cep || "N/A", "cep")}>
+                <span>{cnpjDataFlat.Address?.ZipCode || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.Address?.ZipCode, "cep")}>
                   {copiado.cep ? <FiCheck /> : <FiCopy />}
                 </S.CopyButton>
               </S.ResultValue>
             </S.ResultField>
+
+            <S.ResultField>
+              <S.ResultLabel>Logradouro</S.ResultLabel>
+              <S.ResultValue>
+                <span>
+                  {cnpjDataFlat.Address?.StreetType && cnpjDataFlat.Address?.Street
+                    ? `${cnpjDataFlat.Address.StreetType} ${cnpjDataFlat.Address.Street}${cnpjDataFlat.Address.Number ? `, ${cnpjDataFlat.Address.Number}` : ""}`
+                    : cnpjDataFlat.Address?.StreetType || cnpjDataFlat.Address?.Street || "N/A"}
+                </span>
+                <S.CopyButton onClick={() => copiarParaClipboard(
+                  cnpjDataFlat.Address?.StreetType && cnpjDataFlat.Address?.Street
+                    ? `${cnpjDataFlat.Address.StreetType} ${cnpjDataFlat.Address.Street}${cnpjDataFlat.Address.Number ? `, ${cnpjDataFlat.Address.Number}` : ""}`
+                    : cnpjDataFlat.Address?.StreetType || cnpjDataFlat.Address?.Street || "N/A",
+                  "logradouro"
+                )}>
+                  {copiado.logradouro ? <FiCheck /> : <FiCopy />}
+                </S.CopyButton>
+              </S.ResultValue>
+            </S.ResultField>
+
+            <S.ResultField>
+              <S.ResultLabel>Complemento</S.ResultLabel>
+              <S.ResultValue>
+                <span>{cnpjDataFlat.Address?.Complement || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.Address?.Complement, "complemento")}>
+                  {copiado.complemento ? <FiCheck /> : <FiCopy />}
+                </S.CopyButton>
+              </S.ResultValue>
+            </S.ResultField>
+
+            <S.ResultField>
+              <S.ResultLabel>Município</S.ResultLabel>
+              <S.ResultValue>
+                <span>{cnpjDataFlat.Address?.City || "N/A"}</span>
+                <S.CopyButton onClick={() => copiarParaClipboard(cnpjDataFlat.Address?.City, "municipio")}>
+                  {copiado.municipio ? <FiCheck /> : <FiCopy />}
+                </S.CopyButton>
+              </S.ResultValue>
+            </S.ResultField>
+
+            {/* Botão Maps */}
+            {podeAbrirMapa(cnpjDataFlat) && (
+              <S.MapsButtonFull
+                onClick={() => {
+                  const endereco = montarEnderecoParaMaps({
+                    cep: cnpjDataFlat.Address?.ZipCode,
+                    tipo: cnpjDataFlat.Address?.StreetType,
+                    logradouro: cnpjDataFlat.Address?.Street,
+                    numero: cnpjDataFlat.Address?.Number,
+                    cidade: cnpjDataFlat.Address?.City,
+                    uf: cnpjDataFlat.Address?.State,
+                    complemento: cnpjDataFlat.Address?.Complement,
+                  });
+                  window.open(`https://www.google.com/maps/place/${encodeURIComponent(endereco)}`, "_blank");
+                }}
+              >
+                <FiMapPin size={18} />
+                Ver endereço no maps
+              </S.MapsButtonFull>
+            )}
           </S.ResultCard>
         )}
 
@@ -541,9 +673,10 @@ const ConsultaCNPJ = () => {
           <S.ResultCard ref={resultadoRef}>
             <S.ResultTitle>Resultados Encontrados ({resultList.length})</S.ResultTitle>
             {resultList.map((item, idx) => {
-              const data = item.BasicData || item;
+              const data = flatToBasicData(item) || item;
               const isExpanded = selectedResultIndex === idx;
-              const enderecoMaps = data.Address ? montarEnderecoParaMaps({
+              
+              const enderecoMaps = montarEnderecoParaMaps({
                 cep: data.Address?.ZipCode,
                 tipo: data.Address?.StreetType,
                 logradouro: data.Address?.Street,
@@ -551,8 +684,9 @@ const ConsultaCNPJ = () => {
                 cidade: data.Address?.City,
                 uf: data.Address?.State || data.HeadquarterState,
                 complemento: data.Address?.Complement,
-              }) : "";
-              const podeAbrirMapa = enderecoMaps && (data.Address?.ZipCode || data.Address?.Street);
+              });
+              
+              const podeAbrirMapaChaves = enderecoMaps && (data.Address?.ZipCode || data.Address?.Street);
 
               return (
                 <S.ResultItem key={idx} $expanded={isExpanded}>
@@ -565,25 +699,50 @@ const ConsultaCNPJ = () => {
                   </S.ResultHeader>
                   {isExpanded && (
                     <S.ResultDetails>
+                      <S.DetailRow><strong>Razão Social:</strong> {data.OfficialName || "N/A"}</S.DetailRow>
                       <S.DetailRow><strong>Nome Fantasia:</strong> {data.TradeName || "N/A"}</S.DetailRow>
+                      <S.DetailRow><strong>CNPJ:</strong> {data.TaxIdNumber || "N/A"}</S.DetailRow>
                       <S.DetailRow><strong>Situação Cadastral:</strong> {data.TaxIdStatus || "N/A"}</S.DetailRow>
+                      <S.DetailRow><strong>Atividade Principal:</strong> {data.CnaePrincipal || "N/A"}</S.DetailRow>
+                      <S.DetailRow><strong>Porte:</strong> {data.Porte || "N/A"}</S.DetailRow>
+                      <S.DetailRow><strong>Natureza Jurídica:</strong> {data.NaturezaJuridica || "N/A"}</S.DetailRow>
+                      <S.DetailRow><strong>Matriz/Filial:</strong> {data.MatrizFilial || "N/A"}</S.DetailRow>
                       <S.DetailRow><strong>Telefone:</strong> {data.Contact?.Phone1 || data.Contact?.Phone2 || "N/A"}</S.DetailRow>
                       <S.DetailRow><strong>Email:</strong> {data.Contact?.Email || "N/A"}</S.DetailRow>
-                      <S.DetailRow><strong>Endereço:</strong> 
+                      <S.DetailRow><strong>Data de Início:</strong> {formatarDataBrasileira(data.FoundedDate) || "N/A"}</S.DetailRow>
+                      <S.DetailRow><strong>CEP:</strong> {data.Address?.ZipCode || "N/A"}</S.DetailRow>
+                      <S.DetailRow><strong>Logradouro:</strong> 
                         {data.Address?.StreetType || data.Address?.Street ? 
                           `${data.Address?.StreetType || ""} ${data.Address?.Street || ""}${data.Address?.Number ? `, ${data.Address?.Number}` : ""}`.trim()
                           : "N/A"}
-                        {podeAbrirMapa && (
-                          <S.MapsButtonSmall
-                            onClick={() => window.open(`https://www.google.com/maps/place/${encodeURIComponent(enderecoMaps)}`, "_blank")}
-                          >
-                            <FiMapPin size={14} /> Maps
-                          </S.MapsButtonSmall>
-                        )}
                       </S.DetailRow>
+                      <S.DetailRow><strong>Complemento:</strong> {data.Address?.Complement || "N/A"}</S.DetailRow>
                       <S.DetailRow><strong>Bairro:</strong> {data.Address?.Neighborhood || "N/A"}</S.DetailRow>
-                      <S.DetailRow><strong>Município/UF:</strong> {data.Address?.City || "N/A"} / {data.HeadquarterState || "N/A"}</S.DetailRow>
-                      <S.DetailRow><strong>CEP:</strong> {data.Address?.ZipCode || "N/A"}</S.DetailRow>
+                      <S.DetailRow><strong>Município:</strong> {data.Address?.City || "N/A"}</S.DetailRow>
+                      <S.DetailRow><strong>UF:</strong> {data.HeadquarterState || "N/A"}</S.DetailRow>
+                      
+                      {data.AtividadesSecundarias && data.AtividadesSecundarias.length > 0 && (
+                        <S.DetailRow>
+                          <strong>Atividades Secundárias:</strong>
+                          <ul style={{ marginTop: 4, paddingLeft: 20 }}>
+                            {data.AtividadesSecundarias.filter(c => c.descricao).map((c, i) => (
+                              <li key={i}>{c.descricao}</li>
+                            ))}
+                          </ul>
+                        </S.DetailRow>
+                      )}
+                      
+                      {podeAbrirMapaChaves && (
+                        <S.MapsButtonFull
+                          style={{ marginTop: 12 }}
+                          onClick={() => {
+                            window.open(`https://www.google.com/maps/place/${encodeURIComponent(enderecoMaps)}`, "_blank");
+                          }}
+                        >
+                          <FiMapPin size={18} />
+                          Ver endereço no maps
+                        </S.MapsButtonFull>
+                      )}
                     </S.ResultDetails>
                   )}
                 </S.ResultItem>

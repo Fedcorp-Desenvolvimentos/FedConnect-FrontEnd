@@ -41,6 +41,7 @@ const ConsultaPF = () => {
   });
 
   const handleFormChange = (e) => {
+    console.log("value", e.target.value);
     const { name, value } = e.target;
     let formattedValue = value;
     if (name === "cpf") {
@@ -258,7 +259,7 @@ const ConsultaPF = () => {
                 value={formData.cpf}
                 onChange={handleFormChange}
                 disabled={loading}
-                maxLength={11}
+                maxLength={14}
               />
             </S.FormGroup>
             <S.Button type="submit" disabled={loading}>

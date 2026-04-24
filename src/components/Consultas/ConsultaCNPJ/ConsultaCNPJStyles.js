@@ -21,6 +21,46 @@ export const Container = styled.div`
   }
 `;
 
+export const AtividadesSecundariasList = styled.ul`
+  margin: 0;
+  padding-left: 20px;
+  flex: 1;
+  
+  li {
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: #333;
+  }
+`;
+
+export const MapsButtonFull = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  gap: 8px;
+  width: 50%;
+  margin-top: 16px;
+  padding: 10px 16px;
+  background: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #3367d6;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 // Tabs
 export const TabsContainer = styled.div`
   display: flex;
