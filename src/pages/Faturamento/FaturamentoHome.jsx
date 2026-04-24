@@ -13,6 +13,8 @@ import {
   FaFileInvoiceDollar
 } from "react-icons/fa";
 
+import FaturamentoHelp from "./FaturamentoHelp";
+
 const operacionais = [
   // {
   //   key: "pdf-automation",
@@ -95,16 +97,7 @@ const FaturamentoHome = () => {
       loading={loading}
       empty={operacionaisPermitidos.length === 0}
       emptyMessage="Nenhuma ferramenta de faturamento disponível para seu nível de acesso"
-      helpContent={
-        <div>
-          <p><strong>O que fazer aqui:</strong></p>
-          <ul>
-            <li>Clique em "Acessar" para utilizar a ferramenta desejada</li>
-            <li>Ferramentas externas abrirão em uma nova aba</li>
-            <li>Entre em contato com o suporte caso tenha dificuldades</li>
-          </ul>
-        </div>
-      }
+      helpContent={<FaturamentoHelp/>}
     >
       <S.CardsGrid>
         {operacionaisPermitidos.map((item) => (

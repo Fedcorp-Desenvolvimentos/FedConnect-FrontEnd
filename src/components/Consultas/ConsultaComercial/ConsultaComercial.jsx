@@ -7,6 +7,7 @@ import * as XLSX from "xlsx";
 import * as S from "./ConsultaComercialStyles";
 import PageTemplate from "../../PageTemplate/PageTemplate";
 import { ConsultaService } from "../../../services/consultaService";
+import ConsultaComercialHelp from "./ConsultaComercialHelp";
 
 const ConsultaComercial = () => {
   const [activeTab, setActiveTab] = useState("cnpj");
@@ -248,6 +249,7 @@ const ConsultaComercial = () => {
       title="Consultas Comerciais"
       subtitle="Consulte informações comerciais"
       icon={<IoIosBusiness />}
+      helpContent={<ConsultaComercialHelp />}
     >
       <S.Container>
         {/* Tabs principais */}

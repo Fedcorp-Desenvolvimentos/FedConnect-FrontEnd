@@ -1,3 +1,5 @@
+// src/hooks/useLoading.js
+
 import { useGlobal } from '../context/GlobalContext';
 
 export const useLoading = () => {

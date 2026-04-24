@@ -1,14 +1,17 @@
-// src/components/Help/HelpModal.jsx
-
 import React from 'react';
-import { FaTimes, FaLightbulb, FaQuestionCircle, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
+import { 
+  FaTimes, 
+  FaLightbulb, 
+  FaInfoCircle, 
+  FaExclamationTriangle,
+  FaQuestionCircle
+} from 'react-icons/fa';
 import * as S from './HelpModalStyles';
 
 const HelpModal = ({ 
   isOpen, 
   onClose, 
   title = "Guia Rápido",
-  icon = <FaLightbulb />,
   content,
   type = "info" // info, warning, tip
 }) => {
@@ -37,7 +40,7 @@ const HelpModal = ({
       <S.ModalContent onClick={(e) => e.stopPropagation()}>
         <S.ModalHeader $type={type}>
           <S.ModalTitleWrapper>
-            {icon || getIconByType()}
+            {getIconByType()}
             <S.ModalTitle>{title}</S.ModalTitle>
           </S.ModalTitleWrapper>
           <S.ModalClose onClick={onClose}>

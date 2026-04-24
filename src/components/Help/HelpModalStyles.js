@@ -1,5 +1,3 @@
-// src/components/Help/HelpModalStyles.js
-
 import styled, { keyframes, css } from 'styled-components';
 
 const fadeIn = keyframes`
@@ -37,10 +35,12 @@ export const ModalOverlay = styled.div`
 export const ModalContent = styled.div`
   background: white;
   border-radius: 24px;
-  max-width: 620px;
+  max-width: 600px;
   width: 100%;
-  max-height: 85vh;
+  max-height: 80vh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   animation: ${slideIn} 0.2s ease;
 
@@ -56,7 +56,6 @@ export const ModalHeader = styled.div`
   align-items: center;
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  background: linear-gradient(135deg, #0F3D5D 0%, #1a5a7a 100%);
   
   ${props => props.$type === 'warning' && css`
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
@@ -64,6 +63,10 @@ export const ModalHeader = styled.div`
   
   ${props => props.$type === 'tip' && css`
     background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  `}
+  
+  ${props => (props.$type === 'info' || !props.$type) && css`
+    background: linear-gradient(135deg, #0F3D5D 0%, #1a5a7a 100%);
   `}
 `;
 
@@ -108,8 +111,19 @@ export const ModalBody = styled.div`
   color: #475569;
   line-height: 1.6;
   font-size: 0.9375rem;
-  max-height: 60vh;
   overflow-y: auto;
+  flex: 1;
+
+  /* Estilos para o conteúdo HTML que vem do help */
+  h1, h2, h3, h4, h5, h6 {
+    color: #0F3D5D;
+    margin: 0 0 0.75rem 0;
+  }
+
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.125rem; }
+  h4 { font-size: 1rem; }
 
   p {
     margin: 0 0 1rem 0;
@@ -140,50 +154,10 @@ export const ModalBody = styled.div`
     font-family: monospace;
   }
 
-  /* Estilos específicos para seções de ajuda */
-  .help-section {
-    margin-bottom: 1rem;
-    
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-  
-  .help-title {
-    font-weight: 700;
-    color: #0F3D5D;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .help-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-    margin: 0.75rem 0;
-    
-    @media (max-width: 480px) {
-      grid-template-columns: 1fr;
-    }
-  }
-  
-  .help-card {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 0.75rem;
-    border: 1px solid #e2e8f0;
-    
-    strong {
-      display: block;
-      margin-bottom: 0.25rem;
-    }
-    
-    p {
-      margin: 0;
-      font-size: 0.8125rem;
-    }
+  hr {
+    margin: 1rem 0;
+    border: none;
+    border-top: 1px solid #e2e8f0;
   }
 `;
 

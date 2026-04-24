@@ -221,7 +221,6 @@ export const Button = styled(Link)`
   }
 `;
 
-// Estilo adicional para o PageTemplate se necessário
 export const Container = styled.div`
   width: 100%;
   padding: 0;

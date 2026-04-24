@@ -25,6 +25,7 @@ import { AgendaService } from "../../services/agendaService";
 import PageTemplate from "../../components/PageTemplate/PageTemplate";
 import { CiCalendarDate } from "react-icons/ci";
 import { useSnackbar } from "notistack";
+import AgendaHelp from "./AgendaHelp";
 
 function getFirstMondayOfMonth(date) {
   const firstDay = startOfMonth(date);
@@ -231,6 +232,7 @@ export default function Agenda() {
       title="Agenda"
       subtitle="Gerencie as reservas da sala de reunião de forma fácil e rápida"
       icon={<CiCalendarDate />}
+      helpContent={<AgendaHelp/>}
     >
       <S.Container>
         <S.Toolbar>

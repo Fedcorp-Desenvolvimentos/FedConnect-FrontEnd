@@ -2,6 +2,7 @@ import * as S from "./MetricasStyles";
 import { FaExternalLinkAlt, FaChartBar } from "react-icons/fa";
 import PageTemplate from "../../components/PageTemplate/PageTemplate";
 import { useAuth } from "../../context/AuthContext";
+import MetricasHelp from "./MetricasHelp";
 
 const metricas = [
   {
@@ -59,16 +60,7 @@ const Metricas = () => {
       loading={loading}
       empty={metricasPermitidas.length === 0}
       emptyMessage="Nenhuma métrica disponível para seu nível de acesso"
-      helpContent={
-        <div>
-          <p><strong>O que fazer aqui:</strong></p>
-          <ul>
-            <li>Clique em "Acessar" para abrir o dashboard em uma nova aba</li>
-            <li>Os dashboards contêm métricas atualizadas em tempo real</li>
-            <li>Entre em contato com o suporte caso tenha dificuldades de acesso</li>
-          </ul>
-        </div>
-      }
+      helpContent={<MetricasHelp/>}
     >
       <S.Container>
         <S.CardsGrid>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import * as S from './PageTemplateStyles';
-import HelpModal from '../Help/HelpModal'; // ← CAMINHO CORRIGIDO
+import HelpModal from '../Help/HelpModal';
 import { 
   FaExclamationTriangle, 
   FaInbox, 

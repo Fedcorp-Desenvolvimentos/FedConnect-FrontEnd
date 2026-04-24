@@ -118,7 +118,7 @@ const MinhaConta = () => {
 
   return (
     <PageTemplate
-      title="Configurações da Conta"
+      title="Minha Conta"
       subtitle="Gerencie suas informações pessoais e segurança"
       icon={<IoIosBusiness />}
     >

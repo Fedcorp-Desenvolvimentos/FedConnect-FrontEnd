@@ -1,5 +1,6 @@
 import PageTemplate from "../../components/PageTemplate/PageTemplate";
 import { useAuth } from "../../context/AuthContext";
+import { FerramentasHelp } from "./FerramentasHelp";
 import * as S from "./FerramentasStyles";
 import { 
   FaFire, 
@@ -75,16 +76,7 @@ const Ferramentas = () => {
       loading={loading}
       empty={ferramentasPermitidas.length === 0}
       emptyMessage="Nenhuma ferramenta disponível para seu nível de acesso"
-      helpContent={
-        <div>
-          <p><strong>O que fazer aqui:</strong></p>
-          <ul>
-            <li>Clique em "Acessar" para abrir a ferramenta desejada em uma nova aba</li>
-            <li>As ferramentas com "Em breve" estarão disponíveis em breve</li>
-            <li>Entre em contato com o suporte caso tenha dificuldades de acesso</li>
-          </ul>
-        </div>
-      }
+      helpContent={<FerramentasHelp />}
     >
       <S.CardsGrid>
         {ferramentasPermitidas.map((ferramenta) => (
