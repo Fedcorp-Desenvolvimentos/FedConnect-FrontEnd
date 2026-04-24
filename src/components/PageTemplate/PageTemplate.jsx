@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import * as S from './PageTemplateStyles';
-import HelpModal from '../HelpModal/HelpModal';
+import HelpModal from '../Help/HelpModal'; // ← CAMINHO CORRIGIDO
 import { 
   FaExclamationTriangle, 
   FaInbox, 
@@ -15,6 +15,8 @@ const PageTemplate = ({
   icon,
   actions,
   helpContent,
+  helpTitle = "Guia Rápido",
+  helpType = "info",
   loading = false,
   error = null,
   empty = false,
@@ -64,11 +66,7 @@ const PageTemplate = ({
     );
   }
 
-  // Determina se deve mostrar o botão de ajuda
-  const hasHelp = helpContent && (
-    typeof helpContent === 'string' || 
-    (typeof helpContent === 'object' && helpContent !== null)
-  );
+  const hasHelp = Boolean(helpContent);
 
   return (
     <>
@@ -98,14 +96,13 @@ const PageTemplate = ({
         </S.Content>
       </S.Container>
 
-      {/* Modal de ajuda componentizado */}
-      {showHelp && hasHelp && (
-        <HelpModal 
-          isOpen={showHelp}
-          onClose={() => setShowHelp(false)}
-          content={helpContent}
-        />
-      )}
+      <HelpModal 
+        isOpen={showHelp}
+        onClose={() => setShowHelp(false)}
+        title={helpTitle}
+        content={helpContent}
+        type={helpType}
+      />
     </>
   );
 };

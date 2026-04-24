@@ -1,3 +1,5 @@
+// src/pages/Consultas/ConsultasHome.jsx
+
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import * as S from "./ConsultasHomeStyles";
@@ -10,6 +12,7 @@ import {
   FaSearch
 } from "react-icons/fa";
 import PageTemplate from "../../components/PageTemplate/PageTemplate";
+import { ConsultasHelp  } from "./ConsultasHelp";
 
 const consultas = [
     {
@@ -59,22 +62,6 @@ const consultas = [
     },
 ];
 
-const helpContentComponent = (
-    <div>
-        <p><strong>📋 Consultas Disponíveis</strong></p>
-        <p>Nesta página você pode realizar consultas aos principais cadastros:</p>
-        <ul>
-            <li><strong>Dados Pessoais</strong> - Consulta completa de CPF</li>
-            <li><strong>Dados Empresariais</strong> - Informações de CNPJ</li>
-            <li><strong>Endereços</strong> - Busca por CEP e logradouros</li>
-            <li><strong>Segurados</strong> - Verificação de status de segurados</li>
-            <li><strong>Faturamento</strong> - Relatórios financeiros detalhados</li>
-        </ul>
-        <p><strong>💡 Dica:</strong> Utilize os filtros disponíveis em cada consulta para refinar sua busca.</p>
-        {/* <p><strong>⚠️ Atenção:</strong> As consultas são registradas para fins de auditoria.</p> */}
-    </div>
-);
-
 const ConsultasHome = () => {
     const { user, loading } = useAuth();
     const currentUserType = user?.nivel_acesso;
@@ -91,7 +78,7 @@ const ConsultasHome = () => {
             loading={loading}
             empty={consultasPermitidas.length === 0}
             emptyMessage="Nenhuma consulta disponível para seu nível de acesso"
-            helpContent={helpContentComponent}
+            helpContent={<ConsultasHelp />}
         >
             <S.CardsGrid>
                 {consultasPermitidas.map((consulta) => (
