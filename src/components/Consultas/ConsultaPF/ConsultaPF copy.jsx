@@ -23,7 +23,7 @@ import { useLoading } from "../../../hooks/useLoading";
 
 const ConsultaPF = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { startLoading, stopLoading, withLoading, updateProgress } = useLoading();
+  const { startLoading, stopLoading, withLoading } = useLoading();
   const [activeTab, setActiveTab] = useState("cpf");
   const [resultado, setResultado] = useState(null);
   const [copiado, setCopiado] = useState({});
@@ -126,6 +126,9 @@ const ConsultaPF = () => {
     const file = event.target.files[0];
     if (!file) return;
 
+    setMassConsultaMessage("Lendo planilha...");
+    startLoading("Processando planilha...");
+
     const reader = new FileReader();
     reader.onload = async (e) => {
       try {
@@ -139,37 +142,24 @@ const ConsultaPF = () => {
           .filter(item => item.CPF.length === 11);
 
         if (cpfsValidos.length === 0) {
-          enqueueSnackbar("Nenhum CPF válido encontrado.", { variant: "error" });
+          setMassConsultaMessage("Nenhum CPF válido encontrado.");
+          stopLoading();
           return;
         }
 
         if (cpfsValidos.length > 250) {
-          enqueueSnackbar("Limite máximo de 250 CPFs por planilha.", { variant: "error" });
+          setMassConsultaMessage("Limite máximo de 250 CPFs por planilha.");
+          stopLoading();
           return;
         }
 
-        const total = cpfsValidos.length;
-        // Inicia loading com total conhecido
-        startLoading(`Iniciando consulta de ${total} CPFs...`);
+        setMassConsultaMessage(`Consultando ${cpfsValidos.length} CPFs...`);
         
         const allResults = [];
         const batchSize = 5;
         
         for (let i = 0; i < cpfsValidos.length; i += batchSize) {
           const batch = cpfsValidos.slice(i, i + batchSize);
-          const batchNumber = Math.floor(i / batchSize) + 1;
-          const totalBatches = Math.ceil(total / batchSize);
-          
-          // Atualiza progresso e mensagem
-          const processed = Math.min(i + batchSize, total);
-          const percent = Math.round((processed / total) * 100);
-          
-          updateProgress(
-            percent,
-            // `Consultando CPFs - Lote ${batchNumber}/${totalBatches} (${processed}/${total})`
-            `Consultando CPFs - ${processed}/${total} -`
-          );
-          
           const batchPromises = batch.map(item => 
             ConsultaService.realizarConsulta({ tipo_consulta: "cpf", parametro_consulta: item.CPF })
           );
@@ -188,22 +178,19 @@ const ConsultaPF = () => {
               "Nome da Mãe": consultaResult?.MotherName || "N/A",
             });
           });
+          
+          setMassConsultaMessage(`Processando ${Math.min(i + batchSize, cpfsValidos.length)} de ${cpfsValidos.length}...`);
         }
-        
-        // 100% completo
-        updateProgress(100, `Gerando planilha com ${allResults.length} registros...`);
 
         const newWorksheet = XLSX.utils.json_to_sheet(allResults);
         const newWorkbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, "Resultados");
         XLSX.writeFile(newWorkbook, `resultado-cpf-${new Date().toISOString().slice(0,19)}.xlsx`);
         
-        enqueueSnackbar(`Planilha gerada com ${allResults.length} registros!`, { variant: "success" });
-        setMassConsultaMessage(`✅ Concluído! ${allResults.length} registros processados.`);
-        
+        setMassConsultaMessage("Processamento concluído! Download iniciado.");
+        enqueueSnackbar("Planilha de resultados gerada com sucesso!", { variant: "success" });
       } catch (err) {
-        console.error(err);
-        setMassConsultaMessage("❌ Erro ao processar planilha.");
+        setMassConsultaMessage("Erro ao processar planilha.");
         enqueueSnackbar("Erro ao processar arquivo.", { variant: "error" });
       } finally {
         stopLoading();
@@ -238,7 +225,6 @@ const ConsultaPF = () => {
     { id: "massa", label: "Consulta em Massa", icon: <FiUsers /> },
   ];
 
-  // Remove o loading local da UI - o global cuida disso
   return (
     <PageTemplate
       title="Consulta por Pessoa Física"

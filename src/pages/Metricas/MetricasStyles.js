@@ -108,8 +108,8 @@ export const LogoWrapper = styled.div`
 `;
 
 export const LogoImg = styled.img`
-  width: 120px;
-  height: 120px;
+  width: 200px;
+  height: 200px;
   object-fit: contain;
   border-radius: 20px;
   background: #f8fafc;
@@ -161,7 +161,6 @@ export const Description = styled.p`
   }
 `;
 
-// Botão para links externos (Power BI)
 export const ExternalButton = styled.a`
   display: flex;
   align-items: center;
@@ -208,7 +207,6 @@ export const ExternalButton = styled.a`
   }
 `;
 
-// Botão para links internos (caso use)
 export const InternalButton = styled(Link)`
   display: flex;
   align-items: center;

@@ -21,7 +21,8 @@ import ConsultaPF from '../components/Consultas/ConsultaPF/ConsultaPF';
 import ConsultaEnd from '../components/Consultas/ConsultaEnd/ConsultaEnd';
 import ConsultaCNPJ from '../components/Consultas/ConsultaCNPJ/ConsultaCNPJ';
 // import Comercial from '../components/Consultas/Comercial';
-import ConsultaComercial from '../components/Consultas/ConsultaComercial/ConsultaComercial';
+import ConsultaComercial from '../components/Consultas/ConsultaComercial/ConsultaComercial';  // **********
+// import ConsultaComercial from '../components/Consultas/Comercial';
 // import BuscaRegiao from '../components/Consultas/ComercialRegiao';
 import ComercialRegiao from '../components/Consultas/ComercialRegiao/ComercialRegiao';
 // import Segurados from '../components/Consultas/Segurados';

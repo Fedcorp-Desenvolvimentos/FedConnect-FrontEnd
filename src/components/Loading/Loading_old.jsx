@@ -5,19 +5,11 @@ import LOGO from './LOGO.png';
 const Loading = ({ 
   fullScreen = false, 
   message = 'Carregando...',
-  progress = 0
+  progress = 0  // NOVO - recebe progresso real
 }) => {
   const radius = 90;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
-
-  // Formata mensagem com progresso
-  const getFormattedMessage = () => {
-    if (progress > 0 && progress < 100) {
-      return `${message} ${Math.round(progress)}%`;
-    }
-    return message;
-  };
 
   const LoadingContent = () => (
     <S.Container>
@@ -51,20 +43,18 @@ const Loading = ({
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             style={{
-              transition: 'stroke-dashoffset 0.3s ease'
+              transition: 'stroke-dashoffset 0.3s ease' // animação suave
             }}
           />
         </S.ProgressSvg>
+        
+        {/* Mostra porcentagem no centro */}
+        {/* <S.PercentageBadge>{Math.round(progress)}%</S.PercentageBadge> */}
       </S.LogoWrapper>
       
       {message && (
         <S.MessageContainer>
-          <S.MessageText>{getFormattedMessage()}</S.MessageText>
-          {progress > 0 && progress < 100 && (
-            <S.ProgressBarContainer>
-              <S.ProgressBarFill $progress={progress} />
-            </S.ProgressBarContainer>
-          )}
+          <S.MessageText>{message}</S.MessageText>
         </S.MessageContainer>
       )}
     </S.Container>

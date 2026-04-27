@@ -43,7 +43,6 @@ export const FilterGroup = styled.div`
     &:focus {
       outline: none;
       border-color: #3b82f6;
-      ring: 2px solid #3b82f6;
     }
   }
 `;

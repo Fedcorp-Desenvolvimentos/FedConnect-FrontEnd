@@ -19,6 +19,7 @@ import { ConsultaService } from "../../../services/consultaService";
 import preencherZeros from "../../../utils/preencherZeros";
 import * as XLSX from "xlsx";
 import { BsFillBuildingFill } from "react-icons/bs";
+import { useLoading } from "../../../hooks/useLoading";
 
 function formatarDataBrasileira(dataStr) {
   if (!dataStr) return "";
@@ -74,8 +75,8 @@ function montarEnderecoParaMaps({ cep, tipo, logradouro, numero, cidade, uf, com
 
 const ConsultaCNPJ = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const { startLoading, stopLoading, updateProgress } = useLoading(); // ALTERADO
   const [activeTab, setActiveTab] = useState("cnpj");
-  const [loading, setLoading] = useState(false);
   const [resultado, setResultado] = useState(null);
   const [copiado, setCopiado] = useState({});
   const [selectedResultIndex, setSelectedResultIndex] = useState(null);
@@ -164,7 +165,6 @@ const ConsultaCNPJ = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setLoading(true);
     setResultado(null);
     setSelectedResultIndex(null);
 
@@ -199,9 +199,10 @@ const ConsultaCNPJ = () => {
     }
 
     if (!isValid) {
-      setLoading(false);
       return;
     }
+
+    startLoading("Realizando consulta...");
 
     try {
       const response = await ConsultaService.realizarConsulta(payload);
@@ -213,7 +214,7 @@ const ConsultaCNPJ = () => {
     } catch (err) {
       enqueueSnackbar(err?.response?.data?.detail || err?.message || "Erro ao realizar consulta.", { variant: "error" });
     } finally {
-      setLoading(false);
+      stopLoading();
     }
   };
 
@@ -232,9 +233,6 @@ const ConsultaCNPJ = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    setLoading(true);
-    setMassConsultaMessage("Lendo planilha...");
-
     const reader = new FileReader();
     reader.onload = async (e) => {
       try {
@@ -248,24 +246,38 @@ const ConsultaCNPJ = () => {
           .filter(cnpj => cnpj.length === 14 && isValidCNPJ(cnpj));
 
         if (cnpjsValidos.length === 0) {
+          enqueueSnackbar("Nenhum CNPJ válido encontrado.", { variant: "error" });
           setMassConsultaMessage("Nenhum CNPJ válido encontrado.");
-          setLoading(false);
           return;
         }
 
         if (cnpjsValidos.length > 250) {
+          enqueueSnackbar("Limite máximo de 250 CNPJs por planilha.", { variant: "error" });
           setMassConsultaMessage("Limite máximo de 250 CNPJs por planilha.");
-          setLoading(false);
           return;
         }
 
-        setMassConsultaMessage(`Consultando ${cnpjsValidos.length} CNPJs...`);
+        const total = cnpjsValidos.length;
+        startLoading(`Iniciando consulta de ${total} CNPJs...`);
         
         const allResults = [];
         const batchSize = 5;
         
         for (let i = 0; i < cnpjsValidos.length; i += batchSize) {
           const batch = cnpjsValidos.slice(i, i + batchSize);
+          const batchNumber = Math.floor(i / batchSize) + 1;
+          const totalBatches = Math.ceil(total / batchSize);
+          
+          // Atualiza progresso real
+          const processed = Math.min(i + batchSize, total);
+          const percent = Math.round((processed / total) * 100);
+          
+          updateProgress(
+            percent,
+            // `Consultando CNPJs - Lote ${batchNumber}/${totalBatches} (${processed}/${total})`
+            `Consultando CNPJs - ${processed}/${total} -`
+          );
+          
           const batchPromises = batch.map(item => 
             ConsultaService.realizarConsulta({ tipo_consulta: "cnpj", parametro_consulta: item })
           );
@@ -303,11 +315,11 @@ const ConsultaCNPJ = () => {
               "Data Situação Cadastral": formatarDataBrasileira(data.data_situacao_cadastral) || "N/A",
               "Motivo Situação": data.descricao_motivo_situacao_cadastral || "N/A",
             });
-
           });
-          
-          setMassConsultaMessage(`Processando ${Math.min(i + batchSize, cnpjsValidos.length)} de ${cnpjsValidos.length}...`);
         }
+        
+        // 100% completo
+        updateProgress(100, `Gerando planilha com ${allResults.length} registros...`);
 
         const newWorksheet = XLSX.utils.json_to_sheet(allResults);
         const newWorkbook = XLSX.utils.book_new();
@@ -315,14 +327,14 @@ const ConsultaCNPJ = () => {
         XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, "Resultados");
         XLSX.writeFile(newWorkbook, `resultado-cnpj-${new Date().toISOString().slice(0,19)}.xlsx`);
         
-        setMassConsultaMessage("Processamento concluído! Download iniciado.");
-        enqueueSnackbar("Planilha de resultados gerada com sucesso!", { variant: "success" });
+        setMassConsultaMessage(`✅ Concluído! ${allResults.length} registros processados.`);
+        enqueueSnackbar(`Planilha gerada com ${allResults.length} registros!`, { variant: "success" });
       } catch (err) {
         console.error("Erro ao processar planilha:", err);
-        setMassConsultaMessage("Erro ao processar planilha.");
+        setMassConsultaMessage("❌ Erro ao processar planilha.");
         enqueueSnackbar("Erro ao processar arquivo.", { variant: "error" });
       } finally {
-        setLoading(false);
+        stopLoading();
         event.target.value = null;
       }
     };
@@ -330,6 +342,7 @@ const ConsultaCNPJ = () => {
   };
 
   const handleDownloadModel = async () => {
+    startLoading("Baixando modelo...");
     try {
       const response = await ConsultaService.baixarPlanilhaModeloCNPJ();
       const url = window.URL.createObjectURL(new Blob([response]));
@@ -342,6 +355,8 @@ const ConsultaCNPJ = () => {
       enqueueSnackbar("Download do modelo iniciado!", { variant: "success" });
     } catch (err) {
       enqueueSnackbar("Erro ao baixar modelo.", { variant: "error" });
+    } finally {
+      stopLoading();
     }
   };
 
@@ -393,13 +408,11 @@ const ConsultaCNPJ = () => {
                 placeholder="Digite apenas números"
                 value={cnpj}
                 onChange={handleCnpjChange}
-                disabled={loading}
                 maxLength={18}
               />
             </S.FormGroup>
-            <S.Button type="submit" disabled={loading}>
-              {loading ? <FaSpinner className="spinner" /> : <FiSearch />}
-              {loading ? "Consultando..." : "Consultar"}
+            <S.Button type="submit">
+              <FiSearch /> Consultar
             </S.Button>
           </S.Form>
         )}
@@ -415,13 +428,11 @@ const ConsultaCNPJ = () => {
                 placeholder="Digite a razão social"
                 value={formData.razaoSocial}
                 onChange={handleFormChange}
-                disabled={loading}
               />
             </S.FormGroup>
 
-            <S.Button type="submit" disabled={loading || !formData.razaoSocial.trim()}>
-              {loading ? <FaSpinner className="spinner" /> : <FiSearch />}
-              {loading ? "Consultando..." : "Consultar"}
+            <S.Button type="submit" disabled={!formData.razaoSocial.trim()}>
+              <FiSearch /> Consultar
             </S.Button>
           </S.Form>
         )}
@@ -445,15 +456,8 @@ const ConsultaCNPJ = () => {
               accept=".xlsx, .xls"
               style={{ display: "none" }}
               onChange={handleMassFileUpload}
-              disabled={loading}
             />
-            {loading && (
-              <S.LoadingMessage>
-                <FaSpinner className="spinner" />
-                {massConsultaMessage || "Processando..."}
-              </S.LoadingMessage>
-            )}
-            {!loading && massConsultaMessage && (
+            {massConsultaMessage && (
               <S.InfoMessage $isError={massConsultaMessage.includes("erro") || massConsultaMessage.includes("inválido")}>
                 {massConsultaMessage}
               </S.InfoMessage>
@@ -461,7 +465,7 @@ const ConsultaCNPJ = () => {
           </S.MassContainer>
         )}
 
-        {/* Resultado CNPJ - COMPLETO com todos os campos do antigo */}
+        {/* Resultado CNPJ - COMPLETO com todos os campos */}
         {activeTab === "cnpj" && cnpjDataFlat && (
           <S.ResultCard ref={resultadoRef}>
             <S.ResultTitle>Resultado da Consulta</S.ResultTitle>
@@ -759,19 +763,10 @@ const ConsultaCNPJ = () => {
                         </S.DetailRow>
                       )}
                       
-                      {podeAbrirMapa(cnpjDataFlat) && (
+                      {podeAbrirMapaChaves && (
                         <S.MapsButtonFull
                           onClick={() => {
-                            const endereco = montarEnderecoParaMaps({
-                              cep: cnpjDataFlat.Address?.ZipCode,
-                              tipo: cnpjDataFlat.Address?.StreetType,
-                              logradouro: cnpjDataFlat.Address?.Street,
-                              numero: cnpjDataFlat.Address?.Number,
-                              cidade: cnpjDataFlat.Address?.City,
-                              uf: cnpjDataFlat.Address?.State,
-                              complemento: cnpjDataFlat.Address?.Complement,
-                            });
-                            window.open(`https://www.google.com/maps/place/${encodeURIComponent(endereco)}`, "_blank");
+                            window.open(`https://www.google.com/maps/place/${encodeURIComponent(enderecoMaps)}`, "_blank");
                           }}
                         >
                           <FiMapPin size={18} />
@@ -787,7 +782,7 @@ const ConsultaCNPJ = () => {
         )}
 
         {/* Sem resultados */}
-        {activeTab !== "massa" && resultado && resultList.length === 0 && !loading && (
+        {activeTab !== "massa" && resultado && resultList.length === 0 && (
           <S.NoResults>Nenhum resultado encontrado.</S.NoResults>
         )}
       </S.Container>

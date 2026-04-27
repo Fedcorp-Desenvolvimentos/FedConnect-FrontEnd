@@ -1,741 +1,741 @@
-import { useState, useRef, useEffect } from "react";
-import "../../styles/ComercialRegiao.css";
-import * as XLSX from "xlsx";
-import { ConsultaService } from "../../services/consultaService";
-import { FiCopy, FiCheck, FiX } from "react-icons/fi";
-import { ConsultaRegiaoService } from "../../services/consultaRegiao";
+// import { useState, useRef, useEffect } from "react";
+// import "../../styles/ComercialRegiao.css";
+// import * as XLSX from "xlsx";
+// import { ConsultaService } from "../../services/consultaService";
+// import { FiCopy, FiCheck, FiX } from "react-icons/fi";
+// import { ConsultaRegiaoService } from "../../services/consultaRegiao";
 
-import { useGlobal } from "../../context/GlobalContext";
+// import { useGlobal } from "../../context/GlobalContext";
 
-const ComercialRegiao = () => {
-    const [form, setForm] = useState({
-        uf: "",
-        municipio: "",
-        bairro: "",
-    });
+// const ComercialRegiao = () => {
+//     const [form, setForm] = useState({
+//         uf: "",
+//         municipio: "",
+//         bairro: "",
+//     });
 
-    const { loading, setLoading, setLoadingMessage} = useGlobal();
+//     const { loading, setLoading, setLoadingMessage} = useGlobal();
 
-    const [erro, setErro] = useState(null);
-    const [resultados, setResultados] = useState([]);
-    const [hasSearched, setHasSearched] = useState(false);
-    const [paginaAtual, setPaginaAtual] = useState(1);
-    const itensPorPagina = 4;
+//     const [erro, setErro] = useState(null);
+//     const [resultados, setResultados] = useState([]);
+//     const [hasSearched, setHasSearched] = useState(false);
+//     const [paginaAtual, setPaginaAtual] = useState(1);
+//     const itensPorPagina = 4;
 
-    const [nextPageToken, setNextPageToken] = useState(null);
-    const [carregandoMais, setCarregandoMais] = useState(false);
-    const [todosResultados, setTodosResultados] = useState([]);
+//     const [nextPageToken, setNextPageToken] = useState(null);
+//     const [carregandoMais, setCarregandoMais] = useState(false);
+//     const [todosResultados, setTodosResultados] = useState([]);
 
-    // Modal
-    const [modalAberto, setModalAberto] = useState(false);
-    const [dadosModal, setDadosModal] = useState(null);
-    const [loadingModal, setLoadingModal] = useState(false);
-    const [erroModal, setErroModal] = useState(null);
-    const [copiado, setCopiado] = useState({});
-    const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState("");
+//     // Modal
+//     const [modalAberto, setModalAberto] = useState(false);
+//     const [dadosModal, setDadosModal] = useState(null);
+//     const [loadingModal, setLoadingModal] = useState(false);
+//     const [erroModal, setErroModal] = useState(null);
+//     const [copiado, setCopiado] = useState({});
+//     const [empresaSelecionadaNome, setEmpresaSelecionadaNome] = useState("");
 
-    // Dados de localidades
-    const [localidades, setLocalidades] = useState({});
-    const [municipios, setMunicipios] = useState([]);
-    const [bairros, setBairros] = useState([]);
+//     // Dados de localidades
+//     const [localidades, setLocalidades] = useState({});
+//     const [municipios, setMunicipios] = useState([]);
+//     const [bairros, setBairros] = useState([]);
 
-    const resultadosRef = useRef(null);
+//     const resultadosRef = useRef(null);
 
-    // Carregar localidades
-    useEffect(() => {
-        const fetchLocalidades = async () => {
-            setLoadingMessage("Carregando localidades...");
-            setLoading(true);
-            try {
+//     // Carregar localidades
+//     useEffect(() => {
+//         const fetchLocalidades = async () => {
+//             setLoadingMessage("Carregando localidades...");
+//             setLoading(true);
+//             try {
 
-                const data = await ConsultaRegiaoService.getLocalidades();
-                setLocalidades(data.data || {});
-                // console.log("Localidades carregadas:", data.data);
-            } catch (err) {
-                // console.error("Erro ao buscar localidades:", err);
-                setErro("Erro ao carregar localidades. Tente novamente mais tarde.");
-            } finally {
-                setLoading(false);
-            }
-        };
+//                 const data = await ConsultaRegiaoService.getLocalidades();
+//                 setLocalidades(data.data || {});
+//                 // console.log("Localidades carregadas:", data.data);
+//             } catch (err) {
+//                 // console.error("Erro ao buscar localidades:", err);
+//                 setErro("Erro ao carregar localidades. Tente novamente mais tarde.");
+//             } finally {
+//                 setLoading(false);
+//             }
+//         };
 
-        fetchLocalidades();
-    }, []);
+//         fetchLocalidades();
+//     }, []);
 
-    // Quando UF mudar, atualizar municípios
-    useEffect(() => {
-        if (form.uf && localidades[form.uf]) {
-            const municipiosList = Object.keys(localidades[form.uf].municipios).map(nome => ({
-                nome: nome,
-                total_bairros: localidades[form.uf].municipios[nome].total_bairros
-            }));
-            setMunicipios(municipiosList.sort((a, b) => a.nome.localeCompare(b.nome)));
-            setForm(prev => ({ ...prev, municipio: "", bairro: "" }));
-            setBairros([]);
-        } else {
-            setMunicipios([]);
-            setBairros([]);
-        }
-    }, [form.uf, localidades]);
+//     // Quando UF mudar, atualizar municípios
+//     useEffect(() => {
+//         if (form.uf && localidades[form.uf]) {
+//             const municipiosList = Object.keys(localidades[form.uf].municipios).map(nome => ({
+//                 nome: nome,
+//                 total_bairros: localidades[form.uf].municipios[nome].total_bairros
+//             }));
+//             setMunicipios(municipiosList.sort((a, b) => a.nome.localeCompare(b.nome)));
+//             setForm(prev => ({ ...prev, municipio: "", bairro: "" }));
+//             setBairros([]);
+//         } else {
+//             setMunicipios([]);
+//             setBairros([]);
+//         }
+//     }, [form.uf, localidades]);
 
-    // Quando município mudar, atualizar bairros
-    useEffect(() => {
-        if (form.uf && form.municipio && localidades[form.uf]) {
-            const municipioData = localidades[form.uf].municipios[form.municipio];
-            if (municipioData && municipioData.bairros) {
-                setBairros(municipioData.bairros || []);
-                setForm(prev => ({ ...prev, bairro: "" }));
-            } else {
-                setBairros([]);
-            }
-        } else {
-            setBairros([]);
-        }
-    }, [form.uf, form.municipio, localidades]);
+//     // Quando município mudar, atualizar bairros
+//     useEffect(() => {
+//         if (form.uf && form.municipio && localidades[form.uf]) {
+//             const municipioData = localidades[form.uf].municipios[form.municipio];
+//             if (municipioData && municipioData.bairros) {
+//                 setBairros(municipioData.bairros || []);
+//                 setForm(prev => ({ ...prev, bairro: "" }));
+//             } else {
+//                 setBairros([]);
+//             }
+//         } else {
+//             setBairros([]);
+//         }
+//     }, [form.uf, form.municipio, localidades]);
 
-    useEffect(() => {
-        if (resultados.length > 0 && resultadosRef.current) {
-            setTimeout(() => {
-                resultadosRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-            }, 180);
-        }
-    }, [resultados]);
+//     useEffect(() => {
+//         if (resultados.length > 0 && resultadosRef.current) {
+//             setTimeout(() => {
+//                 resultadosRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+//             }, 180);
+//         }
+//     }, [resultados]);
 
-    useEffect(() => {
-        setPaginaAtual(1);
-    }, [resultados]);
+//     useEffect(() => {
+//         setPaginaAtual(1);
+//     }, [resultados]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
-    };
+//     const handleChange = (e) => {
+//         const { name, value } = e.target;
+//         setForm((prev) => ({ ...prev, [name]: value }));
+//     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoadingMessage("Carregando dados, por favor aguarde...");
-        setLoading(true);
-        setErro(null);
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+//         setLoadingMessage("Carregando dados, por favor aguarde...");
+//         setLoading(true);
+//         setErro(null);
 
-        if (!form.uf || !form.municipio) {
-            setErro("UF e município são obrigatórios.");
-            return;
-        }
+//         if (!form.uf || !form.municipio) {
+//             setErro("UF e município são obrigatórios.");
+//             return;
+//         }
 
-        try {
-            // Resetar estados para nova busca
-            setTodosResultados([]);
-            setNextPageToken(null);
+//         try {
+//             // Resetar estados para nova busca
+//             setTodosResultados([]);
+//             setNextPageToken(null);
             
-            // Montar payload
-            const payload = {
-                uf: form.uf,
-                municipio: form.municipio,
-                ...(form.bairro && { bairro: form.bairro })
-            };
+//             // Montar payload
+//             const payload = {
+//                 uf: form.uf,
+//                 municipio: form.municipio,
+//                 ...(form.bairro && { bairro: form.bairro })
+//             };
             
-            const resp = await ConsultaService.consultaRegiao(payload);
+//             const resp = await ConsultaService.consultaRegiao(payload);
 
-            if (resp && Array.isArray(resp.resultados)) {
-                setTodosResultados(resp.resultados);
-                setResultados(resp.resultados);
-                setNextPageToken(resp.next_page_token);
-            } else {
-                setTodosResultados([]);
-                setResultados([]);
-            }
+//             if (resp && Array.isArray(resp.resultados)) {
+//                 setTodosResultados(resp.resultados);
+//                 setResultados(resp.resultados);
+//                 setNextPageToken(resp.next_page_token);
+//             } else {
+//                 setTodosResultados([]);
+//                 setResultados([]);
+//             }
 
-            setHasSearched(true);
-        } catch (err) {
-            console.error(err);
-            setErro("Erro ao consultar a região. Tente novamente.");
-            setTodosResultados([]);
-            setResultados([]);
-        } finally {
-            setLoading(false);
-        }
-    };
+//             setHasSearched(true);
+//         } catch (err) {
+//             console.error(err);
+//             setErro("Erro ao consultar a região. Tente novamente.");
+//             setTodosResultados([]);
+//             setResultados([]);
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
 
-    const carregarMaisResultados = async () => {
-        if (!nextPageToken || carregandoMais) return;
+//     const carregarMaisResultados = async () => {
+//         if (!nextPageToken || carregandoMais) return;
         
-        setCarregandoMais(true);
+//         setCarregandoMais(true);
         
-        try {
-            const payload = {
-                uf: form.uf,
-                municipio: form.municipio,
-                ...(form.bairro && { bairro: form.bairro }),
-                page_token: nextPageToken
-            };
+//         try {
+//             const payload = {
+//                 uf: form.uf,
+//                 municipio: form.municipio,
+//                 ...(form.bairro && { bairro: form.bairro }),
+//                 page_token: nextPageToken
+//             };
             
-            const resp = await ConsultaService.consultaRegiao(payload);
+//             const resp = await ConsultaService.consultaRegiao(payload);
 
-            if (resp && Array.isArray(resp.resultados)) {
-                const novosResultados = [...todosResultados, ...resp.resultados];
-                setTodosResultados(novosResultados);
-                setResultados(novosResultados);
-                setNextPageToken(resp.next_page_token);
-            }
-        } catch (err) {
-            console.error("Erro ao carregar mais resultados:", err);
-            setErro("Erro ao carregar mais resultados.");
-        } finally {
-            setCarregandoMais(false);
-        }
-    };
+//             if (resp && Array.isArray(resp.resultados)) {
+//                 const novosResultados = [...todosResultados, ...resp.resultados];
+//                 setTodosResultados(novosResultados);
+//                 setResultados(novosResultados);
+//                 setNextPageToken(resp.next_page_token);
+//             }
+//         } catch (err) {
+//             console.error("Erro ao carregar mais resultados:", err);
+//             setErro("Erro ao carregar mais resultados.");
+//         } finally {
+//             setCarregandoMais(false);
+//         }
+//     };
 
-    const exportarExcel = () => {
-        if (!resultados.length) return;
+//     const exportarExcel = () => {
+//         if (!resultados.length) return;
 
-        const data = resultados.map((item) => ({
-            Nome: item.displayName?.text || "N/A",
-            Endereço: item.formattedAddress || "N/A",
-            Telefone: item.nationalPhoneNumber || "N/A",
-            Site: item.websiteUri || "N/A",
-        }));
+//         const data = resultados.map((item) => ({
+//             Nome: item.displayName?.text || "N/A",
+//             Endereço: item.formattedAddress || "N/A",
+//             Telefone: item.nationalPhoneNumber || "N/A",
+//             Site: item.websiteUri || "N/A",
+//         }));
 
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Empresas");
-        XLSX.writeFile(wb, "empresas-regiao.xlsx");
-    };
+//         const ws = XLSX.utils.json_to_sheet(data);
+//         const wb = XLSX.utils.book_new();
+//         XLSX.utils.book_append_sheet(wb, ws, "Empresas");
+//         XLSX.writeFile(wb, "empresas-regiao.xlsx");
+//     };
 
-    const criarLinkMaps = (nome, endereco) => {
-        const query = encodeURIComponent(`${nome} ${endereco}`);
-        return `https://google.com/maps/search/${query}`;
-    };
+//     const criarLinkMaps = (nome, endereco) => {
+//         const query = encodeURIComponent(`${nome} ${endereco}`);
+//         return `https://google.com/maps/search/${query}`;
+//     };
 
-    const criarLinkWhatsApp = (phoneRaw) => {
-        if (!phoneRaw) return "#";
-        let digits = phoneRaw.toString().replace(/\D/g, "");
-        if (digits.length === 11 && digits.startsWith("0")) {
-            digits = digits.slice(1);
-        }
-        if (!digits.startsWith("55")) {
-            digits = "55" + digits;
-        }
-        return `https://wa.me/${digits}`;
-    };
+//     const criarLinkWhatsApp = (phoneRaw) => {
+//         if (!phoneRaw) return "#";
+//         let digits = phoneRaw.toString().replace(/\D/g, "");
+//         if (digits.length === 11 && digits.startsWith("0")) {
+//             digits = digits.slice(1);
+//         }
+//         if (!digits.startsWith("55")) {
+//             digits = "55" + digits;
+//         }
+//         return `https://wa.me/${digits}`;
+//     };
 
-    const copiarParaClipboard = (texto, campo) => {
-        if (!texto) return;
-        navigator.clipboard.writeText(texto);
-        setCopiado((prev) => ({ ...prev, [campo]: true }));
-        setTimeout(() => {
-            setCopiado((prev) => ({ ...prev, [campo]: false }));
-        }, 2000);
-    };
+//     const copiarParaClipboard = (texto, campo) => {
+//         if (!texto) return;
+//         navigator.clipboard.writeText(texto);
+//         setCopiado((prev) => ({ ...prev, [campo]: true }));
+//         setTimeout(() => {
+//             setCopiado((prev) => ({ ...prev, [campo]: false }));
+//         }, 2000);
+//     };
 
-    const formatarDataBrasileira = (data) => {
-        if (!data) return "N/A";
-        if (data.includes("-")) {
-            const [ano, mes, dia] = data.split("-");
-            return `${dia}/${mes}/${ano}`;
-        }
-        return data;
-    };
+//     const formatarDataBrasileira = (data) => {
+//         if (!data) return "N/A";
+//         if (data.includes("-")) {
+//             const [ano, mes, dia] = data.split("-");
+//             return `${dia}/${mes}/${ano}`;
+//         }
+//         return data;
+//     };
 
-    const buscarDetalhesPorRazaoSocial = async (razaoSocial) => {
-        if (!razaoSocial) return;
+//     const buscarDetalhesPorRazaoSocial = async (razaoSocial) => {
+//         if (!razaoSocial) return;
 
-        setModalAberto(true);
-        setLoadingModal(true);
-        setErroModal(null);
-        setDadosModal(null);
+//         setModalAberto(true);
+//         setLoadingModal(true);
+//         setErroModal(null);
+//         setDadosModal(null);
 
-        try {
-            const bigDataCorpPayload = {
-                Datasets: "basic_data",
-                q: `name{${razaoSocial}}`,
-                Limit: 1,
-            };
+//         try {
+//             const bigDataCorpPayload = {
+//                 Datasets: "basic_data",
+//                 q: `name{${razaoSocial}}`,
+//                 Limit: 1,
+//             };
 
-            const payload = {
-                tipo_consulta: "cnpj_razao_social",
-                parametro_consulta: JSON.stringify(bigDataCorpPayload),
-            };
+//             const payload = {
+//                 tipo_consulta: "cnpj_razao_social",
+//                 parametro_consulta: JSON.stringify(bigDataCorpPayload),
+//             };
 
-            const resp = await ConsultaService.realizarConsulta(payload);
-            const data = resp?.resultado_api ?? resp?.resultado ?? null;
+//             const resp = await ConsultaService.realizarConsulta(payload);
+//             const data = resp?.resultado_api ?? resp?.resultado ?? null;
 
-            if (data && typeof data === "object") {
-                setDadosModal(data);
-            } else {
-                setErroModal("Nenhum detalhe encontrado.");
-            }
-        } catch (err) {
-            console.error(err);
-            setErroModal("Erro ao buscar detalhes da empresa.");
-        } finally {
-            setLoadingModal(false);
-        }
-    };
+//             if (data && typeof data === "object") {
+//                 setDadosModal(data);
+//             } else {
+//                 setErroModal("Nenhum detalhe encontrado.");
+//             }
+//         } catch (err) {
+//             console.error(err);
+//             setErroModal("Erro ao buscar detalhes da empresa.");
+//         } finally {
+//             setLoadingModal(false);
+//         }
+//     };
 
-    const fecharModal = () => {
-        setModalAberto(false);
-        setDadosModal(null);
-        setErroModal(null);
-        setCopiado({});
-        setEmpresaSelecionadaNome("");
-    };
+//     const fecharModal = () => {
+//         setModalAberto(false);
+//         setDadosModal(null);
+//         setErroModal(null);
+//         setCopiado({});
+//         setEmpresaSelecionadaNome("");
+//     };
 
-    const exportarExcelDetalhes = () => {
-        if (!dadosModal) return;
+//     const exportarExcelDetalhes = () => {
+//         if (!dadosModal) return;
 
-        const enderecoCompleto = `${dadosModal.descricao_tipo_de_logradouro || ""} ${
-            dadosModal.logradouro || ""
-        }, ${dadosModal.numero || ""} ${dadosModal.complemento || ""}`.trim();
+//         const enderecoCompleto = `${dadosModal.descricao_tipo_de_logradouro || ""} ${
+//             dadosModal.logradouro || ""
+//         }, ${dadosModal.numero || ""} ${dadosModal.complemento || ""}`.trim();
 
-        const qsaFormatado = Array.isArray(dadosModal.qsa)
-            ? dadosModal.qsa
-                  .map((s) => `${s.nome_socio} - ${s.qualificacao_socio}`)
-                  .join(" | ")
-            : "";
+//         const qsaFormatado = Array.isArray(dadosModal.qsa)
+//             ? dadosModal.qsa
+//                   .map((s) => `${s.nome_socio} - ${s.qualificacao_socio}`)
+//                   .join(" | ")
+//             : "";
 
-        const data = [
-            {
-                "Razão Social": dadosModal.razao_social || "",
-                "Nome Fantasia": dadosModal.nome_fantasia || "",
-                CNPJ: dadosModal.cnpj || "",
-                "Situação Cadastral": dadosModal.descricao_situacao_cadastral || "",
-                "Data Início Atividade": formatarDataBrasileira(dadosModal.data_inicio_atividade),
-                Telefone: dadosModal.ddd_telefone_1 || "",
-                Email: dadosModal.email || "",
-                Endereço: enderecoCompleto,
-                Bairro: dadosModal.bairro || "",
-                "Cidade / UF": `${dadosModal.municipio || ""} - ${dadosModal.uf || ""}`,
-                "CNAE Principal": dadosModal.cnae_fiscal_descricao || "",
-                Porte: dadosModal.porte || "",
-                "Capital Social": dadosModal.capital_social || "",
-                QSA: qsaFormatado,
-            },
-        ];
+//         const data = [
+//             {
+//                 "Razão Social": dadosModal.razao_social || "",
+//                 "Nome Fantasia": dadosModal.nome_fantasia || "",
+//                 CNPJ: dadosModal.cnpj || "",
+//                 "Situação Cadastral": dadosModal.descricao_situacao_cadastral || "",
+//                 "Data Início Atividade": formatarDataBrasileira(dadosModal.data_inicio_atividade),
+//                 Telefone: dadosModal.ddd_telefone_1 || "",
+//                 Email: dadosModal.email || "",
+//                 Endereço: enderecoCompleto,
+//                 Bairro: dadosModal.bairro || "",
+//                 "Cidade / UF": `${dadosModal.municipio || ""} - ${dadosModal.uf || ""}`,
+//                 "CNAE Principal": dadosModal.cnae_fiscal_descricao || "",
+//                 Porte: dadosModal.porte || "",
+//                 "Capital Social": dadosModal.capital_social || "",
+//                 QSA: qsaFormatado,
+//             },
+//         ];
 
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Detalhes Empresa");
+//         const ws = XLSX.utils.json_to_sheet(data);
+//         const wb = XLSX.utils.book_new();
+//         XLSX.utils.book_append_sheet(wb, ws, "Detalhes Empresa");
 
-        const nomeArquivo = `detalhes-empresa-${
-            (dadosModal.cnpj || "empresa").toString().replace(/\D/g, "")
-        }.xlsx`;
+//         const nomeArquivo = `detalhes-empresa-${
+//             (dadosModal.cnpj || "empresa").toString().replace(/\D/g, "")
+//         }.xlsx`;
 
-        XLSX.writeFile(wb, nomeArquivo);
-    };
+//         XLSX.writeFile(wb, nomeArquivo);
+//     };
 
-    const indexUltimo = paginaAtual * itensPorPagina;
-    const indexPrimeiro = indexUltimo - itensPorPagina;
-    const resultadosPaginados = resultados.slice(indexPrimeiro, indexUltimo);
-    const totalPaginas = Math.ceil(resultados.length / itensPorPagina);
+//     const indexUltimo = paginaAtual * itensPorPagina;
+//     const indexPrimeiro = indexUltimo - itensPorPagina;
+//     const resultadosPaginados = resultados.slice(indexPrimeiro, indexUltimo);
+//     const totalPaginas = Math.ceil(resultados.length / itensPorPagina);
 
-    const mudarPagina = (n) => {
-        setPaginaAtual(n);
-        resultadosRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+//     const mudarPagina = (n) => {
+//         setPaginaAtual(n);
+//         resultadosRef.current?.scrollIntoView({ behavior: "smooth" });
+//     };
 
-    return (
-        <div className="comercial-regiao-container">
-            <h2 className="comercial-title">
-                <i className="bi bi-geo-alt-fill"></i>
-                Buscar por Região
-            </h2>
+//     return (
+//         <div className="comercial-regiao-container">
+//             <h2 className="comercial-title">
+//                 <i className="bi bi-geo-alt-fill"></i>
+//                 Buscar por Região
+//             </h2>
 
-            <form className="regiao-form" onSubmit={handleSubmit}>
-                <div className="form-row">
-                    <label>Estado *</label>
-                    <select name="uf" value={form.uf} onChange={handleChange}>
-                        <option value="">{Object.keys(localidades).length > 0 ? "Selecione um estado" : "Carregando estados..."}</option>
-                        {Object.keys(localidades).sort().map(sigla => (
-                            <option key={sigla} value={sigla}>
-                                {/* {sigla} - Cerca de {localidades[sigla].total_municipios} municípios */}
-                                {sigla}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+//             <form className="regiao-form" onSubmit={handleSubmit}>
+//                 <div className="form-row">
+//                     <label>Estado *</label>
+//                     <select name="uf" value={form.uf} onChange={handleChange}>
+//                         <option value="">{Object.keys(localidades).length > 0 ? "Selecione um estado" : "Carregando estados..."}</option>
+//                         {Object.keys(localidades).sort().map(sigla => (
+//                             <option key={sigla} value={sigla}>
+//                                 {/* {sigla} - Cerca de {localidades[sigla].total_municipios} municípios */}
+//                                 {sigla}
+//                             </option>
+//                         ))}
+//                     </select>
+//                 </div>
 
-                <div className="form-row">
-                    <label>Município *</label>
-                    <select 
-                        name="municipio" 
-                        value={form.municipio} 
-                        onChange={handleChange}
-                        disabled={!form.uf || municipios.length === 0}
-                    >
-                        <option value="">Selecione um município</option>
-                        {municipios.map(m => (
-                            <option key={m.nome} value={m.nome}>
-                                {/* {m.nome} ({m.total_bairros} bairros) */}
-                                {m.nome}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+//                 <div className="form-row">
+//                     <label>Município *</label>
+//                     <select 
+//                         name="municipio" 
+//                         value={form.municipio} 
+//                         onChange={handleChange}
+//                         disabled={!form.uf || municipios.length === 0}
+//                     >
+//                         <option value="">Selecione um município</option>
+//                         {municipios.map(m => (
+//                             <option key={m.nome} value={m.nome}>
+//                                 {/* {m.nome} ({m.total_bairros} bairros) */}
+//                                 {m.nome}
+//                             </option>
+//                         ))}
+//                     </select>
+//                 </div>
 
-                {bairros.length > 0 && (
-                    <div className="form-row">
-                        <label>Bairro (opcional)</label>
-                        <select name="bairro" value={form.bairro} onChange={handleChange}>
-                            <option value="">Todos os bairros</option>
-                            {bairros.map(b => (
-                                <option key={b.nome} value={b.nome}>
-                                    {b.nome}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
+//                 {bairros.length > 0 && (
+//                     <div className="form-row">
+//                         <label>Bairro (opcional)</label>
+//                         <select name="bairro" value={form.bairro} onChange={handleChange}>
+//                             <option value="">Todos os bairros</option>
+//                             {bairros.map(b => (
+//                                 <option key={b.nome} value={b.nome}>
+//                                     {b.nome}
+//                                 </option>
+//                             ))}
+//                         </select>
+//                     </div>
+//                 )}
 
-                <button type="submit" className="consulta-btn" disabled={loading}>
-                    {loading ? (
-                        <>
-                            <i className="bi bi-hourglass-split loading-icon"></i>
-                            Buscando...
-                        </>
-                    ) : (
-                        <>
-                            <i className="bi bi-search"></i>
-                            Buscar
-                        </>
-                    )}
-                </button>
+//                 <button type="submit" className="consulta-btn" disabled={loading}>
+//                     {loading ? (
+//                         <>
+//                             <i className="bi bi-hourglass-split loading-icon"></i>
+//                             Buscando...
+//                         </>
+//                     ) : (
+//                         <>
+//                             <i className="bi bi-search"></i>
+//                             Buscar
+//                         </>
+//                     )}
+//                 </button>
 
-                {erro && <p className="error-message">{erro}</p>}
-            </form>
+//                 {erro && <p className="error-message">{erro}</p>}
+//             </form>
 
-            <div className="resultados-regiao" ref={resultadosRef}>
-                {resultados.length > 0 && (
-                    <>
-                        <div className="result-header">
-                            <h3 className="result-title">
-                                <i className="bi bi-building"></i>
-                                Empresas encontradas:
-                                <span className="count-badge">{resultados.length}</span>
-                            </h3>
+//             <div className="resultados-regiao" ref={resultadosRef}>
+//                 {resultados.length > 0 && (
+//                     <>
+//                         <div className="result-header">
+//                             <h3 className="result-title">
+//                                 <i className="bi bi-building"></i>
+//                                 Empresas encontradas:
+//                                 <span className="count-badge">{resultados.length}</span>
+//                             </h3>
 
-                            <button className="btn-exportar-excel" onClick={exportarExcel}>
-                                <i className="bi bi-file-earmark-excel"></i>
-                                Exportar Excel
-                            </button>
-                        </div>
+//                             <button className="btn-exportar-excel" onClick={exportarExcel}>
+//                                 <i className="bi bi-file-earmark-excel"></i>
+//                                 Exportar Excel
+//                             </button>
+//                         </div>
 
-                        <ul className="regiao-list">
-                            {resultadosPaginados.map((item, i) => (
-                                <li key={i} className="regiao-card-modern">
-                                    <div className="card-header">
-                                        <h4 className="card-title">{item.displayName?.text}</h4>
-                                        <div className="card-icon">
-                                            <i className="bi bi-building-fill"></i>
-                                        </div>
-                                    </div>
+//                         <ul className="regiao-list">
+//                             {resultadosPaginados.map((item, i) => (
+//                                 <li key={i} className="regiao-card-modern">
+//                                     <div className="card-header">
+//                                         <h4 className="card-title">{item.displayName?.text}</h4>
+//                                         <div className="card-icon">
+//                                             <i className="bi bi-building-fill"></i>
+//                                         </div>
+//                                     </div>
 
-                                    <div className="card-body">
-                                        <div className="info-item">
-                                            <i className="bi bi-geo-alt-fill"></i>
-                                            <span className="info-text">
-                                                {item.formattedAddress || "Endereço não informado"}
-                                            </span>
-                                        </div>
+//                                     <div className="card-body">
+//                                         <div className="info-item">
+//                                             <i className="bi bi-geo-alt-fill"></i>
+//                                             <span className="info-text">
+//                                                 {item.formattedAddress || "Endereço não informado"}
+//                                             </span>
+//                                         </div>
                                         
-                                        {item.nationalPhoneNumber && (
-                                            <div className="info-item">
-                                                <i className="bi bi-telephone-fill"></i>
-                                                <a
-                                                    href={criarLinkWhatsApp(item.nationalPhoneNumber)}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="phone-link"
-                                                >
-                                                    {item.nationalPhoneNumber}
-                                                </a>
-                                            </div>
-                                        )}
+//                                         {item.nationalPhoneNumber && (
+//                                             <div className="info-item">
+//                                                 <i className="bi bi-telephone-fill"></i>
+//                                                 <a
+//                                                     href={criarLinkWhatsApp(item.nationalPhoneNumber)}
+//                                                     target="_blank"
+//                                                     rel="noreferrer"
+//                                                     className="phone-link"
+//                                                 >
+//                                                     {item.nationalPhoneNumber}
+//                                                 </a>
+//                                             </div>
+//                                         )}
 
-                                        {item.websiteUri && (
-                                            <div className="info-item">
-                                                <i className="bi bi-globe"></i>
-                                                <a
-                                                    href={item.websiteUri.startsWith("http") ? item.websiteUri : `https://${item.websiteUri}`}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="site-link"
-                                                >
-                                                    {item.websiteUri.replace(/^https?:\/\//, "")}
-                                                </a>
-                                            </div>
-                                        )}
-                                    </div>
+//                                         {item.websiteUri && (
+//                                             <div className="info-item">
+//                                                 <i className="bi bi-globe"></i>
+//                                                 <a
+//                                                     href={item.websiteUri.startsWith("http") ? item.websiteUri : `https://${item.websiteUri}`}
+//                                                     target="_blank"
+//                                                     rel="noreferrer"
+//                                                     className="site-link"
+//                                                 >
+//                                                     {item.websiteUri.replace(/^https?:\/\//, "")}
+//                                                 </a>
+//                                             </div>
+//                                         )}
+//                                     </div>
 
-                                    <div className="card-footer">
-                                        <a
-                                            href={criarLinkMaps(item.displayName?.text, item.formattedAddress)}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="btn-maps"
-                                        >
-                                            <i className="bi bi-map"></i>
-                                            Ver no Maps
-                                        </a>
+//                                     <div className="card-footer">
+//                                         <a
+//                                             href={criarLinkMaps(item.displayName?.text, item.formattedAddress)}
+//                                             target="_blank"
+//                                             rel="noreferrer"
+//                                             className="btn-maps"
+//                                         >
+//                                             <i className="bi bi-map"></i>
+//                                             Ver no Maps
+//                                         </a>
 
-                                        <button
-                                            type="button"
-                                            className="btn-detalhes"
-                                            style={{ marginLeft: "0.5rem" }}
-                                            onClick={() => {
-                                                const nome = item.displayName?.text;
-                                                setEmpresaSelecionadaNome(nome || "");
-                                                buscarDetalhesPorRazaoSocial(nome);
-                                            }}
-                                        >
-                                            <i className="bi bi-card-text"></i>
-                                            Ver detalhes
-                                        </button>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
+//                                         <button
+//                                             type="button"
+//                                             className="btn-detalhes"
+//                                             style={{ marginLeft: "0.5rem" }}
+//                                             onClick={() => {
+//                                                 const nome = item.displayName?.text;
+//                                                 setEmpresaSelecionadaNome(nome || "");
+//                                                 buscarDetalhesPorRazaoSocial(nome);
+//                                             }}
+//                                         >
+//                                             <i className="bi bi-card-text"></i>
+//                                             Ver detalhes
+//                                         </button>
+//                                     </div>
+//                                 </li>
+//                             ))}
+//                         </ul>
 
-                        {totalPaginas > 1 && (
-                            <div className="pagination">
-                                <button
-                                    className="pagination-btn"
-                                    onClick={() => mudarPagina(paginaAtual - 1)}
-                                    disabled={paginaAtual === 1}
-                                >
-                                    <i className="bi bi-chevron-left"></i>
-                                    Anterior
-                                </button>
+//                         {totalPaginas > 1 && (
+//                             <div className="pagination">
+//                                 <button
+//                                     className="pagination-btn"
+//                                     onClick={() => mudarPagina(paginaAtual - 1)}
+//                                     disabled={paginaAtual === 1}
+//                                 >
+//                                     <i className="bi bi-chevron-left"></i>
+//                                     Anterior
+//                                 </button>
 
-                                <div className="pagination-numbers">
-                                    {[...Array(totalPaginas)].map((_, index) => (
-                                        <button
-                                            key={index}
-                                            className={`pagination-number ${paginaAtual === index + 1 ? "active" : ""}`}
-                                            onClick={() => mudarPagina(index + 1)}
-                                        >
-                                            {index + 1}
-                                        </button>
-                                    ))}
-                                </div>
+//                                 <div className="pagination-numbers">
+//                                     {[...Array(totalPaginas)].map((_, index) => (
+//                                         <button
+//                                             key={index}
+//                                             className={`pagination-number ${paginaAtual === index + 1 ? "active" : ""}`}
+//                                             onClick={() => mudarPagina(index + 1)}
+//                                         >
+//                                             {index + 1}
+//                                         </button>
+//                                     ))}
+//                                 </div>
 
-                                <button
-                                    className="pagination-btn"
-                                    onClick={() => mudarPagina(paginaAtual + 1)}
-                                    disabled={paginaAtual === totalPaginas}
-                                >
-                                    Próxima
-                                    <i className="bi bi-chevron-right"></i>
-                                </button>
-                            </div>
-                        )}
-                    </>
-                )}
+//                                 <button
+//                                     className="pagination-btn"
+//                                     onClick={() => mudarPagina(paginaAtual + 1)}
+//                                     disabled={paginaAtual === totalPaginas}
+//                                 >
+//                                     Próxima
+//                                     <i className="bi bi-chevron-right"></i>
+//                                 </button>
+//                             </div>
+//                         )}
+//                     </>
+//                 )}
 
-                {nextPageToken && (
-                    <div className="carregar-mais-container">
-                        <button 
-                            className="btn-carregar-mais"
-                            onClick={carregarMaisResultados}
-                            disabled={carregandoMais}
-                        >
-                            {carregandoMais ? (
-                                <>
-                                    <i className="bi bi-hourglass-split"></i>
-                                    Carregando...
-                                </>
-                            ) : (
-                                <>
-                                    <i className="bi bi-plus-circle"></i>
-                                    Carregar mais resultados
-                                </>
-                            )}
-                        </button>
-                        {carregandoMais && <p className="info-text">Buscando mais empresas...</p>}
-                    </div>
-                )}
+//                 {nextPageToken && (
+//                     <div className="carregar-mais-container">
+//                         <button 
+//                             className="btn-carregar-mais"
+//                             onClick={carregarMaisResultados}
+//                             disabled={carregandoMais}
+//                         >
+//                             {carregandoMais ? (
+//                                 <>
+//                                     <i className="bi bi-hourglass-split"></i>
+//                                     Carregando...
+//                                 </>
+//                             ) : (
+//                                 <>
+//                                     <i className="bi bi-plus-circle"></i>
+//                                     Carregar mais resultados
+//                                 </>
+//                             )}
+//                         </button>
+//                         {carregandoMais && <p className="info-text">Buscando mais empresas...</p>}
+//                     </div>
+//                 )}
 
-                {!loading && hasSearched && resultados.length === 0 && (
-                    <div className="no-results">
-                        <i className="bi bi-search"></i>
-                        <p>Nenhum resultado encontrado.</p>
-                    </div>
-                )}
-            </div>
+//                 {!loading && hasSearched && resultados.length === 0 && (
+//                     <div className="no-results">
+//                         <i className="bi bi-search"></i>
+//                         <p>Nenhum resultado encontrado.</p>
+//                     </div>
+//                 )}
+//             </div>
 
-            {modalAberto && (
-                <div className="modal-overlay" onClick={fecharModal}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3>
-                                <i className="bi bi-building"></i>
-                                Detalhes da Empresa
-                                {empresaSelecionadaNome && (
-                                    <span style={{ marginLeft: 8, fontWeight: 300 }}>
-                                        — {empresaSelecionadaNome}
-                                    </span>
-                                )}
-                            </h3>
-                            <button className="modal-close-btn" onClick={fecharModal}>
-                                <FiX size={24} />
-                            </button>
+//             {modalAberto && (
+//                 <div className="modal-overlay" onClick={fecharModal}>
+//                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+//                         <div className="modal-header">
+//                             <h3>
+//                                 <i className="bi bi-building"></i>
+//                                 Detalhes da Empresa
+//                                 {empresaSelecionadaNome && (
+//                                     <span style={{ marginLeft: 8, fontWeight: 300 }}>
+//                                         — {empresaSelecionadaNome}
+//                                     </span>
+//                                 )}
+//                             </h3>
+//                             <button className="modal-close-btn" onClick={fecharModal}>
+//                                 <FiX size={24} />
+//                             </button>
 
-                            {!loadingModal && !erroModal && dadosModal && (
-                                <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginBottom: "0.1rem", marginLeft: "1rem" }}>
-                                    <button type="button" className="btn-exportar-excel" onClick={exportarExcelDetalhes}>
-                                        <i className="bi bi-file-earmark-excel"></i>
-                                        Baixar Excel
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+//                             {!loadingModal && !erroModal && dadosModal && (
+//                                 <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginBottom: "0.1rem", marginLeft: "1rem" }}>
+//                                     <button type="button" className="btn-exportar-excel" onClick={exportarExcelDetalhes}>
+//                                         <i className="bi bi-file-earmark-excel"></i>
+//                                         Baixar Excel
+//                                     </button>
+//                                 </div>
+//                             )}
+//                         </div>
 
-                        <div className="modal-body">
-                            {loadingModal && (
-                                <div className="modal-loading">
-                                    <div className="spinner-modal"></div>
-                                    <p>Buscando informações...</p>
-                                </div>
-                            )}
+//                         <div className="modal-body">
+//                             {loadingModal && (
+//                                 <div className="modal-loading">
+//                                     <div className="spinner-modal"></div>
+//                                     <p>Buscando informações...</p>
+//                                 </div>
+//                             )}
 
-                            {!loadingModal && erroModal && (
-                                <div className="modal-erro">
-                                    <i className="bi bi-exclamation-circle"></i>
-                                    <p>{erroModal}</p>
-                                </div>
-                            )}
+//                             {!loadingModal && erroModal && (
+//                                 <div className="modal-erro">
+//                                     <i className="bi bi-exclamation-circle"></i>
+//                                     <p>{erroModal}</p>
+//                                 </div>
+//                             )}
 
-                            {!loadingModal && dadosModal && (
-                                <>
-                                    <div className="modal-dados">
-                                        <CampoCopiavel
-                                            label="Razão Social"
-                                            valor={dadosModal.razao_social}
-                                            campo="razao"
-                                            copiar={copiarParaClipboard}
-                                            copiado={copiado}
-                                        />
+//                             {!loadingModal && dadosModal && (
+//                                 <>
+//                                     <div className="modal-dados">
+//                                         <CampoCopiavel
+//                                             label="Razão Social"
+//                                             valor={dadosModal.razao_social}
+//                                             campo="razao"
+//                                             copiar={copiarParaClipboard}
+//                                             copiado={copiado}
+//                                         />
 
-                                        <CampoCopiavel
-                                            label="CNPJ"
-                                            valor={dadosModal.cnpj}
-                                            campo="cnpj"
-                                            copiar={copiarParaClipboard}
-                                            copiado={copiado}
-                                        />
+//                                         <CampoCopiavel
+//                                             label="CNPJ"
+//                                             valor={dadosModal.cnpj}
+//                                             campo="cnpj"
+//                                             copiar={copiarParaClipboard}
+//                                             copiado={copiado}
+//                                         />
 
-                                        <CampoCopiavel
-                                            label="Situação Cadastral"
-                                            valor={dadosModal.descricao_situacao_cadastral}
-                                            campo="situacao"
-                                            copiar={copiarParaClipboard}
-                                            copiado={copiado}
-                                        />
+//                                         <CampoCopiavel
+//                                             label="Situação Cadastral"
+//                                             valor={dadosModal.descricao_situacao_cadastral}
+//                                             campo="situacao"
+//                                             copiar={copiarParaClipboard}
+//                                             copiado={copiado}
+//                                         />
 
-                                        {dadosModal.ddd_telefone_1 && (
-                                            <CampoCopiavel
-                                                label="Telefone"
-                                                valor={dadosModal.ddd_telefone_1}
-                                                campo="telefone"
-                                                copiar={copiarParaClipboard}
-                                                copiado={copiado}
-                                            />
-                                        )}
+//                                         {dadosModal.ddd_telefone_1 && (
+//                                             <CampoCopiavel
+//                                                 label="Telefone"
+//                                                 valor={dadosModal.ddd_telefone_1}
+//                                                 campo="telefone"
+//                                                 copiar={copiarParaClipboard}
+//                                                 copiado={copiado}
+//                                             />
+//                                         )}
 
-                                        {dadosModal.email && (
-                                            <CampoCopiavel
-                                                label="Email"
-                                                valor={dadosModal.email}
-                                                campo="email"
-                                                copiar={copiarParaClipboard}
-                                                copiado={copiado}
-                                            />
-                                        )}
+//                                         {dadosModal.email && (
+//                                             <CampoCopiavel
+//                                                 label="Email"
+//                                                 valor={dadosModal.email}
+//                                                 campo="email"
+//                                                 copiar={copiarParaClipboard}
+//                                                 copiado={copiado}
+//                                             />
+//                                         )}
 
-                                        <CampoCopiavel
-                                            label="Endereço"
-                                            valor={`${dadosModal.descricao_tipo_de_logradouro || ""} ${
-                                                dadosModal.logradouro || ""
-                                            }, ${dadosModal.numero || ""} ${
-                                                dadosModal.complemento || ""
-                                            }`.trim()}
-                                            campo="endereco"
-                                            copiar={copiarParaClipboard}
-                                            copiado={copiado}
-                                        />
+//                                         <CampoCopiavel
+//                                             label="Endereço"
+//                                             valor={`${dadosModal.descricao_tipo_de_logradouro || ""} ${
+//                                                 dadosModal.logradouro || ""
+//                                             }, ${dadosModal.numero || ""} ${
+//                                                 dadosModal.complemento || ""
+//                                             }`.trim()}
+//                                             campo="endereco"
+//                                             copiar={copiarParaClipboard}
+//                                             copiado={copiado}
+//                                         />
 
-                                        <CampoCopiavel
-                                            label="Bairro"
-                                            valor={dadosModal.bairro}
-                                            campo="bairro"
-                                            copiar={copiarParaClipboard}
-                                            copiado={copiado}
-                                        />
+//                                         <CampoCopiavel
+//                                             label="Bairro"
+//                                             valor={dadosModal.bairro}
+//                                             campo="bairro"
+//                                             copiar={copiarParaClipboard}
+//                                             copiado={copiado}
+//                                         />
 
-                                        <CampoCopiavel
-                                            label="Cidade / UF"
-                                            valor={`${dadosModal.municipio} - ${dadosModal.uf}`}
-                                            campo="cidade_uf"
-                                            copiar={copiarParaClipboard}
-                                            copiado={copiado}
-                                        />
+//                                         <CampoCopiavel
+//                                             label="Cidade / UF"
+//                                             valor={`${dadosModal.municipio} - ${dadosModal.uf}`}
+//                                             campo="cidade_uf"
+//                                             copiar={copiarParaClipboard}
+//                                             copiado={copiado}
+//                                         />
 
-                                        <div className="modal-field">
-                                            <label>CNAE Principal:</label>
-                                            <input readOnly value={dadosModal.cnae_fiscal_descricao || "N/A"} />
-                                        </div>
+//                                         <div className="modal-field">
+//                                             <label>CNAE Principal:</label>
+//                                             <input readOnly value={dadosModal.cnae_fiscal_descricao || "N/A"} />
+//                                         </div>
 
-                                        {dadosModal.cnaes_secundarios?.length > 0 && (
-                                            <div className="modal-field">
-                                                <label>CNAEs Secundários:</label>
-                                                <ul className="lista-secundarios">
-                                                    {dadosModal.cnaes_secundarios.map((c, i) => (
-                                                        <li key={i}>{c.descricao}</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
+//                                         {dadosModal.cnaes_secundarios?.length > 0 && (
+//                                             <div className="modal-field">
+//                                                 <label>CNAEs Secundários:</label>
+//                                                 <ul className="lista-secundarios">
+//                                                     {dadosModal.cnaes_secundarios.map((c, i) => (
+//                                                         <li key={i}>{c.descricao}</li>
+//                                                     ))}
+//                                                 </ul>
+//                                             </div>
+//                                         )}
 
-                                        <div className="modal-field">
-                                            <label>Porte:</label>
-                                            <input readOnly value={dadosModal.porte || "N/A"} />
-                                        </div>
+//                                         <div className="modal-field">
+//                                             <label>Porte:</label>
+//                                             <input readOnly value={dadosModal.porte || "N/A"} />
+//                                         </div>
 
-                                        {dadosModal.qsa?.length > 0 && (
-                                            <div className="modal-field">
-                                                <label>Quadro Societário (QSA):</label>
-                                                <ul className="lista-qsa">
-                                                    {dadosModal.qsa.map((socio, i) => (
-                                                        <li key={i}>
-                                                            <strong>{socio.nome_socio}</strong> — {socio.qualificacao_socio}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
+//                                         {dadosModal.qsa?.length > 0 && (
+//                                             <div className="modal-field">
+//                                                 <label>Quadro Societário (QSA):</label>
+//                                                 <ul className="lista-qsa">
+//                                                     {dadosModal.qsa.map((socio, i) => (
+//                                                         <li key={i}>
+//                                                             <strong>{socio.nome_socio}</strong> — {socio.qualificacao_socio}
+//                                                         </li>
+//                                                     ))}
+//                                                 </ul>
+//                                             </div>
+//                                         )}
+//                                     </div>
+//                                 </>
+//                             )}
+//                         </div>
+//                     </div>
+//                 </div>
+//             )}
+//         </div>
+//     );
+// };
 
-const CampoCopiavel = ({ label, valor, campo, copiar, copiado }) => {
-    if (!valor) valor = "N/A";
+// const CampoCopiavel = ({ label, valor, campo, copiar, copiado }) => {
+//     if (!valor) valor = "N/A";
 
-    return (
-        <div className="modal-field">
-            <label>{label}:</label>
-            <div className="modal-input-group">
-                <input readOnly value={valor} />
-                <button className="modal-copy-btn" onClick={() => copiar(valor, campo)}>
-                    {copiado[campo] ? <FiCheck color="#10b981" /> : <FiCopy />}
-                </button>
-            </div>
-        </div>
-    );
-};
+//     return (
+//         <div className="modal-field">
+//             <label>{label}:</label>
+//             <div className="modal-input-group">
+//                 <input readOnly value={valor} />
+//                 <button className="modal-copy-btn" onClick={() => copiar(valor, campo)}>
+//                     {copiado[campo] ? <FiCheck color="#10b981" /> : <FiCopy />}
+//                 </button>
+//             </div>
+//         </div>
+//     );
+// };
 
-export default ComercialRegiao;
+// export default ComercialRegiao;
