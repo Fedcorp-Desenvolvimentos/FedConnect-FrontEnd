@@ -11,8 +11,9 @@ export const Container = styled.div`
   margin: 2rem auto;
   padding: 0 1rem;
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     margin: 1rem auto;
+    padding: 0 0.5rem;
   }
 `;
 
@@ -21,6 +22,10 @@ export const Card = styled.div`
   border-radius: 16px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    border-radius: 12px;
+  }
 `;
 
 // Tabs
@@ -84,6 +89,60 @@ export const Tab = styled.button`
   }
 `;
 
+// Messages
+export const MessagesContainer = styled.div`
+  padding: 1rem 1.5rem 0 1.5rem;
+
+  @media (max-width: 640px) {
+    padding: 0.75rem 1rem 0 1rem;
+  }
+`;
+
+export const Alert = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  animation: slideDown 0.3s ease-out;
+
+  ${props => props.$type === 'success' && `
+    background: #dcfce7;
+    color: #166534;
+    border-left: 4px solid #10b981;
+  `}
+
+  ${props => props.$type === 'error' && `
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+  `}
+`;
+
+export const AlertClose = styled.button`
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+  color: inherit;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  svg {
+    font-size: 0.875rem;
+  }
+`;
+
 // Content
 export const Content = styled.div`
   padding: 1.5rem;
@@ -98,6 +157,10 @@ export const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+
+  @media (max-width: 640px) {
+    gap: 1rem;
+  }
 `;
 
 export const FormField = styled.div`
@@ -113,6 +176,10 @@ export const Label = styled.label`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
 `;
 
 export const Input = styled.input`
@@ -122,6 +189,7 @@ export const Input = styled.input`
   font-size: 0.875rem;
   transition: all 0.2s ease;
   background: white;
+  width: 100%;
 
   &:focus {
     outline: none;
@@ -140,6 +208,11 @@ export const Input = styled.input`
     border-color: #0F3D5D;
     background: #eff6ff;
   `}
+
+  @media (max-width: 480px) {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+  }
 `;
 
 export const InputWrapper = styled.div`
@@ -179,6 +252,7 @@ export const FormActions = styled.div`
 
   @media (max-width: 640px) {
     flex-direction: column;
+    gap: 0.5rem;
   }
 `;
 
@@ -233,6 +307,12 @@ export const Button = styled.button`
   &:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+  }
+
+  @media (max-width: 480px) {
+    height: 38px;
+    padding: 0 1rem;
+    font-size: 0.8rem;
   }
 `;
 

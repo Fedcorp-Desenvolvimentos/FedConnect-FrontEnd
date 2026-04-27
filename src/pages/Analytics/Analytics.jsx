@@ -33,6 +33,7 @@ import {
 
 import { useLoading } from "../../hooks/useLoading";
 import api from '../../services/api';
+import AnalyticsHelp from './AnalyticsHelp';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -273,6 +274,7 @@ export const Analytics = () => {
       icon={<i className="bi bi-bar-chart-fill"></i>}
       loading={loading}
       emptyMessage="Nenhum dado disponível"
+      helpContent={<AnalyticsHelp/>}
     >
       <Container>
         {/* Filtro de período - Híbrido */}

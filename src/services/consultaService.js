@@ -23,8 +23,13 @@ export const ConsultaService = {
   },
 
   realizarConsulta: async (payload) => {
-    const response = await api.post("/consultas/realizar/", payload);
-    return response.data;
+    try {
+      const response = await api.post("/consultas/realizar/", payload);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao realizar consulta:", error);
+      throw error;
+    };
   },
 
   consultarCpf: async (cpf) => {

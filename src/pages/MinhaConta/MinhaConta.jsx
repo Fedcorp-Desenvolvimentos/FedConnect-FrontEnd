@@ -10,10 +10,12 @@ import PasswordForm from './components/PasswordForm';
 import { useUserData } from './hooks/useUserData';
 import { usePasswordChange } from './hooks/usePasswordChange';
 import { useEditMode } from './hooks/useEditMode';
+import { useLoading } from '../../hooks/useLoading';
 import { UserService } from '../../services/userService';
 
 const MinhaConta = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const { startLoading, stopLoading, withLoading } = useLoading();
   const [activeTab, setActiveTab] = useState('perfil');
 
   const { userData, loading: userLoading, refreshUserData } = useUserData();
@@ -37,11 +39,16 @@ const MinhaConta = () => {
   // Função de save para perfil
   const handleSavePerfil = useCallback(async (data) => {
     try {
-      await UserService.updateUser(userData.userId, {
-        nome_completo: data.nomeCompleto,
-        cpf: data.cpf,
-        email: data.email
-      });
+      await withLoading(
+        async () => {
+          await UserService.updateUser(userData.userId, {
+            nome_completo: data.nomeCompleto,
+            cpf: data.cpf,
+            email: data.email
+          });
+        },
+        'Atualizando perfil...'
+      );
       enqueueSnackbar('Perfil atualizado com sucesso!', { variant: 'success' });
       await refreshUserData();
       return true;
@@ -49,26 +56,36 @@ const MinhaConta = () => {
       enqueueSnackbar(err.response?.data?.detail || 'Erro ao atualizar perfil', { variant: 'error' });
       return false;
     }
-  }, [userData.userId, refreshUserData, enqueueSnackbar]);
+  }, [userData.userId, refreshUserData, enqueueSnackbar, withLoading]);
 
   // Função de save para senha
   const handleSaveSenha = useCallback(async (data) => {
-    const success = await changePassword(
-      data.senhaAtual,
-      data.novaSenha,
-      data.confirmarSenha
-    );
-    
-    if (success) {
-      enqueueSnackbar('Senha alterada com sucesso!', { variant: 'success' });
-      resetPasswordFields();
-      return true;
-    } else if (passwordError) {
-      enqueueSnackbar(passwordError, { variant: 'error' });
+    try {
+      const success = await withLoading(
+        async () => {
+          return await changePassword(
+            data.senhaAtual,
+            data.novaSenha,
+            data.confirmarSenha
+          );
+        },
+        'Alterando senha...'
+      );
+      
+      if (success) {
+        enqueueSnackbar('Senha alterada com sucesso!', { variant: 'success' });
+        resetPasswordFields();
+        return true;
+      } else if (passwordError) {
+        enqueueSnackbar(passwordError, { variant: 'error' });
+        return false;
+      }
+      return false;
+    } catch (err) {
+      enqueueSnackbar('Erro ao alterar senha', { variant: 'error' });
       return false;
     }
-    return false;
-  }, [changePassword, passwordError, enqueueSnackbar, resetPasswordFields]);
+  }, [changePassword, passwordError, enqueueSnackbar, resetPasswordFields, withLoading]);
 
   // Configurar modo de edição para perfil
   const profileEdit = useEditMode(
@@ -101,26 +118,14 @@ const MinhaConta = () => {
     await passwordEdit.saveEditing();
   };
 
-  if (userLoading) {
-    return (
-      <PageTemplate
-        title="Minha Conta"
-        subtitle="Gerencie suas informações"
-        icon={<IoIosBusiness />}
-      >
-        <S.LoadingContainer>
-          <FaSpinner className="spinner" />
-          <p>Carregando seus dados...</p>
-        </S.LoadingContainer>
-      </PageTemplate>
-    );
-  }
-
+  // Loading global está sendo gerenciado pelo hook, não precisa do loading local
+  // O PageTemplate já trata o loading via props
   return (
     <PageTemplate
       title="Minha Conta"
       subtitle="Gerencie suas informações pessoais e segurança"
       icon={<IoIosBusiness />}
+      loading={userLoading}
     >
       <S.Container>
         <S.Card>

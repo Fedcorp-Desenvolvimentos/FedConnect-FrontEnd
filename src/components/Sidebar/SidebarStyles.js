@@ -1,4 +1,3 @@
-// components/Sidebar/SidebarStyles.js
 import styled, { css, keyframes } from 'styled-components';
 
 const fadeIn = keyframes`
@@ -199,7 +198,7 @@ export const NavLink = styled.a`
     font-weight: 600;
     border-left: 3px solid #2463eb;
     
-    & i {
+    svg {
       color: #2463eb;
     }
   `}
@@ -208,7 +207,7 @@ export const NavLink = styled.a`
     background: #f1f5f9;
     color: #2463eb;
     
-    & i {
+    svg {
       color: #2463eb;
     }
   }
@@ -273,11 +272,16 @@ export const IconTooltip = styled.div`
   }
 `;
 
-export const Icon = styled.i`
-  font-size: 1.25rem;
+export const IconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-width: 24px;
-  text-align: center;
-  transition: color 0.2s ease;
+  
+  svg {
+    font-size: 1.25rem;
+    transition: color 0.2s ease;
+  }
 `;
 
 export const LinkText = styled.span`

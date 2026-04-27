@@ -217,6 +217,17 @@ const ConsultaCNPJ = () => {
     }
   };
 
+  function formatarMoedaBR(valor) {
+    if (valor == null || valor === "") return <i>não informado</i>;
+    let numero = valor;
+    if (typeof valor === "string") {
+      numero = valor.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".");
+    }
+    numero = Number(numero);
+    if (isNaN(numero)) return valor;
+    return numero.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+
   const handleMassFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -272,13 +283,27 @@ const ConsultaCNPJ = () => {
               "Atividades Secundárias": Array.isArray(data.cnaes_secundarios)
                 ? data.cnaes_secundarios.map(c => c.descricao).filter(d => d).join(", ")
                 : "N/A",
-              "UF": data.uf || "N/A",
+              
+              // ENDEREÇO COMPLETO
+              "Logradouro": `${data.descricao_tipo_de_logradouro || ""} ${data.logradouro || ""}`.trim() || "N/A",
+              "Número": data.numero || "N/A",
+              "Complemento": data.complemento || "N/A",
+              "Bairro": data.bairro || "N/A",
+              "CEP": data.cep || "N/A",
               "Município": data.municipio || "N/A",
+              "UF": data.uf || "N/A",
+              
               "Telefone": data.ddd_telefone_1 || data.ddd_telefone_2 || "N/A",
+              "Email": data.email || "N/A",
               "Porte": data.porte || "N/A",
               "Matriz/Filial": data.descricao_identificador_matriz_filial || "N/A",
-              "Data Início": formatarDataBrasileira(data.data_inicio_atividade) || "N/A",
+              "Natureza Jurídica": data.natureza_juridica || "N/A",
+              "Capital Social": data.capital_social ? formatarMoedaBR(data.capital_social) : "N/A",
+              "Data Início Atividade": formatarDataBrasileira(data.data_inicio_atividade) || "N/A",
+              "Data Situação Cadastral": formatarDataBrasileira(data.data_situacao_cadastral) || "N/A",
+              "Motivo Situação": data.descricao_motivo_situacao_cadastral || "N/A",
             });
+
           });
           
           setMassConsultaMessage(`Processando ${Math.min(i + batchSize, cnpjsValidos.length)} de ${cnpjsValidos.length}...`);
@@ -286,12 +311,14 @@ const ConsultaCNPJ = () => {
 
         const newWorksheet = XLSX.utils.json_to_sheet(allResults);
         const newWorkbook = XLSX.utils.book_new();
+        
         XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, "Resultados");
         XLSX.writeFile(newWorkbook, `resultado-cnpj-${new Date().toISOString().slice(0,19)}.xlsx`);
         
         setMassConsultaMessage("Processamento concluído! Download iniciado.");
         enqueueSnackbar("Planilha de resultados gerada com sucesso!", { variant: "success" });
       } catch (err) {
+        console.error("Erro ao processar planilha:", err);
         setMassConsultaMessage("Erro ao processar planilha.");
         enqueueSnackbar("Erro ao processar arquivo.", { variant: "error" });
       } finally {

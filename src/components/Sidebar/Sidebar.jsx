@@ -1,6 +1,18 @@
-// components/Sidebar/Sidebar.js
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { 
+  FaHome, 
+  FaClipboardList, 
+  FaBriefcase, 
+  FaTools, 
+  FaWallet, 
+  FaChartBar, 
+  FaCalendarAlt,
+  FaChartLine,
+  FaCog,
+  FaProjectDiagram,
+  FaUsers
+} from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import * as S from "./SidebarStyles";
 
@@ -58,17 +70,17 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
   ];
 
   const navItems = [
-    { path: "/home", label: "Início", icon: "bi-house-door-fill", allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
-    { path: "/consultas", label: "Consultas", icon: "bi-clipboard2-minus-fill", allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
-    { path: "/consulta-comercial", label: "Comercial", icon: "bi-ui-checks-grid", allowed: ["admin", "comercial"] },
-    { path: "/ferramentas", label: "Ferramentas", icon: "bi-tools", allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
-    { path: "/faturamento", label: "Faturamento", icon: "bi-wallet2", allowed: ["admin", "faturamento", "ti"] },
-    { path: "/metricas", label: "Métricas", icon: "bi-bar-chart-fill", allowed: ["admin"] },
-    { path: "/agenda", label: "Agenda", icon: "bi-calendar-event", allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
-    // { path: "/automacao", label: "Automação", icon: "bi-gear-fill", allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin"] : [] },
-    { path: "/analytics", label: "Estatísticas", icon: "bi-bar-chart-fill", allowed: ["admin"] },
-    // { path: "/workflow", label: "Workflow", icon: "bi-kanban-fill", allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
-    // { path: "/rh", label: "Recursos Humanos", icon: "bi-people-fill", allowed: ["admin"] },
+    { path: "/home", label: "Início", icon: <FaHome />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
+    { path: "/consultas", label: "Consultas", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
+    { path: "/consulta-comercial", label: "Comercial", icon: <FaBriefcase />, allowed: ["admin", "comercial"] },
+    { path: "/ferramentas", label: "Ferramentas", icon: <FaTools />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
+    { path: "/faturamento", label: "Faturamento", icon: <FaWallet />, allowed: ["admin", "faturamento", "ti"] },
+    { path: "/metricas", label: "Métricas", icon: <FaChartBar />, allowed: ["admin"] },
+    { path: "/agenda", label: "Agenda", icon: <FaCalendarAlt />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
+    // { path: "/automacao", label: "Automação", icon: <FaCog />, allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin"] : [] },
+    { path: "/analytics", label: "Estatísticas", icon: <FaChartLine />, allowed: ["admin"] },
+    // { path: "/workflow", label: "Workflow", icon: <FaProjectDiagram />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
+    // { path: "/rh", label: "Recursos Humanos", icon: <FaUsers />, allowed: ["admin"] },
   ];
 
   return (
@@ -129,7 +141,9 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
                     onClick={handleLinkClick}
                   >
                     <S.IconTooltip $isClosed={!sidebarOpen} $isOpen={sidebarOpen}>
-                      <S.Icon className={`bi ${item.icon}`} />
+                      <S.IconWrapper>
+                        {item.icon}
+                      </S.IconWrapper>
                       <S.LinkText>{item.label}</S.LinkText>
                     </S.IconTooltip>
                   </S.NavLink>
