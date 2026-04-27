@@ -1,8 +1,4 @@
-// src/pages/Consultas/ConsultasHome.jsx
-
-import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import * as S from "./ConsultasHomeStyles";
 import { 
   FaUser, 
   FaBuilding, 
@@ -11,8 +7,9 @@ import {
   FaFileInvoiceDollar,
   FaSearch
 } from "react-icons/fa";
-import PageTemplate from "../../components/PageTemplate/PageTemplate";
-import { ConsultasHelp  } from "./ConsultasHelp";
+import CardGridLayout from "../../Layouts/CardGridLayout/CardGridLayout";
+import { Card, CardBody, IconWrapper, Title, Description, Button } from "../../Layouts/CardGridLayout/CardGridLayoutStyles";
+import { ConsultasHelp } from "./ConsultasHelp";
 
 const consultas = [
     {
@@ -31,7 +28,7 @@ const consultas = [
         desc: "Informações sobre empresas registradas, como razão social, CNPJ, e situação cadastral.",
         to: "/consultas/consulta-cnpj",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
-        color: "#2463eb", // 10b981
+        color: "#2463eb",
     },
     {
         key: "endereco",
@@ -40,7 +37,7 @@ const consultas = [
         desc: "Informações detalhadas sobre endereços completos, logradouros, CEPs, cidades e estados.",
         to: "/consultas/consulta-end",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
-        color: "#2463eb", // f59e0b
+        color: "#2463eb",
     },
     {
         key: "segurados",
@@ -49,7 +46,7 @@ const consultas = [
         desc: "Localize informações sobre segurados com base nos registros disponíveis internamente.",
         to: "/consultas/consulta-segurados",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
-        color: "#2463eb", // 8b5cf6
+        color: "#2463eb",
     },
     {
         key: "faturas-dinamicas",
@@ -58,7 +55,7 @@ const consultas = [
         desc: "Consulte faturamento de maneira detalhada com parâmetros de pesquisa.",
         to: "/consultas/consulta-faturamento",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
-        color: "#2463eb", // ef4444
+        color: "#2463eb",
     },
 ];
 
@@ -71,7 +68,7 @@ const ConsultasHome = () => {
     );
 
     return (
-        <PageTemplate
+        <CardGridLayout
             title="Consultas Disponíveis"
             subtitle="Consulte informações detalhadas"
             icon={<FaSearch />}
@@ -79,25 +76,23 @@ const ConsultasHome = () => {
             empty={consultasPermitidas.length === 0}
             emptyMessage="Nenhuma consulta disponível para seu nível de acesso"
             helpContent={<ConsultasHelp />}
-        >
-            <S.CardsGrid>
-                {consultasPermitidas.map((consulta) => (
-                    <S.Card key={consulta.key} $color={consulta.color}>
-                        <S.CardBody>
-                            <S.IconWrapper $color={consulta.color}>
-                                {consulta.icon}
-                            </S.IconWrapper>
-                            <S.Title>{consulta.title}</S.Title>
-                            <S.Description>{consulta.desc}</S.Description>
-                            <S.Button to={consulta.to} $color={consulta.color}>
-                                <FaSearch size={14} />
-                                <span>Pesquisar</span>
-                            </S.Button>
-                        </S.CardBody>
-                    </S.Card>
-                ))}
-            </S.CardsGrid>
-        </PageTemplate>
+            items={consultasPermitidas}
+            renderCard={(consulta) => (
+                <Card key={consulta.key} $color={consulta.color}>
+                    <CardBody>
+                        <IconWrapper $color={consulta.color}>
+                            {consulta.icon}
+                        </IconWrapper>
+                        <Title>{consulta.title}</Title>
+                        <Description>{consulta.desc}</Description>
+                        <Button to={consulta.to} $color={consulta.color}>
+                            <FaSearch size={14} />
+                            Pesquisar
+                        </Button>
+                    </CardBody>
+                </Card>
+            )}
+        />
     );
 };
 

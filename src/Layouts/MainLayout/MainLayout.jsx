@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import Sidebar from '../components/Sidebar/Sidebar';
-import Breadcrumb from '../components/Breadcrumb/Breadcrumb';
-import * as S from './DashboardLayoutStyles';
+import Sidebar from '../../components/Sidebar/Sidebar';
+import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
+import * as S from './MainLayoutStyles';
 
-const DashboardLayout = () => {
+const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
 
@@ -41,4 +41,4 @@ const DashboardLayout = () => {
   );
 };
 
-export default DashboardLayout;
+export default MainLayout;

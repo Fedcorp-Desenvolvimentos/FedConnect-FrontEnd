@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 // Layouts
-import DashboardLayout from '../Layouts/DashboardLayout';
+import MainLayout from '../Layouts/MainLayout/MainLayout';
 
 // Componentes públicos
 import NotFound from '../components/NotFound/NotFound';
@@ -92,6 +92,7 @@ import Ferramentas from '../pages/Ferramentas/Ferramentas';
 // Testes de novas paginas
 import WorkflowHub from '../pages/Workflow/WorkflowHub';
 import RHHub from '../pages/RH/RHHub';
+import TestePage from '../pages/Teste';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -107,7 +108,7 @@ const AppRouter = () => {
 
       {/* Rotas Protegidas */}
       <Route element={<PrivateRouter />}>
-        <Route element={<DashboardLayout />}>
+        <Route element={<MainLayout />}>
           {/* Home */}
           <Route path="/home" element={<HomePage />} />
           
@@ -173,6 +174,8 @@ const AppRouter = () => {
           <Route path="/workflow" element={< WorkflowHub />} />
 
           <Route path="/rh" element={<RHHub />} />
+
+          <Route path="/teste-page" element={<TestePage />} />
 
         </Route>
       </Route>
