@@ -60,10 +60,9 @@ export const Header = styled.div`
   gap: 1rem;
   flex-wrap: wrap;
 
-  @media (max-width: 640px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
+  /* Em telas menores que 900px, empilha */
+  @media (max-width: 450px) {
+    font-size: 0.3rem;
   }
 `;
 
@@ -72,9 +71,17 @@ export const HeaderLeft = styled.div`
   align-items: center;
   gap: 1rem;
   flex: 1;
+  flex: 1;
 
-  @media (max-width: 640px) {
+  /* Em telas médias, centraliza dentro do container pai */
+  @media (max-width: 900px) {
     justify-content: center;
+  }
+
+  /* Em mobile, mantém alinhamento à esquerda com wrap */
+  @media (max-width: 560px) {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 `;
 
@@ -84,7 +91,8 @@ export const HeaderRight = styled.div`
   gap: 1rem;
   flex-shrink: 0;
 
-  @media (max-width: 640px) {
+  /* Quando empilhado, alinha à direita do container */
+  @media (max-width: 900px) {
     justify-content: flex-end;
   }
 `;
@@ -106,21 +114,25 @@ export const IconWrapper = styled.div`
   }
 
   @media (max-width: 768px) {
-    width: 48px;
-    height: 48px;
-    
-    svg {
-      font-size: 24px;
-    }
+    display: none;
   }
 `;
 
 export const TitlesWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  min-width: 0; /* Permite que o texto quebre corretamente */
 
-  @media (max-width: 640px) {
+  /* Em telas médias, centraliza */
+  @media (max-width: 900px) {
     align-items: center;
+    text-align: center;
+  }
+
+  /* Em mobile, alinha à esquerda */
+  @media (max-width: 560px) {
+    align-items: flex-start;
+    text-align: left;
   }
 `;
 
@@ -134,6 +146,7 @@ export const Title = styled.h1`
   margin: 0;
   line-height: 1.2;
   letter-spacing: -0.02em;
+  word-break: break-word;
 
   @media (max-width: 768px) {
     font-size: 1.5rem;
@@ -148,11 +161,9 @@ export const Subtitle = styled.p`
   font-size: 0.875rem;
   color: #64748b;
   margin: 0.25rem 0 0 0;
+  word-break: break-word;
 
-  @media (max-width: 640px) {
-    text-align: center;
-  }
-
+  /* Esconde em telas muito pequenas para economizar espaço */
   @media (max-width: 480px) {
     display: none;
   }
@@ -180,6 +191,7 @@ export const HelpButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 
   svg {
     color: #2463eb;
@@ -296,7 +308,7 @@ export const ModalOverlay = styled.div`
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
-  z-index: 2000;
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -307,7 +319,7 @@ export const ModalOverlay = styled.div`
 export const ModalContent = styled.div`
   background: white;
   border-radius: 20px;
-  max-width: 500px;
+  max-width: 600px;
   width: 100%;
   max-height: 80vh;
   overflow: hidden;
