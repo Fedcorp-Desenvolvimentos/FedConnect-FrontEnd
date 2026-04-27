@@ -24,7 +24,7 @@ export const ModalOverlay = styled.div`
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
-  z-index: 2000;
+  z-index: 99999; /* Z-index altíssimo para garantir que fique acima de tudo */
   display: flex;
   align-items: center;
   justify-content: center;

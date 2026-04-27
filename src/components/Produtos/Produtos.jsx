@@ -1,19 +1,90 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
+import { FaDownload, FaEye, FaFilePdf, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
+import * as S from './ProdutosStyles';
+import PageTemplate from '../../components/PageTemplate/PageTemplate';
 import { PRODUTOS } from '../../data/produtos';
-import '../../styles/Produtos.css';
+import { ProdutosHelp } from './ProdutosHelp';
 
 const CATEGORIAS = ["Todos", "Residencial", "Condomínio", "Vida", "Saúde", "Auto", "Garantias", "Institucional"];
 
+// Componente do modal de imagem para ser renderizado via Portal
+const ImageViewerModal = ({ imagemAberta, imagensGaleria, indexAtual, onClose, onDownload, onPrev, onNext, onDotClick }) => {
+  if (!imagemAberta) return null;
+
+  return ReactDOM.createPortal(
+    <S.ImageViewer onClick={onClose}>
+      <S.ViewerClose onClick={onClose}>
+        <FaTimes />
+      </S.ViewerClose>
+
+      <S.ViewerImage
+        src={imagemAberta}
+        alt="Folheto do produto"
+        onClick={(e) => e.stopPropagation()}
+      />
+
+      <S.ViewerDownload
+        onClick={(e) => {
+          e.stopPropagation();
+          onDownload();
+        }}
+      >
+        <FaDownload />
+        Download
+      </S.ViewerDownload>
+
+      {imagensGaleria.length > 1 && (
+        <>
+          <S.ViewerArrow $left onClick={(e) => { e.stopPropagation(); onPrev(); }}>
+            <FaChevronLeft />
+          </S.ViewerArrow>
+
+          <S.ViewerArrow onClick={(e) => { e.stopPropagation(); onNext(); }}>
+            <FaChevronRight />
+          </S.ViewerArrow>
+
+          <S.ViewerDots>
+            {imagensGaleria.map((_, idx) => (
+              <S.ViewerDot
+                key={idx}
+                $active={idx === indexAtual}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDotClick(idx);
+                }}
+              />
+            ))}
+          </S.ViewerDots>
+        </>
+      )}
+    </S.ImageViewer>,
+    document.body
+  );
+};
+
 const Produtos = () => {
+  const { user, loading } = useAuth();
   const [categoriaAtiva, setCategoriaAtiva] = useState("Todos");
   const [imagemAberta, setImagemAberta] = useState(null);
   const [imagensGaleria, setImagensGaleria] = useState([]);
   const [indexAtual, setIndexAtual] = useState(0);
 
+  const nivelAcesso = user?.nivel_acesso;
+  
+  // Admin e comercial podem ver todos os produtos
+  const podeVerTodos = nivelAcesso === "admin" || nivelAcesso === "comercial";
+  
+  // Se não tiver permissão, mostra apenas institucionais
+  const produtosFiltradosPorPermissao = podeVerTodos 
+    ? PRODUTOS 
+    : PRODUTOS.filter(p => p.categoria === "Institucional");
+
   const produtosFiltrados =
     categoriaAtiva === "Todos"
-      ? PRODUTOS
-      : PRODUTOS.filter((p) => p.categoria === categoriaAtiva);
+      ? produtosFiltradosPorPermissao
+      : produtosFiltradosPorPermissao.filter((p) => p.categoria === categoriaAtiva);
 
   const baixarArquivo = (url) => {
     if (!url) return;
@@ -25,16 +96,18 @@ const Produtos = () => {
     document.body.removeChild(link);
   };
 
-  // ABRIR IMAGENS DO PRODUTO
   const abrirImagem = (produto) => {
+    let imagens = [];
     if (Array.isArray(produto.imagens) && produto.imagens.length > 0) {
-      setImagensGaleria(produto.imagens);
-      setIndexAtual(0);
-      setImagemAberta(produto.imagens[0]);
+      imagens = produto.imagens;
     } else if (typeof produto.imagem === 'string') {
-      setImagensGaleria([produto.imagem]);
+      imagens = [produto.imagem];
+    }
+    
+    if (imagens.length > 0) {
+      setImagensGaleria(imagens);
       setIndexAtual(0);
-      setImagemAberta(produto.imagem);
+      setImagemAberta(imagens[0]);
     }
   };
 
@@ -58,160 +131,109 @@ const Produtos = () => {
     setImagemAberta(imagensGaleria[novoIndex]);
   };
 
-  return (
-    <div className="page-container">
-      <div className="page-inner">
-        <header className="produtos-header">
-          <div>
-            <h1 className="page-title">Portfólio de Produtos</h1>
-            <p className="page-subtitle">
-              Apresente rapidamente os produtos da FedCorp durante o atendimento.
-            </p>
-          </div>
+  const irParaImagem = (idx) => {
+    setIndexAtual(idx);
+    setImagemAberta(imagensGaleria[idx]);
+  };
 
-          <div className="produtos-filters">
+  const headerActions = null;
+
+  const subtitle = "Apresente rapidamente os produtos da FedCorp durante o atendimento.";
+
+  return (
+    <>
+      <PageTemplate
+        title="Portfólio de Produtos"
+        subtitle={subtitle}
+        icon={<FaFilePdf />}
+        loading={loading}
+        empty={produtosFiltrados.length === 0}
+        emptyMessage="Nenhum produto disponível para seu nível de acesso"
+        actions={headerActions}
+        helpContent={<ProdutosHelp />}
+      >
+        <S.Container>
+          {/* Filtros */}
+          <S.FiltersContainer>
             {CATEGORIAS.map((cat) => (
-              <button
+              <S.ChipButton
                 key={cat}
-                className={`chip ${categoriaAtiva === cat ? "chip--active" : ""}`}
+                $active={categoriaAtiva === cat}
                 onClick={() => setCategoriaAtiva(cat)}
               >
                 {cat}
-              </button>
+              </S.ChipButton>
             ))}
-          </div>
-        </header>
+          </S.FiltersContainer>
 
-        <section className="produtos-grid">
-          {produtosFiltrados.map((produto) => (
-            <article key={produto.id} className="produto-card">
-              <div className="produto-body">
-                <span className="produto-categoria-pill">{produto.categoria}</span>
+          {/* Grid de Produtos */}
+          <S.ProductsGrid>
+            {produtosFiltrados.map((produto) => (
+              <S.ProductCard key={produto.id}>
+                <S.ProductBody>
+                  <S.CategoryPill>{produto.categoria}</S.CategoryPill>
+                  <S.ProductName>{produto.nome}</S.ProductName>
 
-                <h2 className="produto-nome">{produto.nome}</h2>
-
-                {produto.preco && (
-                  <p className="produto-preco">{produto.preco}</p>
-                )}
-
-                {produto.destaques && produto.destaques.length > 0 && (
-                  <ul className="produto-destaques">
-                    {produto.destaques.map((destaque, idx) => (
-                      <li key={idx}>{destaque}</li>
-                    ))}
-                  </ul>
-                )}
-
-                {produto.observacao && (
-                  <p className="produto-observacao">{produto.observacao}</p>
-                )}
-
-                {/* AÇÕES DO CARD */}
-                {((Array.isArray(produto.imagens) && produto.imagens.length > 0) ||
-                  (produto.tipo === 'pdf' && produto.pdf)) && (
-                    <div className="produto-actions">
-                      {Array.isArray(produto.imagens) && produto.imagens.length > 0 && (
-                        <button
-                          className="btn btn-primary"
-                          type="button"
-                          onClick={() => abrirImagem(produto)}
-                        >
-                          Ver folheto
-                        </button>
-                      )}
-
-                      {/* INSTITUCIONAIS */}
-                      {produto.tipo === 'pdf' && produto.pdf && (
-                        <div className="pdf-actions">
-                          <button
-                            className="btn btn-primary"
-                            type="button"
-                            onClick={() => window.open(produto.pdf, '_blank')}
-                          >
-                            Abrir apresentação
-                          </button>
-
-                          <button
-                            className="btn btn-outline"
-                            type="button"
-                            onClick={() => baixarArquivo(produto.pdf)}
-                          >
-                            Baixar PDF
-                          </button>
-                        </div>
-                      )}
-
-                    </div>
+                  {produto.preco && (
+                    <S.ProductPrice>{produto.preco}</S.ProductPrice>
                   )}
-              </div>
-            </article>
-          ))}
-        </section>
-      </div>
 
-      {imagemAberta && (
-        <div className="image-viewer" onClick={fecharImagem}>
-          <button className="viewer-close" onClick={fecharImagem}>
-            ✕
-          </button>
+                  {produto.destaques && produto.destaques.length > 0 && (
+                    <S.DestaquesList>
+                      {produto.destaques.map((destaque, idx) => (
+                        <li key={idx}>{destaque}</li>
+                      ))}
+                    </S.DestaquesList>
+                  )}
 
-          <img
-            src={imagemAberta}
-            alt="Folheto do produto"
-            className="viewer-image"
-            onClick={(e) => e.stopPropagation()}
-          />
+                  {produto.observacao && (
+                    <S.Observacao>{produto.observacao}</S.Observacao>
+                  )}
 
-          <button
-            className="viewer-download"
-            onClick={(e) => {
-              e.stopPropagation();
-              baixarArquivo(imagemAberta);
-            }}
-          >
-            Fazer Download
-          </button>
+                  {/* Ações do card */}
+                  {((Array.isArray(produto.imagens) && produto.imagens.length > 0) ||
+                    (produto.tipo === 'pdf' && produto.pdf)) && (
+                    <S.ActionsContainer>
+                      {Array.isArray(produto.imagens) && produto.imagens.length > 0 && (
+                        <S.PrimaryButton onClick={() => abrirImagem(produto)}>
+                          <FaEye />
+                          Ver folheto
+                        </S.PrimaryButton>
+                      )}
 
-          {imagensGaleria.length > 1 && (
-            <>
-              <button
-                className="viewer-arrow viewer-arrow--left"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  irAnterior();
-                }}
-              >
-                ‹
-              </button>
+                      {produto.tipo === 'pdf' && produto.pdf && (
+                        <S.PdfActions>
+                          <S.PrimaryButton onClick={() => window.open(produto.pdf, '_blank')}>
+                            <FaFilePdf />
+                            Abrir apresentação
+                          </S.PrimaryButton>
+                          <S.OutlineButton onClick={() => baixarArquivo(produto.pdf)}>
+                            <FaDownload />
+                            Baixar PDF
+                          </S.OutlineButton>
+                        </S.PdfActions>
+                      )}
+                    </S.ActionsContainer>
+                  )}
+                </S.ProductBody>
+              </S.ProductCard>
+            ))}
+          </S.ProductsGrid>
+        </S.Container>
+      </PageTemplate>
 
-              <button
-                className="viewer-arrow viewer-arrow--right"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  irProximo();
-                }}
-              >
-                ›
-              </button>
-
-              <div className="viewer-dots">
-                {imagensGaleria.map((_, idx) => (
-                  <button
-                    key={idx}
-                    className={`viewer-dot ${idx === indexAtual ? 'viewer-dot--active' : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIndexAtual(idx);
-                      setImagemAberta(imagensGaleria[idx]);
-                    }}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      )}
-    </div>
+      {/* Modal de visualização de imagem - renderizado via Portal */}
+      <ImageViewerModal
+        imagemAberta={imagemAberta}
+        imagensGaleria={imagensGaleria}
+        indexAtual={indexAtual}
+        onClose={fecharImagem}
+        onDownload={() => baixarArquivo(imagemAberta)}
+        onPrev={irAnterior}
+        onNext={irProximo}
+        onDotClick={irParaImagem}
+      />
+    </>
   );
 };
 

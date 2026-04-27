@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { 
   FaTimes, 
   FaLightbulb, 
@@ -8,15 +9,12 @@ import {
 } from 'react-icons/fa';
 import * as S from './HelpModalStyles';
 
-const HelpModal = ({ 
-  isOpen, 
+const HelpModalContent = ({ 
   onClose, 
-  title = "Guia Rápido",
-  content,
-  type = "info" // info, warning, tip
+  title, 
+  content, 
+  type 
 }) => {
-  if (!isOpen) return null;
-
   const getIconByType = () => {
     switch (type) {
       case 'warning':
@@ -59,6 +57,27 @@ const HelpModal = ({
         </S.ModalFooter>
       </S.ModalContent>
     </S.ModalOverlay>
+  );
+};
+
+const HelpModal = ({ 
+  isOpen, 
+  onClose, 
+  title = "Guia Rápido",
+  content,
+  type = "info" // info, warning, tip
+}) => {
+  if (!isOpen) return null;
+
+  // Renderiza o modal diretamente no body usando Portal
+  return ReactDOM.createPortal(
+    <HelpModalContent
+      onClose={onClose}
+      title={title}
+      content={content}
+      type={type}
+    />,
+    document.body
   );
 };
 
