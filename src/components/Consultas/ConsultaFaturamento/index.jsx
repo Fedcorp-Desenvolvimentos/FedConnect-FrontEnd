@@ -1,7 +1,7 @@
 // components/Faturamento/ConsultaFaturamento.jsx
 import { useEffect, useRef, useCallback, useState } from "react";
 import { FaFileInvoiceDollar, FaSearch, FaTrash, FaChevronDown, FaChevronUp } from "react-icons/fa";
-import * as S from "./ConsultaFaturamentoStyles";
+import * as S from "./styles/ConsultaFaturamentoStyles";
 import PageTemplate from "../../PageTemplate/PageTemplate";
 
 // Hooks

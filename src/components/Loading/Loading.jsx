@@ -60,11 +60,11 @@ const Loading = ({
       {message && (
         <S.MessageContainer>
           <S.MessageText>{getFormattedMessage()}</S.MessageText>
-          {progress > 0 && progress < 100 && (
+          {/* {progress > 0 && progress < 100 && (
             <S.ProgressBarContainer>
               <S.ProgressBarFill $progress={progress} />
             </S.ProgressBarContainer>
-          )}
+          )} */}
         </S.MessageContainer>
       )}
     </S.Container>

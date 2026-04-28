@@ -1,5 +1,5 @@
 import React from 'react';
-import * as S from "../ConsultaFaturamentoStyles";
+import * as S from "../styles/ConsultaFaturamentoStyles";
 
 export const STATUS_MAP = {
     A: { label: "Ativa", status: "A" },

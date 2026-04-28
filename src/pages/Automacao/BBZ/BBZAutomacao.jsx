@@ -7,15 +7,15 @@ import {
   TbUpload, 
   TbRefresh, 
   TbCheck,
-  TbFilePdf,
   TbTrash,
-  TbInfoCircle
+  TbInfoCircle,
+  TbFile
 } from "react-icons/tb";
 import { FaSpinner } from "react-icons/fa";
-import PageTemplate from "../../PageTemplate/PageTemplate";
 import { AutomacaoService } from "../../../services/automacaoService";
 import * as S from "./BBZAutomacaoStyles";
 import { BBZAutomacaoHelp } from "./BBZAutomacaoHelp";
+import PageTemplate from "../../../components/PageTemplate/PageTemplate";
 
 const BBZAutomacao = () => {
     const { user } = useAuth();
@@ -138,7 +138,7 @@ const BBZAutomacao = () => {
                     <S.FileInputArea>
                         <S.FileInput id="file-input" type="file" multiple accept=".pdf" onChange={handleFileSelect} disabled={isUploading} />
                         <S.FileLabel htmlFor="file-input" disabled={isUploading}>
-                            <TbFilePdf size={18} />
+                            <TbFile size={18} />
                             Selecionar arquivos PDF
                         </S.FileLabel>
                     </S.FileInputArea>

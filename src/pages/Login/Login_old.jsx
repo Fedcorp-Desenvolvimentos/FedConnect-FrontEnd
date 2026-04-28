@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { useLoading } from '../../hooks/useLoading';
+import { useGlobal } from '../../context/GlobalContext';
 import * as S from './LoginStyles';
 
 const Login = () => {
@@ -11,48 +11,28 @@ const Login = () => {
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const { startLoading, stopLoading, updateProgress } = useLoading();
+    const { loading, setLoading } = useGlobal();
     const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setLoading(true);
         setError(null);
-        
-        // Inicia o loading com progresso
-        startLoading("Iniciando login...");
-        
-        // Simula etapas do processo de login
-        updateProgress(10, "Verificando credenciais...");
-        
-        // Pequeno delay para simular processamento (opcional - efeito visual)
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        updateProgress(40, "Autenticando usuário...");
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        updateProgress(70, "Carregando dados do usuário...");
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        updateProgress(85, "Configurando sessão...");
         
         try {
             const result = await login({ email, password });
 
             if (result.success) {
-                updateProgress(100, "Login realizado com sucesso!");
-                await new Promise(resolve => setTimeout(resolve, 300));
                 navigate('/home');
             } else {
-                updateProgress(0, "Erro no login");
                 setError(result.error || 'Falha no login. Verifique suas credenciais.');
-                setTimeout(() => stopLoading(), 1500);
             }
         } catch (err) {
-            updateProgress(0, "Erro no login");
             setError('Ocorreu um erro inesperado durante o login.');
             console.error('Erro de login no componente:', err);
-            setTimeout(() => stopLoading(), 1500);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -110,8 +90,8 @@ const Login = () => {
                                 </S.ErrorMessage>
                             )}
 
-                            <S.LoginButton type="submit">
-                                Entrar
+                            <S.LoginButton type="submit" disabled={loading}>
+                                {loading ? 'Entrando...' : 'Entrar'}
                             </S.LoginButton>
 
                             <S.ForgotPassword href="/recuperar-senha">

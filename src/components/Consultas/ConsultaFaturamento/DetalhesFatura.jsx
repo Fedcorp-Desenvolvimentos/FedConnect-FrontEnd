@@ -1,7 +1,7 @@
 // components/Faturamento/DetalhesFatura.jsx
 import React from 'react';
 import { FaReceipt, FaFileInvoiceDollar } from 'react-icons/fa';
-import * as S from "./ConsultaFaturamentoStyles";
+import * as S from "./styles/ConsultaFaturamentoStyles";
 import { formatarData, formatarValor, formatarVigencia } from "./utils/formatacao";
 import { TabelaBoletos } from "./TabelaBoletos";
 

@@ -1,6 +1,6 @@
 // components/Faturamento/TabelaBoletos.jsx
 import React, { useState } from 'react';
-import * as S from "./ConsultaFaturamentoStyles";
+import * as S from "./styles/ConsultaFaturamentoStyles";
 import { verificarVencimento } from "../../../utils/Faturamento/verificarVencimento";
 import { formatarValor } from "../../../utils/Faturamento/formatarValor";
 import { formatarData } from "../../../utils/Faturamento/formatarData";

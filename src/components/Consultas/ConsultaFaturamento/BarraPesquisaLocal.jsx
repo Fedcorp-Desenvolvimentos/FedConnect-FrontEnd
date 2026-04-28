@@ -1,7 +1,7 @@
 // components/Faturamento/BarraPesquisaLocal.jsx
 import React from 'react';
 import { FaSearch, FaTimes, FaInfoCircle, FaExclamationCircle } from 'react-icons/fa';
-import * as S from "./ConsultaFaturamentoStyles";
+import * as S from "./styles/ConsultaFaturamentoStyles";
 
 export const BarraPesquisaLocal = ({ 
     termoPesquisa, 

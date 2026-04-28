@@ -1,6 +1,6 @@
 // components/Faturamento/TabelaBaixas.jsx
 import React from 'react';
-import * as S from "./ConsultaFaturamentoStyles";
+import * as S from "./styles/ConsultaFaturamentoStyles";
 import { formatarValor } from "../../../utils/Faturamento/formatarValor";
 import { formatarData } from "../../../utils/Faturamento/formatarData";
 

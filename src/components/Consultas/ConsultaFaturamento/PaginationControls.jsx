@@ -1,6 +1,6 @@
 // components/Faturamento/PaginationControls.jsx
 import React from 'react';
-import * as S from "./ConsultaFaturamentoStyles";
+import * as S from "./styles/ConsultaFaturamentoStyles";
 
 export const PaginationControls = ({ 
     pagination, 

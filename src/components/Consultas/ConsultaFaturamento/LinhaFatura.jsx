@@ -1,14 +1,28 @@
 // components/Faturamento/LinhaFatura.jsx
 import React from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import * as S from "./ConsultaFaturamentoStyles";
+import * as S from "./styles/ConsultaFaturamentoStyles";
 import { formatarData } from "../../../utils/Faturamento/formatarData";
 import { verificarVencimento } from "../../../utils/Faturamento/verificarVencimento";
 import { renderStatusBadge } from "./utils/constants";
 import { DetalhesFatura } from "./DetalhesFatura";
 
+// Mapeamento de status para classes CSS
+const getStatusClass = (status) => {
+    const statusMap = {
+        'vencido': 'vencido',
+        'hoje': 'vencido',
+        'pendente': 'proximo',
+        'proximo': 'proximo',
+        'ok': 'ok',
+        'desconhecido': 'desconhecido'
+    };
+    return statusMap[status] || 'desconhecido';
+};
+
 export const LinhaFatura = ({ fatura, index, isExpanded, toggleExpandRow, obterNomeCedente, obterNomeCorretor }) => {
     const venc = verificarVencimento(fatura.VENCIMENTO);
+    const statusClass = getStatusClass(venc.status);
 
     return (
         <React.Fragment>
@@ -27,8 +41,8 @@ export const LinhaFatura = ({ fatura, index, isExpanded, toggleExpandRow, obterN
                 <td>{formatarData(fatura.DATA_FAT)}</td>
                 <td>{renderStatusBadge(fatura.BOLETOS, fatura.PARCELAS, fatura.STATUS)}</td>
                 <td>
-                    <S.VencimentoSpan className={venc.status}>
-                        {formatarData(fatura.VENCIMENTO)}
+                    <S.VencimentoSpan className={statusClass}>
+                        {venc.label}
                     </S.VencimentoSpan>
                 </td>
             </S.TableRow>

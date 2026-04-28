@@ -1,14 +1,12 @@
 import React from 'react';
+import { FaExclamationTriangle, FaLightbulb } from 'react-icons/fa';
 import { 
   TbAutomation, 
   TbUpload, 
   TbRefresh, 
-  TbFilePdf,
   TbFolder,
   TbCalendar,
   TbBuilding,
-  FaLightbulb,
-  FaExclamationTriangle
 } from 'react-icons/tb';
 
 export const BBZAutomacaoHelp = () => {

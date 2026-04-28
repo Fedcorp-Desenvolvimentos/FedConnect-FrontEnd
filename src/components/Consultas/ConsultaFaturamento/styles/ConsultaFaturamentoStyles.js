@@ -291,12 +291,12 @@ export const VencimentoSpan = styled.span`
   font-weight: 500;
   white-space: nowrap;
 
-  &.vencido {
+  &.vencido, &.hoje {
     background: #fee2e2;
     color: #dc2626;
   }
 
-  &.proximo {
+  &.proximo, &.pendente {
     background: #fef3c7;
     color: #d97706;
   }
@@ -304,6 +304,11 @@ export const VencimentoSpan = styled.span`
   &.ok {
     background: #dcfce7;
     color: #16a34a;
+  }
+
+  &.desconhecido {
+    background: #f1f5f9;
+    color: #475569;
   }
 
   @media (max-width: 768px) {

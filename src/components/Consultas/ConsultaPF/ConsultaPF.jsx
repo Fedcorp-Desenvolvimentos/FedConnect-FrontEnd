@@ -199,11 +199,11 @@ const ConsultaPF = () => {
         XLSX.writeFile(newWorkbook, `resultado-cpf-${new Date().toISOString().slice(0,19)}.xlsx`);
         
         enqueueSnackbar(`Planilha gerada com ${allResults.length} registros!`, { variant: "success" });
-        setMassConsultaMessage(`✅ Concluído! ${allResults.length} registros processados.`);
+        setMassConsultaMessage(`Concluído! ${allResults.length} registros processados.`);
         
       } catch (err) {
         console.error(err);
-        setMassConsultaMessage("❌ Erro ao processar planilha.");
+        setMassConsultaMessage("Erro ao processar planilha.");
         enqueueSnackbar("Erro ao processar arquivo.", { variant: "error" });
       } finally {
         stopLoading();

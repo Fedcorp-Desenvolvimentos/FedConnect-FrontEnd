@@ -327,11 +327,11 @@ const ConsultaCNPJ = () => {
         XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, "Resultados");
         XLSX.writeFile(newWorkbook, `resultado-cnpj-${new Date().toISOString().slice(0,19)}.xlsx`);
         
-        setMassConsultaMessage(`✅ Concluído! ${allResults.length} registros processados.`);
+        setMassConsultaMessage(`Concluído! ${allResults.length} registros processados.`);
         enqueueSnackbar(`Planilha gerada com ${allResults.length} registros!`, { variant: "success" });
       } catch (err) {
         console.error("Erro ao processar planilha:", err);
-        setMassConsultaMessage("❌ Erro ao processar planilha.");
+        setMassConsultaMessage("Erro ao processar planilha.");
         enqueueSnackbar("Erro ao processar arquivo.", { variant: "error" });
       } finally {
         stopLoading();

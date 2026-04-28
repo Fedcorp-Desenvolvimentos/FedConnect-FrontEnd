@@ -2,7 +2,7 @@
 import React from 'react';
 import { FaTimes, FaReceipt } from 'react-icons/fa';
 import * as Dialog from '@radix-ui/react-dialog';
-import * as S from "./ConsultaFaturamentoStyles";
+import * as S from "./styles/ConsultaFaturamentoStyles";
 import { verificarVencimento } from "../../../utils/Faturamento/verificarVencimento";
 import { formatarValor } from "../../../utils/Faturamento/formatarValor";
 import { formatarData } from "../../../utils/Faturamento/formatarData";
