@@ -7,7 +7,7 @@ import * as S from "./ComercialRegiaoStyles";
 import { ConsultaService } from "../../../services/consultaService";
 import { ConsultaRegiaoService } from "../../../services/consultaRegiaoService";
 import { useGlobal } from "../../../context/GlobalContext";
-import PageTemplate from "../../../components/PageTemplate/PageTemplate";
+import PageLayout from "../../../components/PageLayout/PageLayout";
 
 const ComercialRegiao = () => {
     const [form, setForm] = useState({
@@ -344,7 +344,7 @@ const ComercialRegiao = () => {
     };
 
     return (
-        <PageTemplate
+        <PageLayout
             title="Buscar por Região"
             subtitle="Encontre empresas por estado, município e bairro"
             icon={<FaMapMarkerAlt />}
@@ -616,7 +616,7 @@ const ComercialRegiao = () => {
                     </S.ModalOverlay>
                 )}
             </S.Container>
-        </PageTemplate>
+        </PageLayout>
     );
 };
 

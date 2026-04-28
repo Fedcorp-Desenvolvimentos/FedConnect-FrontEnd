@@ -1,6 +1,6 @@
 import * as S from "./MetricasStyles";
 import { FaExternalLinkAlt, FaChartBar } from "react-icons/fa";
-import PageTemplate from "../../components/PageTemplate/PageTemplate";
+import PageLayout from "../../components/PageLayout/PageLayout";
 import { useAuth } from "../../context/AuthContext";
 import MetricasHelp from "./MetricasHelp";
 
@@ -53,7 +53,7 @@ const Metricas = () => {
   const subtitle = "Acompanhe as principais métricas e resultados do Grupo FedCorp";
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Métricas da FedCorp"
       subtitle={subtitle}
       icon={<FaChartBar />}
@@ -96,7 +96,7 @@ const Metricas = () => {
           ))}
         </S.CardsGrid>
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

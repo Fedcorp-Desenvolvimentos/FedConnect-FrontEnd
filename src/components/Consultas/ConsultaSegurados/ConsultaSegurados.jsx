@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
 import { IoShieldCheckmarkOutline } from "react-icons/io5";
-import PageTemplate from "../../PageTemplate/PageTemplate";
+import PageLayout from "../../PageLayout/PageLayout";
 import { ConsultaService } from "../../../services/consultaService";
 import { resolveNomeApoliceFromRecord } from "../../../services/apoliceDePara";
 
@@ -388,7 +388,7 @@ const ConsultaSegurados = () => {
   const isSubmitDisabled = loading || loadingAdms;
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Consulta de Segurados"
       subtitle="Consulte informações de segurados"
       icon={<IoShieldCheckmarkOutline />}
@@ -587,7 +587,7 @@ const ConsultaSegurados = () => {
           </S.ResultCard>
         )}
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

@@ -1,6 +1,6 @@
 // import "../../styles/Consulta.css";
 // import { FiCopy, FiCheck, FiUser, FiFileText, FiUsers, FiUserPlus } from "react-icons/fi";
-// import PageTemplate from "../PageTemplate/PageTemplate";
+// import PageLayout from "../PageLayout/PageLayout";
 // import { useEffect, useRef, useState } from "react";
 // import { formatarData } from "../../utils/formatar_data";
 // import { ConsultaService } from "../../services/consultaService";
@@ -366,7 +366,7 @@
 //     }, [loading, scrollOnNextResult, resultado, activeForm]);
   
 //   return (
-//     <PageTemplate
+//     <PageLayout
 //       title="Consulta por Pessoa Física"
 //       subtitle="Consulte informações de pessoas físicas"
 //       icon={<FiUser />}
@@ -840,7 +840,7 @@
 //                   </div>
 //                 )}
 //       </div>
-//     </PageTemplate>
+//     </PageLayout>
 //   );
 // };
 

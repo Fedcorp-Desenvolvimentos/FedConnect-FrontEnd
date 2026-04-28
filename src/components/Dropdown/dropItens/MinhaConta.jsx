@@ -2,7 +2,7 @@
 // import "../../../styles/MinhaConta.css";
 // import { UserService } from "../../../services/userService";
 // import { IoIosBusiness } from "react-icons/io";
-// import PageTemplate from "../../PageTemplate/PageTemplate";
+// import PageLayout from "../../PageLayout/PageLayout";
 
 // const MinhaConta = () => {
 //   const [activeTab, setActiveTab] = useState("perfil");
@@ -114,7 +114,7 @@
 //   };
 
 //   return (
-//     <PageTemplate
+//     <PageLayout
 //       title="Consultas comerciais"
 //       subtitle="Consulte informações comerciais"
 //       icon={<IoIosBusiness />}
@@ -272,7 +272,7 @@
 //           )}
 //         </div>
 //       </div>
-//     </PageTemplate>
+//     </PageLayout>
 //   );
 // };
 

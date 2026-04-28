@@ -10,7 +10,7 @@ import SearchBar from './SearchBar';
 import Pagination from './Pagination';
 import { ITEMS_PER_PAGE } from './constants/userConstants';
 import './styles/GerenciarUsuarios.css';
-import PageTemplate from '../../../PageTemplate/PageTemplate';
+import PageLayout from '../../../PageLayout/PageLayout';
 
 const GerenciarUsuarios = () => {
   const { 
@@ -100,7 +100,7 @@ const GerenciarUsuarios = () => {
   };
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Gerenciar Usuários"
       subtitle="Gerencie os usuários do sistema, editando ou excluindo suas informações."
     >
@@ -155,7 +155,7 @@ const GerenciarUsuarios = () => {
           />
         </main>
       </div>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

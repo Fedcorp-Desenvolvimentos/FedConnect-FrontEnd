@@ -1,29 +1,32 @@
+// src/components/Loading/LoadingStyles.js
 import styled, { keyframes } from 'styled-components';
 
-// Animações
-const spin = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
 `;
 
-// Overlay do loading
+const fadeOut = keyframes`
+  from { opacity: 1; }
+  to { opacity: 0; }
+`;
+
+// Overlay com blur - fundo claro
 export const Overlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(255, 255, 255, 0.432);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  animation: ${props => props.$isExiting ? fadeOut : fadeIn} 0.3s ease forwards;
+  pointer-events: ${props => props.$isExiting ? 'none' : 'auto'};
 `;
 
 // Container principal
@@ -32,21 +35,43 @@ export const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 32px;
+  gap: 24px;
   padding: 32px;
-  background: transparent;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  animation: ${props => props.$isExiting ? fadeOut : fadeIn} 0.3s ease forwards;
+  animation-delay: ${props => props.$isExiting ? '0s' : '0.05s'};
+
+  @media (max-width: 768px) {
+    padding: 24px;
+    gap: 20px;
+    border-radius: 20px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 20px;
+    gap: 16px;
+    border-radius: 16px;
+  }
 `;
 
 // Wrapper da logo
 export const LogoWrapper = styled.div`
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 220px;
+  height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
+    width: 180px;
+    height: 180px;
+  }
+
+  @media (max-width: 480px) {
     width: 150px;
     height: 150px;
   }
@@ -54,15 +79,20 @@ export const LogoWrapper = styled.div`
 
 // Logo
 export const LogoImg = styled.img`
-  width: 160px;
-  height: 160px;
+  width: 130px;
+  height: 130px;
   object-fit: contain;
   z-index: 2;
   display: block;
+  
+  @media (max-width: 768px) {
+    width: 100px;
+    height: 100px;
+  }
 
-  @media (max-width: 640px) {
-    width: 120px;
-    height: 120px;
+  @media (max-width: 480px) {
+    width: 80px;
+    height: 80px;
   }
 `;
 
@@ -74,83 +104,58 @@ export const ProgressSvg = styled.svg`
   width: 100%;
   height: 100%;
   transform: rotate(-90deg);
+`;
 
-  circle {
-    transition: stroke-dashoffset 0.2s linear;
+// Badge de porcentagem - dentro do círculo, abaixo da logo
+export const PercentageBadge = styled.div`
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  font-weight: 700;
+  color: #2563eb;
+  padding: 4px 12px;
+  border-radius: 20px;
+  z-index: 3;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, monospace;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+  
+  @media (max-width: 768px) {
+    bottom: 20px;
+    font-size: 16px;
+    padding: 3px 10px;
+  }
+
+  @media (max-width: 480px) {
+    bottom: 15px;
+    font-size: 14px;
+    padding: 2px 8px;
   }
 `;
 
 // Container da mensagem
 export const MessageContainer = styled.div`
   text-align: center;
+  opacity: 0;
+  animation: ${props => props.$isExiting ? fadeOut : fadeIn} 0.3s ease forwards;
+  animation-delay: ${props => props.$isExiting ? '0s' : '0.1s'};
 `;
 
 // Texto da mensagem
 export const MessageText = styled.p`
-  color: #1e293b;
-  font-size: 16px;
+  color: #64748b;
+  font-size: 14px;
   font-weight: 500;
   margin: 0;
-  margin-bottom: 8px;
+  letter-spacing: 0.3px;
 
-  @media (max-width: 640px) {
-    font-size: 0.875rem;
+  @media (max-width: 768px) {
+    font-size: 13px;
   }
-`;
 
-// Porcentagem (comentada mas mantida)
-export const PercentageText = styled.p`
-  color: #2463eb;
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-
-  @media (max-width: 640px) {
-    font-size: 1rem;
+  @media (max-width: 480px) {
+    font-size: 12px;
   }
-`;
-
-// Adicione isso no seu LoadingStyles.js
-export const PercentageBadge = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 24px;
-  font-weight: bold;
-  color: #2463eb;
-  background: white;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  font-family: monospace;
-  z-index: 3;
-
-  @media (max-width: 640px) {
-    width: 45px;
-    height: 45px;
-    font-size: 18px;
-  }
-`;
-
-export const ProgressBarContainer = styled.div`
-  width: 280px;
-  max-width: 80vw;
-  height: 6px;
-  background-color: #e2e8f0;
-  border-radius: 3px;
-  overflow: hidden;
-  margin-top: 12px;
-`;
-
-export const ProgressBarFill = styled.div`
-  width: ${props => props.$progress || 0}%;
-  height: 100%;
-  background-color: #2463eb;
-  border-radius: 3px;
-  transition: width 0.3s ease;
 `;

@@ -1,53 +1,58 @@
 import { useState, useCallback } from 'react';
 import { ConsultaService } from '../../../services/consultaService';
+import { useLoading } from '../../../hooks/useLoading';
 
 export const useDetalhesConsulta = (enqueueSnackbar) => {
   const [selectedConsultaId, setSelectedConsultaId] = useState(null);
-  const [detalhesConsulta, setDetalhesConsulta] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+
+  const [detalhesMap, setDetalhesMap] = useState({});
+  const [errorMap, setErrorMap] = useState({});
+
+  const { withLoading } = useLoading();
 
   const fetchDetalhes = useCallback(async (consultaId) => {
-    setLoading(true);
-    setError('');
-    
+    setErrorMap(prev => ({ ...prev, [consultaId]: '' }));
+
     try {
-      const data = await ConsultaService.getHistoryByID(consultaId);
-      setDetalhesConsulta(data);
-      return data;
+      await withLoading(async () => {
+        const data = await ConsultaService.getHistoryByID(consultaId);
+
+        setDetalhesMap(prev => ({
+          ...prev,
+          [consultaId]: data
+        }));
+      }, 'Carregando detalhes...');
     } catch (err) {
       console.error('Erro ao carregar detalhes:', err);
-      setError('Não foi possível carregar os detalhes desta consulta.');
+
+      setErrorMap(prev => ({
+        ...prev,
+        [consultaId]: 'Não foi possível carregar os detalhes desta consulta.'
+      }));
+
       enqueueSnackbar('Erro ao carregar detalhes', { variant: 'error' });
-      return null;
-    } finally {
-      setLoading(false);
     }
   }, [enqueueSnackbar]);
 
   const toggleDetalhes = useCallback(async (consultaId) => {
-    if (selectedConsultaId === consultaId) {
+    const id = String(consultaId);
+
+    if (selectedConsultaId === id) {
       setSelectedConsultaId(null);
-      setDetalhesConsulta(null);
       return;
     }
-    
-    setSelectedConsultaId(consultaId);
-    await fetchDetalhes(consultaId);
-  }, [selectedConsultaId, fetchDetalhes]);
 
-  const clearDetalhes = useCallback(() => {
-    setSelectedConsultaId(null);
-    setDetalhesConsulta(null);
-    setError('');
-  }, []);
+    setSelectedConsultaId(id);
+
+    if (!detalhesMap[id]) {
+      await fetchDetalhes(id);
+    }
+  }, [selectedConsultaId, detalhesMap, fetchDetalhes]);
 
   return {
     selectedConsultaId,
-    detalhesConsulta,
-    loading,
-    error,
-    toggleDetalhes,
-    clearDetalhes
+    detalhesMap,
+    errorMap,
+    toggleDetalhes
   };
 };

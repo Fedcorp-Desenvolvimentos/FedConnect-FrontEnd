@@ -10,7 +10,7 @@ export const ACCESS_LEVELS = {
 
 export const ACCESS_LEVEL_LABELS = {
   [ACCESS_LEVELS.ADMIN]: "Administrador",
-  [ACCESS_LEVELS.USUARIO]: "Usuário Comum",
+  [ACCESS_LEVELS.USUARIO]: "Usuário",
   [ACCESS_LEVELS.COMERCIAL]: "Comercial",
   [ACCESS_LEVELS.MODERADOR]: "Moderador",
   [ACCESS_LEVELS.RECEPCIONISTA]: "Recepcionista",

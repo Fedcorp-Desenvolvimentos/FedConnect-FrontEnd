@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import * as S from './PageTemplateStyles';
-import HelpModal from '../Help/HelpModal';
+import * as S from './PageLayoutStyles';
 import { 
   FaExclamationTriangle, 
   FaInbox, 
   FaSpinner,
   FaQuestionCircle
 } from 'react-icons/fa';
+import HelpModal from '../../components/Help/HelpModal';
 
-const PageTemplate = ({ 
+const PageLayout = ({ 
   children, 
   title, 
   subtitle,
@@ -107,4 +107,4 @@ const PageTemplate = ({
   );
 };
 
-export default PageTemplate;
+export default PageLayout;

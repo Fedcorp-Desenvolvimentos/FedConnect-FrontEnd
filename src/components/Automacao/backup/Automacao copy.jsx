@@ -3,7 +3,7 @@
 // import { useState } from "react";
 // import "../../styles/ConsultasHome.css";
 // import { useAuth } from "../../context/AuthContext";
-// import PageTemplate from "../PageTemplate/PageTemplate";
+// import PageLayout from "../PageLayout/PageLayout";
 // import { TbAutomation } from "react-icons/tb";
 // import { AutomacaoService } from "../../services/automacaoService";
 // import { useSnackbar } from "notistack";
@@ -114,7 +114,7 @@
 //     };
 
 //     return (
-//         <PageTemplate
+//         <PageLayout
 //         title="Automação de processos"
 //         subtitle="Gerencie e monitore suas automações de forma eficiente"
 //         icon={<TbAutomation />}
@@ -183,7 +183,7 @@
 //             </ul>
 //             </div>
 //         </div>
-//         </PageTemplate>
+//         </PageLayout>
 //     );
 // };
 

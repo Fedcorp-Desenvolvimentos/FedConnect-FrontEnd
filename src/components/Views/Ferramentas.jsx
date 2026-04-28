@@ -1,4 +1,4 @@
-import PageTemplate from "../PageTemplate/PageTemplate";
+import PageLayout from "../PageLayout/PageLayout";
 import "../../styles/Ferramentas.css";
 
 const ferramentas = [
@@ -34,7 +34,7 @@ const Ferramentas = () => {
   const subtitle = "Acesse rapidamente as principais plataformas e soluções digitais da FedCorp.";
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Ferramentas da FedCorp"
       icon={<i className="bi bi-tools"></i>}
       subtitle={subtitle}
@@ -61,7 +61,7 @@ const Ferramentas = () => {
           </div>
         ))}
       </div>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

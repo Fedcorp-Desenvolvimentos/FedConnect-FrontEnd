@@ -26,10 +26,10 @@ import {
   FaBirthdayCake
 } from "react-icons/fa";
 import { GiHealthNormal } from "react-icons/gi";
-import * as S from "./RHHubStyles";
-import PageTemplate from "../../components/PageTemplate/PageTemplate";
+import * as S from "./RHStyles";
+import PageLayout from "../../components/PageLayout/PageLayout";
 
-const RHHub = () => {
+const RH = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -200,7 +200,7 @@ const RHHub = () => {
   ];
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Recursos Humanos"
       subtitle="Gestão de recursos humanos, documentos e solicitações"
       icon={<FiUsers />}
@@ -395,8 +395,8 @@ const RHHub = () => {
           </S.DocsGrid>
         </S.Section>
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 
-export default RHHub;
+export default RH;

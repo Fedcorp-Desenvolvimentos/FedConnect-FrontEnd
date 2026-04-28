@@ -23,7 +23,7 @@ import AgendaReservaForm from "../../components/Agenda/AgendaReservaForm";
 import AgendaDetalhe from "../../components/Agenda/AgendaDetalhe";
 import { useAuth } from "../../context/AuthContext";
 import { AgendaService } from "../../services/agendaService";
-import PageTemplate from "../../components/PageTemplate/PageTemplate";
+import PageLayout from "../../components/PageLayout/PageLayout";
 import { CiCalendarDate } from "react-icons/ci";
 
 function getFirstMondayOfMonth(date) {
@@ -228,7 +228,7 @@ export default function AgendaSala() {
   );
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Agenda"
       subtitle="Gerencie as reservas da sala de reunião de forma fácil e rápida"
       icon={<CiCalendarDate />}
@@ -300,6 +300,6 @@ export default function AgendaSala() {
 
         {!!toastMsg && <div className="agenda-toast">{toastMsg}</div>}
       </div>
-    </PageTemplate>
+    </PageLayout>
   );
 }

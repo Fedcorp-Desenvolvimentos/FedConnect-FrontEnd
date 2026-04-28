@@ -2,7 +2,7 @@
 
 import React from 'react';
 import * as S from './CardGridLayoutStyles';
-import PageTemplate from '../../components/PageTemplate/PageTemplate';
+import PageLayout from '../../components/PageLayout/PageLayout';
 
 const CardGridLayout = ({ 
   title,
@@ -18,7 +18,7 @@ const CardGridLayout = ({
 }) => {
   if (empty && (!items || items.length === 0)) {
     return (
-      <PageTemplate
+      <PageLayout
         title={title}
         subtitle={subtitle}
         icon={icon}
@@ -31,7 +31,7 @@ const CardGridLayout = ({
   }
 
   return (
-    <PageTemplate
+    <PageLayout
       title={title}
       subtitle={subtitle}
       icon={icon}
@@ -41,7 +41,7 @@ const CardGridLayout = ({
       <S.CardsGrid {...gridProps}>
         {items?.map((item, index) => renderCard(item, index))}
       </S.CardsGrid>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

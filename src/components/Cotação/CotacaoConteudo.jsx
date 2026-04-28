@@ -3,7 +3,7 @@ import { FaHome, FaCalculator, FaBuilding, FaShieldAlt, FaSpinner } from "react-
 import { useSnackbar } from "notistack";
 import { useLoading } from "../../hooks/useLoading";
 import * as S from "./CotacaoConteudoStyles";
-import PageTemplate from "../../components/PageTemplate/PageTemplate";
+import PageLayout from "../../components/PageLayout/PageLayout";
 import { CotacaoConteudoHelp } from "./CotacaoConteudoHelp";
 import cotacaoService from "../../services/cotacaoService";
 
@@ -119,7 +119,7 @@ const CotacaoConteudo = () => {
     (Number(String(repasse).replace("%", "").replace(",", ".")) / 100);
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Estudo – Incêndio Conteúdo"
       subtitle="Calcule o valor do seguro incêndio para seu imóvel"
       icon={<FaHome />}
@@ -268,7 +268,7 @@ const CotacaoConteudo = () => {
           </S.ResultContainer>
         )}
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

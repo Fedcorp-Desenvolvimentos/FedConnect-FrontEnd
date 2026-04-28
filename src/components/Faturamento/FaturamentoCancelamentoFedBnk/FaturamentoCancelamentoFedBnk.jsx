@@ -5,7 +5,7 @@ import * as S from "./FaturamentoCancelamentoFedBnkStyles";
 import { useAuth } from "../../../context/AuthContext";
 import { getFaturamento } from "../../../services/consultaFatura";
 import { cancelarBoletoFedBNK } from "../../../services/boletofedbnk";
-import PageTemplate from "../../PageTemplate/PageTemplate";
+import PageLayout from "../../PageLayout/PageLayout";
 
 const FaturamentoCancelamentoFedBnk = () => {
   const { user, isAuthenticated } = useAuth();
@@ -240,7 +240,7 @@ const FaturamentoCancelamentoFedBnk = () => {
   }
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Cancelamentos FedBnk"
       subtitle="Consulte uma fatura e cancele boletos individualmente ou em lote"
       icon={<GiCancel />}
@@ -424,7 +424,7 @@ const FaturamentoCancelamentoFedBnk = () => {
           </S.ModalOverlay>
         )}
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

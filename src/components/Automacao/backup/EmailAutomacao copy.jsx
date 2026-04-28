@@ -1,7 +1,7 @@
 // // EmailAutomationPage.jsx
 // import { useState, useEffect } from "react";
 // import { useAuth } from "../../context/AuthContext";
-// import PageTemplate from "../PageTemplate/PageTemplate";
+// import PageLayout from "../PageLayout/PageLayout";
 // import { 
 //   TbMail, 
 //   TbSend, 
@@ -143,7 +143,7 @@
 //   };
 
 //   return (
-//     <PageTemplate
+//     <PageLayout
 //       title="Automação de E-mails"
 //       subtitle="Envie, agende e automatize o envio de e-mails para condomínios"
 //       icon={<TbMail />}
@@ -402,7 +402,7 @@
 //           </div>
 //         </div>
 //       </div>
-//     </PageTemplate>
+//     </PageLayout>
 //   );
 // };
 

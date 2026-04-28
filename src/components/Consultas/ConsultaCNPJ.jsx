@@ -4,7 +4,7 @@
 // import { ConsultaService } from "../../services/consultaService";
 // import { FileSpreadsheet } from "lucide-react";
 // import { FiCopy, FiCheck } from "react-icons/fi";
-// import PageTemplate from "../PageTemplate/PageTemplate";
+// import PageLayout from "../PageLayout/PageLayout";
 // import { IoMdBusiness } from "react-icons/io";
 
 // function preencherZeros(valor, tamanho) {
@@ -451,7 +451,7 @@
 //   };
 
 //   return (
-//      <PageTemplate
+//      <PageLayout
 //       title="Consulta por Pessoa Jurídica"
 //       subtitle="Consulte informações de pessoas jurídicas"
 //       icon={<IoMdBusiness />}
@@ -1030,7 +1030,7 @@
 //           </div>
 //         )}
 //     </div>
-//     </PageTemplate>
+//     </PageLayout>
 //   );
 // };
 

@@ -21,7 +21,7 @@ import MobileAccordionVisitas from "./components/MobileAccordionVisitas";
 import { AgendaComercialService } from "../../services/agenda_comercial";
 import * as XLSX from "xlsx";
 import { IoIosBusiness } from "react-icons/io";
-import PageTemplate from "../../components/PageTemplate/PageTemplate";
+import PageLayout from "../../components/PageLayout/PageLayout";
 
 // Utils
 function toBRDate(d) {
@@ -238,7 +238,7 @@ export default function Comercial() {
 
   if (loading && visitas.length === 0) {
     return (
-      <PageTemplate
+      <PageLayout
         title="Acompanhamento Comercial"
         subtitle="Gestão de visitas e acompanhamento comercial"
         icon={<IoIosBusiness />}
@@ -248,12 +248,12 @@ export default function Comercial() {
           <FaSpinner className="spinner" />
           <p>Carregando visitas...</p>
         </S.LoadingContainer>
-      </PageTemplate>
+      </PageLayout>
     );
   }
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Acompanhamento Comercial"
       subtitle="Gestão de visitas e acompanhamento comercial"
       icon={<IoIosBusiness />}
@@ -368,6 +368,6 @@ export default function Comercial() {
           />
         )}
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 }

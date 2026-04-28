@@ -15,30 +15,20 @@ import RecuperarSenha from '../pages/RecuperarSenha/RecuperarSenha';
 // Home
 import HomePage from '../pages/Home/Home';
 
-// Componentes protegidos
+// Consultas
 import ConsultasHome from '../pages/Consultas/ConsultasHome';
 import ConsultaPF from '../components/Consultas/ConsultaPF/ConsultaPF';
 import ConsultaEnd from '../components/Consultas/ConsultaEnd/ConsultaEnd';
 import ConsultaCNPJ from '../components/Consultas/ConsultaCNPJ/ConsultaCNPJ';
-// import Comercial from '../components/Consultas/Comercial';
-import ConsultaComercial from '../components/Consultas/ConsultaComercial/ConsultaComercial';  // **********
-// import ConsultaComercial from '../components/Consultas/Comercial';
-// import BuscaRegiao from '../components/Consultas/ComercialRegiao';
+import ConsultaComercial from '../components/Consultas/ConsultaComercial/ConsultaComercial';
 import ComercialRegiao from '../components/Consultas/ComercialRegiao/ComercialRegiao';
-// import Segurados from '../components/Consultas/Segurados';
 import ConsultaSegurados from '../components/Consultas/ConsultaSegurados/ConsultaSegurados';
 import ConsultaFat from '../components/Consultas/ConsultaFat';
 import ConsultaFaturamento from '../components/Consultas/ConsultaFaturamento';
 import ConsultaDetalhe from '../components/Detalhes/ConsultaDetalhe';
 import CotacaoConteudo from '../components/Cotação/CotacaoConteudo';
 
-// Dropdown itens
-// import GerenciarUsuarios from '../components/Dropdown/dropItens/GerenciarUsuarios/GerenciarUsuarios';
-// import MinhaConta from '../components/Dropdown/dropItens/MinhaConta/MinhaConta';
-// import Cadastro from '../components/Dropdown/dropItens/Cadastro/Cadastro';
-// import HistoricoPage from '../components/Dropdown/dropItens/Historico/Historico';
-
-// Novas páginas de usuario e conta
+// Conta e Gerenciamento de Usuários
 import MinhaConta from '../pages/MinhaConta/MinhaConta';
 import GerenciarUsuarios from '../pages/GerenciarUsuarios/GerenciarUsuarios';
 import Cadastro from '../pages/Cadastro/Cadastro';
@@ -49,8 +39,7 @@ import HomeAdm from '../components/Adm/ImportacaoAdmPage';
 import Upload from '../components/Adm/Upload';
 import ImportVida from '../components/Adm/ImportVida';
 
-// Views
-// import Metricas from '../components/Views/Metricas';
+// Dados
 import Metricas from '../pages/Metricas/Metricas';
 // import Ferramentas from '../components/Views/Ferramentas';
 
@@ -87,12 +76,12 @@ import EmailAutomacao from '../components/Automacao/Email/EmailAutomacao';
 
 // Teste renderização Mapa
 import Mapa from '../components/Mapa/Mapa';
-import { Analytics } from '../pages/Analytics/Analytics';
+import Analytics from '../pages/Analytics/Analytics';
 import Ferramentas from '../pages/Ferramentas/Ferramentas';
 
 // Testes de novas paginas
-import WorkflowHub from '../pages/Workflow/WorkflowHub';
-import RHHub from '../pages/RH/RHHub';
+import Workflow from '../pages/Workflow/Workflow';
+import RH from '../pages/RH/RH';
 import TestePage from '../pages/Teste';
 
 const AppRouter = () => {
@@ -172,9 +161,9 @@ const AppRouter = () => {
 
           <Route path="/analytics" element={<Analytics/>} />
 
-          <Route path="/workflow" element={< WorkflowHub />} />
+          <Route path="/workflow" element={< Workflow />} />
 
-          <Route path="/rh" element={<RHHub />} />
+          <Route path="/rh" element={<RH />} />
 
           <Route path="/teste-page" element={<TestePage />} />
 

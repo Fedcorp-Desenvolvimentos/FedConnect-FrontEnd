@@ -5,7 +5,7 @@ import { FaBriefcase, FaFileExcel, FaSearch } from "react-icons/fa";
 import { Clapperboard, MapPin} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-import PageTemplate from "../PageTemplate/PageTemplate";
+import PageLayout from "../PageLayout/PageLayout";
 import { IoIosBusiness } from "react-icons/io";
 
 const ConsultaComercial = () => {
@@ -262,7 +262,7 @@ const ConsultaComercial = () => {
   };
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Consultas comerciais"
       subtitle="Consulte informações comerciais"
       icon={<IoIosBusiness />}
@@ -609,7 +609,7 @@ const ConsultaComercial = () => {
         )}
 
       </div>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

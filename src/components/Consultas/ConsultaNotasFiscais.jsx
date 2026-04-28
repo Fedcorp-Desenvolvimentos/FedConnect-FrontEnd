@@ -1,6 +1,6 @@
 // import { getNFSePorBoleto } from "../../services/consultaNFSeService";
 // import "../../styles/Consulta.css";
-// import PageTemplate from "../PageTemplate/PageTemplate";
+// import PageLayout from "../PageLayout/PageLayout";
 // import { useEffect, useState } from "react";
 // import { FaFileInvoice } from "react-icons/fa";
 
@@ -21,7 +21,7 @@
 //     }, []);
 
 //     return (
-//         <PageTemplate 
+//         <PageLayout 
 //             title="Consulta Notas Fiscais"
 //             subtitle="Consulte notas fiscais de maneira detalhada com parâmetros de pesquisa."
 //             icon={<FaFileInvoice />}
@@ -29,7 +29,7 @@
 //             <div className="consulta-container">
 //                 <h2>Em desenvolvimento...</h2>
 //             </div>
-//         </PageTemplate>
+//         </PageLayout>
 //     );
 // }
 

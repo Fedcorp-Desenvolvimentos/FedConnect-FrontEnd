@@ -3,7 +3,7 @@ import { FaUserCircle, FaShieldAlt, FaSpinner } from 'react-icons/fa';
 import { IoIosBusiness } from 'react-icons/io';
 import { useSnackbar } from 'notistack';
 import * as S from './MinhaContaStyles';
-import PageTemplate from '../../components/PageTemplate/PageTemplate';
+import PageLayout from '../../Layouts/PageLayout/PageLayout';
 import Tabs from './components/Tabs';
 import ProfileForm from './components/ProfileForm';
 import PasswordForm from './components/PasswordForm';
@@ -18,7 +18,7 @@ const MinhaConta = () => {
   const { startLoading, stopLoading, withLoading } = useLoading();
   const [activeTab, setActiveTab] = useState('perfil');
 
-  const { userData, loading: userLoading, refreshUserData } = useUserData();
+  const { userData, refreshUserData } = useUserData();
   const { 
     passwordData, 
     updatePasswordField, 
@@ -118,14 +118,11 @@ const MinhaConta = () => {
     await passwordEdit.saveEditing();
   };
 
-  // Loading global está sendo gerenciado pelo hook, não precisa do loading local
-  // O PageTemplate já trata o loading via props
   return (
-    <PageTemplate
+    <PageLayout
       title="Minha Conta"
       subtitle="Gerencie suas informações pessoais e segurança"
       icon={<IoIosBusiness />}
-      loading={userLoading}
     >
       <S.Container>
         <S.Card>
@@ -162,7 +159,7 @@ const MinhaConta = () => {
           </S.Content>
         </S.Card>
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { FaDownload, FaEye, FaFilePdf, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import * as S from './ProdutosStyles';
-import PageTemplate from '../../components/PageTemplate/PageTemplate';
+import PageLayout from '../PageLayout/PageLayout';
 import { PRODUTOS } from '../../data/produtos';
 import { ProdutosHelp } from './ProdutosHelp';
 
@@ -142,7 +142,7 @@ const Produtos = () => {
 
   return (
     <>
-      <PageTemplate
+      <PageLayout
         title="Portfólio de Produtos"
         subtitle={subtitle}
         icon={<FaFilePdf />}
@@ -220,7 +220,7 @@ const Produtos = () => {
             ))}
           </S.ProductsGrid>
         </S.Container>
-      </PageTemplate>
+      </PageLayout>
 
       {/* Modal de visualização de imagem - renderizado via Portal */}
       <ImageViewerModal

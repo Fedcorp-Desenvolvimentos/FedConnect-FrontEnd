@@ -9,7 +9,7 @@ import { usePasswordChange } from './hooks/usePasswordChange';
 import { useEditMode } from './hooks/useEditMode';
 import { IoIosBusiness } from 'react-icons/io';
 import './styles/MinhaConta.css';
-import PageTemplate from '../../../PageTemplate/PageTemplate';
+import PageLayout from '../../../PageLayout/PageLayout';
 import { UserService } from '../../../../services/userService';
 
 const MinhaConta = () => {
@@ -121,7 +121,7 @@ const MinhaConta = () => {
 
   if (userLoading) {
     return (
-      <PageTemplate
+      <PageLayout
         title="Minha Conta"
         subtitle="Gerencie suas informações"
         icon={<IoIosBusiness />}
@@ -130,12 +130,12 @@ const MinhaConta = () => {
           <div className="spinner"></div>
           <p>Carregando seus dados...</p>
         </div>
-      </PageTemplate>
+      </PageLayout>
     );
   }
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Configurações da Conta"
       subtitle="Gerencie suas informações pessoais e segurança"
       icon={<IoIosBusiness />}
@@ -183,7 +183,7 @@ const MinhaConta = () => {
           </div>
         </div>
       </div>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

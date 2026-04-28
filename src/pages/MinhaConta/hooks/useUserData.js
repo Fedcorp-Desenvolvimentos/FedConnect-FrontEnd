@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { UserService } from '../../../services/userService';
+import { useLoading } from '../../../hooks/useLoading';
 
 export const useUserData = () => {
   const [userData, setUserData] = useState({
@@ -8,25 +9,27 @@ export const useUserData = () => {
     cpf: '',
     email: ''
   });
-  const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState(null);
+  const { withLoading } = useLoading();
 
   const fetchUserData = useCallback(async () => {
     try {
-      setLoading(true);
-      const data = await UserService.getMe();
-      setUserData({
-        userId: data.id,
-        nomeCompleto: data.nome_completo || '',
-        email: data.email || '',
-        cpf: data.cpf || ''
-      });
+      await withLoading(async () => {
+        const data = await UserService.getMe();
+
+        setUserData({
+          userId: data.id,
+          nomeCompleto: data.nome_completo || '',
+          email: data.email || '',
+          cpf: data.cpf || ''
+        });
+      }, 'Carregando dados do usuário...');
+
       setError(null);
     } catch (err) {
       console.error('Error fetching user data:', err);
       setError('Erro ao carregar dados do usuário');
-    } finally {
-      setLoading(false);
     }
   }, []);
 
@@ -34,14 +37,9 @@ export const useUserData = () => {
     fetchUserData();
   }, [fetchUserData]);
 
-  const refreshUserData = useCallback(async () => {
-    await fetchUserData();
-  }, [fetchUserData]);
-
   return {
     userData,
-    loading,
     error,
-    refreshUserData
+    refreshUserData: fetchUserData
   };
 };

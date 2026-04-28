@@ -19,47 +19,38 @@ const Login = () => {
         event.preventDefault();
         setError(null);
         
-        // Inicia o loading com progresso
-        startLoading("Iniciando login...");
+        // Inicia o loading
+        startLoading("Autenticando...");
         
-        // Simula etapas do processo de login
-        updateProgress(10, "Verificando credenciais...");
-        
-        // Pequeno delay para simular processamento (opcional - efeito visual)
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        updateProgress(40, "Autenticando usuário...");
+        updateProgress(30);
         await new Promise(resolve => setTimeout(resolve, 200));
         
-        updateProgress(70, "Carregando dados do usuário...");
+        updateProgress(60, "Verificando credenciais...");
         await new Promise(resolve => setTimeout(resolve, 200));
         
-        updateProgress(85, "Configurando sessão...");
+        updateProgress(85);
         
         try {
             const result = await login({ email, password });
 
             if (result.success) {
-                updateProgress(100, "Login realizado com sucesso!");
+                updateProgress(100);
                 await new Promise(resolve => setTimeout(resolve, 300));
                 navigate('/home');
             } else {
-                updateProgress(0, "Erro no login");
                 setError(result.error || 'Falha no login. Verifique suas credenciais.');
-                setTimeout(() => stopLoading(), 1500);
+                stopLoading();
             }
         } catch (err) {
-            updateProgress(0, "Erro no login");
             setError('Ocorreu um erro inesperado durante o login.');
             console.error('Erro de login no componente:', err);
-            setTimeout(() => stopLoading(), 1500);
+            stopLoading();
         }
     };
 
     return (
         <>
             <S.GradientBg />
-            
             <S.LoginWrapper>
                 <S.LoginContainer>
                     <S.LoginBox>

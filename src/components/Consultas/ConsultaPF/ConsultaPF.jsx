@@ -14,7 +14,7 @@ import {
   FiChevronUp
 } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
-import PageTemplate from "../../PageTemplate/PageTemplate";
+import PageLayout from "../../PageLayout/PageLayout";
 import { formatarData } from "../../../utils/formatar_data";
 import { ConsultaService } from "../../../services/consultaService";
 import preencherZeros from "../../../utils/preencherZeros";
@@ -240,7 +240,7 @@ const ConsultaPF = () => {
 
   // Remove o loading local da UI - o global cuida disso
   return (
-    <PageTemplate
+    <PageLayout
       title="Consulta por Pessoa Física"
       subtitle="Consulte informações de pessoas físicas"
       icon={<FiUser />}
@@ -455,7 +455,7 @@ const ConsultaPF = () => {
           <S.NoResults>Nenhum resultado encontrado.</S.NoResults>
         )}
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

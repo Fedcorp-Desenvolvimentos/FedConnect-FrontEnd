@@ -22,7 +22,7 @@ import AgendaReservaForm from "../../components/Agenda/AgendaReservaForm/AgendaR
 import AgendaDetalhe from "../../components/Agenda/AgendaDetalhe/AgendaDetalhe";
 import { useAuth } from "../../context/AuthContext";
 import { AgendaService } from "../../services/agendaService";
-import PageTemplate from "../../components/PageTemplate/PageTemplate";
+import PageLayout from "../../components/PageLayout/PageLayout";
 import { CiCalendarDate } from "react-icons/ci";
 import { useSnackbar } from "notistack";
 import AgendaHelp from "./AgendaHelp";
@@ -228,7 +228,7 @@ export default function Agenda() {
   );
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Agenda"
       subtitle="Gerencie as reservas da sala de reunião de forma fácil e rápida"
       icon={<CiCalendarDate />}
@@ -287,6 +287,6 @@ export default function Agenda() {
           />
         )}
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 }

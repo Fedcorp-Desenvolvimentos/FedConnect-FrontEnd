@@ -1,5 +1,5 @@
 // import { Link } from "react-router-dom";
-// import PageTemplate from "../PageTemplate/PageTemplate";
+// import PageLayout from "../PageLayout/PageLayout";
 // import { useAuth } from "../../context/AuthContext";
 // import "../../styles/ConsultasHome.css";
 
@@ -64,7 +64,7 @@
 //     );
 
 //     return (
-//         <PageTemplate
+//         <PageLayout
 //             title="Consultas Disponíveis"
 //             subtitle="Consulte informações detalhadas"
 //             icon={<i className="bi bi-clipboard-data"></i>}
@@ -86,7 +86,7 @@
 //                     </div>
 //                 ))}
 //             </div>
-//         </PageTemplate>
+//         </PageLayout>
 //     );
 // };
 

@@ -5,7 +5,7 @@ import { useCadastro } from './hooks/useCadastro';
 import { useFormValidation } from './hooks/useFormValidation';
 import CadastroForm from './CadastroForm';
 import './styles/Cadastro.css';
-import PageTemplate from '../../../PageTemplate/PageTemplate';
+import PageLayout from '../../../PageLayout/PageLayout';
 
 const Cadastro = () => {
   const { empresas, loading: loadingEmpresas, error: empresasError } = useEmpresas();
@@ -48,7 +48,7 @@ const Cadastro = () => {
   const displayError = submitError || empresasError;
 
   return (
-    <PageTemplate
+    <PageLayout
         title="Cadastro de Usuário"
         subtitle="Crie uma nova conta para acessar o sistema"
     >
@@ -85,7 +85,7 @@ const Cadastro = () => {
         </section>
       </div>
     </main>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

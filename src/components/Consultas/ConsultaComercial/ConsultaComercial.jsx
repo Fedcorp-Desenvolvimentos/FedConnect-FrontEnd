@@ -5,7 +5,7 @@ import { IoIosBusiness } from "react-icons/io";
 import { FiUsers, FiSettings } from "react-icons/fi";
 import * as XLSX from "xlsx";
 import * as S from "./ConsultaComercialStyles";
-import PageTemplate from "../../PageTemplate/PageTemplate";
+import PageLayout from "../../PageLayout/PageLayout";
 import { ConsultaService } from "../../../services/consultaService";
 import ConsultaComercialHelp from "./ConsultaComercialHelp";
 
@@ -245,7 +245,7 @@ const ConsultaComercial = () => {
   };
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Consultas Comerciais"
       subtitle="Consulte informações comerciais"
       icon={<IoIosBusiness />}
@@ -406,7 +406,7 @@ const ConsultaComercial = () => {
           </S.ModalOverlay>
         )}
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

@@ -11,7 +11,7 @@ const HistoricoTable = ({
   loadingMap,
   errorMap
 }) => {
-  if (consultas.length === 0) {
+  if (!consultas || consultas.length === 0) {
     return (
       <S.EmptyState>
         <FaInbox />
@@ -33,17 +33,21 @@ const HistoricoTable = ({
           </tr>
         </thead>
         <tbody>
-          {consultas.map((consulta) => (
-            <HistoricoRow
-              key={consulta.id}
-              consulta={consulta}
-              isExpanded={expandedId === consulta.id}
-              onToggle={onToggle}
-              detalhes={detalhesMap[consulta.id]}
-              detalhesLoading={loadingMap[consulta.id]}
-              detalhesError={errorMap[consulta.id]}
-            />
-          ))}
+          {consultas.map((consulta) => {
+            const id = consulta?.id ? String(consulta.id) : null;
+
+            return (
+              <HistoricoRow
+                key={id}
+                consulta={consulta}
+                isExpanded={expandedId === id}
+                onToggle={onToggle}
+                detalhes={id ? detalhesMap?.[id] : null}
+                detalhesLoading={id ? loadingMap?.[id] : false}
+                detalhesError={id ? errorMap?.[id] : null}
+              />
+            );
+          })}
         </tbody>
       </S.Table>
     </S.TableWrapper>

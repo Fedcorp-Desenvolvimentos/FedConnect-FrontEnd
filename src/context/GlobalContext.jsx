@@ -7,9 +7,9 @@ const GlobalContext = createContext();
 export const useGlobal = () => useContext(GlobalContext);
 
 export const GlobalProvider = ({ children }) => {
-  const [loading, setLoading] = useState(false); // mudei pra false (não começa carregando)
+  const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Carregando...");
-  const [loadingProgress, setLoadingProgress] = useState(0); // NOVO
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   return (
     <GlobalContext.Provider value={{ 
@@ -17,8 +17,8 @@ export const GlobalProvider = ({ children }) => {
       setLoading, 
       loadingMessage, 
       setLoadingMessage,
-      loadingProgress,      // NOVO
-      setLoadingProgress    // NOVO
+      loadingProgress,
+      setLoadingProgress
     }}>
       {children}
 
@@ -26,7 +26,8 @@ export const GlobalProvider = ({ children }) => {
         <Loading 
           fullScreen 
           message={loadingMessage}
-          progress={loadingProgress}  // NOVO - passa o progresso real
+          progress={loadingProgress}
+          isVisible={loading}
         />
       )}
     </GlobalContext.Provider>

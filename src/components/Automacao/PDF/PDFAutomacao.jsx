@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Upload, Zap, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import './PDFAutomacao.css';
 import { AutomacaoService } from '../../../services/automacaoService';
-import PageTemplate from '../../PageTemplate/PageTemplate';
+import PageLayout from '../../PageLayout/PageLayout';
 import { useGlobal } from '../../../context/GlobalContext';
 import { useAuth } from '../../../context/AuthContext';
 import { TbPdf, TbTrash } from 'react-icons/tb';
@@ -21,7 +21,7 @@ const PDFAutomacao = () => {
 
     if(!admin) {
         return (
-        <PageTemplate
+        <PageLayout
             title="Acesso Negado"
             subtitle="Você não tem permissão para acessar esta página"
             icon={<TbPdf />}
@@ -31,7 +31,7 @@ const PDFAutomacao = () => {
             <p>Ops! Parece que você não tem acesso a esta funcionalidade.</p>
             <p>Se você acha que isso é um erro, entre em contato com o administrador do sistema.</p>
             </div>
-        </PageTemplate>
+        </PageLayout>
         );
     }
 
@@ -99,7 +99,7 @@ const PDFAutomacao = () => {
     };
 
     return (
-        <PageTemplate
+        <PageLayout
             title="Automações de PDF's"
             subtitle="Automatize processos de PDFs forma eficiente"
             icon={<i className="bi bi-file-earmark-pdf-fill"></i>}
@@ -220,7 +220,7 @@ const PDFAutomacao = () => {
                 </div>
             </div>
         </div>
-        </PageTemplate>
+        </PageLayout>
     );
 };
 

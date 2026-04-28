@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import PageTemplate from "../../PageTemplate/PageTemplate";
+import PageLayout from "../../PageLayout/PageLayout";
 import { 
   TbMail, 
   TbSend, 
@@ -44,7 +44,7 @@ const EmailAutomacao = () => {
 
   if(!admin) {
     return (
-      <PageTemplate
+      <PageLayout
         title="Acesso Negado"
         subtitle="Você não tem permissão para acessar esta página"
         icon={<TbMail />}
@@ -54,7 +54,7 @@ const EmailAutomacao = () => {
           <p>Ops! Parece que você não tem acesso a esta funcionalidade.</p>
           <p>Se você acha que isso é um erro, entre em contato com o administrador do sistema.</p>
         </div>
-      </PageTemplate>
+      </PageLayout>
     );
   }
   
@@ -288,7 +288,7 @@ const EmailAutomacao = () => {
   );
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Automação de E-mails"
       subtitle="Envie e agende e-mails para condomínios utilizando templates"
       icon={<TbMail />}
@@ -561,7 +561,7 @@ const EmailAutomacao = () => {
         />
 
       </div>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "../../styles/ConsultasHome.css";
 import { useAuth } from "../../context/AuthContext";
-import PageTemplate from "../PageTemplate/PageTemplate";
+import PageLayout from "../PageLayout/PageLayout";
 import { FaHammer } from "react-icons/fa";
  
 const operacionais = [
@@ -62,7 +62,7 @@ const OperacionalHome = () => {
   }
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Processos operacionais"
       subtitle="Acesse ferramentas e sistemas para otimizar processos operacionais"
       icon={<FaHammer />}
@@ -112,7 +112,7 @@ const OperacionalHome = () => {
           </div>
         </main>
       </div>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

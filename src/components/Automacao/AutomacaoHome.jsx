@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import PageTemplate from "../PageTemplate/PageTemplate";
+import PageLayout from "../PageLayout/PageLayout";
 import { useAuth } from "../../context/AuthContext";
 import "../../styles/ConsultasHome.css";
 
@@ -40,7 +40,7 @@ const AutomacaoHome = () => {
     );
 
     return (
-        <PageTemplate
+        <PageLayout
             title="Automações"
             subtitle="Automatize processos de forma eficiente"
             icon={<i className="bi bi-gear-fill"></i>}
@@ -62,7 +62,7 @@ const AutomacaoHome = () => {
                     </div>
                 ))}
             </div>
-        </PageTemplate>
+        </PageLayout>
     );
 };
 

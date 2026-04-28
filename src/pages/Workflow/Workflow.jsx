@@ -12,11 +12,11 @@ import {
   FiActivity
 } from "react-icons/fi";
 import { FaSpinner, FaTasks } from "react-icons/fa";
-import * as S from "./WorkflowHubStyles";
-import PageTemplate from "../../components/PageTemplate/PageTemplate";
+import * as S from "./WorkflowStyles";
+import PageLayout from "../../components/PageLayout/PageLayout";
 import { workflowService } from "../../services/workflowService";
 
-const WorkflowHub = () => {
+const Workflow = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -107,7 +107,7 @@ const WorkflowHub = () => {
   };
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Workflow Hub"
       subtitle="Gerencie tarefas e solicitações entre setores"
       icon={<FaTasks />}
@@ -225,8 +225,8 @@ const WorkflowHub = () => {
           </S.Section>
         )}
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 
-export default WorkflowHub;
+export default Workflow;

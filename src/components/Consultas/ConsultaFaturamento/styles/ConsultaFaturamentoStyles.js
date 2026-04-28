@@ -342,7 +342,6 @@ export const SectionTitle = styled.h6`
   padding-left: 0.75rem;
 `;
 
-// Cards style para desktop
 export const InfoGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -391,7 +390,6 @@ export const InfoCard = styled.div`
   }
 `;
 
-// Para mobile mantém o estilo linha
 export const InfoItem = styled.div`
   display: flex;
   justify-content: space-between;
@@ -464,8 +462,6 @@ export const SubTable = styled.div`
     }
   }
 `;
-
-// Substitua a definição de StatusBadge por esta:
 
 export const StatusBadge = styled.span`
   display: inline-flex;

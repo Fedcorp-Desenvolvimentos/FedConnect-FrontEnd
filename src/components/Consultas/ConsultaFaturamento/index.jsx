@@ -2,7 +2,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { FaFileInvoiceDollar, FaSearch, FaTrash, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import * as S from "./styles/ConsultaFaturamentoStyles";
-import PageTemplate from "../../PageTemplate/PageTemplate";
+import PageLayout from "../../PageLayout/PageLayout";
 
 // Hooks
 import { useFaturamento } from "./hooks/useFaturamento";
@@ -150,7 +150,7 @@ const ConsultaFaturamento = () => {
     }, [localPagination.has_previous]);
 
     return (
-        <PageTemplate
+        <PageLayout
             title="Consulta de Faturamento"
             subtitle="Consulte informações de faturamento"
             icon={<FaFileInvoiceDollar />}
@@ -248,7 +248,7 @@ const ConsultaFaturamento = () => {
                     </S.ResultContainer>
                 )}
             </S.Container>
-        </PageTemplate>
+        </PageLayout>
     );
 };
 

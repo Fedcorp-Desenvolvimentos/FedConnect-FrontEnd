@@ -4,7 +4,7 @@
 // import { ConsultaService } from "../../services/consultaService";
 // import { FileSpreadsheet } from "lucide-react";
 // import { FiCopy, FiCheck } from "react-icons/fi";
-// import PageTemplate from "../PageTemplate/PageTemplate";
+// import PageLayout from "../PageLayout/PageLayout";
 // import { FaAddressCard } from "react-icons/fa";
 
 // const ConsultaEnd = () => {
@@ -371,7 +371,7 @@
 //   }
 
 //   return (
-//      <PageTemplate
+//      <PageLayout
 //       title="Consulta CEP"
 //       subtitle="Consulte informações de endereços"
 //       icon={<FaAddressCard />}
@@ -728,7 +728,7 @@
 //           </div>
 //         )}
 //     </div>
-//     </PageTemplate>
+//     </PageLayout>
 //   );
 // };
 

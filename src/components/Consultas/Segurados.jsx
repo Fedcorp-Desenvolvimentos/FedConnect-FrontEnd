@@ -2,7 +2,7 @@
 // import "../../styles/Consulta.css";
 // import { ConsultaService } from "../../services/consultaService";
 // import { resolveNomeApoliceFromRecord } from "../../services/apoliceDePara";
-// import PageTemplate from "../PageTemplate/PageTemplate";
+// import PageLayout from "../PageLayout/PageLayout";
 // import { IoShieldCheckmarkOutline } from "react-icons/io5";
 
 // function traduzirErroApi(mensagem) {
@@ -514,7 +514,7 @@
 //   }, [resultado]);
 
 //   return (
-//     <PageTemplate
+//     <PageLayout
 //       title="Consulta de Segurados"
 //       subtitle="Consulte informações de segurados"
 //       icon={<IoShieldCheckmarkOutline />}
@@ -746,7 +746,7 @@
 //         </div>
 //       )}
 //     </div>
-//     </PageTemplate>
+//     </PageLayout>
 //   );
 // };
 

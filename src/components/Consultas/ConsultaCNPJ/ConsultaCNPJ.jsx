@@ -14,7 +14,7 @@ import {
   FiMapPin
 } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
-import PageTemplate from "../../PageTemplate/PageTemplate";
+import PageLayout from "../../PageLayout/PageLayout";
 import { ConsultaService } from "../../../services/consultaService";
 import preencherZeros from "../../../utils/preencherZeros";
 import * as XLSX from "xlsx";
@@ -371,7 +371,7 @@ const ConsultaCNPJ = () => {
   };
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Consulta por Pessoa Jurídica"
       subtitle="Consulte informações de pessoas jurídicas"
       icon={<BsFillBuildingFill />}
@@ -786,7 +786,7 @@ const ConsultaCNPJ = () => {
           <S.NoResults>Nenhum resultado encontrado.</S.NoResults>
         )}
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

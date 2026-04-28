@@ -1,19 +1,19 @@
 import { useEffect } from 'react';
-import { FaSpinner } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import * as S from './CadastroStyles';
-import PageTemplate from '../../components/PageTemplate/PageTemplate';
 import CadastroForm from './components/CadastroForm';
 import { useEmpresas } from './hooks/useEmpresas';
 import { useCadastro } from './hooks/useCadastro';
 import { useFormValidation } from './hooks/useFormValidation';
+import PageLayout from '../../Layouts/PageLayout/PageLayout';
 
 const Cadastro = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { empresas, loading: loadingEmpresas, error: empresasError } = useEmpresas();
+
+  const { empresas } = useEmpresas();
+
   const {
     formData,
-    loading: loadingSubmit,
     handleChange,
     handleSubmit,
     resetForm
@@ -27,39 +27,28 @@ const Cadastro = () => {
   } = useFormValidation();
 
   useEffect(() => {
-    if (empresas.length > 0 && !formData.empresa && formData.empresa !== 0) {
+    if (empresas.length > 0 && formData.empresa === '') {
       handleChange({
         target: { name: 'empresa', value: 0 }
       });
     }
-  }, [empresas, formData.empresa, handleChange]);
+  }, [empresas]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     clearErrors();
-    
+
     const isValid = validateForm(formData, empresas);
     if (!isValid) {
       enqueueSnackbar('Preencha todos os campos corretamente', { variant: 'warning' });
       return;
     }
-    
-    await handleSubmit(e);
+
+    await handleSubmit();
   };
 
-  if (loadingEmpresas) {
-    return (
-      <PageTemplate title="Cadastro de Usuário" subtitle="Crie uma nova conta para acessar o sistema">
-        <S.LoadingContainer>
-          <FaSpinner className="spinner" />
-          <p>Carregando dados...</p>
-        </S.LoadingContainer>
-      </PageTemplate>
-    );
-  }
-
   return (
-    <PageTemplate
+    <PageLayout
       title="Cadastro de Usuário"
       subtitle="Crie uma nova conta para acessar o sistema"
     >
@@ -69,7 +58,8 @@ const Cadastro = () => {
             <S.Title>
               <i className="bi bi-person-plus-fill"></i> Cadastrar Usuário
             </S.Title>
-            <S.ResetButton onClick={resetForm} title="Limpar formulário">
+
+            <S.ResetButton onClick={resetForm}>
               <i className="bi bi-arrow-counterclockwise"></i>
             </S.ResetButton>
           </S.CardHeader>
@@ -77,8 +67,6 @@ const Cadastro = () => {
           <CadastroForm
             formData={formData}
             empresas={empresas}
-            loadingEmpresas={loadingEmpresas}
-            loadingSubmit={loadingSubmit}
             errors={errors}
             onSubmit={onSubmit}
             onChange={handleChange}
@@ -86,7 +74,7 @@ const Cadastro = () => {
           />
         </S.Card>
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

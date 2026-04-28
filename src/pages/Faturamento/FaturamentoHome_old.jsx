@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import * as S from "./FaturamentoHomeStyles";
-import PageTemplate from "../../components/PageTemplate/PageTemplate";
+import PageLayout from "../../components/PageLayout/PageLayout";
 import { 
   FaHammer, 
   FaFilePdf, 
@@ -90,7 +90,7 @@ const FaturamentoHome = () => {
   );
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Faturamento"
       subtitle="Acesse ferramentas e sistemas para otimizar processos de faturamento"
       icon={<FaHammer />}
@@ -130,7 +130,7 @@ const FaturamentoHome = () => {
           </S.Card>
         ))}
       </S.CardsGrid>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

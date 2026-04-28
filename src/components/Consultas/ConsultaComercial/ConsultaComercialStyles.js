@@ -405,33 +405,38 @@ export const NoResultsMessage = styled.p`
 `;
 
 // ============================================
-// MODAL (mesmo do original, mantido)
+// MODAL
 // ============================================
 export const ModalOverlay = styled.div`
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
   padding: 1rem;
+  animation: ${fadeIn} 0.2s ease;
 `;
 
 export const ModalContent = styled.div`
-  position: relative;
   background: white;
-  padding: 2rem;
   border-radius: 24px;
+  max-width: 600px;
   width: 100%;
-  max-width: 900px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  max-height: 90vh;
-  overflow-y: auto;
 
-  @media (max-width: 768px) {
-    padding: 1.5rem;
+  @media (max-width: 640px) {
+    max-width: 95%;
+    border-radius: 20px;
   }
 `;
 

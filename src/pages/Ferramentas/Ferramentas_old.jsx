@@ -1,4 +1,4 @@
-import PageTemplate from "../../components/PageTemplate/PageTemplate";
+import PageLayout from "../../components/PageLayout/PageLayout";
 import { useAuth } from "../../context/AuthContext";
 import { FerramentasHelp } from "./FerramentasHelp";
 import * as S from "./FerramentasStyles";
@@ -69,7 +69,7 @@ const Ferramentas = () => {
   const subtitle = "Acesse rapidamente as principais plataformas e soluções digitais da FedCorp.";
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Ferramentas da FedCorp"
       subtitle={subtitle}
       icon={<FaTools />}
@@ -104,7 +104,7 @@ const Ferramentas = () => {
           </S.Card>
         ))}
       </S.CardsGrid>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

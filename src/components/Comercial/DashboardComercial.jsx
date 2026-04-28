@@ -5,7 +5,7 @@ import DetalheVisita from "./DetalheVisita";
 import { AgendaComercialService } from "../../services/agenda_comercial";
 import "../../styles/DashboardComercial.css";
 import * as XLSX from "xlsx";
-import PageTemplate from "../PageTemplate/PageTemplate";
+import PageLayout from "../PageLayout/PageLayout";
 import { IoIosBusiness } from "react-icons/io";
 
 /* ==================== utils ==================== */
@@ -396,7 +396,7 @@ export default function DashboardComercial() {
   }
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Consultas comerciais"
       subtitle="Consulte informações comerciais"
       icon={<IoIosBusiness />}
@@ -528,6 +528,6 @@ export default function DashboardComercial() {
         )}
 
       </div>
-    </PageTemplate>
+    </PageLayout>
   );
 }

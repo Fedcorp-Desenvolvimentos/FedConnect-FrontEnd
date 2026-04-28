@@ -5,7 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
-import PageTemplate from '../../components/PageTemplate/PageTemplate';
+import PageLayout from '../../components/PageLayout/PageLayout';
 import { useAuth } from '../../context/AuthContext';
 import analyticsService from '../../services/analyticsService';
 import {
@@ -257,7 +257,7 @@ export const Analytics = () => {
 
   if (authLoading) {
     return (
-      <PageTemplate
+      <PageLayout
         title="Análise de Dados"
         subtitle="Visualize e interprete seus dados"
         icon={<i className="bi bi-bar-chart-fill"></i>}
@@ -267,7 +267,7 @@ export const Analytics = () => {
   }
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Dashboard Analytics"
       subtitle="Métricas e análises de faturamento"
       icon={<i className="bi bi-bar-chart-fill"></i>}
@@ -520,6 +520,6 @@ export const Analytics = () => {
           </LoadingOverlay>
         )}
       </Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };

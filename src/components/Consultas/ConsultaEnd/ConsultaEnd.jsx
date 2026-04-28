@@ -15,7 +15,7 @@ import {
   FiMap
 } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
-import PageTemplate from "../../PageTemplate/PageTemplate";
+import PageLayout from "../../PageLayout/PageLayout";
 import { ConsultaService } from "../../../services/consultaService";
 import * as XLSX from "xlsx";
 
@@ -238,7 +238,7 @@ const ConsultaEnd = () => {
   const chavesResults = resultado?.resultado_api?.resultados_viacep || [];
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Consulta de Endereço"
       subtitle="Consulte informações de endereços por CEP"
       icon={<FiMap />}
@@ -515,7 +515,7 @@ const ConsultaEnd = () => {
           <S.NoResults>Nenhum resultado encontrado.</S.NoResults>
         )}
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

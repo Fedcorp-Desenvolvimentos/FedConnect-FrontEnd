@@ -3,7 +3,7 @@
 import { useState } from "react";
 import "./BBZAutomacao.css";
 import { useAuth } from "../../../context/AuthContext";
-import PageTemplate from "../../PageTemplate/PageTemplate";
+import PageLayout from "../../PageLayout/PageLayout";
 import { TbAutomation, TbUpload, TbRefresh, TbCheck } from "react-icons/tb";
 import { FaFilePdf } from "react-icons/fa6";
 
@@ -102,7 +102,7 @@ const BBZAutomacao = () => {
     };
 
     return (
-        <PageTemplate
+        <PageLayout
             title="Automação da BBZ"
             subtitle="Gerencie e monitore suas automações de forma eficiente"
             icon={<TbAutomation />}
@@ -219,7 +219,7 @@ const BBZAutomacao = () => {
                     </ul>
                 </div> */}
             </div>
-        </PageTemplate>
+        </PageLayout>
     );
 };
 

@@ -1,7 +1,7 @@
 // pages/Historico/Historico.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../../context/AuthContext';
-import PageTemplate from '../../../PageTemplate/PageTemplate';
+import PageLayout from '../../../PageLayout/PageLayout';
 import { useHistorico } from './hooks/useHistorico';
 import { useDetalhesConsulta } from './hooks/useDetalhesConsulta';
 import { useFiltroPaginacao } from './hooks/useFiltroPaginacao';
@@ -65,7 +65,7 @@ const Historico = () => {
   const totalExibidos = filtro ? totalFiltrados : totalResultados;
   
   return (
-    <PageTemplate
+    <PageLayout
       title="Histórico de Consultas"
       subtitle="Visualize todas as consultas realizadas na plataforma"
     >
@@ -110,7 +110,7 @@ const Historico = () => {
           </>
         )}
       </div>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

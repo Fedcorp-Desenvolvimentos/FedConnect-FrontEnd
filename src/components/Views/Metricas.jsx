@@ -1,5 +1,5 @@
 import "../../styles/Ferramentas.css";
-import PageTemplate from "../PageTemplate/PageTemplate";
+import PageLayout from "../PageLayout/PageLayout";
 import { FaChartSimple } from "react-icons/fa6";
 
 const ferramentas = [
@@ -30,7 +30,7 @@ const ferramentas = [
 ];
 
 const Metricas = () => (
-  <PageTemplate
+  <PageLayout
       title="Métricas da FedCorp"
       subtitle="Acompanhe as principais métricas e resultados do Grupo FedCorp"
       icon={<FaChartSimple />}
@@ -79,7 +79,7 @@ const Metricas = () => (
         ))}
       </div>
     </div>
-  </PageTemplate>
+  </PageLayout>
 );
 
 export default Metricas;

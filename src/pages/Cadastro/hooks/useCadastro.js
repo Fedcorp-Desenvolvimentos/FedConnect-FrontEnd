@@ -1,8 +1,11 @@
 import { useState, useCallback } from 'react';
 import { FORM_FIELDS, MESSAGES } from '../constants/cadastroConstants';
 import { UserService } from '../../../services/userService';
+import { useLoading } from '../../../hooks/useLoading';
 
 export const useCadastro = (empresas, enqueueSnackbar) => {
+  const { withLoading } = useLoading();
+
   const [formData, setFormData] = useState({
     [FORM_FIELDS.NOME_COMPLETO]: '',
     [FORM_FIELDS.EMAIL]: '',
@@ -10,16 +13,14 @@ export const useCadastro = (empresas, enqueueSnackbar) => {
     [FORM_FIELDS.NIVEL_ACESSO]: '',
     [FORM_FIELDS.EMPRESA]: empresas.length > 0 ? 0 : ''
   });
-  
+
   const [empresaSelecionada, setEmpresaSelecionada] = useState(empresas[0] || null);
-  const [loading, setLoading] = useState(false);
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
 
     if (name === FORM_FIELDS.EMPRESA) {
-      const empresa = empresas[value];
-      setEmpresaSelecionada(empresa);
+      setEmpresaSelecionada(empresas[value]);
     }
 
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -33,38 +34,27 @@ export const useCadastro = (empresas, enqueueSnackbar) => {
       [FORM_FIELDS.NIVEL_ACESSO]: '',
       [FORM_FIELDS.EMPRESA]: empresas.length > 0 ? 0 : ''
     });
+
     setEmpresaSelecionada(empresas[0] || null);
   }, [empresas]);
 
   const extractErrorMessage = useCallback((error) => {
     const errorData = error.response?.data;
-    
+
     if (!errorData) return MESSAGES.ERROR_DEFAULT;
-    
-    if (errorData.email) {
-      return `Erro no E-mail: ${Array.isArray(errorData.email) ? errorData.email.join(', ') : errorData.email}`;
-    }
-    
-    if (errorData.password) {
-      return `Erro na Senha: ${Array.isArray(errorData.password) ? errorData.password.join(', ') : errorData.password}`;
-    }
-    
-    if (errorData.nome_completo) {
-      return `Erro no Nome: ${Array.isArray(errorData.nome_completo) ? errorData.nome_completo.join(', ') : errorData.nome_completo}`;
-    }
-    
+
+    if (errorData.email) return `Erro no E-mail: ${errorData.email.join(', ')}`;
+    if (errorData.password) return `Erro na Senha: ${errorData.password.join(', ')}`;
+    if (errorData.nome_completo) return `Erro no Nome: ${errorData.nome_completo.join(', ')}`;
     if (errorData.detail) return errorData.detail;
-    
+
     return MESSAGES.ERROR_DEFAULT;
   }, []);
 
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const handleSubmit = useCallback(async () => {
     try {
       if (!empresaSelecionada) {
-        throw new Error('Por favor, selecione uma empresa válida');
+        throw new Error('Selecione uma empresa válida');
       }
 
       const payload = {
@@ -77,28 +67,27 @@ export const useCadastro = (empresas, enqueueSnackbar) => {
         is_fed: true
       };
 
-      const response = await UserService.registerUser(payload);
-      
+      const response = await withLoading(
+        () => UserService.registerUser(payload),
+        'Cadastrando usuário...'
+      );
+
       enqueueSnackbar(
         `Usuário "${response.nome_completo || response.email}" cadastrado com sucesso!`,
         { variant: 'success' }
       );
-      
+
       resetForm();
-      
+
     } catch (error) {
-      console.error('Erro ao cadastrar usuário:', error);
+      console.error(error);
       const errorMessage = extractErrorMessage(error);
       enqueueSnackbar(errorMessage, { variant: 'error' });
-    } finally {
-      setLoading(false);
     }
-  }, [formData, empresaSelecionada, resetForm, extractErrorMessage, enqueueSnackbar]);
+  }, [formData, empresaSelecionada, resetForm, extractErrorMessage, enqueueSnackbar, withLoading]);
 
   return {
     formData,
-    empresaSelecionada,
-    loading,
     handleChange,
     handleSubmit,
     resetForm

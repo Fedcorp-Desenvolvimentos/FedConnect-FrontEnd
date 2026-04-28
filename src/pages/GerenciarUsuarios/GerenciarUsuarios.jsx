@@ -2,7 +2,7 @@ import React from 'react';
 import { FaPlus, FaSpinner } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import * as S from './GerenciarUsuariosStyles';
-import PageTemplate from '../../components/PageTemplate/PageTemplate';
+import PageLayout from '../../Layouts/PageLayout/PageLayout';
 import UserTable from './components/UserTable';
 import UserModal from './components/UserModal';
 import SearchBar from './components/SearchBar';
@@ -16,7 +16,6 @@ const GerenciarUsuarios = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { 
     usuarios, 
-    loading,
     error: usersError,
     updateUser,
     deleteUser,
@@ -100,22 +99,8 @@ const GerenciarUsuarios = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <PageTemplate
-        title="Gerenciar Usuários"
-        subtitle="Gerencie os usuários do sistema"
-      >
-        <S.LoadingContainer>
-          <FaSpinner className="spinner" />
-          <p>Carregando usuários...</p>
-        </S.LoadingContainer>
-      </PageTemplate>
-    );
-  }
-
   return (
-    <PageTemplate
+    <PageLayout
       title="Gerenciar Usuários"
       subtitle="Gerencie os usuários do sistema, editando ou excluindo suas informações"
     >
@@ -161,7 +146,7 @@ const GerenciarUsuarios = () => {
           {...getModalProps()}
         />
       </S.Container>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

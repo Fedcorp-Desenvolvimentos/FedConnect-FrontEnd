@@ -4,7 +4,7 @@ import ptBR from "date-fns/locale/pt-BR";
 import { FaTimes, FaTrash } from "react-icons/fa";
 import "../../styles/AgendaSala.css";
 import { useAuth } from "../../context/AuthContext";
-import PageTemplate from "../PageTemplate/PageTemplate";
+import PageLayout from "../PageLayout/PageLayout";
 import { CiCalendarDate } from "react-icons/ci";
 
 export default function AgendaDetalhe({ reserva, onClose, onDelete }) {
@@ -37,7 +37,7 @@ export default function AgendaDetalhe({ reserva, onClose, onDelete }) {
     reserva?.tema ?? reserva?.assunto ?? reserva?.titulo ?? "-";
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Agenda - Detalhes da Reserva"
       subtitle="Confira as informações detalhadas da reserva selecionada"
       icon={<CiCalendarDate />}
@@ -100,6 +100,6 @@ export default function AgendaDetalhe({ reserva, onClose, onDelete }) {
           </div>
         </div>
       </div>
-    </PageTemplate>
+    </PageLayout>
   );
 }

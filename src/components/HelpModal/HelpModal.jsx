@@ -1,6 +1,6 @@
 // import React from 'react';
 // import { FaTimes, FaLightbulb } from 'react-icons/fa';
-// import * as S from '../PageTemplate/PageTemplateStyles';
+// import * as S from '../PageLayout/PageLayoutStyles';
 
 // const HelpModal = ({ isOpen, onClose, content }) => {
 //   if (!isOpen) return null;

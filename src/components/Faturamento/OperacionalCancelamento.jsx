@@ -5,7 +5,7 @@ import { getFaturamento } from "../../services/consultaFatura";
 import { cancelarBoletoFedBNK } from "../../services/boletofedbnk";
 import { GiCancel, GiCheckMark, GiTrashCan } from "react-icons/gi";
 import { FaSpinner } from "react-icons/fa";
-import PageTemplate from "../PageTemplate/PageTemplate";
+import PageLayout from "../PageLayout/PageLayout";
 
 const OperacionalCancelamento = () => {
   const { user, isAuthenticated } = useAuth();
@@ -267,7 +267,7 @@ const OperacionalCancelamento = () => {
   }
 
   return (
-    <PageTemplate
+    <PageLayout
       title="Cancelamentos FedBnk"
       subtitle="Consulte uma fatura e cancele boletos individualmente ou em lote."
       icon={<GiCancel />}
@@ -460,7 +460,7 @@ const OperacionalCancelamento = () => {
           </div>
         </div>
       </div>
-    </PageTemplate>
+    </PageLayout>
   );
 };
 

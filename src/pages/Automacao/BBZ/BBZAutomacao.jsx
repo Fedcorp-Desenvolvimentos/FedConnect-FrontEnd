@@ -15,7 +15,7 @@ import { FaSpinner } from "react-icons/fa";
 import { AutomacaoService } from "../../../services/automacaoService";
 import * as S from "./BBZAutomacaoStyles";
 import { BBZAutomacaoHelp } from "./BBZAutomacaoHelp";
-import PageTemplate from "../../../components/PageTemplate/PageTemplate";
+import PageLayout from "../../../components/PageLayout/PageLayout";
 
 const BBZAutomacao = () => {
     const { user } = useAuth();
@@ -119,7 +119,7 @@ const BBZAutomacao = () => {
     };
 
     return (
-        <PageTemplate
+        <PageLayout
             title="Automação da BBZ"
             subtitle="Gerencie e monitore suas automações de forma eficiente"
             icon={<TbAutomation />}
@@ -206,7 +206,7 @@ const BBZAutomacao = () => {
                     </S.InfoBadge>
                 </S.Section>
             </S.Container>
-        </PageTemplate>
+        </PageLayout>
     );
 };
 
