@@ -4,14 +4,14 @@ import { useAuth } from "../../context/AuthContext";
 import "../../styles/ConsultasHome.css";
 
 const automacoes = [
-    {
-        key: "pdf-automation",
-        icon: <i className="bi bi-file-earmark-pdf-fill" />,
-        title: "Automações com PDF",
-        desc: "Renomear, separar e automatizar processos com PDFs usando regras e arquivos modelo.",
-        to: "/automacao/pdf",
-        niveis: ["admin", "faturamento"]
-    },
+    // {
+    //     key: "pdf-automation",
+    //     icon: <i className="bi bi-file-earmark-pdf-fill" />,
+    //     title: "Automações com PDF",
+    //     desc: "Renomear, separar e automatizar processos com PDFs usando regras e arquivos modelo.",
+    //     to: "/automacao/pdf",
+    //     niveis: ["admin", "faturamento"]
+    // },
     {
         key: "bbz-automation",
         icon: <i className="bi bi-file-earmark-pdf-fill" />,
@@ -20,14 +20,14 @@ const automacoes = [
         to: "/automacao/bbz",
         niveis: ["admin", "faturamento"]
     },
-    {
-        key: "email-automation",
-        icon: <i className="bi bi-envelope-fill" />,
-        title: "Automações com Email",
-        desc: "Automatize processos relacionados ao envio e gerenciamento de emails.",
-        to: "/automacao/email",
-        niveis: ["admin", "faturamento"]
-    },
+    // {
+    //     key: "email-automation",
+    //     icon: <i className="bi bi-envelope-fill" />,
+    //     title: "Automações com Email",
+    //     desc: "Automatize processos relacionados ao envio e gerenciamento de emails.",
+    //     to: "/automacao/email",
+    //     niveis: ["admin", "faturamento"]
+    // },
 ];
 
 const AutomacaoHome = () => {

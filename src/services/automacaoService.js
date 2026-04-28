@@ -18,10 +18,15 @@ export const AutomacaoService = {
   
   // Apenas processar (move para pastas corretas)
   processar_pdfs_bbz: async (fazerBackup = true) => {
-    const response = await api.post(`automacao/processar-pdfs-bbz/`, {
-      fazer_backup: fazerBackup
-    });
-    return response.data;
+    try {
+      const response = await api.post(`automacao/processar-pdfs-bbz/`, {
+        fazer_backup: fazerBackup
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao processar PDFs do BBZ:", error);
+      throw error;
+    }
   },
 
   separar_pdf: async (file, nomeBase = '') => {

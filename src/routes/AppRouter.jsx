@@ -82,7 +82,7 @@ import PrivateRouter from './PrivateRouter';
 // Automação
 import AutomacaoHome from '../components/Automacao/AutomacaoHome';
 import PDFAutomacao from '../components/Automacao/PDF/PDFAutomacao';
-import BBZAutomacao from '../components/Automacao/Faturamento/BBZAutomacao';
+import BBZAutomacao from '../pages/Automacao/BBZ/BBZAutomacao';
 import EmailAutomacao from '../components/Automacao/Email/EmailAutomacao';
 
 // Teste renderização Mapa
