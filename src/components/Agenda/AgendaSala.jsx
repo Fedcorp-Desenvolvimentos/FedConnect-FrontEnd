@@ -23,7 +23,7 @@ import AgendaReservaForm from "../../components/Agenda/AgendaReservaForm";
 import AgendaDetalhe from "../../components/Agenda/AgendaDetalhe";
 import { useAuth } from "../../context/AuthContext";
 import { AgendaService } from "../../services/agendaService";
-import PageLayout from "../../components/PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { CiCalendarDate } from "react-icons/ci";
 
 function getFirstMondayOfMonth(date) {

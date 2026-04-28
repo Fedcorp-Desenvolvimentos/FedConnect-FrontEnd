@@ -5,7 +5,7 @@ import DetalheVisita from "./DetalheVisita";
 import { AgendaComercialService } from "../../services/agenda_comercial";
 import "../../styles/DashboardComercial.css";
 import * as XLSX from "xlsx";
-import PageLayout from "../PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { IoIosBusiness } from "react-icons/io";
 
 /* ==================== utils ==================== */

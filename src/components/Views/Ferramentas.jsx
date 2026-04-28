@@ -1,4 +1,4 @@
-import PageLayout from "../PageLayout/PageLayout";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import "../../styles/Ferramentas.css";
 
 const ferramentas = [

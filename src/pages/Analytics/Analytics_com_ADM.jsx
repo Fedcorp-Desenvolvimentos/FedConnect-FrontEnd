@@ -5,7 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
-import PageLayout from '../../components/PageLayout/PageLayout';
+import PageLayout from '../../Layouts/PageLayout/PageLayout';
 import { useAuth } from '../../context/AuthContext';
 import analyticsService from '../../services/analyticsService';
 import {

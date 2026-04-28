@@ -2,7 +2,7 @@
 
 import React from 'react';
 import * as S from './CardGridLayoutStyles';
-import PageLayout from '../../components/PageLayout/PageLayout';
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 
 const CardGridLayout = ({ 
   title,

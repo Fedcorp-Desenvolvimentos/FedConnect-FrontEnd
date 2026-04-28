@@ -5,7 +5,7 @@ import { FaBriefcase, FaFileExcel, FaSearch } from "react-icons/fa";
 import { Clapperboard, MapPin} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-import PageLayout from "../PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { IoIosBusiness } from "react-icons/io";
 
 const ConsultaComercial = () => {

@@ -7,7 +7,7 @@ import * as S from "./ComercialRegiaoStyles";
 import { ConsultaService } from "../../../services/consultaService";
 import { ConsultaRegiaoService } from "../../../services/consultaRegiaoService";
 import { useGlobal } from "../../../context/GlobalContext";
-import PageLayout from "../../../components/PageLayout/PageLayout";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 
 const ComercialRegiao = () => {
     const [form, setForm] = useState({

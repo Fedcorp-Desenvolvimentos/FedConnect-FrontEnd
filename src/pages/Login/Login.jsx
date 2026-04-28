@@ -18,18 +18,7 @@ const Login = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         setError(null);
-        
-        // Inicia o loading
-        startLoading("Autenticando...");
-        
-        updateProgress(30);
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        updateProgress(60, "Verificando credenciais...");
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        updateProgress(85);
-        
+        startLoading();
         try {
             const result = await login({ email, password });
 
@@ -44,6 +33,7 @@ const Login = () => {
         } catch (err) {
             setError('Ocorreu um erro inesperado durante o login.');
             console.error('Erro de login no componente:', err);
+        } finally {
             stopLoading();
         }
     };

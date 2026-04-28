@@ -5,7 +5,7 @@ import { useCadastro } from './hooks/useCadastro';
 import { useFormValidation } from './hooks/useFormValidation';
 import CadastroForm from './CadastroForm';
 import './styles/Cadastro.css';
-import PageLayout from '../../../PageLayout/PageLayout';
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 
 const Cadastro = () => {
   const { empresas, loading: loadingEmpresas, error: empresasError } = useEmpresas();

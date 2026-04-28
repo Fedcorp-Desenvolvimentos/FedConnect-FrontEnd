@@ -4,7 +4,7 @@ import ptBR from "date-fns/locale/pt-BR";
 import { FaTimes, FaTrash } from "react-icons/fa";
 import "../../styles/AgendaSala.css";
 import { useAuth } from "../../context/AuthContext";
-import PageLayout from "../PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { CiCalendarDate } from "react-icons/ci";
 
 export default function AgendaDetalhe({ reserva, onClose, onDelete }) {

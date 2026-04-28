@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from "react-router-dom";
-import PageLayout from '../../components/PageLayout/PageLayout'
+import PageLayout from '../../Layouts/PageLayout/PageLayout';
 
 import { Button, Card, CardBody, Grid, Badge } from "../../styles/ui";
 import { FaSearch } from 'react-icons/fa';

@@ -5,7 +5,7 @@ import * as S from "./FaturamentoCancelamentoFedBnkStyles";
 import { useAuth } from "../../../context/AuthContext";
 import { getFaturamento } from "../../../services/consultaFatura";
 import { cancelarBoletoFedBNK } from "../../../services/boletofedbnk";
-import PageLayout from "../../PageLayout/PageLayout";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 
 const FaturamentoCancelamentoFedBnk = () => {
   const { user, isAuthenticated } = useAuth();

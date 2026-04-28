@@ -5,7 +5,7 @@ import { getFaturamento } from "../../services/consultaFatura";
 import { cancelarBoletoFedBNK } from "../../services/boletofedbnk";
 import { GiCancel, GiCheckMark, GiTrashCan } from "react-icons/gi";
 import { FaSpinner } from "react-icons/fa";
-import PageLayout from "../PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 
 const OperacionalCancelamento = () => {
   const { user, isAuthenticated } = useAuth();

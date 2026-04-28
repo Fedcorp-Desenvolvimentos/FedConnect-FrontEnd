@@ -21,7 +21,7 @@ import MobileAccordionVisitas from "./components/MobileAccordionVisitas";
 import { AgendaComercialService } from "../../services/agenda_comercial";
 import * as XLSX from "xlsx";
 import { IoIosBusiness } from "react-icons/io";
-import PageLayout from "../../components/PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 
 // Utils
 function toBRDate(d) {

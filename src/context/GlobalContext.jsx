@@ -7,7 +7,7 @@ const GlobalContext = createContext();
 export const useGlobal = () => useContext(GlobalContext);
 
 export const GlobalProvider = ({ children }) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState("Carregando...");
   const [loadingProgress, setLoadingProgress] = useState(0);
 

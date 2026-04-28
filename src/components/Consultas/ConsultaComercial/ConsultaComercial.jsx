@@ -5,7 +5,7 @@ import { IoIosBusiness } from "react-icons/io";
 import { FiUsers, FiSettings } from "react-icons/fi";
 import * as XLSX from "xlsx";
 import * as S from "./ConsultaComercialStyles";
-import PageLayout from "../../PageLayout/PageLayout";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { ConsultaService } from "../../../services/consultaService";
 import ConsultaComercialHelp from "./ConsultaComercialHelp";
 

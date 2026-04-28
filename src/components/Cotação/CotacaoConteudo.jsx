@@ -3,7 +3,7 @@ import { FaHome, FaCalculator, FaBuilding, FaShieldAlt, FaSpinner } from "react-
 import { useSnackbar } from "notistack";
 import { useLoading } from "../../hooks/useLoading";
 import * as S from "./CotacaoConteudoStyles";
-import PageLayout from "../../components/PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { CotacaoConteudoHelp } from "./CotacaoConteudoHelp";
 import cotacaoService from "../../services/cotacaoService";
 

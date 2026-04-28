@@ -15,7 +15,7 @@ import { FaSpinner } from "react-icons/fa";
 import { AutomacaoService } from "../../../services/automacaoService";
 import * as S from "./BBZAutomacaoStyles";
 import { BBZAutomacaoHelp } from "./BBZAutomacaoHelp";
-import PageLayout from "../../../components/PageLayout/PageLayout";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 
 const BBZAutomacao = () => {
     const { user } = useAuth();

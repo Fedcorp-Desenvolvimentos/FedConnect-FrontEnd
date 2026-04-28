@@ -5,7 +5,7 @@ import CadastroForm from './components/CadastroForm';
 import { useEmpresas } from './hooks/useEmpresas';
 import { useCadastro } from './hooks/useCadastro';
 import { useFormValidation } from './hooks/useFormValidation';
-import PageLayout from '../../Layouts/PageLayout/PageLayout';
+import PageLayout from './../../Layouts/PageLayout/PageLayout';
 
 const Cadastro = () => {
   const { enqueueSnackbar } = useSnackbar();

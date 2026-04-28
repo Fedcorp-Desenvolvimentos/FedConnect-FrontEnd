@@ -10,7 +10,7 @@ import SearchBar from './SearchBar';
 import Pagination from './Pagination';
 import { ITEMS_PER_PAGE } from './constants/userConstants';
 import './styles/GerenciarUsuarios.css';
-import PageLayout from '../../../PageLayout/PageLayout';
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 
 const GerenciarUsuarios = () => {
   const { 

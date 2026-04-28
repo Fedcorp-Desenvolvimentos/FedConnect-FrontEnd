@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "../../styles/ConsultasHome.css";
 import { useAuth } from "../../context/AuthContext";
-import PageLayout from "../PageLayout/PageLayout";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { FaHammer } from "react-icons/fa";
  
 const operacionais = [

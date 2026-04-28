@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import PageLayout from "../PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { useAuth } from "../../context/AuthContext";
 import "../../styles/ConsultasHome.css";
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Upload, Zap, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import './PDFAutomacao.css';
 import { AutomacaoService } from '../../../services/automacaoService';
-import PageLayout from '../../PageLayout/PageLayout';
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { useGlobal } from '../../../context/GlobalContext';
 import { useAuth } from '../../../context/AuthContext';
 import { TbPdf, TbTrash } from 'react-icons/tb';

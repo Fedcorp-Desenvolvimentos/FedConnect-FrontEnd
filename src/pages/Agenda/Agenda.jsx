@@ -22,7 +22,7 @@ import AgendaReservaForm from "../../components/Agenda/AgendaReservaForm/AgendaR
 import AgendaDetalhe from "../../components/Agenda/AgendaDetalhe/AgendaDetalhe";
 import { useAuth } from "../../context/AuthContext";
 import { AgendaService } from "../../services/agendaService";
-import PageLayout from "../../components/PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { CiCalendarDate } from "react-icons/ci";
 import { useSnackbar } from "notistack";
 import AgendaHelp from "./AgendaHelp";

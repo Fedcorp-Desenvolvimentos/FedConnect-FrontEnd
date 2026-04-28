@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 import { FaSpinner, FaTasks } from "react-icons/fa";
 import * as S from "./WorkflowStyles";
-import PageLayout from "../../components/PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { workflowService } from "../../services/workflowService";
 
 const Workflow = () => {

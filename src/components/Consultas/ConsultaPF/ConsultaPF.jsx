@@ -14,7 +14,7 @@ import {
   FiChevronUp
 } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
-import PageLayout from "../../PageLayout/PageLayout";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { formatarData } from "../../../utils/formatar_data";
 import { ConsultaService } from "../../../services/consultaService";
 import preencherZeros from "../../../utils/preencherZeros";

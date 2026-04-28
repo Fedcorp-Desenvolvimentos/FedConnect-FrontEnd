@@ -2,7 +2,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { FaFileInvoiceDollar, FaSearch, FaTrash, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import * as S from "./styles/ConsultaFaturamentoStyles";
-import PageLayout from "../../PageLayout/PageLayout";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 
 // Hooks
 import { useFaturamento } from "./hooks/useFaturamento";

@@ -27,7 +27,7 @@ import {
 } from "react-icons/fa";
 import { GiHealthNormal } from "react-icons/gi";
 import * as S from "./RHStyles";
-import PageLayout from "../../components/PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 
 const RH = () => {
   const { user } = useAuth();

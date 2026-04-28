@@ -9,7 +9,7 @@ import { usePasswordChange } from './hooks/usePasswordChange';
 import { useEditMode } from './hooks/useEditMode';
 import { IoIosBusiness } from 'react-icons/io';
 import './styles/MinhaConta.css';
-import PageLayout from '../../../PageLayout/PageLayout';
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { UserService } from '../../../../services/userService';
 
 const MinhaConta = () => {

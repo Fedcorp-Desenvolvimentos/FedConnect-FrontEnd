@@ -1,5 +1,5 @@
 import "../../styles/Ferramentas.css";
-import PageLayout from "../PageLayout/PageLayout";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { FaChartSimple } from "react-icons/fa6";
 
 const ferramentas = [

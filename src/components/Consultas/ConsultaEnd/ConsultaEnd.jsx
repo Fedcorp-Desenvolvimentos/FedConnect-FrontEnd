@@ -15,7 +15,7 @@ import {
   FiMap
 } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
-import PageLayout from "../../PageLayout/PageLayout";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { ConsultaService } from "../../../services/consultaService";
 import * as XLSX from "xlsx";
 

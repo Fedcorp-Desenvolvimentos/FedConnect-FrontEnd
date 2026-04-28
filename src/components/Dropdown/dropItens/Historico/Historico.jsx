@@ -1,7 +1,7 @@
 // pages/Historico/Historico.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../../context/AuthContext';
-import PageLayout from '../../../PageLayout/PageLayout';
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { useHistorico } from './hooks/useHistorico';
 import { useDetalhesConsulta } from './hooks/useDetalhesConsulta';
 import { useFiltroPaginacao } from './hooks/useFiltroPaginacao';

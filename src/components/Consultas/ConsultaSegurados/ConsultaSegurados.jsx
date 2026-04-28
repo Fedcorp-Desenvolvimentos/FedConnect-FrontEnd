@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
 import { IoShieldCheckmarkOutline } from "react-icons/io5";
-import PageLayout from "../../PageLayout/PageLayout";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { ConsultaService } from "../../../services/consultaService";
 import { resolveNomeApoliceFromRecord } from "../../../services/apoliceDePara";
 

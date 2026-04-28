@@ -3,7 +3,7 @@
 import { useState } from "react";
 import "./BBZAutomacao.css";
 import { useAuth } from "../../../context/AuthContext";
-import PageLayout from "../../PageLayout/PageLayout";
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { TbAutomation, TbUpload, TbRefresh, TbCheck } from "react-icons/tb";
 import { FaFilePdf } from "react-icons/fa6";
 

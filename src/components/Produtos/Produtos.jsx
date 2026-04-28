@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { FaDownload, FaEye, FaFilePdf, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import * as S from './ProdutosStyles';
-import PageLayout from '../PageLayout/PageLayout';
+import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { PRODUTOS } from '../../data/produtos';
 import { ProdutosHelp } from './ProdutosHelp';
 
