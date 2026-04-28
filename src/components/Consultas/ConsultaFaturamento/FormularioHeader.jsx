@@ -2,7 +2,7 @@
 import React from 'react';
 import { FaSearch, FaTrash } from 'react-icons/fa';
 import * as S from "./styles/ConsultaFaturamentoStyles";
-import AdministradoraAutocomplete from "../../Adm/AdministradorasAutocomplete";
+import AdministradoraAutocomplete from "./AdministradoraAutocomplete";
 
 export const FormularioHeader = ({ 
     formData, 
