@@ -82,7 +82,10 @@ import Ferramentas from '../pages/Ferramentas/Ferramentas';
 // Testes de novas paginas
 import Workflow from '../pages/Workflow/Workflow';
 import RH from '../pages/RH/RH';
-import TestePage from '../pages/Teste';
+
+// Testes
+import TestePageSC from '../pages/Teste/_styled_components/Teste';
+import TestePageCH from '../pages/Teste/_outro//Teste';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -165,7 +168,8 @@ const AppRouter = () => {
 
           <Route path="/rh" element={<RH />} />
 
-          <Route path="/teste-page" element={<TestePage />} />
+          <Route path="/teste-page-styled" element={<TestePageSC />} />
+          <Route path="/teste-page-chat" element={<TestePageCH />} />
 
         </Route>
       </Route>
