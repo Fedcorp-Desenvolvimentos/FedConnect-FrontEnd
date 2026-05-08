@@ -24,8 +24,8 @@ const ferramentas = [
   },
   {
     nome: "Produtos ADM",
-    url: "",
-    descricao: "Em breve: produtos da administradora integrados na plataforma.",
+    url: "https://fedcorp.store/login",
+    descricao: "Produtos da administradora integrados na plataforma.",
   },
 ];
 

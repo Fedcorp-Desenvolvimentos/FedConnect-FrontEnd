@@ -7,7 +7,8 @@ import {
   FaBoxes, 
   FaTools,
   FaExternalLinkAlt,
-  FaSearch
+  FaSearch,
+  FaExclamationTriangle 
 } from "react-icons/fa";
 import CardGridLayout from "../../Layouts/CardGridLayout/CardGridLayout";
 import { Card, CardBody, IconWrapper, Title, Description, ExternalButton, Badge } from "../../Layouts/CardGridLayout/CardGridLayoutStyles";
@@ -50,8 +51,17 @@ const ferramentas = [
     key: "produtos-adm",
     icon: <FaBoxes />,
     title: "Produtos ADM",
-    desc: "Em breve: produtos da administradora integrados na plataforma.",
-    url: "",
+    desc: "Produtos da administradora integrados na plataforma.",
+    url: "https://fedcorp.store/login",
+    color: "#2463eb",
+  },
+
+   {
+    key: "sinistro-fedcorp",
+    icon: <FaExclamationTriangle  />,
+    title: "Sinistro Fedcorp",
+    desc: "Comunicação e acompanhamento de sinistros centralizados em um único lugar",
+    url: "https://sinistro.grupofedcorp.com.br/#login",
     color: "#2463eb",
   },
 ];
