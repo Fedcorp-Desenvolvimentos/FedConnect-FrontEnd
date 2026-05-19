@@ -133,6 +133,23 @@ export const PRODUTOS = [
       'Cobertura para acessórios, carroceria, blindagem e kit-gás'
     ],
   },
+
+   {
+    id: 'carros-eletricos',
+    nome: 'Carros Elétricos',
+    categoria: 'Auto',
+    preco: 'Sob consulta',
+     tipo: 'pdf',
+    pdf: ['/imagens/produtos/Cobertura-Carregadores-Veiculos.pdf'],
+    destaques: [
+      'O Seguro Condomínio pode oferecer cobertura específica para carregadores de veículos elétricos',
+      'Estão protegidos:',
+      '-  Danos aos carregadores em caso de incêndio',
+      '-  Danos à estrutura do condomínio decorrentes do sinistro',
+      '- Danos a terceiros, quando contratada a cobertura de Responsabilidade Civil Garagem'
+    ],
+  },
+
     {
     id: 'institucional-fedcorp',
     nome: 'Apresentação Institucional Grupo Fedcorp',

@@ -64,6 +64,15 @@ const ferramentas = [
     url: "https://sinistro.grupofedcorp.com.br/#login",
     color: "#2463eb",
   },
+
+  {
+    key: "assistencia-fedcorp",
+    icon: <FaHandshake  />,
+    title: "Porto Assistência",
+    desc: "Consulta de coberturas e exclusões da Porto Assistência em um único lugar",
+    url: "https://assistencia.grupofedcorp.com.br/",
+    color: "#2463eb",
+  },
 ];
 
 const Ferramentas = () => {
