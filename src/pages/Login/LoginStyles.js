@@ -291,6 +291,12 @@ export const LoginButton = styled.button`
   }
 `;
 
+export const LoginGoogle = styled.div`
+display: flex;
+justify-content: center;
+margin-top: 1.25rem;
+`;
+
 export const ForgotPassword = styled.a`
   display: block;
   margin-top: 1.25rem;

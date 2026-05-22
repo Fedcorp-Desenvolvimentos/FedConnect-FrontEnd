@@ -123,16 +123,18 @@ const Login = () => {
                             <S.Divider>
                                 <span>ou</span>
                             </S.Divider>
-
-                            <GoogleLogin
-                                onSuccess={handleGoogleSuccess}
-                                onError={handleGoogleError}
-                                useOneTap={false}
-                                theme="outline"
-                                size="large"
-                                text="continue_with"
-                                shape="rectangular"
-                            />
+                            
+                            <S.LoginGoogle>
+                                <GoogleLogin
+                                    onSuccess={handleGoogleSuccess}
+                                    onError={handleGoogleError}
+                                    useOneTap={false}
+                                    theme="outline"
+                                    size="large"
+                                    text="continue_with"
+                                    shape="rectangular"
+                                />
+                            </S.LoginGoogle>
 
                             <S.ForgotPassword href="/recuperar-senha">
                                 Esqueceu sua senha?
