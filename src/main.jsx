@@ -9,6 +9,7 @@ import ScrollToTop from './utils/scrolltop';
 import App from './App.jsx';
 import { SnackbarProvider } from 'notistack';
 import { GlobalStyles } from './styles/GlobalStyles';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -20,13 +21,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       }}>
       <GlobalProvider>
         <AuthProvider>
-          <ScrollToTop />
-          <SnackbarProvider
-            maxSnack={3}
-            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-          >
-            <App />
-          </SnackbarProvider>
+          <GoogleOAuthProvider clientId="765602112412-336nt6annegl11j5s3ffm5lie68a975q.apps.googleusercontent.com">
+            <ScrollToTop />
+            <SnackbarProvider
+              maxSnack={3}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+              <App />
+            </SnackbarProvider>
+          </GoogleOAuthProvider>
         </AuthProvider>
       </GlobalProvider>
     </Router>

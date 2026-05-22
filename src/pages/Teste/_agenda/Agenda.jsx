@@ -1,3 +1,5 @@
+// src/pages/Teste/_agenda/Agenda.jsx
+
 import { useEffect, useState, forwardRef } from "react";
 import {
   FaPlus,
@@ -18,14 +20,14 @@ import ptBR from "date-fns/locale/pt-BR";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import * as S from "./AgendaStyles";
-import AgendaReservaForm from "../../components/Agenda/AgendaReservaForm/AgendaReservaForm";
-import AgendaDetalhe from "../../components/Agenda/AgendaDetalhe/AgendaDetalhe";
-import { AgendaService } from "../../services/agendaService";
-import PageLayout from "../../Layouts/PageLayout/PageLayout";
+import AgendaReservaForm from "./AgendaReservaForm/AgendaReservaForm";
+import AgendaDetalhe from "./AgendaDetalhe/AgendaDetalhe";
+import { useAuth } from "../../../context/AuthContext";
+import { AgendaService } from "../../../services/agendaService";
+import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { CiCalendarDate } from "react-icons/ci";
 import { useSnackbar } from "notistack";
 import AgendaHelp from "./AgendaHelp";
-import { useAuth } from "../../context/AuthContext";
 
 function getFirstMondayOfMonth(date) {
   const firstDay = startOfMonth(date);

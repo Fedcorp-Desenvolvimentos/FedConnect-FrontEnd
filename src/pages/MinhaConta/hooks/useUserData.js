@@ -5,8 +5,8 @@ import { useLoading } from '../../../hooks/useLoading';
 export const useUserData = () => {
   const [userData, setUserData] = useState({
     userId: null,
-    nomeCompleto: '',
-    cpf: '',
+    username: '',
+    administradora_nome: '',
     email: ''
   });
 
@@ -20,9 +20,9 @@ export const useUserData = () => {
 
         setUserData({
           userId: data.id,
-          nomeCompleto: data.nome_completo || '',
+          username: data.username || '',
           email: data.email || '',
-          cpf: data.cpf || ''
+          administradora_nome: data.administradora_nome || ''
         });
       }, 'Carregando dados do usuário...');
 

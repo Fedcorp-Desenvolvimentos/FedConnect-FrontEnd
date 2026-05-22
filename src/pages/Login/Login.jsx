@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useLoading } from '../../hooks/useLoading';
+import { GoogleLogin } from '@react-oauth/google';
 import * as S from './LoginStyles';
 
 const Login = () => {
@@ -12,7 +13,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const { startLoading, stopLoading, updateProgress } = useLoading();
-    const { login } = useAuth();
+    const { login, loginGoogle } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
@@ -36,6 +37,30 @@ const Login = () => {
         } finally {
             stopLoading();
         }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        setError(null);
+        
+        try {
+            console.log('Google credential received');
+            
+            const result = await loginGoogle(credentialResponse.credential);
+
+            if (result.success) {
+                navigate('/home');
+            } else {
+                setError(result.error || 'Falha no login com Google');
+            }
+        } catch (err) {
+            console.error('Google login error:', err);
+            setError('Erro ao autenticar com Google. Tente novamente.');
+        }
+    };
+
+    const handleGoogleError = () => {
+        console.error('Google login failed');
+        setError('Erro no login com Google. Tente novamente ou use email/senha.');
     };
 
     return (
@@ -94,6 +119,20 @@ const Login = () => {
                             <S.LoginButton type="submit">
                                 Entrar
                             </S.LoginButton>
+
+                            <S.Divider>
+                                <span>ou</span>
+                            </S.Divider>
+
+                            <GoogleLogin
+                                onSuccess={handleGoogleSuccess}
+                                onError={handleGoogleError}
+                                useOneTap={false}
+                                theme="outline"
+                                size="large"
+                                text="continue_with"
+                                shape="rectangular"
+                            />
 
                             <S.ForgotPassword href="/recuperar-senha">
                                 Esqueceu sua senha?

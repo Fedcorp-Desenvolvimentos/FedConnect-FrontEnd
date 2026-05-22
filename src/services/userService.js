@@ -47,14 +47,14 @@ export const UserService = {
    * Busca todos os usuários.
    * @returns {Promise<Array<object>>} - Promessa com um array de usuários.
    */
-getAllUsers: async (pagina = 1, porPagina = 20, busca = "") => {
-    let url = `/users?page=${pagina}&page_size=${porPagina}`;
-    if (busca) {
-        url += `&search=${encodeURIComponent(busca)}`;
-    }
-    const response = await api.get(url);
-    return response.data;
-},
+  getAllUsers: async (pagina = 1, porPagina = 20, busca = "") => {
+      let url = `/users?page=${pagina}&page_size=${porPagina}`;
+      if (busca) {
+          url += `&search=${encodeURIComponent(busca)}`;
+      }
+      const response = await api.get(url);
+      return response.data;
+  },
 
 
   /**
