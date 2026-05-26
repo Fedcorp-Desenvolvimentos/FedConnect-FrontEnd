@@ -53,7 +53,14 @@ export const PRODUTOS = [
     nome: 'Incêndio Locação',
     categoria: 'Residencial',
     preco: 'Sob consulta',
-    imagens: ['/imagens/produtos/incendio-locacao.jpg'],
+    imagens: ['/imagens/produtos/incendio-locacao.jpg',
+      
+      '/imagens/produtos/incendio2.jpg',
+      '/imagens/produtos/incendio3.jpg',
+      '/imagens/produtos/incendio4.jpg',
+      '/imagens/produtos/incendio5.jpg'
+    ],
+    
     destaques: [
       'Cobertura para incêndio, raio e explosão',
       'Indenização sobre prejuízos na edificação do imóvel',
