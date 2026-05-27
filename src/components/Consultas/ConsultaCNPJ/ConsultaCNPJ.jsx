@@ -118,13 +118,21 @@ const ConsultaCNPJ = () => {
     return root;
   };
 
-  const getResultList = (res) => {
-    if (!res) return [];
-    const root = getResultData(res);
-    if (Array.isArray(root?.Result)) return root.Result;
-    if (root?.cnpj || root?.razao_social) return [{ BasicData: root }];
-    return [];
-  };
+const getResultList = (res) => {
+  if (!res) return [];
+
+  const root = getResultData(res);
+
+  if (Array.isArray(root?.Result)) {
+    return root.Result.map((item) => item.BasicData ?? item);
+  }
+
+  if (root?.cnpj || root?.razao_social) {
+    return [root];
+  }
+
+  return [];
+};
 
   const flatToBasicData = (flat) => {
     if (!flat) return null;
@@ -704,7 +712,7 @@ const ConsultaCNPJ = () => {
           <S.ResultCard ref={resultadoRef}>
             <S.ResultTitle>Resultados Encontrados ({resultList.length})</S.ResultTitle>
             {resultList.map((item, idx) => {
-              const data = flatToBasicData(item) || item;
+              const data = flatToBasicData(item.BasicData ?? item) || item.BasicData || item;
               const isExpanded = selectedResultIndex === idx;
               
               const enderecoMaps = montarEnderecoParaMaps({
