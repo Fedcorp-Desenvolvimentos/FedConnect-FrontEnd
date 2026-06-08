@@ -6,7 +6,7 @@ const api = axios.create({
   // baseURL: "http://localhost:8000/",
 });
 
-// Intercepta todas as requisições Axios
+// Intercepta todas as requisições Axios teste
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
