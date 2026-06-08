@@ -132,3 +132,22 @@ export const exportarFaturasParaPDF = async (filtros = {}) => {
   window.URL.revokeObjectURL(url);
   document.body.removeChild(a);
 };
+
+export const rodar_procedure_tratamento_erros = async () => {
+  try {
+    const token = localStorage.getItem("accessToken", "");
+    const response = await api.post(
+      "faturamento/tratamento-de-erros/rodar-procedure/",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao rodar procedure de tratamento de erros:", error);
+    throw error;
+  }
+};

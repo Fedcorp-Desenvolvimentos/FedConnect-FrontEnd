@@ -87,6 +87,8 @@ import RH from '../pages/RH/RH';
 import TestePageSC from '../pages/Teste/_styled_components/Teste';
 import TestePageCH from '../pages/Teste/_outro//Teste';
 import TesteAgenda from '../pages/Teste/_agenda/Agenda';
+import ChatPage from '../pages/Chat/ChatPage';
+import TratamentoErros from '../components/TratamentoErros/TratamentoErros';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -172,6 +174,10 @@ const AppRouter = () => {
           <Route path="/teste-page-styled" element={<TestePageSC />} />
           <Route path="/teste-page-chat" element={<TestePageCH />} />
           <Route path="/teste-page-agenda" element={<TesteAgenda />} />
+
+          <Route path="/chat" element={<ChatPage />} />
+
+          <Route path="/tratamento-erros" element={<TratamentoErros />} />
 
         </Route>
       </Route>

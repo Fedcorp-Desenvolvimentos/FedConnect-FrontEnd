@@ -41,6 +41,16 @@ const operacionais = [
     color: "#2463eb",
     external: false,
   },
+   {
+    key: "tratamento-de-erros",
+    icon: <FaTimesCircle />,
+    title: "Tratamento de Erros",
+    desc: "Consulte e trate erros de faturamento de maneira detalhada.",
+    to: "/tratamento-erros",
+    niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
+    color: "#2463eb",
+    external: false,
+  },
 ];
 
 const FaturamentoHome = () => {
