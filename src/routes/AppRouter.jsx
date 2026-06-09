@@ -88,8 +88,12 @@ import TestePageSC from '../pages/Teste/_styled_components/Teste';
 import TestePageCH from '../pages/Teste/_outro//Teste';
 import TesteAgenda from '../pages/Teste/_agenda/Agenda';
 import ChatPage from '../pages/Chat/ChatPage';
-import TratamentoErros from '../components/TratamentoErros/TratamentoErros';
+
+import TratamentoErros from '../pages/TratamentoErros/TratamentoErros';
 import TratamentoErrosBOAT from '../components/TratamentoErros/TratamentoErrosBOAT';
+
+import FormatosArquivos from '../pages/FormatosArquivos/FormatosArquivos';
+import ConverterBoletoCSV from '../components/FormatosArquivos/ConverterBoletoCSV';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -181,6 +185,10 @@ const AppRouter = () => {
           {/* Tratamento de Erros */}
           <Route path="/tratamento-erros" element={<TratamentoErros />} />
           <Route path="/tratamento-erros/tratamento-de-erros-boat" element={<TratamentoErrosBOAT />} />
+
+          {/* Formatos de Arquivos */}
+          <Route path="/formatos-arquivos" element={<FormatosArquivos />} />
+          <Route path="/formatos-arquivos/converter-boleto-csv" element={<ConverterBoletoCSV />} />
 
         </Route>
       </Route>

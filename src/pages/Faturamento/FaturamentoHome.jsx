@@ -52,6 +52,16 @@ const operacionais = [
     color: "#2463eb",
     external: false,
   },
+     {
+    key: "formatos-de-arquivos",
+    icon: <MdError />,
+    title: "Formatos de Arquivos",
+    desc: "Gerencie e converta formatos de arquivos de maneira simples.",
+    to: "/formatos-arquivos",
+    niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
+    color: "#2463eb",
+    external: false,
+  },
 ];
 
 const FaturamentoHome = () => {
