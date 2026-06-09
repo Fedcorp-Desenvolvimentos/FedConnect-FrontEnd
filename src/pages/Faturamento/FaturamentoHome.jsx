@@ -9,6 +9,7 @@ import {
 import CardGridLayout from "../../Layouts/CardGridLayout/CardGridLayout";
 import { Card, CardBody, IconWrapper, Title, Description, Button, ExternalButton } from "../../Layouts/CardGridLayout/CardGridLayoutStyles";
 import FaturamentoHelp from "./FaturamentoHelp";
+import { MdError } from "react-icons/md";
 
 const operacionais = [
   {
@@ -43,9 +44,9 @@ const operacionais = [
   },
    {
     key: "tratamento-de-erros",
-    icon: <FaTimesCircle />,
+    icon: <MdError />,
     title: "Tratamento de Erros",
-    desc: "Consulte e trate erros de faturamento de maneira detalhada.",
+    desc: "Trate erros de faturamento de maneira simples.",
     to: "/tratamento-erros",
     niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     color: "#2463eb",

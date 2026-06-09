@@ -89,6 +89,7 @@ import TestePageCH from '../pages/Teste/_outro//Teste';
 import TesteAgenda from '../pages/Teste/_agenda/Agenda';
 import ChatPage from '../pages/Chat/ChatPage';
 import TratamentoErros from '../components/TratamentoErros/TratamentoErros';
+import TratamentoErrosBOAT from '../components/TratamentoErros/TratamentoErrosBOAT';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -177,7 +178,9 @@ const AppRouter = () => {
 
           <Route path="/chat" element={<ChatPage />} />
 
+          {/* Tratamento de Erros */}
           <Route path="/tratamento-erros" element={<TratamentoErros />} />
+          <Route path="/tratamento-erros/tratamento-de-erros-boat" element={<TratamentoErrosBOAT />} />
 
         </Route>
       </Route>
