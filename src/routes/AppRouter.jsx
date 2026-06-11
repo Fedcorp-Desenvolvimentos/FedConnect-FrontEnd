@@ -74,6 +74,9 @@ import PDFAutomacao from '../components/Automacao/PDF/PDFAutomacao';
 import BBZAutomacao from '../pages/Automacao/BBZ/BBZAutomacao';
 import EmailAutomacao from '../components/Automacao/Email/EmailAutomacao';
 
+// Questionario
+import Questionario from '../pages/Questionarios/Questionarios';
+
 // Teste renderização Mapa
 import Mapa from '../components/Mapa/Mapa';
 import Analytics from '../pages/Analytics/Analytics';
@@ -171,6 +174,8 @@ const AppRouter = () => {
           <Route path="/mapa" element={<Mapa />} />
 
           <Route path="/analytics" element={<Analytics/>} />
+
+          <Route path="/questionarios" element={<Questionario/>} />
 
           <Route path="/workflow" element={< Workflow />} />
 

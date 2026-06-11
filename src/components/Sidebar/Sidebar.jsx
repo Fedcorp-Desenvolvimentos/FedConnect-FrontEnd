@@ -11,7 +11,8 @@ import {
   FaChartLine,
   FaCog,
   FaProjectDiagram,
-  FaUsers
+  FaUsers,
+  
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import * as S from "./SidebarStyles";
@@ -79,6 +80,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
     { path: "/agenda", label: "Agenda", icon: <FaCalendarAlt />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     { path: "/automacao", label: "Automação", icon: <FaCog />, allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin"] : [] },
     { path: "/analytics", label: "Estatísticas", icon: <FaChartLine />, allowed: ["admin"] },
+    { path: "/questionarios", label: "Questionário", icon: <FaClipboardList  />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     // { path: "/workflow", label: "Workflow", icon: <FaProjectDiagram />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     // { path: "/rh", label: "Recursos Humanos", icon: <FaUsers />, allowed: ["admin"] },
   ];
