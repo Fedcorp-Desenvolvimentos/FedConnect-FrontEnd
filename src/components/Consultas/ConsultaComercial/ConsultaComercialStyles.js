@@ -424,19 +424,22 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalContent = styled.div`
+  position: relative;
   background: white;
+  margin-left: 200px;     
   border-radius: 24px;
-  max-width: 600px;
-  width: 100%;
-  max-height: 80vh;
-  overflow: hidden;
+  width: min(92vw, 760px);
+  max-height: 82vh;
+  padding: 2rem;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.28);
 
-  @media (max-width: 640px) {
-    max-width: 95%;
-    border-radius: 20px;
+  @media (max-width: 768px) {
+    width: 95vw;
+    padding: 1.5rem;
+    border-radius: 18px;
   }
 `;
 
@@ -458,15 +461,11 @@ export const ModalClose = styled.button`
 `;
 
 export const ModalTitle = styled.h2`
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   text-align: center;
-  margin-bottom: 1.5rem;
-  font-weight: 700;
+  margin: 0 0 1.75rem;
+  font-weight: 800;
   color: #0F3D5D;
-
-  @media (max-width: 768px) {
-    font-size: 1.25rem;
-  }
 `;
 
 export const ModalLoading = styled.div`
@@ -488,43 +487,46 @@ export const ModalLoading = styled.div`
 
 export const ModalGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem 2rem;
+  width: 100%;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 1rem;
   }
 `;
 
 export const ModalColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-
-  strong {
-    color: #0F3D5D;
-  }
+  gap: 0.9rem;
 
   p {
     margin: 0;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
+    line-height: 1.45;
     color: #1e293b;
+    word-break: break-word;
+  }
+
+  strong {
+    color: #0F3D5D;
+    font-weight: 800;
   }
 `;
 
 export const ModalActions = styled.div`
   display: flex;
   justify-content: flex-end;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
 `;
 
 export const ModalButton = styled.button`
-  padding: 0.6rem 1.5rem;
-  border-radius: 10px;
-  font-weight: 600;
+  min-width: 120px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
   background: linear-gradient(135deg, #0F3D5D 0%, #1a5a7a 100%);
   color: white;
   border: none;
@@ -533,7 +535,7 @@ export const ModalButton = styled.button`
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(15, 61, 93, 0.3);
+    box-shadow: 0 4px 12px rgba(15, 61, 93, 0.35);
   }
 `;
 
