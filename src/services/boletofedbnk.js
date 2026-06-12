@@ -4,11 +4,11 @@ import api from "./api";
 export const cancelarBoletoFedBNK = async (payload) => {
   try {
     const token = localStorage.getItem("accessToken");
-    
+
     if (!token) {
       throw new Error("Usuário não autenticado");
     }
-    
+
     // Payload: sempre com metodo, fatura e documento (documento pode ser null)
     const requestPayload = {
       metodo: payload.metodo,      // "INDIVIDUAL" ou "TODOS"
@@ -17,7 +17,7 @@ export const cancelarBoletoFedBNK = async (payload) => {
       motivo: payload.motivo,
       mail: payload.mail
     };
-    
+
     const response = await api.post(
       `boletofedbnk/cancelar/`,
       requestPayload,
@@ -28,7 +28,7 @@ export const cancelarBoletoFedBNK = async (payload) => {
         }
       }
     );
-    
+
     return response.data;
   } catch (error) {
     console.error('Erro ao cancelar boleto:', error);
@@ -49,7 +49,7 @@ export const triggerWebhook = async (payload) => {
     return response.data;
   } catch (error) {
     console.error('Erro ao chamar o webhook:', error);
-    throw error; 
+    throw error;
   }
 };
 
@@ -66,6 +66,21 @@ export const impressWebhook = async (payload) => {
     return response.data;
   } catch (error) {
     console.error('Erro ao chamar o webhook:', error);
-    throw error; 
+    throw error;
+  }
+};
+
+/**
+ * Consulta dados para segunda via de boleto por número de fatura.
+ * GET /api/faturamento/dados-segunda-via/{fatura}/
+ * @param {string} fatura - Número da fatura
+ */
+export const consultarSegundaVia = async (fatura) => {
+  try {
+    const response = await api.get(`faturamento/dados-segunda-via-boleto/${fatura}/`);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao consultar segunda via:', error);
+    throw error;
   }
 };

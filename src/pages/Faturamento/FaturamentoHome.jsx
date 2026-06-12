@@ -1,8 +1,8 @@
 import { useAuth } from "../../context/AuthContext";
-import { 
-  FaHammer, 
-  FaTimesCircle, 
-  FaFileInvoice, 
+import {
+  FaHammer,
+  FaTimesCircle,
+  FaFileInvoice,
   FaExternalLinkAlt,
   FaFileInvoiceDollar
 } from "react-icons/fa";
@@ -42,7 +42,7 @@ const operacionais = [
     color: "#2463eb",
     external: false,
   },
-   {
+  {
     key: "tratamento-de-erros",
     icon: <MdError />,
     title: "Tratamento de Erros",
@@ -52,12 +52,22 @@ const operacionais = [
     color: "#2463eb",
     external: false,
   },
-     {
+  {
     key: "formatos-de-arquivos",
     icon: <MdError />,
     title: "Formatos de Arquivos",
     desc: "Gerencie e converta formatos de arquivos de maneira simples.",
     to: "/formatos-arquivos",
+    niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
+    color: "#2463eb",
+    external: false,
+  },
+  {
+    key: "segunda-via",
+    icon: <FaFileInvoiceDollar />,
+    title: "Segunda Via de Boletos",
+    desc: "Consulte e emita a segunda via dos seus boletos.",
+    to: "/faturamento/segunda-via",
     niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     color: "#2463eb",
     external: false,
@@ -76,7 +86,7 @@ const FaturamentoHome = () => {
     );
   }
 
-  const operacionaisPermitidos = operacionais.filter(c => 
+  const operacionaisPermitidos = operacionais.filter(c =>
     c.niveis.includes(currentUserType)
   );
 
@@ -102,9 +112,9 @@ const FaturamentoHome = () => {
             </Title>
             <Description>{item.desc}</Description>
             {item.external ? (
-              <ExternalButton 
-                href={item.to} 
-                target="_blank" 
+              <ExternalButton
+                href={item.to}
+                target="_blank"
                 rel="noopener noreferrer"
                 $color={item.color}
               >
