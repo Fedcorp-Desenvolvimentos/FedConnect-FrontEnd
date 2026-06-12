@@ -84,3 +84,23 @@ export const consultarSegundaVia = async (fatura) => {
     throw error;
   }
 };
+
+/**
+ * Emite segunda via de boletos para uma fatura.
+ * POST /api/faturamento/emissao-segunda-via-boleto/{fatura}/
+ * @param {string} fatura - Número da fatura
+ * @param {Array} boletos - Array com os objetos completos dos boletos a emitir
+ */
+export const emitirSegundaVia = async (fatura, boletos) => {
+  try {
+    const response = await api.post(
+      `faturamento/emissao-segunda-via-boleto/${fatura}/`,
+      boletos,
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao emitir segunda via:', error);
+    throw error;
+  }
+};
