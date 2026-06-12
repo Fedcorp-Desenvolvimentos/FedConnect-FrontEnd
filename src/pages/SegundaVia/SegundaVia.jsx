@@ -3,7 +3,7 @@ import { FaSearch, FaFileInvoiceDollar, FaSpinner, FaTimesCircle, FaCheckCircle,
 import { useSnackbar } from 'notistack';
 import * as S from './SegundaViaStyles';
 import PageLayout from '../../Layouts/PageLayout/PageLayout';
-import { consultarSegundaVia } from '../../services/boletofedbnk';
+import { consultarSegundaVia, emitirSegundaVia } from '../../services/boletofedbnk';
 
 const STATUS_LABEL = {
   pago: 'Pago',
@@ -21,7 +21,9 @@ const SegundaVia = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [consulted, setConsulted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [emitindo, setEmitindo] = useState(false);
   const [boletos, setBoletos] = useState([]);
+  const [dadosOriginais, setDadosOriginais] = useState([]);
   const [administradora, setAdministradora] = useState('');
   const [numeroFatura, setNumeroFatura] = useState('');
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -68,14 +70,26 @@ const SegundaVia = () => {
     }
   };
 
-  const emitirSelecionados = () => {
+  const emitirSelecionados = async () => {
     const selecionados = boletos.filter(b => selectedIds.has(b.id));
     if (selecionados.length === 0) {
       enqueueSnackbar('Selecione ao menos um boleto para emitir a segunda via.', { variant: 'warning' });
       return;
     }
-    const nomes = selecionados.map(b => b.fatura).join(', ');
-    enqueueSnackbar(`Segunda via emitida com sucesso para: ${nomes}`, { variant: 'success' });
+
+    const indices = selecionados.map(b => b.id - 1);
+    const payload = indices.map(i => dadosOriginais[i]);
+
+    setEmitindo(true);
+
+    try {
+      await emitirSegundaVia(numeroFatura, payload);
+      enqueueSnackbar(`${selecionados.length} boleto(s) emitido(s) com sucesso!`, { variant: 'success' });
+    } catch (error) {
+      enqueueSnackbar('Erro ao emitir segunda via. Tente novamente.', { variant: 'error' });
+    } finally {
+      setEmitindo(false);
+    }
   };
 
   const consultarFatura = async () => {
@@ -89,24 +103,31 @@ const SegundaVia = () => {
     try {
       const response = await consultarSegundaVia(faturaInput.trim());
 
-      if (response.status === 'success' && response.data.length > 0) {
-        const normalizados = response.data.map((item, index) => ({
+      if (response.sucesso && response.dados.length > 0) {
+        const parseBrl = (str) => {
+          if (!str) return 0;
+          if (typeof str === 'number') return str;
+          return Number(str.replace(/\./g, '').replace(',', '.'));
+        };
+
+        const normalizados = response.dados.map((item, index) => ({
           id: index + 1,
           fatura: item.FATURA_NUM,
-          condominio: item.ESTIPULANTE || item.CO_ESTIPULANTE,
-          valor: item.VALOR_DOCUMENTO || item.VALOR_TOTAL,
+          condominio: item.CO_ESTIPULANTE || item.ESTIPULANTE,
+          valor: parseBrl(item.VALOR_DOCUMENTO || item.VALOR_TOTAL),
           vencimento: item.VENCIMENTO,
           nossoNumero: item.NOSSO_NUMERO,
           linhaDigitavel: item.LINHA_DIGITAVEL,
           status: 'pendente',
         }));
 
-        setAdministradora(response.data[0].EMISSOR);
-        setNumeroFatura(response.numero_fatura);
+        setAdministradora(response.dados[0].EMISSOR);
+        setNumeroFatura(response.dados[0].FATURA_NUM);
+        setDadosOriginais(response.dados);
         setBoletos(normalizados);
         setSelectedIds(new Set(normalizados.map(b => b.id)));
         setConsulted(true);
-        enqueueSnackbar(`${normalizados.length} boleto(s) encontrado(s) para a fatura ${response.numero_fatura}`, { variant: 'success' });
+        enqueueSnackbar(`${normalizados.length} boleto(s) encontrado(s) para a fatura ${response.dados[0].FATURA_NUM}`, { variant: 'success' });
       } else {
         enqueueSnackbar('Nenhum boleto encontrado para esta fatura.', { variant: 'warning' });
       }
@@ -233,9 +254,9 @@ const SegundaVia = () => {
                       </S.SelectedInfo>
                     </S.ActionsLeft>
                     <S.ActionsRight>
-                      <S.PrimaryButton onClick={emitirSelecionados}>
-                        <FaFileInvoiceDollar style={{ marginRight: 6 }} />
-                        Emitir Segunda Via
+                      <S.PrimaryButton onClick={emitirSelecionados} disabled={emitindo}>
+                        {emitindo ? <FaSpinner className="spinner" /> : <FaFileInvoiceDollar style={{ marginRight: 6 }} />}
+                        {emitindo ? 'Emitindo...' : 'Emitir Segunda Via'}
                       </S.PrimaryButton>
                     </S.ActionsRight>
                   </S.ActionsRow>
