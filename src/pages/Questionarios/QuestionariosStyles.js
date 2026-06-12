@@ -612,3 +612,36 @@ export const StyledSelect = styled.select`
     cursor: not-allowed;
   }
 `;
+
+// Adicione no QuestionariosStyles.js
+
+export const NewButton = styled(PrimaryButton)`
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 0.75rem 1.5rem;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+`;
+
+export const FormFooter = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 0;
+  margin-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+
+  button {
+    min-width: 200px;
+  }
+
+  @media (max-width: 640px) {
+    button {
+      width: 100%;
+    }
+  }
+`;
+

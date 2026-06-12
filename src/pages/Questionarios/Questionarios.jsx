@@ -10,7 +10,7 @@ import {
   FaSearch,
   FaEye,
   FaSpinner,
-  FaChevronDown,
+  FaPlus,
 } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import * as S from './QuestionariosStyles';
@@ -21,7 +21,6 @@ import {
 
 // Configuração dos setores e subáreas
 const SETORES_CONFIG = {
-  // Setores Principais
   "Mapa de Setores": {
     type: "main",
     options: [
@@ -37,7 +36,6 @@ const SETORES_CONFIG = {
       "Medicina e Segurança do Trabalho"
     ]
   },
-  // Subáreas de Faturamentos
   "Faturamentos": {
     type: "subarea",
     parent: "Faturamentos",
@@ -50,7 +48,6 @@ const SETORES_CONFIG = {
       "Benefícios"
     ]
   },
-  // Subáreas de Medicina e Segurança do Trabalho
   "Medicina e Segurança do Trabalho": {
     type: "subarea",
     parent: "Medicina e Segurança do Trabalho",
@@ -154,16 +151,14 @@ function Questionarios() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [carregandoLista, setCarregandoLista] = useState(false);
+  const [formVisible, setFormVisible] = useState(false);
 
-  // Obter opções de setor disponíveis
   const setorOptions = SETORES_CONFIG["Mapa de Setores"].options;
 
-  // Verificar se o setor selecionado tem subáreas
   const hasSubareas = (setor) => {
     return SETORES_CONFIG[setor] && SETORES_CONFIG[setor].type === "subarea";
   };
 
-  // Obter subáreas para o setor selecionado
   const getSubareas = (setor) => {
     if (hasSubareas(setor)) {
       return SETORES_CONFIG[setor].options;
@@ -171,13 +166,12 @@ function Questionarios() {
     return [];
   };
 
-  // Quando o setor mudar, limpar a subárea
   const handleSetorChange = (e) => {
     const newSetor = e.target.value;
     setForm((prev) => ({ 
       ...prev, 
       setor: newSetor,
-      subarea: "" // Limpa subárea quando o setor muda
+      subarea: ""
     }));
   };
 
@@ -194,6 +188,7 @@ function Questionarios() {
   const limparFormulario = () => {
     setForm(initialForm);
     setEditandoId(null);
+    setFormVisible(false);
   };
 
   const validarFormulario = () => {
@@ -224,14 +219,15 @@ function Questionarios() {
     });
   }, [busca, questionarios]);
 
-  // Carregar questionarios do backend
   const carregarQuestionarios = async () => {
     if (!podeVisualizarQuestionarios) return;
 
     setCarregandoLista(true);
     try {
       const response = await listarQuestionarios();
-      const dadosConvertidos = (response.data || []).map(item => ({
+      // O response já é o array de dados diretamente, não response.data
+      const dados = Array.isArray(response) ? response : (response.data || []);
+      const dadosConvertidos = dados.map(item => ({
         id: item.id,
         setor: item.setor,
         subarea: item.subarea || "",
@@ -267,23 +263,24 @@ function Questionarios() {
     e.preventDefault();
     if (!validarFormulario()) return;
     
-    // Prepara os dados para envio - combina setor e subárea se existir
     const dadosParaEnvio = {
       ...form,
       setor: form.subarea ? `${form.setor} - ${form.subarea}` : form.setor
     };
+    
+    // Remove subarea do envio se não for necessário
+    delete dadosParaEnvio.subarea;
     
     setSubmitting(true);
     try {
       if (editandoId) {
         await atualizarQuestionario(editandoId, dadosParaEnvio);
         enqueueSnackbar('Questionário atualizado com sucesso.', { variant: 'success' });
-        await carregarQuestionarios();
       } else {
         await enviarQuestionario(dadosParaEnvio);
         enqueueSnackbar('Questionário enviado com sucesso.', { variant: 'success' });
-        await carregarQuestionarios();
       }
+      await carregarQuestionarios();
       limparFormulario();
     } catch (error) {
       console.error('Erro ao salvar:', error);
@@ -294,11 +291,9 @@ function Questionarios() {
   };
 
   const editarQuestionario = (item) => {
-    // Para edição, precisamos separar setor e subárea se estiverem combinados
     let setorOriginal = item.setor;
     let subareaOriginal = item.subarea || "";
     
-    // Se não tem subárea salva separadamente, tenta extrair do setor
     if (!subareaOriginal && setorOriginal.includes(" - ")) {
       const partes = setorOriginal.split(" - ");
       setorOriginal = partes[0];
@@ -324,6 +319,7 @@ function Questionarios() {
       consideracoesFinais: item.consideracoesFinais || "",
     });
     setEditandoId(item.id);
+    setFormVisible(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -354,162 +350,200 @@ function Questionarios() {
     return item.subarea ? `${item.setor} - ${item.subarea}` : item.setor;
   };
 
+  // Botão de enviar/submit reutilizável
+  const SubmitButton = () => (
+    <S.PrimaryButton type="submit" disabled={submitting}>
+      {submitting ? <S.SpinnerIcon as={FaSpinner} /> : <FaSave />}
+      {submitting ? "Salvando..." : (editandoId ? "Salvar alterações" : "Enviar questionário")}
+    </S.PrimaryButton>
+  );
+
   return (
     <PageLayout
       title="Questionários"
       subtitle="Cadastro de respostas para mapear processos, gargalos, oportunidades de automação e melhorias operacionais."
     >
       <S.PageContainer>
-        <S.Form onSubmit={salvarQuestionario}>
-          <S.FormTitleRow>
-            <div>
-              <h2>{editandoId ? "Editar questionário" : "Novo questionário"}</h2>
-              <p>Campos com * são obrigatórios.</p>
-            </div>
-            <S.FormActionsTop>
-              {editandoId && (
-                <S.SecondaryButton type="button" onClick={limparFormulario}>
-                  <FaTimes />
-                  Cancelar edição
-                </S.SecondaryButton>
-              )}
-              <S.PrimaryButton type="submit" disabled={submitting}>
-                {submitting ? <S.SpinnerIcon as={FaSpinner} /> : <FaSave />}
-                {submitting ? "Salvando..." : (editandoId ? "Salvar alterações" : "Enviar questionário")}
-              </S.PrimaryButton>
-            </S.FormActionsTop>
-          </S.FormTitleRow>
+        <S.Header>
+          <S.HeaderContent>
+            <S.HeaderTag>
+              <FaClipboardList />
+              Levantamento de Processos
+            </S.HeaderTag>
+            <S.HeaderTitle>Questionários</S.HeaderTitle>
+            <S.HeaderSubtitle>
+              Cadastro de respostas para mapear processos, gargalos, oportunidades
+              de automação e melhorias operacionais.
+            </S.HeaderSubtitle>
+          </S.HeaderContent>
+          {!formVisible && !editandoId && (
+            <S.NewButton onClick={() => setFormVisible(true)}>
+              <FaPlus />
+              Novo Questionário
+            </S.NewButton>
+          )}
+        </S.Header>
 
-          <S.Card>
-            <h3>1. Identificação</h3>
-            <S.FormGrid>
-              <S.FormGroup>
-                <label>Setor *</label>
-                <S.StyledSelect
-                  name="setor"
-                  value={form.setor}
-                  onChange={handleSetorChange}
-                  required
-                >
-                  <option value="">Selecione um setor</option>
-                  {setorOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </S.StyledSelect>
-              </S.FormGroup>
+        {(formVisible || editandoId) && (
+          <S.Form onSubmit={salvarQuestionario}>
+            <S.FormTitleRow>
+              <div>
+                <h2>{editandoId ? "Editar questionário" : "Novo questionário"}</h2>
+                <p>Campos com * são obrigatórios.</p>
+              </div>
+              <S.FormActionsTop>
+                {editandoId && (
+                  <S.SecondaryButton type="button" onClick={limparFormulario}>
+                    <FaTimes />
+                    Cancelar edição
+                  </S.SecondaryButton>
+                )}
+                {!editandoId && (
+                  <S.SecondaryButton type="button" onClick={limparFormulario}>
+                    <FaTimes />
+                    Cancelar
+                  </S.SecondaryButton>
+                )}
+                <SubmitButton />
+              </S.FormActionsTop>
+            </S.FormTitleRow>
 
-              {hasSubareas(form.setor) && (
+            <S.Card>
+              <h3>1. Identificação</h3>
+              <S.FormGrid>
                 <S.FormGroup>
-                  <label>Subárea *</label>
+                  <label>Setor *</label>
                   <S.StyledSelect
-                    name="subarea"
-                    value={form.subarea}
-                    onChange={handleSubareaChange}
+                    name="setor"
+                    value={form.setor}
+                    onChange={handleSetorChange}
                     required
                   >
-                    <option value="">Selecione uma subárea</option>
-                    {getSubareas(form.setor).map((option) => (
+                    <option value="">Selecione um setor</option>
+                    {setorOptions.map((option) => (
                       <option key={option} value={option}>
                         {option}
                       </option>
                     ))}
                   </S.StyledSelect>
                 </S.FormGroup>
-              )}
 
+                {hasSubareas(form.setor) && (
+                  <S.FormGroup>
+                    <label>Subárea *</label>
+                    <S.StyledSelect
+                      name="subarea"
+                      value={form.subarea}
+                      onChange={handleSubareaChange}
+                      required
+                    >
+                      <option value="">Selecione uma subárea</option>
+                      {getSubareas(form.setor).map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </S.StyledSelect>
+                  </S.FormGroup>
+                )}
+
+                <S.FormGroup>
+                  <label>Responsável pela entrevista *</label>
+                  <input
+                    type="text"
+                    name="responsavelEntrevista"
+                    value={form.responsavelEntrevista}
+                    onChange={handleChange}
+                    placeholder="Nome do responsável"
+                    required
+                  />
+                </S.FormGroup>
+
+                <S.FormGroup>
+                  <label>Participantes</label>
+                  <input
+                    type="text"
+                    name="participantes"
+                    value={form.participantes}
+                    onChange={handleChange}
+                    placeholder="Participantes da entrevista"
+                  />
+                </S.FormGroup>
+
+                <S.FormGroup>
+                  <label>Data *</label>
+                  <input
+                    type="date"
+                    name="data"
+                    value={form.data}
+                    onChange={handleChange}
+                    required
+                  />
+                </S.FormGroup>
+              </S.FormGrid>
+            </S.Card>
+
+            <QuestionarioBloco
+              titulo="2. Processos"
+              perguntas={[
+                { label: "Quais são os principais processos executados pelo setor? *", name: "principaisProcessos", required: true },
+                { label: "Quais atividades são feitas com frequência diária, semanal ou mensal?", name: "atividadesFrequencia" },
+                { label: "Quais informações o setor mais precisa consultar?", name: "informacoesConsultadas" },
+              ]}
+              form={form}
+              onChange={handleChange}
+            />
+
+            <QuestionarioBloco
+              titulo="3. Sistemas"
+              perguntas={[
+                { label: "Quais sistemas, planilhas ou ferramentas são usados hoje? *", name: "sistemasUtilizados", required: true },
+                { label: "Existe necessidade de consultar mais de uma fonte para concluir uma atividade?", name: "multiplasFontes" },
+              ]}
+              form={form}
+              onChange={handleChange}
+            />
+
+            <QuestionarioBloco
+              titulo="4. Gargalos"
+              perguntas={[
+                { label: "Quais atividades são manuais, repetitivas ou geram retrabalho? *", name: "atividadesManuaisRetrabalho", required: true },
+                { label: "Onde acontecem mais erros, inconsistências ou perda de tempo?", name: "errosPerdaTempo" },
+                { label: "Quais processos dependem de outro setor?", name: "dependenciaOutroSetor" },
+              ]}
+              form={form}
+              onChange={handleChange}
+            />
+
+            <QuestionarioBloco
+              titulo="5. Gestão e Melhoria"
+              perguntas={[
+                { label: "Quais relatórios, indicadores ou dashboards seriam úteis?", name: "relatoriosIndicadores" },
+                { label: "O que poderia ser automatizado, simplificado ou melhorado com maior impacto? *", name: "melhoriasImpacto", required: true },
+              ]}
+              form={form}
+              onChange={handleChange}
+            />
+
+            <S.Card>
+              <h3>Considerações Finais</h3>
               <S.FormGroup>
-                <label>Responsável pela entrevista *</label>
-                <input
-                  type="text"
-                  name="responsavelEntrevista"
-                  value={form.responsavelEntrevista}
+                <label>Sugestões adicionais ou oportunidades não citadas</label>
+                <textarea
+                  name="consideracoesFinais"
+                  value={form.consideracoesFinais}
                   onChange={handleChange}
-                  placeholder="Nome do responsável"
-                  required
+                  placeholder="Digite as considerações finais..."
                 />
               </S.FormGroup>
+            </S.Card>
 
-              <S.FormGroup>
-                <label>Participantes</label>
-                <input
-                  type="text"
-                  name="participantes"
-                  value={form.participantes}
-                  onChange={handleChange}
-                  placeholder="Participantes da entrevista"
-                />
-              </S.FormGroup>
-
-              <S.FormGroup>
-                <label>Data *</label>
-                <input
-                  type="date"
-                  name="data"
-                  value={form.data}
-                  onChange={handleChange}
-                  required
-                />
-              </S.FormGroup>
-            </S.FormGrid>
-          </S.Card>
-
-          <QuestionarioBloco
-            titulo="2. Processos"
-            perguntas={[
-              { label: "Quais são os principais processos executados pelo setor? *", name: "principaisProcessos", required: true },
-              { label: "Quais atividades são feitas com frequência diária, semanal ou mensal?", name: "atividadesFrequencia" },
-              { label: "Quais informações o setor mais precisa consultar?", name: "informacoesConsultadas" },
-            ]}
-            form={form}
-            onChange={handleChange}
-          />
-
-          <QuestionarioBloco
-            titulo="3. Sistemas"
-            perguntas={[
-              { label: "Quais sistemas, planilhas ou ferramentas são usados hoje? *", name: "sistemasUtilizados", required: true },
-              { label: "Existe necessidade de consultar mais de uma fonte para concluir uma atividade?", name: "multiplasFontes" },
-            ]}
-            form={form}
-            onChange={handleChange}
-          />
-
-          <QuestionarioBloco
-            titulo="4. Gargalos"
-            perguntas={[
-              { label: "Quais atividades são manuais, repetitivas ou geram retrabalho? *", name: "atividadesManuaisRetrabalho", required: true },
-              { label: "Onde acontecem mais erros, inconsistências ou perda de tempo?", name: "errosPerdaTempo" },
-              { label: "Quais processos dependem de outro setor?", name: "dependenciaOutroSetor" },
-            ]}
-            form={form}
-            onChange={handleChange}
-          />
-
-          <QuestionarioBloco
-            titulo="5. Gestão e Melhoria"
-            perguntas={[
-              { label: "Quais relatórios, indicadores ou dashboards seriam úteis?", name: "relatoriosIndicadores" },
-              { label: "O que poderia ser automatizado, simplificado ou melhorado com maior impacto? *", name: "melhoriasImpacto", required: true },
-            ]}
-            form={form}
-            onChange={handleChange}
-          />
-
-          <S.Card>
-            <h3>Considerações Finais</h3>
-            <S.FormGroup>
-              <label>Sugestões adicionais ou oportunidades não citadas</label>
-              <textarea
-                name="consideracoesFinais"
-                value={form.consideracoesFinais}
-                onChange={handleChange}
-                placeholder="Digite as considerações finais..."
-              />
-            </S.FormGroup>
-          </S.Card>
-        </S.Form>
+            {/* Botão enviar no rodapé */}
+            <S.FormFooter>
+              <SubmitButton />
+            </S.FormFooter>
+          </S.Form>
+        )}
 
         {podeVisualizarQuestionarios && (
           <S.ListSection>
@@ -539,7 +573,11 @@ function Questionarios() {
                 <FaClipboardList />
                 <h3>Nenhum questionário encontrado</h3>
                 <p>
-                  Cadastre a primeira resposta usando o formulário acima.
+                  {!formVisible && !editandoId ? (
+                    <>Clique em "Novo Questionário" para começar.</>
+                  ) : (
+                    "Cadastre a primeira resposta usando o formulário acima."
+                  )}
                 </p>
               </S.EmptyState>
             ) : (
@@ -595,6 +633,7 @@ function Questionarios() {
           </S.ListSection>
         )}
 
+        {/* Modais... */}
         {modalExcluir && (
           <S.ModalOverlay>
             <S.ModalCardSmall>
