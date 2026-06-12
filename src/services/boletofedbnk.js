@@ -96,7 +96,10 @@ export const emitirSegundaVia = async (fatura, boletos) => {
     const response = await api.post(
       `faturamento/emissao-segunda-via-boleto/${fatura}/`,
       boletos,
-      { headers: { 'Content-Type': 'application/json' } }
+      {
+        responseType: 'blob',
+        headers: { 'Content-Type': 'application/json' }
+      }
     );
     return response.data;
   } catch (error) {

@@ -83,7 +83,9 @@ const SegundaVia = () => {
     setEmitindo(true);
 
     try {
-      await emitirSegundaVia(numeroFatura, payload);
+      const blob = await emitirSegundaVia(numeroFatura, payload);
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
       enqueueSnackbar(`${selecionados.length} boleto(s) emitido(s) com sucesso!`, { variant: 'success' });
     } catch (error) {
       enqueueSnackbar('Erro ao emitir segunda via. Tente novamente.', { variant: 'error' });
@@ -158,6 +160,12 @@ const SegundaVia = () => {
             <S.ListTitle>
               <i className="bi bi-receipt"></i> Boletos
             </S.ListTitle>
+            {consulted && (
+              <S.PrimaryButton onClick={emitirSelecionados} disabled={emitindo}>
+                {emitindo ? <FaSpinner className="spinner" /> : <FaFileInvoiceDollar />}
+                {emitindo ? 'Emitindo...' : 'Emitir Segunda Via'}
+              </S.PrimaryButton>
+            )}
           </S.ListCardHeader>
 
           <S.FaturaInputWrapper style={{ maxWidth: 500, marginBottom: consulted ? '1.5rem' : 0 }}>
@@ -245,20 +253,12 @@ const SegundaVia = () => {
                   </S.TableWrapper>
 
                   <S.ActionsRow>
-                    <S.ActionsLeft>
-                      <S.SecondaryButton onClick={toggleAll}>
-                        {allFilteredSelected ? 'Desmarcar Todos' : 'Marcar Todos'}
-                      </S.SecondaryButton>
-                      <S.SelectedInfo>
-                        <strong>{selectedCount}</strong> boleto{selectedCount !== 1 ? 's' : ''} selecionado{selectedCount !== 1 ? 's' : ''}
-                      </S.SelectedInfo>
-                    </S.ActionsLeft>
-                    <S.ActionsRight>
-                      <S.PrimaryButton onClick={emitirSelecionados} disabled={emitindo}>
-                        {emitindo ? <FaSpinner className="spinner" /> : <FaFileInvoiceDollar style={{ marginRight: 6 }} />}
-                        {emitindo ? 'Emitindo...' : 'Emitir Segunda Via'}
-                      </S.PrimaryButton>
-                    </S.ActionsRight>
+                    <S.SecondaryButton onClick={toggleAll}>
+                      {allFilteredSelected ? 'Desmarcar Todos' : 'Marcar Todos'}
+                    </S.SecondaryButton>
+                    <S.SelectedInfo>
+                      <strong>{selectedCount}</strong> boleto{selectedCount !== 1 ? 's' : ''} selecionado{selectedCount !== 1 ? 's' : ''}
+                    </S.SelectedInfo>
                   </S.ActionsRow>
                 </>
               )}
