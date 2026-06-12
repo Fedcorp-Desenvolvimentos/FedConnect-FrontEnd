@@ -458,9 +458,9 @@ function Questionarios() {
           <QuestionarioBloco
             titulo="2. Processos"
             perguntas={[
-              { label: "1. Quais são os principais processos executados pelo setor? *", name: "principaisProcessos", required: true },
-              { label: "2. Quais atividades são feitas com frequência diária, semanal ou mensal?", name: "atividadesFrequencia" },
-              { label: "3. Quais informações o setor mais precisa consultar?", name: "informacoesConsultadas" },
+              { label: "Quais são os principais processos executados pelo setor? *", name: "principaisProcessos", required: true },
+              { label: "Quais atividades são feitas com frequência diária, semanal ou mensal?", name: "atividadesFrequencia" },
+              { label: "Quais informações o setor mais precisa consultar?", name: "informacoesConsultadas" },
             ]}
             form={form}
             onChange={handleChange}
@@ -469,8 +469,8 @@ function Questionarios() {
           <QuestionarioBloco
             titulo="3. Sistemas"
             perguntas={[
-              { label: "4. Quais sistemas, planilhas ou ferramentas são usados hoje? *", name: "sistemasUtilizados", required: true },
-              { label: "5. Existe necessidade de consultar mais de uma fonte para concluir uma atividade?", name: "multiplasFontes" },
+              { label: "Quais sistemas, planilhas ou ferramentas são usados hoje? *", name: "sistemasUtilizados", required: true },
+              { label: "Existe necessidade de consultar mais de uma fonte para concluir uma atividade?", name: "multiplasFontes" },
             ]}
             form={form}
             onChange={handleChange}
@@ -479,9 +479,9 @@ function Questionarios() {
           <QuestionarioBloco
             titulo="4. Gargalos"
             perguntas={[
-              { label: "6. Quais atividades são manuais, repetitivas ou geram retrabalho? *", name: "atividadesManuaisRetrabalho", required: true },
-              { label: "7. Onde acontecem mais erros, inconsistências ou perda de tempo?", name: "errosPerdaTempo" },
-              { label: "8. Quais processos dependem de outro setor?", name: "dependenciaOutroSetor" },
+              { label: "Quais atividades são manuais, repetitivas ou geram retrabalho? *", name: "atividadesManuaisRetrabalho", required: true },
+              { label: "Onde acontecem mais erros, inconsistências ou perda de tempo?", name: "errosPerdaTempo" },
+              { label: "Quais processos dependem de outro setor?", name: "dependenciaOutroSetor" },
             ]}
             form={form}
             onChange={handleChange}
@@ -490,15 +490,15 @@ function Questionarios() {
           <QuestionarioBloco
             titulo="5. Gestão e Melhoria"
             perguntas={[
-              { label: "9. Quais relatórios, indicadores ou dashboards seriam úteis?", name: "relatoriosIndicadores" },
-              { label: "10. O que poderia ser automatizado, simplificado ou melhorado com maior impacto? *", name: "melhoriasImpacto", required: true },
+              { label: "Quais relatórios, indicadores ou dashboards seriam úteis?", name: "relatoriosIndicadores" },
+              { label: "O que poderia ser automatizado, simplificado ou melhorado com maior impacto? *", name: "melhoriasImpacto", required: true },
             ]}
             form={form}
             onChange={handleChange}
           />
 
           <S.Card>
-            <h3>6. Considerações Finais</h3>
+            <h3>Considerações Finais</h3>
             <S.FormGroup>
               <label>Sugestões adicionais ou oportunidades não citadas</label>
               <textarea
