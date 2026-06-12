@@ -25,6 +25,7 @@ const SETORES_CONFIG = {
   "Mapa de Setores": {
     type: "main",
     options: [
+      "Tecnologia da Informação",
       "Seguro Fiança",
       "Seguro de Automóvel",
       "Seguro de Vida Individual",
