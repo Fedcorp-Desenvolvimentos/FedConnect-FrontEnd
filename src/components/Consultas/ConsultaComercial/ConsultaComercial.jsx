@@ -1,6 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaBriefcase, FaFileExcel, FaSearch, FaMapMarkerAlt, FaFilm, FaTimes, FaSpinner, FaChartLine } from "react-icons/fa";
+import { FaBriefcase, 
+  FaFileExcel, 
+  FaSearch, 
+  FaMapMarkerAlt, 
+  FaFilm, 
+  FaTimes, 
+  FaSpinner, 
+  FaChartLine,
+  FaFileAlt 
+} from "react-icons/fa";
 import { IoIosBusiness } from "react-icons/io";
 import { FiUsers, FiSettings } from "react-icons/fi";
 import * as XLSX from "xlsx";
@@ -241,6 +250,7 @@ const ConsultaComercial = () => {
     operacional: [
       { id: "conteudo", label: "Estudo Conteúdo", icon: <FaSearch />, isExternal: true, path: "/cotacao-conteudo" },
       { id: "produtos", label: "Apresentação Comercial", icon: <FaFilm />, isExternal: true, path: "/produtos" },
+      { id: "material", label: "Materiais Comerciais", icon: <FaFileAlt />, isExternal: true, path: "/material" },
     ],
   };
 
@@ -369,14 +379,14 @@ const ConsultaComercial = () => {
                 <FaTimes />
               </S.ModalClose>
               <S.ModalTitle>Informações Básicas</S.ModalTitle>
-              
+
               {modalLoading && (
                 <S.ModalLoading>
                   <FaSpinner className="spinner" />
                   <p>Buscando detalhes de contato...</p>
                 </S.ModalLoading>
               )}
-              
+
               {modalError && <S.ErrorMessage>{modalError}</S.ErrorMessage>}
 
               {modalPersonData && !modalLoading && !modalError && (
@@ -411,3 +421,4 @@ const ConsultaComercial = () => {
 };
 
 export default ConsultaComercial;
+
