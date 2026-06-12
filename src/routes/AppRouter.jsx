@@ -55,6 +55,7 @@ import Acompanhamento from '../components/Comercial/DashboardComercial';
 import AgendaComercial from '../components/Comercial/AgendaComercial';
 import Financeiro from '../components/Comercial/Financeiro';
 import Produtos from '../components/Produtos/Produtos';
+import Material from '../pages/Comercial/materiais/ComercialMateriais.jsx';
 
 // Faturamento
 // import OperacionalHome from '../components/Faturamento/OperacionalHome';
@@ -159,6 +160,7 @@ const AppRouter = () => {
           <Route path="/acompanhamento" element={<Acompanhamento />} />
           <Route path="/financeiro" element={<Financeiro />} />
           <Route path="/produtos" element={<Produtos />} />
+          <Route path="/material" element={<Material />} />
 
           {/* Faturamento */}
           <Route path="/faturamento" element={<FaturamentoHome />} />
