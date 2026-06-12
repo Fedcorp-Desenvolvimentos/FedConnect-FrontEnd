@@ -85,7 +85,12 @@ const SegundaVia = () => {
     try {
       const blob = await emitirSegundaVia(numeroFatura, payload);
       const url = window.URL.createObjectURL(blob);
-      window.open(url, '_blank');
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `segunda-via-${numeroFatura}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       enqueueSnackbar(`${selecionados.length} boleto(s) emitido(s) com sucesso!`, { variant: 'success' });
     } catch (error) {
       enqueueSnackbar('Erro ao emitir segunda via. Tente novamente.', { variant: 'error' });
