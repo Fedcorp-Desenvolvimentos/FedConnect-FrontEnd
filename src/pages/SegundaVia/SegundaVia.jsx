@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { FaSearch, FaFileInvoiceDollar, FaSpinner, FaTimesCircle, FaCheckCircle, FaExclamationTriangle, FaBuilding } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
-import * as S from './SegundaVia';
+import * as S from './SegundaViaStyles';
 import PageLayout from '../../Layouts/PageLayout/PageLayout';
 import { consultarSegundaVia, emitirSegundaVia } from '../../services/boletofedbnk';
 
