@@ -2,22 +2,18 @@
 import styled, { keyframes } from 'styled-components';
 
 const fadeIn = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
 `;
 
 const fadeOut = keyframes`
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.97); }
 `;
 
-// Overlay com blur - fundo claro
 export const Overlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -25,39 +21,30 @@ export const Overlay = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  animation: ${props => props.$isExiting ? fadeOut : fadeIn} 0.3s ease forwards;
-  pointer-events: ${props => props.$isExiting ? 'none' : 'auto'};
+  animation: ${({ $isExiting }) => ($isExiting ? fadeOut : fadeIn)} 0.3s ease forwards;
+  pointer-events: ${({ $isExiting }) => ($isExiting ? 'none' : 'auto')};
 `;
 
-// Container principal
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 24px;
-  padding: 32px;
-  background: white;
+  padding: 36px 44px;
+  background: #ffffff;
   border-radius: 24px;
-  box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.08);
   opacity: 0;
-  animation: ${props => props.$isExiting ? fadeOut : fadeIn} 0.3s ease forwards;
-  animation-delay: ${props => props.$isExiting ? '0s' : '0.05s'};
-
-  @media (max-width: 768px) {
-    padding: 24px;
-    gap: 20px;
-    border-radius: 20px;
-  }
+  animation: ${({ $isExiting }) => ($isExiting ? fadeOut : fadeIn)} 0.3s ease forwards;
+  animation-delay: ${({ $isExiting }) => ($isExiting ? '0s' : '0.05s')};
 
   @media (max-width: 480px) {
-    padding: 20px;
-    gap: 16px;
-    border-radius: 16px;
+    padding: 24px 28px;
+    gap: 18px;
+    border-radius: 20px;
   }
 `;
 
-// Wrapper da logo
 export const LogoWrapper = styled.div`
   position: relative;
   width: 220px;
@@ -66,94 +53,64 @@ export const LogoWrapper = styled.div`
   align-items: center;
   justify-content: center;
 
-  @media (max-width: 768px) {
-    width: 180px;
-    height: 180px;
-  }
-
   @media (max-width: 480px) {
-    width: 150px;
-    height: 150px;
+    width: 170px;
+    height: 170px;
   }
 `;
 
-// Logo
-export const LogoImg = styled.img`
-  width: 130px;
-  height: 130px;
-  object-fit: contain;
-  z-index: 2;
-  display: block;
-  
-  @media (max-width: 768px) {
-    width: 100px;
-    height: 100px;
-  }
-
-  @media (max-width: 480px) {
-    width: 80px;
-    height: 80px;
-  }
-`;
-
-// SVG do progresso circular
-export const ProgressSvg = styled.svg`
+/* Full-size SVG overlay, rings rotate via transform in JSX */
+export const OrbitalSvg = styled.svg`
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
-  transform: rotate(-90deg);
+  overflow: visible;
 `;
 
-// Badge de porcentagem - dentro do círculo, abaixo da logo
-export const PercentageBadge = styled.div`
-  position: absolute;
-  bottom: 25px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 18px;
-  font-weight: 700;
-  color: #2563eb;
-  padding: 4px 12px;
-  border-radius: 20px;
-  z-index: 3;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, monospace;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  white-space: nowrap;
-  
-  @media (max-width: 768px) {
-    bottom: 20px;
-    font-size: 16px;
-    padding: 3px 10px;
-  }
+export const LogoImg = styled.img`
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
 
   @media (max-width: 480px) {
-    bottom: 15px;
-    font-size: 14px;
-    padding: 2px 8px;
+    width: 76px;
+    height: 76px;
   }
 `;
 
-// Container da mensagem
-export const MessageContainer = styled.div`
-  text-align: center;
-  opacity: 0;
-  animation: ${props => props.$isExiting ? fadeOut : fadeIn} 0.3s ease forwards;
-  animation-delay: ${props => props.$isExiting ? '0s' : '0.1s'};
-`;
+export const PercentageBadge = styled.div`
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 15px;
+  font-weight: 600;
+  color: #185FA5;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, monospace;
+  white-space: nowrap;
+  z-index: 3;
 
-// Texto da mensagem
-export const MessageText = styled.p`
-  color: #64748b;
-  font-size: 14px;
-  font-weight: 500;
-  margin: 0;
-  letter-spacing: 0.3px;
-
-  @media (max-width: 768px) {
+  @media (max-width: 480px) {
+    bottom: 16px;
     font-size: 13px;
   }
+`;
+
+export const MessageContainer = styled.div`
+  opacity: 0;
+  animation: ${({ $isExiting }) => ($isExiting ? fadeOut : fadeIn)} 0.3s ease forwards;
+  animation-delay: ${({ $isExiting }) => ($isExiting ? '0s' : '0.1s')};
+`;
+
+export const MessageText = styled.p`
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0.3px;
 
   @media (max-width: 480px) {
     font-size: 12px;
