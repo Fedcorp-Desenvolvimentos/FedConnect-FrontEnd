@@ -138,6 +138,8 @@ function Questionarios() {
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
+  // console.log("user", user); // Log para verificar o conteúdo de user
+
   const podeVisualizarQuestionarios =
     user?.nivel_acesso?.toLowerCase() === "admin" ||
     user?.nivel_acesso?.toLowerCase() === "ti";
@@ -265,6 +267,7 @@ function Questionarios() {
     
     const dadosParaEnvio = {
       ...form,
+      userId: user.id,
       setor: form.subarea ? `${form.setor} - ${form.subarea}` : form.setor
     };
     
@@ -278,6 +281,7 @@ function Questionarios() {
         enqueueSnackbar('Questionário atualizado com sucesso.', { variant: 'success' });
       } else {
         await enviarQuestionario(dadosParaEnvio);
+        // console.log("Dados a serem enviados:", dadosParaEnvio); // Log dos dados formatados
         enqueueSnackbar('Questionário enviado com sucesso.', { variant: 'success' });
       }
       await carregarQuestionarios();
@@ -545,7 +549,7 @@ function Questionarios() {
           </S.Form>
         )}
 
-        {podeVisualizarQuestionarios && (
+        {/* {podeVisualizarQuestionarios && (
           <S.ListSection>
             <S.ListHeader>
               <div>
@@ -631,7 +635,7 @@ function Questionarios() {
               </S.TableWrapper>
             )}
           </S.ListSection>
-        )}
+        )} */}
 
         {/* Modais... */}
         {modalExcluir && (
