@@ -57,6 +57,9 @@ import Financeiro from '../components/Comercial/Financeiro';
 import Produtos from '../components/Produtos/Produtos';
 import Material from '../pages/Comercial/materiais/ComercialMateriais.jsx';
 
+// Financeiro
+import FinanceiroComissionamento from '../pages/Financeiro/comissoes/EmissaoRecibosComissoes.jsx';
+
 // Faturamento
 // import OperacionalHome from '../components/Faturamento/OperacionalHome';
 import FaturamentoHome from '../pages/Faturamento/FaturamentoHome';
@@ -169,6 +172,9 @@ const AppRouter = () => {
           <Route path="/faturamento/reimpressao-boleto" element={<ReimpressaoBoleto />} />
           <Route path="/faturamento/paybox" element={<Payxbox />} />
           <Route path="/faturamento/segunda-via" element={<SegundaVia />} />
+          
+          {/* Financeiro */}
+           <Route path="/financeiro/comissao" element={<FinanceiroComissionamento />} />
 
           {/* Automação */}
           <Route path="/automacao" element={<AutomacaoHome />} />

@@ -62,7 +62,8 @@ const SETORES_CONFIG = {
       "Gerenciamento das clínicas",
       "Emissão de propostas",
       "Agendamento de visitas",
-      "Elaboração de documentos"
+      "Elaboração de documentos",
+      "Cursos"
     ]
   }
 };

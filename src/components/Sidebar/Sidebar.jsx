@@ -1,21 +1,22 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { 
-  FaHome, 
-  FaClipboardList, 
-  FaBriefcase, 
-  FaTools, 
-  FaWallet, 
-  FaChartBar, 
+import {
+  FaHome,
+  FaClipboardList,
+  FaBriefcase,
+  FaTools,
+  FaWallet,
+  FaChartBar,
   FaCalendarAlt,
   FaChartLine,
   FaCog,
   FaProjectDiagram,
   FaUsers,
-  
+
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import * as S from "./SidebarStyles";
+import { DollarSign } from "lucide-react";
 
 function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
   const [overlayVisible, setOverlayVisible] = useState(false);
@@ -33,7 +34,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
       setIsMobile(mobile);
       if (!mobile) setSidebarOpen(true);
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [setSidebarOpen]);
@@ -44,14 +45,14 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
 
   useEffect(() => {
     if (!isMobile) return;
-    
+
     function handleClickOutside(e) {
       if (sidebarOpen && sidebarRef.current && !sidebarRef.current.contains(e.target)) {
         setSidebarOpen(false);
         setOverlayVisible(false);
       }
     }
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [sidebarOpen, setSidebarOpen, isMobile]);
@@ -80,7 +81,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
     { path: "/agenda", label: "Agenda", icon: <FaCalendarAlt />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     { path: "/automacao", label: "Automação", icon: <FaCog />, allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin"] : [] },
     { path: "/analytics", label: "Estatísticas", icon: <FaChartLine />, allowed: ["admin"] },
-    { path: "/questionarios", label: "Questionário", icon: <FaClipboardList  />, allowed: ["admin", "ti"] },
+    { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ["admin", "ti"] },
+    // { path: "/financeiro/comissao", label: "Financeiro", icon: <DollarSign />, allowed: ["admin", "ti"] },
     // { path: "/workflow", label: "Workflow", icon: <FaProjectDiagram />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     // { path: "/rh", label: "Recursos Humanos", icon: <FaUsers />, allowed: ["admin"] },
   ];
@@ -94,23 +96,23 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
         }} />
       )}
 
-      <S.SidebarContainer 
+      <S.SidebarContainer
         ref={sidebarRef}
         $isOpen={sidebarOpen}
         aria-label="Menu lateral principal"
       >
         <S.SidebarHeader>
           <S.LogoLink href="/home" onClick={handleLinkClick}>
-            <S.Logo 
-              src="/imagens/LOGO.png" 
+            <S.Logo
+              src="/imagens/LOGO.png"
               alt="Fedcorp Logo"
               $isClosed={!sidebarOpen}
               $isMobile={isMobile}
             />
           </S.LogoLink>
-          
+
           {isMobile && (
-            <S.CloseButton 
+            <S.CloseButton
               $isOpen={sidebarOpen}
               onClick={() => {
                 setSidebarOpen(false);
@@ -127,10 +129,10 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
           <ul>
             {navItems.map((item) => {
               if (!item.allowed.includes(nivelAcesso)) return null;
-              const isActive = location.pathname === item.path || 
-                              (item.path === "/consultas" && location.pathname.startsWith("/consultas")) ||
-                              (item.path === "/faturamento" && location.pathname.startsWith("/faturamento"));
-              
+              const isActive = location.pathname === item.path ||
+                (item.path === "/consultas" && location.pathname.startsWith("/consultas")) ||
+                (item.path === "/faturamento" && location.pathname.startsWith("/faturamento"));
+
               return (
                 <li key={item.path} className={isActive ? "active" : ""}>
                   <S.NavLink
