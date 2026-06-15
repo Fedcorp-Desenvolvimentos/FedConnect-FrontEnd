@@ -21,6 +21,7 @@
     "axios": "^1.9.0",
     "bootstrap-icons": "^1.13.1",
     "date-fns": "^4.1.0",
+    "file-saver": "^2.0.5",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.513.0",
     "notistack": "^3.0.2",

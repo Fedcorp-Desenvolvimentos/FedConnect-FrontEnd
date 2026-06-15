@@ -11,7 +11,10 @@ import {
   FaEye,
   FaSpinner,
   FaPlus,
+  FaFileExcel,
 } from 'react-icons/fa';
+import * as XLSX from "xlsx";
+import { saveAs } from 'file-saver';
 import { useAuth } from '../../context/AuthContext';
 import * as S from './QuestionariosStyles';
 import PageLayout from '../../Layouts/PageLayout/PageLayout';
@@ -383,6 +386,49 @@ function Questionarios() {
     return item.subarea ? `${item.setor} - ${item.subarea}` : item.setor;
   };
 
+  const exportarQuestionariosExcel = () => {
+  if (questionariosFiltrados.length === 0) {
+    enqueueSnackbar("Não há respostas para exportar.", { variant: "warning" });
+    return;
+  }
+
+  const dadosExportacao = questionariosFiltrados.map((item) => ({
+    "Setor": exibirSetorCompleto(item),
+    "Responsável pela entrevista": item.responsavelEntrevista || "",
+    "Participantes": item.participantes || "",
+    "Data": formatarData(item.data),
+    "Principais processos": item.principaisProcessos || "",
+    "Atividades por frequência": item.atividadesFrequencia || "",
+    "Informações consultadas": item.informacoesConsultadas || "",
+    "Sistemas utilizados": item.sistemasUtilizados || "",
+    "Consulta em múltiplas fontes": item.multiplasFontes || "",
+    "Atividades manuais / retrabalho": item.atividadesManuaisRetrabalho || "",
+    "Erros / inconsistências / perda de tempo": item.errosPerdaTempo || "",
+    "Dependência de outro setor": item.dependenciaOutroSetor || "",
+    "Relatórios / indicadores / dashboards": item.relatoriosIndicadores || "",
+    "Melhorias de maior impacto": item.melhoriasImpacto || "",
+    "Considerações finais": item.consideracoesFinais || "",
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(dadosExportacao);
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Questionarios");
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "array",
+  });
+
+  const blob = new Blob([excelBuffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+
+  saveAs(blob, `questionarios_admin_${new Date().toISOString().slice(0, 10)}.xlsx`);
+
+  enqueueSnackbar("Arquivo Excel gerado com sucesso.", { variant: "success" });
+};
+
   // Botão de enviar/submit reutilizável
   const SubmitButton = () => (
     <S.PrimaryButton type="submit" disabled={submitting}>
@@ -580,21 +626,33 @@ function Questionarios() {
         {/* LISTA DE QUESTIONÁRIOS - DESCOMENTADA */}
         {podeVisualizarQuestionarios && (
           <S.ListSection>
-            <S.ListHeader>
-              <div>
-                <h2>Respostas cadastradas</h2>
-                <p>Consulte, edite ou exclua respostas já registradas.</p>
-              </div>
-              <S.SearchBox>
-                <FaSearch />
-                <input
-                  type="text"
-                  value={busca}
-                  onChange={(e) => setBusca(e.target.value)}
-                  placeholder="Buscar por setor, responsável ou participante"
-                />
-              </S.SearchBox>
-            </S.ListHeader>
+          <S.ListHeader>
+  <div>
+    <h2>Respostas cadastradas</h2>
+    <p>Consulte, edite, exclua ou extraia respostas já registradas.</p>
+  </div>
+
+  <S.ListActions>
+    <S.ExportButton
+      type="button"
+      onClick={exportarQuestionariosExcel}
+      disabled={carregandoLista || questionariosFiltrados.length === 0}
+    >
+      <FaFileExcel />
+      Exportar Excel
+    </S.ExportButton>
+
+    <S.SearchBox>
+      <FaSearch />
+      <input
+        type="text"
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        placeholder="Buscar por setor, responsável ou participante"
+      />
+    </S.SearchBox>
+  </S.ListActions>
+</S.ListHeader>
 
             {carregandoLista ? (
               <S.EmptyState>
