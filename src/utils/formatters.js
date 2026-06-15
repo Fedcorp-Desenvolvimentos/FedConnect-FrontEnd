@@ -1,0 +1,99 @@
+export function parseNumberBR(value) {
+  if (typeof value === "number") return value;
+  if (value === null || value === undefined || value === "") return Number.NaN;
+
+  const cleaned = String(value).trim().replace(/[^\d,.-]/g, "");
+  if (!cleaned) return Number.NaN;
+
+  const hasComma = cleaned.includes(",");
+  const hasDot = cleaned.includes(".");
+  let normalized = cleaned;
+
+  if (hasComma && hasDot) {
+    normalized =
+      cleaned.lastIndexOf(",") > cleaned.lastIndexOf(".")
+        ? cleaned.replace(/\./g, "").replace(",", ".")
+        : cleaned.replace(/,/g, "");
+  } else if (hasComma) {
+    normalized = cleaned.replace(",", ".");
+  } else if (hasDot) {
+    const parts = cleaned.split(".");
+    const lastPart = parts[parts.length - 1];
+    if (parts.length > 2 || lastPart.length === 3) {
+      normalized = cleaned.replace(/\./g, "");
+    }
+  }
+
+  return Number(normalized);
+}
+
+export function formatCurrencyBR(value, fallback = "R$ 0,00") {
+  if (value === null || value === undefined || value === "") return fallback;
+
+  const numberValue = parseNumberBR(value);
+  if (Number.isNaN(numberValue)) return fallback;
+
+  return numberValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+export function formatPercentBR(value, fallback = "0%") {
+  if (value === null || value === undefined || value === "") return fallback;
+
+  const numberValue = parseNumberBR(value);
+  if (Number.isNaN(numberValue)) return fallback;
+
+  return `${numberValue.toFixed(2).replace(".", ",")}%`;
+}
+
+export function formatNumberBR(value, fallback = "0", options = {}) {
+  if (value === null || value === undefined || value === "") return fallback;
+
+  const numberValue = parseNumberBR(value);
+  if (Number.isNaN(numberValue)) return fallback;
+
+  return numberValue.toLocaleString("pt-BR", options);
+}
+
+export function formatDateBR(value, fallback = "", options = {}) {
+  const { invalidFallback = fallback, timeZone } = options;
+  if (!value) return fallback;
+
+  if (typeof value === "string") {
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) return value;
+
+    const dateMatch = value.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+
+    if (dateMatch) {
+      const [, year, month, day] = dateMatch;
+      return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+    }
+  }
+
+  const date = value instanceof Date ? value : new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return typeof invalidFallback === "function"
+      ? invalidFallback(value)
+      : invalidFallback;
+  }
+
+  return date.toLocaleDateString(
+    "pt-BR",
+    timeZone ? { timeZone } : undefined
+  );
+}
+
+export function formatTimeHHMM(value, fallback = "--:--") {
+  if (!value) return fallback;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  return String(value).slice(0, 5) || fallback;
+}
