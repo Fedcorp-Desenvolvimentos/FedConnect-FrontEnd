@@ -403,7 +403,7 @@ function Questionarios() {
               <FaClipboardList />
               Levantamento de Processos
             </S.HeaderTag>
-            <S.HeaderTitle>Questionários</S.HeaderTitle>
+            {/* <S.HeaderTitle>Questionários</S.HeaderTitle> */}
             <S.HeaderSubtitle>
               Cadastro de respostas para mapear processos, gargalos, oportunidades
               de automação e melhorias operacionais.
