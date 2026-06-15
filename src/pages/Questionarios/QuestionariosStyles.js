@@ -31,7 +31,6 @@ export const PageContainer = styled.div`
   width: 100%;
   min-height: 100vh;
   padding: 1.5rem;
-  background: #f5f7fb;
   color: #1f2937;
 
   @media (max-width: 560px) {
@@ -41,18 +40,24 @@ export const PageContainer = styled.div`
 
 export const Header = styled.section`
   display: flex;
-  align-items: stretch;
+  align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
   margin-bottom: 1.25rem;
+  flex-wrap: wrap;
 
   @media (max-width: 900px) {
     flex-direction: column;
+    align-items: stretch;
   }
 `;
 
 export const HeaderContent = styled.div`
   flex: 1;
+  
+  @media (max-width: 900px) {
+    text-align: center;
+  }
 `;
 
 export const HeaderTag = styled.span`
@@ -613,8 +618,6 @@ export const StyledSelect = styled.select`
   }
 `;
 
-// Adicione no QuestionariosStyles.js
-
 export const NewButton = styled(PrimaryButton)`
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   padding: 0.75rem 1.5rem;
@@ -624,6 +627,31 @@ export const NewButton = styled(PrimaryButton)`
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  /* Responsividade */
+  @media (max-width: 900px) {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.8125rem;
+  }
+
+  @media (max-width: 640px) {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    white-space: normal;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+
+  svg {
+    @media (max-width: 640px) {
+      font-size: 0.875rem;
+    }
   }
 `;
 
