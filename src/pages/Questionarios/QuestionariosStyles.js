@@ -645,3 +645,42 @@ export const FormFooter = styled.div`
   }
 `;
 
+export const ListActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+export const ExportButton = styled.button`
+  border: none;
+  background: #1f8f4d;
+  color: #ffffff;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #18743e;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+`;
