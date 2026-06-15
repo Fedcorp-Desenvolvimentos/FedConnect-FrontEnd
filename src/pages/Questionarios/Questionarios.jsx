@@ -138,8 +138,6 @@ function Questionarios() {
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
-  // console.log("user", user); // Log para verificar o conteúdo de user
-
   const podeVisualizarQuestionarios =
     user?.nivel_acesso?.toLowerCase() === "admin" ||
     user?.nivel_acesso?.toLowerCase() === "ti";
@@ -227,8 +225,28 @@ function Questionarios() {
     setCarregandoLista(true);
     try {
       const response = await listarQuestionarios();
-      // O response já é o array de dados diretamente, não response.data
-      const dados = Array.isArray(response) ? response : (response.data || []);
+
+      console.log("Resposta da API:", response);
+
+      // A resposta do Django REST Framework tem a estrutura { count, next, previous, results }
+      // Os dados estão em response.results ou response.data.results
+      let dados = [];
+      
+      if (response.results) {
+        // Formato paginado do DRF
+        dados = response.results;
+      } else if (Array.isArray(response)) {
+        // Formato array direto
+        dados = response;
+      } else if (response.data && response.data.results) {
+        // Caso o axios tenha envelopado em .data
+        dados = response.data.results;
+      } else if (response.data && Array.isArray(response.data)) {
+        dados = response.data;
+      } else {
+        dados = [];
+      }
+
       const dadosConvertidos = dados.map(item => ({
         id: item.id,
         setor: item.setor,
@@ -248,6 +266,7 @@ function Questionarios() {
         melhoriasImpacto: item.melhorias_impacto,
         consideracoesFinais: item.consideracoes_finais,
       }));
+      
       setQuestionarios(dadosConvertidos);
     } catch (error) {
       console.error('Erro ao carregar questionários:', error);
@@ -265,13 +284,13 @@ function Questionarios() {
     e.preventDefault();
     if (!validarFormulario()) return;
     
+    // Prepara os dados para envio - NÃO envia userId
     const dadosParaEnvio = {
       ...form,
-      userId: user.id,
-      setor: form.subarea ? `${form.setor} - ${form.subarea}` : form.setor
+      setor: form.subarea ? `${form.setor} - ${form.subarea}` : form.setor,
     };
     
-    // Remove subarea do envio se não for necessário
+    // Remove subarea do envio
     delete dadosParaEnvio.subarea;
     
     setSubmitting(true);
@@ -279,16 +298,26 @@ function Questionarios() {
       if (editandoId) {
         await atualizarQuestionario(editandoId, dadosParaEnvio);
         enqueueSnackbar('Questionário atualizado com sucesso.', { variant: 'success' });
+        await carregarQuestionarios();
+        limparFormulario();
       } else {
         await enviarQuestionario(dadosParaEnvio);
-        // console.log("Dados a serem enviados:", dadosParaEnvio); // Log dos dados formatados
         enqueueSnackbar('Questionário enviado com sucesso.', { variant: 'success' });
+        await carregarQuestionarios();
+        limparFormulario();
       }
-      await carregarQuestionarios();
-      limparFormulario();
     } catch (error) {
       console.error('Erro ao salvar:', error);
-      enqueueSnackbar(error.response?.data?.message || 'Erro ao salvar questionário', { variant: 'error' });
+      
+      // Tratamento específico para erro de duplicata
+      if (error.response?.data?.code === 'duplicate_submission') {
+        enqueueSnackbar(
+          'Você já enviou um questionário. Cada usuário pode enviar apenas um questionário.', 
+          { variant: 'warning' }
+        );
+      } else {
+        enqueueSnackbar(error.response?.data?.message || 'Erro ao salvar questionário', { variant: 'error' });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -542,14 +571,14 @@ function Questionarios() {
               </S.FormGroup>
             </S.Card>
 
-            {/* Botão enviar no rodapé */}
             <S.FormFooter>
               <SubmitButton />
             </S.FormFooter>
           </S.Form>
         )}
 
-        {/* {podeVisualizarQuestionarios && (
+        {/* LISTA DE QUESTIONÁRIOS - DESCOMENTADA */}
+        {podeVisualizarQuestionarios && (
           <S.ListSection>
             <S.ListHeader>
               <div>
@@ -635,9 +664,8 @@ function Questionarios() {
               </S.TableWrapper>
             )}
           </S.ListSection>
-        )} */}
+        )}
 
-        {/* Modais... */}
         {modalExcluir && (
           <S.ModalOverlay>
             <S.ModalCardSmall>
