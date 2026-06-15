@@ -135,7 +135,7 @@ const SegundaVia = () => {
           status: 'pendente',
         }));
 
-        setAdministradora(response.dados[0].EMISSOR);
+        setAdministradora(response.dados[0].ESTIPULANTE);
         setNumeroFatura(response.dados[0].FATURA_NUM);
         setDadosOriginais(response.dados);
         setBoletos(normalizados);
