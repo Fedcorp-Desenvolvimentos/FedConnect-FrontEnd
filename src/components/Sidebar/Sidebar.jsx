@@ -81,8 +81,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
     { path: "/agenda", label: "Agenda", icon: <FaCalendarAlt />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     { path: "/automacao", label: "Automação", icon: <FaCog />, allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin"] : [] },
     { path: "/analytics", label: "Estatísticas", icon: <FaChartLine />, allowed: ["admin"] },
-    { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ["admin", "ti"] },
-    // { path: "/financeiro/comissao", label: "Financeiro", icon: <DollarSign />, allowed: ["admin", "ti"] },
+    { path: "/questionarios", label: "Questionário", icon: <FaClipboardList  />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
+ main
     // { path: "/workflow", label: "Workflow", icon: <FaProjectDiagram />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     // { path: "/rh", label: "Recursos Humanos", icon: <FaUsers />, allowed: ["admin"] },
   ];
