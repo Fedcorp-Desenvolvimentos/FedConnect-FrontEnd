@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { FaSearch, FaFileInvoiceDollar, FaSpinner, FaTimesCircle, FaCheckCircle, FaExclamationTriangle, FaBuilding } from 'react-icons/fa';
+import { FaSearch, FaFileInvoiceDollar, FaSpinner, FaTimesCircle, FaCheckCircle, FaExclamationTriangle, FaBuilding, FaBarcode } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import * as S from './SegundaViaStyles';
 import PageLayout from '../../Layouts/PageLayout/PageLayout';
@@ -42,6 +42,8 @@ const SegundaVia = () => {
 
   const allFilteredSelected = filteredBoletos.length > 0 &&
     filteredBoletos.every(b => selectedIds.has(b.id));
+
+  const someFilteredSelected = filteredBoletos.some(b => selectedIds.has(b.id));
 
   const selectedCount = selectedIds.size;
 
@@ -105,6 +107,11 @@ const SegundaVia = () => {
       return;
     }
 
+    // Reset state on new search
+    setConsulted(false);
+    setBoletos([]);
+    setSelectedIds(new Set());
+    setFiltro('');
     setLoading(true);
 
     try {
@@ -165,15 +172,10 @@ const SegundaVia = () => {
             <S.ListTitle>
               <i className="bi bi-receipt"></i> Boletos
             </S.ListTitle>
-            {consulted && (
-              <S.PrimaryButton onClick={emitirSelecionados} disabled={emitindo}>
-                {emitindo ? <FaSpinner className="spinner" /> : <FaFileInvoiceDollar />}
-                {emitindo ? 'Emitindo...' : 'Emitir Segunda Via'}
-              </S.PrimaryButton>
-            )}
           </S.ListCardHeader>
 
-          <S.FaturaInputWrapper style={{ maxWidth: 500, marginBottom: consulted ? '1.5rem' : 0 }}>
+          {/* Search bar */}
+          <S.FaturaInputWrapper style={{ maxWidth: 500, marginBottom: '1.5rem' }}>
             <S.FaturaInput
               type="text"
               placeholder="Digite o número da fatura..."
@@ -190,23 +192,53 @@ const SegundaVia = () => {
 
           {consulted && !loading && (
             <>
-              <S.InfoBox style={{ marginBottom: '1.5rem' }}>
-                <FaBuilding />
-                <div>
-                  <p><strong>Administradora:</strong> {administradora}</p>
-                  <p style={{ marginTop: 4 }}><strong>Fatura:</strong> {numeroFatura} &mdash; <strong>{boletos.length}</strong> boleto(s) encontrado(s)</p>
-                </div>
-              </S.InfoBox>
+              {/* Info box + emit button side by side */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                <S.InfoBox style={{ flex: 1, marginBottom: 0 }}>
+                  <FaBuilding />
+                  <div>
+                    <p><strong>Administradora:</strong> {administradora}</p>
+                    <p style={{ marginTop: 4 }}><strong>Fatura:</strong> {numeroFatura} &mdash; <strong>{boletos.length}</strong> boleto(s) encontrado(s)</p>
+                  </div>
+                </S.InfoBox>
 
-              <S.SearchBarWrapper style={{ marginBottom: '1.5rem' }}>
-                <FaSearch />
-                <S.SearchInput
-                  type="text"
-                  placeholder="Filtrar por condomínio, fatura ou nosso número..."
-                  value={filtro}
-                  onChange={e => setFiltro(e.target.value)}
-                />
-              </S.SearchBarWrapper>
+                <S.PrimaryButton
+                  onClick={emitirSelecionados}
+                  disabled={emitindo || selectedCount === 0}
+                  title={selectedCount === 0 ? 'Selecione ao menos um boleto' : `Emitir ${selectedCount} boleto(s)`}
+                >
+                  {emitindo ? <FaSpinner className="spinner" /> : <FaFileInvoiceDollar />}
+                  {emitindo
+                    ? 'Emitindo...'
+                    : selectedCount > 0
+                      ? `Emitir ${selectedCount} boleto${selectedCount !== 1 ? 's' : ''}`
+                      : 'Emitir Segunda Via'}
+                </S.PrimaryButton>
+              </div>
+
+              {/* Filter + select-all in one toolbar row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+                <S.SearchBarWrapper style={{ flex: 1, minWidth: 200, marginBottom: 0 }}>
+                  <FaSearch />
+                  <S.SearchInput
+                    type="text"
+                    placeholder="Filtrar por condomínio, fatura ou nosso número..."
+                    value={filtro}
+                    onChange={e => setFiltro(e.target.value)}
+                  />
+                  {filtro && (
+                    <FaTimesCircle
+                      style={{ cursor: 'pointer', opacity: 0.5 }}
+                      onClick={() => setFiltro('')}
+                      title="Limpar filtro"
+                    />
+                  )}
+                </S.SearchBarWrapper>
+
+                <S.SecondaryButton onClick={toggleAll} style={{ whiteSpace: 'nowrap' }}>
+                  {allFilteredSelected ? 'Desmarcar Todos' : 'Marcar Todos'}
+                </S.SecondaryButton>
+              </div>
 
               {filteredBoletos.length === 0 ? (
                 <S.EmptyState>
@@ -221,10 +253,13 @@ const SegundaVia = () => {
                       <thead>
                         <tr>
                           <th style={{ width: 50, textAlign: 'center' }}>
-                            <S.CheckboxLabel>
+                            <S.CheckboxLabel title={allFilteredSelected ? 'Desmarcar todos' : 'Marcar todos'}>
                               <S.CheckboxInput
                                 type="checkbox"
                                 checked={allFilteredSelected}
+                                ref={el => {
+                                  if (el) el.indeterminate = someFilteredSelected && !allFilteredSelected;
+                                }}
                                 onChange={toggleAll}
                               />
                             </S.CheckboxLabel>
@@ -237,8 +272,12 @@ const SegundaVia = () => {
                       </thead>
                       <tbody>
                         {filteredBoletos.map(boleto => (
-                          <tr key={boleto.id}>
-                            <td style={{ textAlign: 'center' }}>
+                          <tr
+                            key={boleto.id}
+                            onClick={() => toggleSelect(boleto.id)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <td style={{ textAlign: 'center' }} onClick={e => e.stopPropagation()}>
                               <S.CheckboxLabel>
                                 <S.CheckboxInput
                                   type="checkbox"
@@ -257,14 +296,12 @@ const SegundaVia = () => {
                     </S.Table>
                   </S.TableWrapper>
 
-                  <S.ActionsRow>
-                    <S.SecondaryButton onClick={toggleAll}>
-                      {allFilteredSelected ? 'Desmarcar Todos' : 'Marcar Todos'}
-                    </S.SecondaryButton>
-                    <S.SelectedInfo>
+                  {/* Subtle count footer — no redundant button */}
+                  {selectedCount > 0 && (
+                    <S.SelectedInfo style={{ marginTop: '0.75rem', display: 'block', textAlign: 'right' }}>
                       <strong>{selectedCount}</strong> boleto{selectedCount !== 1 ? 's' : ''} selecionado{selectedCount !== 1 ? 's' : ''}
                     </S.SelectedInfo>
-                  </S.ActionsRow>
+                  )}
                 </>
               )}
             </>
