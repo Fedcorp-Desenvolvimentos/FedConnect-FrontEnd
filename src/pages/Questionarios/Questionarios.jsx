@@ -27,6 +27,7 @@ const SETORES_CONFIG = {
   "Mapa de Setores": {
     type: "main",
     options: [
+      "Comercial",
       "Tecnologia da Informação",
       "Seguro Fiança",
       "Seguro de Automóvel",
@@ -48,7 +49,7 @@ const SETORES_CONFIG = {
       "BOAT",
       "Incêndio Locação",
       "Incêndio Conteúdo",
-      "Benefícios"
+      "Benefícios",
     ]
   },
   "Medicina e Segurança do Trabalho": {
@@ -63,7 +64,7 @@ const SETORES_CONFIG = {
       "Emissão de propostas",
       "Agendamento de visitas",
       "Elaboração de documentos",
-      "Cursos"
+      "Cursos",
     ]
   }
 };
