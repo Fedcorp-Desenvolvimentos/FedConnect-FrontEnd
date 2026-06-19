@@ -292,9 +292,17 @@ export const LoginButton = styled.button`
 `;
 
 export const LoginGoogle = styled.div`
-display: flex;
-justify-content: center;
-margin-top: 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 1.25rem;
+
+  > div {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
 `;
 
 export const ForgotPassword = styled.a`

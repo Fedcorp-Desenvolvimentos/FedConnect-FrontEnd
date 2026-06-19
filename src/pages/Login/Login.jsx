@@ -124,15 +124,15 @@ const Login = () => {
                                 <span>ou</span>
                             </S.Divider>
                             
-                            <S.LoginGoogle>
+                           <S.LoginGoogle>
                                 <GoogleLogin
                                     onSuccess={handleGoogleSuccess}
                                     onError={handleGoogleError}
-                                    useOneTap={false}
                                     theme="outline"
                                     size="large"
                                     text="continue_with"
                                     shape="rectangular"
+                                    width="300"
                                 />
                             </S.LoginGoogle>
 
