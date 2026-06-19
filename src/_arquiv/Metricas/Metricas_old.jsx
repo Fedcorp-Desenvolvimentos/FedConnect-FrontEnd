@@ -1,8 +1,8 @@
-import * as S from "./MetricasStyles";
+import * as S from "../../pages/Metricas/MetricasStyles";
 import { FaExternalLinkAlt, FaChartBar } from "react-icons/fa";
 import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { useAuth } from "../../context/AuthContext";
-import MetricasHelp from "./MetricasHelp";
+import MetricasHelp from "../../pages/Metricas/MetricasHelp";
 
 const metricas = [
   {

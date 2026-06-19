@@ -1,7 +1,7 @@
 import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { useAuth } from "../../context/AuthContext";
-import { FerramentasHelp } from "./FerramentasHelp";
-import * as S from "./FerramentasStyles";
+import { FerramentasHelp } from "../../pages/Ferramentas/FerramentasHelp";
+import * as S from "../../pages/Ferramentas/FerramentasStyles";
 import { 
   FaFire, 
   FaHandshake, 
