@@ -5,7 +5,13 @@ import {
   getInvoiceStatusView,
 } from "../utils/recibosComissoesUtils";
 
-export function FaturasTable({ faturas, selectedInvoice, onSelectInvoice }) {
+export function FaturasTable({
+  faturas,
+  selectedInvoices,
+  allInvoicesSelected,
+  onToggleInvoice,
+  onToggleAllInvoices,
+}) {
   return (
     <div className="recibos-card">
       <div className="recibos-card-header">
@@ -13,6 +19,16 @@ export function FaturasTable({ faturas, selectedInvoice, onSelectInvoice }) {
           <FaFileInvoiceDollar />
           <h2>2. Faturas</h2>
         </div>
+
+        {/* {faturas.length > 0 && (
+          <button
+            type="button"
+            className="link-button"
+            onClick={onToggleAllInvoices}
+          >
+            {allInvoicesSelected ? "Desmarcar todas" : "Selecionar todas"}
+          </button>
+        )} */}
       </div>
 
       {faturas.length === 0 ? (
@@ -22,12 +38,20 @@ export function FaturasTable({ faturas, selectedInvoice, onSelectInvoice }) {
           <table className="recibos-table">
             <thead>
               <tr>
+                {/* <th>
+                  <input
+                    type="checkbox"
+                    checked={allInvoicesSelected}
+                    onChange={onToggleAllInvoices}
+                    aria-label="Selecionar todas as faturas"
+                  />
+                </th> */}
                 <th>Fatura</th>
                 <th>Tipo</th>
                 <th>Favorecido</th>
                 <th>Vencimento</th>
                 <th>Parcela</th>
-                <th>Valor liquido</th>
+                <th>Valor líquido</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -35,13 +59,22 @@ export function FaturasTable({ faturas, selectedInvoice, onSelectInvoice }) {
             <tbody>
               {faturas.map((fatura) => {
                 const status = getInvoiceStatusView(fatura.status);
+                const isSelected = selectedInvoices.includes(fatura.id);
 
                 return (
                   <tr
                     key={fatura.id}
-                    className={selectedInvoice?.id === fatura.id ? "selected-row" : ""}
-                    onClick={() => onSelectInvoice(fatura)}
+                    className={isSelected ? "selected-row" : ""}
                   >
+                    {/* <td>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => onToggleInvoice(fatura.id)}
+                        aria-label={`Selecionar fatura ${fatura.numero}`}
+                      />
+                    </td> */}
+
                     <td>{fatura.numero}</td>
                     <td>{fatura.tipo}</td>
                     <td>{fatura.favorecido}</td>

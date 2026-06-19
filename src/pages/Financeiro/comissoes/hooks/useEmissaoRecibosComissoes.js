@@ -13,17 +13,26 @@ import {
 export function useEmissaoRecibosComissoes() {
   const [filters, setFilters] = useState(initialRecibosFilters);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
   const [faturas, setFaturas] = useState([]);
-  const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [comissoes, setComissoes] = useState([]);
+
+  const [selectedInvoices, setSelectedInvoices] = useState([]);
   const [selectedCommissions, setSelectedCommissions] = useState([]);
   const [selectedRetentions, setSelectedRetentions] = useState([]);
+
   const [documentType, setDocumentType] = useState("recibo");
   const [printPaidValue, setPrintPaidValue] = useState(false);
   const [statusMessage, setStatusMessage] = useState("Aguardando consulta");
   const [lastEmission, setLastEmission] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isIssuing, setIsIssuing] = useState(false);
+
+  const allInvoicesSelected =
+    faturas.length > 0 && selectedInvoices.length === faturas.length;
+
+  const allCommissionsSelected =
+    comissoes.length > 0 && selectedCommissions.length === comissoes.length;
 
   const retentionSummary = useMemo(
     () =>
@@ -38,6 +47,8 @@ export function useEmissaoRecibosComissoes() {
   const summary = useMemo(
     () => ({
       invoices: faturas.length,
+      selectedInvoices: selectedInvoices.length,
+      commissions: comissoes.length,
       selectedCommissions: selectedCommissions.length,
       selectedTotal: formatMoney(retentionSummary.grossTotal),
       netTotal: formatMoney(retentionSummary.netTotal),
@@ -45,9 +56,11 @@ export function useEmissaoRecibosComissoes() {
     }),
     [
       faturas.length,
+      comissoes.length,
+      selectedInvoices.length,
+      selectedCommissions.length,
       retentionSummary.grossTotal,
       retentionSummary.netTotal,
-      selectedCommissions.length,
       statusMessage,
     ]
   );
@@ -58,29 +71,64 @@ export function useEmissaoRecibosComissoes() {
 
   async function searchInvoices() {
     setIsSearching(true);
-    setStatusMessage("Consultando faturas");
+    setStatusMessage("Consultando faturas e comissões");
 
     try {
-      const result = await buscarFaturasComissao(filters);
-      setFaturas(result);
-      setSelectedInvoice(null);
-      setComissoes([]);
+      const faturasResult = await buscarFaturasComissao(filters);
+
+      const comissoesResult = await Promise.all(
+        faturasResult.map(async (fatura) => {
+          const comissoesDaFatura = await buscarComissoesPorFatura(fatura.id);
+
+          return comissoesDaFatura.map((comissao) => ({
+            ...comissao,
+            faturaId: fatura.id,
+            faturaNumero: fatura.numero,
+            favorecido: fatura.favorecido,
+          }));
+        })
+      );
+
+      const todasComissoes = comissoesResult.flat();
+
+      setFaturas(faturasResult);
+      setComissoes(todasComissoes);
+
+      setSelectedInvoices([]);
       setSelectedCommissions([]);
+      setSelectedRetentions([]);
       setLastEmission(null);
-      setStatusMessage(result.length ? "Faturas encontradas" : "Nenhuma fatura encontrada");
+
+      if (!faturasResult.length) {
+        setStatusMessage("Nenhuma fatura encontrada");
+        return;
+      }
+
+      setStatusMessage(
+        `${faturasResult.length} fatura(s) e ${todasComissoes.length} comissão(ões) encontrada(s)`
+      );
     } finally {
       setIsSearching(false);
     }
   }
 
-  async function selectInvoice(fatura) {
-    setSelectedInvoice(fatura);
-    setSelectedCommissions([]);
-    setLastEmission(null);
-    setStatusMessage(`Fatura ${fatura.numero} selecionada`);
+  function toggleInvoice(invoiceId) {
+    setSelectedInvoices((current) => {
+      if (current.includes(invoiceId)) {
+        return current.filter((id) => id !== invoiceId);
+      }
 
-    const result = await buscarComissoesPorFatura(fatura.id);
-    setComissoes(result);
+      return [...current, invoiceId];
+    });
+  }
+
+  function toggleAllInvoices() {
+    if (allInvoicesSelected) {
+      setSelectedInvoices([]);
+      return;
+    }
+
+    setSelectedInvoices(faturas.map((fatura) => fatura.id));
   }
 
   function toggleCommission(comissaoId) {
@@ -94,7 +142,7 @@ export function useEmissaoRecibosComissoes() {
   }
 
   function toggleAllCommissions() {
-    if (selectedCommissions.length === comissoes.length) {
+    if (allCommissionsSelected) {
       setSelectedCommissions([]);
       return;
     }
@@ -115,8 +163,8 @@ export function useEmissaoRecibosComissoes() {
   function clearAll() {
     setFilters(initialRecibosFilters);
     setFaturas([]);
-    setSelectedInvoice(null);
     setComissoes([]);
+    setSelectedInvoices([]);
     setSelectedCommissions([]);
     setSelectedRetentions([]);
     setLastEmission(null);
@@ -124,7 +172,9 @@ export function useEmissaoRecibosComissoes() {
   }
 
   async function issueDocument() {
-    if (!selectedInvoice || selectedCommissions.length === 0) return;
+    if (selectedInvoices.length === 0 && selectedCommissions.length === 0) {
+      return;
+    }
 
     setIsIssuing(true);
     setStatusMessage("Emitindo documento");
@@ -132,7 +182,7 @@ export function useEmissaoRecibosComissoes() {
     try {
       const result = await emitirDocumentoComissoes({
         tipoDocumento: documentType,
-        faturaId: selectedInvoice.id,
+        faturasIds: selectedInvoices,
         comissoesIds: selectedCommissions,
         retencoes: selectedRetentions,
         imprimirValorQuitado: printPaidValue,
@@ -140,15 +190,20 @@ export function useEmissaoRecibosComissoes() {
       });
 
       setLastEmission(result);
-      setStatusMessage(`${documentType === "voucher" ? "Voucher" : "Recibo"} emitido`);
+      setStatusMessage(
+        `${documentType === "voucher" ? "Voucher" : "Recibo"} emitido`
+      );
     } finally {
       setIsIssuing(false);
     }
   }
 
   function previewDocument() {
-    if (!selectedInvoice || selectedCommissions.length === 0) return;
-    setStatusMessage("Pre-visualizacao preparada");
+    if (selectedInvoices.length === 0 && selectedCommissions.length === 0) {
+      return;
+    }
+
+    setStatusMessage("Pré-visualização preparada");
   }
 
   return {
@@ -165,15 +220,23 @@ export function useEmissaoRecibosComissoes() {
     printPaidValue,
     retentionSummary,
     searchInvoices,
+
+    selectedInvoices,
     selectedCommissions,
-    selectedInvoice,
     selectedRetentions,
+
+    allInvoicesSelected,
+    allCommissionsSelected,
+
     setDocumentType,
     setPrintPaidValue,
     setShowAdvancedFilters,
     showAdvancedFilters,
-    selectInvoice,
+
     summary,
+
+    toggleAllInvoices,
+    toggleInvoice,
     toggleAllCommissions,
     toggleCommission,
     toggleRetention,

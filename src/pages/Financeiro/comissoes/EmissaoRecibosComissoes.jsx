@@ -1,16 +1,20 @@
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+
 import { ComissoesPanel } from "./components/ComissoesPanel";
 import { ConsultaRecibosForm } from "./components/ConsultaRecibosForm";
 import { EmissaoPanel } from "./components/EmissaoPanel";
 import { FaturasTable } from "./components/FaturasTable";
 import { RetencoesPanel } from "./components/RetencoesPanel";
 import { SummaryCards } from "./components/SummaryCards";
+
 import { useEmissaoRecibosComissoes } from "./hooks/useEmissaoRecibosComissoes";
+
 import "./EmissaoRecibosComissoes.css";
 
 export default function EmissaoRecibosComissoes() {
   const navigate = useNavigate();
+
   const {
     clearAll,
     comissoes,
@@ -25,22 +29,31 @@ export default function EmissaoRecibosComissoes() {
     printPaidValue,
     retentionSummary,
     searchInvoices,
+
+    selectedInvoices,
     selectedCommissions,
-    selectedInvoice,
     selectedRetentions,
+
+    allInvoicesSelected,
+    allCommissionsSelected,
+
     setDocumentType,
     setPrintPaidValue,
     setShowAdvancedFilters,
     showAdvancedFilters,
-    selectInvoice,
+
     summary,
+
+    toggleAllInvoices,
+    toggleInvoice,
     toggleAllCommissions,
     toggleCommission,
     toggleRetention,
     updateFilter,
   } = useEmissaoRecibosComissoes();
 
-  const canIssue = Boolean(selectedInvoice && selectedCommissions.length > 0);
+  const canIssue =
+    selectedInvoices.length > 0 || selectedCommissions.length > 0;
 
   return (
     <main className="recibos-page">
@@ -48,17 +61,17 @@ export default function EmissaoRecibosComissoes() {
         <button
           type="button"
           className="recibos-back"
-          onClick={() => navigate("/financeiero")}
+          onClick={() => navigate("/financeiro")}
         >
           <FaArrowLeft />
           Voltar
         </button>
 
         <div className="recibos-title">
-          <span>Financeiro / Comissoes</span>
-          <h1>Emissao de Recibos de Comissoes</h1>
+          <span>Financeiro / Comissões</span>
+          <h1>Emissão de Recibos de Comissões</h1>
           <p>
-            Consulte faturas, selecione comissoes, aplique retencoes e emita
+            Consulte faturas, selecione comissões, aplique retenções e emita
             recibos ou vouchers.
           </p>
         </div>
@@ -85,14 +98,16 @@ export default function EmissaoRecibosComissoes() {
       <section className="recibos-workflow-grid">
         <FaturasTable
           faturas={faturas}
-          selectedInvoice={selectedInvoice}
-          onSelectInvoice={selectInvoice}
+          selectedInvoices={selectedInvoices}
+          allInvoicesSelected={allInvoicesSelected}
+          onToggleInvoice={toggleInvoice}
+          onToggleAllInvoices={toggleAllInvoices}
         />
 
         <ComissoesPanel
           comissoes={comissoes}
           selectedCommissions={selectedCommissions}
-          selectedInvoice={selectedInvoice}
+          allCommissionsSelected={allCommissionsSelected}
           totals={retentionSummary}
           onToggleAllCommissions={toggleAllCommissions}
           onToggleCommission={toggleCommission}
@@ -105,10 +120,11 @@ export default function EmissaoRecibosComissoes() {
         isIssuing={isIssuing}
         lastEmission={lastEmission}
         printPaidValue={printPaidValue}
-        selectedInvoice={selectedInvoice}
+        selectedInvoices={selectedInvoices}
+        selectedCommissions={selectedCommissions}
         totals={retentionSummary}
         onDocumentTypeChange={setDocumentType}
-        onExit={() => navigate(ROUTES.FINANCEIRO)}
+        onExit={() => navigate("/financeiro")}
         onIssue={issueDocument}
         onPreview={previewDocument}
         onPrintPaidValueChange={setPrintPaidValue}
