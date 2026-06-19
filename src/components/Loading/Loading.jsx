@@ -1,11 +1,10 @@
-// src/components/Loading/Loading.jsx
 import { useState, useEffect, useRef } from 'react';
 import * as S from './LoadingStyles'; 
 import LOGO from './LOGO.png';
 
 const Loading = ({
-  fullScreen = false,
-  message = 'Carregando...',
+  fullScreen = true, // Sempre true agora
+  message = 'Carregando',
   progress = 0,
   isVisible = true,
 }) => {
@@ -15,12 +14,12 @@ const Loading = ({
   const animRef = useRef(null);
   const t0Ref = useRef(performance.now());
 
-  const SIZE = 220;
+  const SIZE = 200; // Reduzi um pouco
   const CX = SIZE / 2;
   const CY = SIZE / 2;
-  const R_OUTER = 96;
-  const R_MID = 80;
-  const R_INNER = 62;
+  const R_OUTER = 88;
+  const R_MID = 74;
+  const R_INNER = 58;
   const CIRC_OUTER = 2 * Math.PI * R_OUTER;
   const CIRC_MID = 2 * Math.PI * R_MID;
 
@@ -35,7 +34,6 @@ const Loading = ({
     }
   }, [isVisible]);
 
-  // Animate orbiting dots
   useEffect(() => {
     if (!shouldRender || !svgRef.current) return;
 
@@ -75,45 +73,77 @@ const Loading = ({
   const outerOffset = CIRC_OUTER - (progress / 100) * CIRC_OUTER;
   const midOffset = CIRC_MID - (Math.min(100, progress * 1.3) / 100) * CIRC_MID;
 
-  const LoadingContent = () => (
-    <S.Container $isExiting={isExiting}>
+  return (
+    <S.Overlay $isExiting={isExiting}>
       <S.LogoWrapper>
-        {/* SVG overlay with orbital rings + dots */}
         <S.OrbitalSvg
           ref={svgRef}
           viewBox={`0 0 ${SIZE} ${SIZE}`}
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Background rings */}
-          <circle cx={CX} cy={CY} r={R_OUTER} fill="none" stroke="#e2e8f0" strokeWidth="1.5" />
-          <circle cx={CX} cy={CY} r={R_MID}   fill="none" stroke="#e2e8f0" strokeWidth="1.5" />
+          {/* Anéis de fundo - mais sutis */}
+          <circle 
+            cx={CX} cy={CY} r={R_OUTER} 
+            fill="none" 
+            stroke="rgba(203, 213, 225, 0.4)" 
+            strokeWidth="1.5" 
+          />
+          <circle 
+            cx={CX} cy={CY} r={R_MID}   
+            fill="none" 
+            stroke="rgba(203, 213, 225, 0.4)" 
+            strokeWidth="1.5" 
+          />
 
-          {/* Progress arcs */}
+          {/* Progress arcs - cores mais suaves */}
           <circle
             cx={CX} cy={CY} r={R_OUTER}
             fill="none"
-            stroke="#185FA5"
+            stroke="#2563eb" // Azul mais suave
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeDasharray={CIRC_OUTER}
             strokeDashoffset={outerOffset}
-            style={{ transform: 'rotate(-90deg)', transformOrigin: `${CX}px ${CY}px`, transition: 'stroke-dashoffset 0.15s linear' }}
+            style={{ 
+              transform: 'rotate(-90deg)', 
+              transformOrigin: `${CX}px ${CY}px`, 
+              transition: 'stroke-dashoffset 0.15s linear',
+            }}
           />
           <circle
             cx={CX} cy={CY} r={R_MID}
             fill="none"
-            stroke="#1D9E75"
+            stroke="#059669" // Verde mais suave
             strokeWidth="2"
             strokeLinecap="round"
             strokeDasharray={CIRC_MID}
             strokeDashoffset={midOffset}
-            style={{ transform: 'rotate(-90deg)', transformOrigin: `${CX}px ${CY}px`, transition: 'stroke-dashoffset 0.15s linear' }}
+            style={{ 
+              transform: 'rotate(-90deg)', 
+              transformOrigin: `${CX}px ${CY}px`, 
+              transition: 'stroke-dashoffset 0.15s linear',
+            }}
           />
 
-          {/* Orbiting dots — positions updated via JS */}
-          <circle id="orbital-dot1" r="4"   fill="#185FA5" />
-          <circle id="orbital-dot2" r="3"   fill="#1D9E75" />
-          <circle id="orbital-dot3" r="2.5" fill="#AFA9EC" />
+          {/* Dots orbitais - sem cores fortes */}
+          <circle 
+            id="orbital-dot1" 
+            r="4" 
+            fill="#2563eb"
+            style={{ filter: 'drop-shadow(0 0 8px rgba(37, 99, 235, 0.3))' }}
+          />
+          <circle 
+            id="orbital-dot2" 
+            r="3" 
+            fill="#059669"
+            style={{ filter: 'drop-shadow(0 0 8px rgba(5, 150, 105, 0.3))' }}
+          />
+          <circle 
+            id="orbital-dot3" 
+            r="2.5" 
+            fill="#8b5cf6" // Roxo suave
+            style={{ filter: 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.3))' }}
+          />
         </S.OrbitalSvg>
 
         <S.LogoImg
@@ -135,18 +165,8 @@ const Loading = ({
           <S.MessageText>{message}</S.MessageText>
         </S.MessageContainer>
       )}
-    </S.Container>
+    </S.Overlay>
   );
-
-  if (fullScreen) {
-    return (
-      <S.Overlay $isExiting={isExiting}>
-        <LoadingContent />
-      </S.Overlay>
-    );
-  }
-
-  return <LoadingContent />;
 };
 
 export default Loading;
