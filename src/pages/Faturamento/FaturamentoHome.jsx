@@ -4,7 +4,9 @@ import {
   FaTimesCircle,
   FaFileInvoice,
   FaExternalLinkAlt,
-  FaFileInvoiceDollar
+  FaFileInvoiceDollar,
+  FaCopy,
+  FaFunnelDollar 
 } from "react-icons/fa";
 import CardGridLayout from "../../Layouts/CardGridLayout/CardGridLayout";
 import { Card, CardBody, IconWrapper, Title, Description, Button, ExternalButton } from "../../Layouts/CardGridLayout/CardGridLayoutStyles";
@@ -54,7 +56,7 @@ const operacionais = [
   },
   {
     key: "formatos-de-arquivos",
-    icon: <MdError />,
+    icon: <FaCopy  />,
     title: "Formatos de Arquivos",
     desc: "Gerencie e converta formatos de arquivos de maneira simples.",
     to: "/formatos-arquivos",
@@ -64,7 +66,7 @@ const operacionais = [
   },
   {
     key: "segunda-via",
-    icon: <FaFileInvoiceDollar />,
+    icon: <FaFunnelDollar  />,
     title: "Segunda Via de Boletos",
     desc: "Consulte e emita a segunda via dos seus boletos.",
     to: "/faturamento/segunda-via",
