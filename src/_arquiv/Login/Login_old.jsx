@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useGlobal } from '../../context/GlobalContext';
-import * as S from './LoginStyles';
+import * as S from '../../pages/Login/LoginStyles';
 
 const Login = () => {
     const [email, setEmail] = useState('');

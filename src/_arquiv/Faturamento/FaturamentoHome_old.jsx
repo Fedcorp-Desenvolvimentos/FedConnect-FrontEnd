@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import * as S from "./FaturamentoHomeStyles";
+import * as S from "../../pages/Faturamento/FaturamentoHomeStyles";
 import PageLayout from "../../Layouts/PageLayout/PageLayout";
 import { 
   FaHammer, 
@@ -13,7 +13,7 @@ import {
   FaFileInvoiceDollar
 } from "react-icons/fa";
 
-import FaturamentoHelp from "./FaturamentoHelp";
+import FaturamentoHelp from "../../pages/Faturamento/FaturamentoHelp";
 
 const operacionais = [
   // {
