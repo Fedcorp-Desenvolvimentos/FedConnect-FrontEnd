@@ -4,39 +4,44 @@ import { formatDate, formatMoney } from "../utils/recibosComissoesUtils";
 export function ComissoesPanel({
   comissoes,
   selectedCommissions,
-  selectedInvoice,
   totals,
+  allCommissionsSelected,
   onToggleAllCommissions,
   onToggleCommission,
 }) {
-  const allSelected =
-    comissoes.length > 0 && selectedCommissions.length === comissoes.length;
-
   return (
     <div className="recibos-card">
       <div className="recibos-card-header">
         <div>
           <FaReceipt />
-          <h2>3. Comissoes</h2>
+          <h2>3. Comissões</h2>
         </div>
+
+        {comissoes.length > 0 && (
+          <button
+            type="button"
+            className="link-button"
+            onClick={onToggleAllCommissions}
+          >
+            {allCommissionsSelected ? "Desmarcar todas" : "Selecionar todas"}
+          </button>
+        )}
       </div>
 
-      {!selectedInvoice ? (
-        <div className="empty-state">Selecione uma fatura.</div>
-      ) : comissoes.length === 0 ? (
-        <div className="empty-state">Nenhuma comissao disponivel.</div>
+      {comissoes.length === 0 ? (
+        <div className="empty-state">
+          Nenhuma comissão encontrada para os filtros informados.
+        </div>
       ) : (
         <>
           <div className="commission-toolbar">
-            <strong>Fatura selecionada: {selectedInvoice.numero}</strong>
+            <strong>
+              {comissoes.length} comissão(ões) encontrada(s)
+            </strong>
 
-            <button
-              type="button"
-              className="link-button"
-              onClick={onToggleAllCommissions}
-            >
-              {allSelected ? "Desmarcar todas" : "Selecionar todas"}
-            </button>
+            <span>
+              {selectedCommissions.length} selecionada(s)
+            </span>
           </div>
 
           <div className="commission-list">
@@ -51,8 +56,8 @@ export function ComissoesPanel({
                 <div>
                   <strong>{comissao.produto}</strong>
                   <span>
-                    {comissao.cliente} | {comissao.competencia} |{" "}
-                    {formatDate(comissao.data)}
+                    Fatura {comissao.faturaNumero} | {comissao.cliente} |{" "}
+                    {comissao.competencia} | {formatDate(comissao.data)}
                   </span>
                 </div>
 
@@ -63,8 +68,8 @@ export function ComissoesPanel({
 
           <div className="commission-totals">
             <span>Bruto: {formatMoney(totals.grossTotal)}</span>
-            <span>Retencoes: {formatMoney(totals.retentionTotal)}</span>
-            <strong>Liquido: {formatMoney(totals.netTotal)}</strong>
+            <span>Retenções: {formatMoney(totals.retentionTotal)}</span>
+            <strong>Líquido: {formatMoney(totals.netTotal)}</strong>
           </div>
         </>
       )}

@@ -19,7 +19,7 @@ export function ConsultaRecibosForm({
       <div className="recibos-card-header">
         <div>
           <FaSearch />
-          <h2>1. Consulta</h2>
+          <h2>1. Consulta de faturas</h2>
         </div>
       </div>
 
@@ -30,8 +30,10 @@ export function ConsultaRecibosForm({
             <input
               type="text"
               value={filters.favorecido}
-              onChange={(event) => onFilterChange("favorecido", event.target.value)}
-              placeholder="Nome, codigo ou documento"
+              onChange={(event) =>
+                onFilterChange("favorecido", event.target.value)
+              }
+              placeholder="Nome, código ou documento"
             />
           </label>
 
@@ -41,29 +43,7 @@ export function ConsultaRecibosForm({
               type="text"
               value={filters.fatura}
               onChange={(event) => onFilterChange("fatura", event.target.value)}
-              placeholder="Numero da fatura"
-            />
-          </label>
-
-          <label>
-            Vencimento inicial
-            <input
-              type="date"
-              value={filters.vencimentoInicial}
-              onChange={(event) =>
-                onFilterChange("vencimentoInicial", event.target.value)
-              }
-            />
-          </label>
-
-          <label>
-            Vencimento final
-            <input
-              type="date"
-              value={filters.vencimentoFinal}
-              onChange={(event) =>
-                onFilterChange("vencimentoFinal", event.target.value)
-              }
+              placeholder="Filtrar por número da fatura"
             />
           </label>
 
@@ -80,21 +60,33 @@ export function ConsultaRecibosForm({
           </label>
 
           <label>
-            Tipo
+            Tipo de pagamento
             <select
               value={filters.tipo}
               onChange={(event) => onFilterChange("tipo", event.target.value)}
             >
               <option value="">Todos</option>
-              <option value="A">Tipo A</option>
-              <option value="B">Tipo B</option>
+              <option value="A">Peaga</option>
+              <option value="B">Outros</option>
+              <option value="C">Fedcorp</option>
+              <option value="D">Corretora</option>
+              <option value="E">Lider</option>
+              <option value="F">Condocorp</option>
+              <option value="G">Cartão</option>
+              <option value="H">Benefício</option>
             </select>
           </label>
         </div>
 
-        <button type="button" className="advanced-toggle" onClick={onToggleAdvanced}>
+        <button
+          type="button"
+          className="advanced-toggle"
+          onClick={onToggleAdvanced}
+        >
           <FaSlidersH />
-          {showAdvancedFilters ? "Ocultar filtros avancados" : "Exibir filtros avancados"}
+          {showAdvancedFilters
+            ? "Ocultar filtros avançados"
+            : "Exibir filtros avançados"}
         </button>
 
         {showAdvancedFilters && (
@@ -112,37 +104,19 @@ export function ConsultaRecibosForm({
             </label>
 
             <label>
-              Apolice
-              <input
-                type="text"
-                value={filters.apolice}
-                onChange={(event) => onFilterChange("apolice", event.target.value)}
-                placeholder="Numero da apolice"
-              />
-            </label>
-
-            <label>
-              Comercial
-              <input
-                type="text"
-                value={filters.comercial}
-                onChange={(event) => onFilterChange("comercial", event.target.value)}
-                placeholder="Responsavel comercial"
-              />
-            </label>
-
-            <label>
               Recibo
               <input
                 type="text"
                 value={filters.recibo}
-                onChange={(event) => onFilterChange("recibo", event.target.value)}
-                placeholder="Numero do recibo"
+                onChange={(event) =>
+                  onFilterChange("recibo", event.target.value)
+                }
+                placeholder="Número do recibo"
               />
             </label>
 
             <label>
-              Vigencia inicial
+              Vigência inicial
               <input
                 type="date"
                 value={filters.vigenciaInicial}
@@ -153,7 +127,7 @@ export function ConsultaRecibosForm({
             </label>
 
             <label>
-              Vigencia final
+              Vigência final
               <input
                 type="date"
                 value={filters.vigenciaFinal}
@@ -168,11 +142,7 @@ export function ConsultaRecibosForm({
         <div className="recibos-actions">
           <button type="submit" className="primary-button" disabled={isSearching}>
             <FaSearch />
-            {isSearching ? "Consultando" : "Consultar faturas"}
-          </button>
-
-          <button type="button" className="secondary-button">
-            Consultar comissoes anteriores
+            {isSearching ? "Consultando" : "Buscar"}
           </button>
 
           <button type="button" className="ghost-button" onClick={onClear}>

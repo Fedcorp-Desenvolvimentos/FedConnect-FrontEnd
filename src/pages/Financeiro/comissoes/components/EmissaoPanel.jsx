@@ -47,10 +47,10 @@ export function EmissaoPanel({
       </div>
 
       <div className="emissao-review">
-        <div>
+        {/* <div>
           <span>Fatura</span>
           <strong>{selectedInvoice?.numero || "-"}</strong>
-        </div>
+        </div> */}
         <div>
           <span>Total bruto</span>
           <strong>{formatMoney(totals.grossTotal)}</strong>
