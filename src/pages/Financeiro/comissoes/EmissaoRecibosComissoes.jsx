@@ -25,6 +25,7 @@ export default function EmissaoRecibosComissoes() {
     isSearching,
     issueDocument,
     lastEmission,
+    pessoas,
     previewDocument,
     printPaidValue,
     retentionSummary,
@@ -86,6 +87,7 @@ export default function EmissaoRecibosComissoes() {
         onFilterChange={updateFilter}
         onSearch={searchInvoices}
         onToggleAdvanced={() => setShowAdvancedFilters((current) => !current)}
+        pessoas={pessoas}
         showAdvancedFilters={showAdvancedFilters}
       />
 

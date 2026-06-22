@@ -14,12 +14,12 @@ import {
   FaFileExcel,
 } from 'react-icons/fa';
 import * as XLSX from "xlsx";
-import { saveAs } from 'file-saver';
+
 import { useAuth } from '../../context/AuthContext';
 import * as S from './QuestionariosStyles';
 import PageLayout from '../../Layouts/PageLayout/PageLayout';
-import { 
-    enviarQuestionario, listarQuestionarios, atualizarQuestionario, excluirQuestionario 
+import {
+  enviarQuestionario, listarQuestionarios, atualizarQuestionario, excluirQuestionario
 } from '../../services/questionarioService';
 
 // Configuração dos setores e subáreas
@@ -173,8 +173,8 @@ function Questionarios() {
 
   const handleSetorChange = (e) => {
     const newSetor = e.target.value;
-    setForm((prev) => ({ 
-      ...prev, 
+    setForm((prev) => ({
+      ...prev,
       setor: newSetor,
       subarea: ""
     }));
@@ -236,7 +236,7 @@ function Questionarios() {
       // A resposta do Django REST Framework tem a estrutura { count, next, previous, results }
       // Os dados estão em response.results ou response.data.results
       let dados = [];
-      
+
       if (response.results) {
         // Formato paginado do DRF
         dados = response.results;
@@ -271,7 +271,7 @@ function Questionarios() {
         melhoriasImpacto: item.melhorias_impacto,
         consideracoesFinais: item.consideracoes_finais,
       }));
-      
+
       setQuestionarios(dadosConvertidos);
     } catch (error) {
       console.error('Erro ao carregar questionários:', error);
@@ -288,16 +288,16 @@ function Questionarios() {
   const salvarQuestionario = async (e) => {
     e.preventDefault();
     if (!validarFormulario()) return;
-    
+
     // Prepara os dados para envio - NÃO envia userId
     const dadosParaEnvio = {
       ...form,
       setor: form.subarea ? `${form.setor} - ${form.subarea}` : form.setor,
     };
-    
+
     // Remove subarea do envio
     delete dadosParaEnvio.subarea;
-    
+
     setSubmitting(true);
     try {
       if (editandoId) {
@@ -313,11 +313,11 @@ function Questionarios() {
       }
     } catch (error) {
       console.error('Erro ao salvar:', error);
-      
+
       // Tratamento específico para erro de duplicata
       if (error.response?.data?.code === 'duplicate_submission') {
         enqueueSnackbar(
-          'Você já enviou um questionário. Cada usuário pode enviar apenas um questionário.', 
+          'Você já enviou um questionário. Cada usuário pode enviar apenas um questionário.',
           { variant: 'warning' }
         );
       } else {
@@ -331,13 +331,13 @@ function Questionarios() {
   const editarQuestionario = (item) => {
     let setorOriginal = item.setor;
     let subareaOriginal = item.subarea || "";
-    
+
     if (!subareaOriginal && setorOriginal.includes(" - ")) {
       const partes = setorOriginal.split(" - ");
       setorOriginal = partes[0];
       subareaOriginal = partes.slice(1).join(" - ");
     }
-    
+
     setForm({
       setor: setorOriginal || "",
       subarea: subareaOriginal || "",
@@ -363,7 +363,7 @@ function Questionarios() {
 
   const confirmarExclusao = async () => {
     if (!modalExcluir) return;
-    
+
     setLoading(true);
     try {
       await excluirQuestionario(modalExcluir.id);
@@ -389,47 +389,47 @@ function Questionarios() {
   };
 
   const exportarQuestionariosExcel = () => {
-  if (questionariosFiltrados.length === 0) {
-    enqueueSnackbar("Não há respostas para exportar.", { variant: "warning" });
-    return;
-  }
+    if (questionariosFiltrados.length === 0) {
+      enqueueSnackbar("Não há respostas para exportar.", { variant: "warning" });
+      return;
+    }
 
-  const dadosExportacao = questionariosFiltrados.map((item) => ({
-    "Setor": exibirSetorCompleto(item),
-    "Responsável pela entrevista": item.responsavelEntrevista || "",
-    "Participantes": item.participantes || "",
-    "Data": formatarData(item.data),
-    "Principais processos": item.principaisProcessos || "",
-    "Atividades por frequência": item.atividadesFrequencia || "",
-    "Informações consultadas": item.informacoesConsultadas || "",
-    "Sistemas utilizados": item.sistemasUtilizados || "",
-    "Consulta em múltiplas fontes": item.multiplasFontes || "",
-    "Atividades manuais / retrabalho": item.atividadesManuaisRetrabalho || "",
-    "Erros / inconsistências / perda de tempo": item.errosPerdaTempo || "",
-    "Dependência de outro setor": item.dependenciaOutroSetor || "",
-    "Relatórios / indicadores / dashboards": item.relatoriosIndicadores || "",
-    "Melhorias de maior impacto": item.melhoriasImpacto || "",
-    "Considerações finais": item.consideracoesFinais || "",
-  }));
+    const dadosExportacao = questionariosFiltrados.map((item) => ({
+      "Setor": exibirSetorCompleto(item),
+      "Responsável pela entrevista": item.responsavelEntrevista || "",
+      "Participantes": item.participantes || "",
+      "Data": formatarData(item.data),
+      "Principais processos": item.principaisProcessos || "",
+      "Atividades por frequência": item.atividadesFrequencia || "",
+      "Informações consultadas": item.informacoesConsultadas || "",
+      "Sistemas utilizados": item.sistemasUtilizados || "",
+      "Consulta em múltiplas fontes": item.multiplasFontes || "",
+      "Atividades manuais / retrabalho": item.atividadesManuaisRetrabalho || "",
+      "Erros / inconsistências / perda de tempo": item.errosPerdaTempo || "",
+      "Dependência de outro setor": item.dependenciaOutroSetor || "",
+      "Relatórios / indicadores / dashboards": item.relatoriosIndicadores || "",
+      "Melhorias de maior impacto": item.melhoriasImpacto || "",
+      "Considerações finais": item.consideracoesFinais || "",
+    }));
 
-  const worksheet = XLSX.utils.json_to_sheet(dadosExportacao);
-  const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(dadosExportacao);
+    const workbook = XLSX.utils.book_new();
 
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Questionarios");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Questionarios");
 
-  const excelBuffer = XLSX.write(workbook, {
-    bookType: "xlsx",
-    type: "array",
-  });
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
 
-  const blob = new Blob([excelBuffer], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  });
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
 
-  saveAs(blob, `questionarios_admin_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    saveAs(blob, `questionarios_admin_${new Date().toISOString().slice(0, 10)}.xlsx`);
 
-  enqueueSnackbar("Arquivo Excel gerado com sucesso.", { variant: "success" });
-};
+    enqueueSnackbar("Arquivo Excel gerado com sucesso.", { variant: "success" });
+  };
 
   // Botão de enviar/submit reutilizável
   const SubmitButton = () => (
@@ -628,33 +628,33 @@ function Questionarios() {
         {/* LISTA DE QUESTIONÁRIOS - DESCOMENTADA */}
         {podeVisualizarQuestionarios && (
           <S.ListSection>
-          <S.ListHeader>
-  <div>
-    <h2>Respostas cadastradas</h2>
-    <p>Consulte, edite, exclua ou extraia respostas já registradas.</p>
-  </div>
+            <S.ListHeader>
+              <div>
+                <h2>Respostas cadastradas</h2>
+                <p>Consulte, edite, exclua ou extraia respostas já registradas.</p>
+              </div>
 
-  <S.ListActions>
-    <S.ExportButton
-      type="button"
-      onClick={exportarQuestionariosExcel}
-      disabled={carregandoLista || questionariosFiltrados.length === 0}
-    >
-      <FaFileExcel />
-      Exportar Excel
-    </S.ExportButton>
+              <S.ListActions>
+                <S.ExportButton
+                  type="button"
+                  onClick={exportarQuestionariosExcel}
+                  disabled={carregandoLista || questionariosFiltrados.length === 0}
+                >
+                  <FaFileExcel />
+                  Exportar Excel
+                </S.ExportButton>
 
-    <S.SearchBox>
-      <FaSearch />
-      <input
-        type="text"
-        value={busca}
-        onChange={(e) => setBusca(e.target.value)}
-        placeholder="Buscar por setor, responsável ou participante"
-      />
-    </S.SearchBox>
-  </S.ListActions>
-</S.ListHeader>
+                <S.SearchBox>
+                  <FaSearch />
+                  <input
+                    type="text"
+                    value={busca}
+                    onChange={(e) => setBusca(e.target.value)}
+                    placeholder="Buscar por setor, responsável ou participante"
+                  />
+                </S.SearchBox>
+              </S.ListActions>
+            </S.ListHeader>
 
             {carregandoLista ? (
               <S.EmptyState>

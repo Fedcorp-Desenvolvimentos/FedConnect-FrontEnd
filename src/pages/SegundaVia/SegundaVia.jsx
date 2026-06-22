@@ -95,7 +95,25 @@ const SegundaVia = () => {
       document.body.removeChild(link);
       enqueueSnackbar(`${selecionados.length} boleto(s) emitido(s) com sucesso!`, { variant: 'success' });
     } catch (error) {
-      enqueueSnackbar('Erro ao emitir segunda via. Tente novamente.', { variant: 'error' });
+      console.error(error);
+
+      let mensagemErro = "Erro ao emitir segunda via.";
+
+      if (error.response && error.response.data instanceof Blob) {
+        try {
+          const textoErro = await error.response.data.text();
+          const jsonErro = JSON.parse(textoErro);
+          mensagemErro = jsonErro.erro || jsonErro.detail || mensagemErro;
+        } catch (parseError) {
+          console.error("Erro ao extrair JSON do blob", parseError);
+        }
+      } else if (error.response && error.response.data) {
+        mensagemErro = error.response.data.erro || error.response.data.detail || mensagemErro;
+      } else if (error.message) {
+        mensagemErro = error.message;
+      }
+
+      enqueueSnackbar(mensagemErro, { variant: 'error' });
     } finally {
       setEmitindo(false);
     }

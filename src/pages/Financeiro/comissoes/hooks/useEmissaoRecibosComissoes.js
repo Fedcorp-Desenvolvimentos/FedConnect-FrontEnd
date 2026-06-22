@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   buscarComissoesPorFatura,
   buscarFaturasComissao,
+  buscarPessoas,
   emitirDocumentoComissoes,
 } from "../services/recibosComissoesService";
 import {
@@ -16,6 +17,7 @@ export function useEmissaoRecibosComissoes() {
 
   const [faturas, setFaturas] = useState([]);
   const [comissoes, setComissoes] = useState([]);
+  const [pessoas, setPessoas] = useState([]);
 
   const [selectedInvoices, setSelectedInvoices] = useState([]);
   const [selectedCommissions, setSelectedCommissions] = useState([]);
@@ -69,27 +71,60 @@ export function useEmissaoRecibosComissoes() {
     setFilters((current) => ({ ...current, [field]: value }));
   }
 
+  useEffect(() => {
+    buscarPessoas({ status: "A", limit: 7000 })
+      .then((response) => {
+        const lista = Array.isArray(response)
+          ? response
+          : response?.data || response?.results || [];
+        setPessoas(lista);
+      })
+      .catch(() => setPessoas([]));
+  }, []);
+
   async function searchInvoices() {
     setIsSearching(true);
     setStatusMessage("Consultando faturas e comissões");
 
     try {
-      const faturasResult = await buscarFaturasComissao(filters);
+      const data = await buscarFaturasComissao(filters);
 
-      const comissoesResult = await Promise.all(
-        faturasResult.map(async (fatura) => {
-          const comissoesDaFatura = await buscarComissoesPorFatura(fatura.id);
+      const rawList = Array.isArray(data)
+        ? data
+        : data?.results || data?.data || [];
 
-          return comissoesDaFatura.map((comissao) => ({
-            ...comissao,
-            faturaId: fatura.id,
-            faturaNumero: fatura.numero,
-            favorecido: fatura.favorecido,
-          }));
-        })
-      );
+      const faturasResult = rawList.map((f) => ({
+        ...f,
+        id: f.id || f.ID || f.codigo || f.CODIGO,
+        numero: f.numero || f.NUMERO || f.NUMERO_FATURA,
+        favorecido: f.favorecido || f.FAVORECIDO || f.NOME || "",
+        vencimento: f.vencimento || f.VENCIMENTO,
+        vigencia: f.vigencia || f.VIGENCIA,
+        valorLiquido: f.valorLiquido || f.VALOR_LIQUIDO || f.VALOR || 0,
+        status: f.status || f.STATUS || "pendente",
+        tipo: f.tipo || f.TIPO || "",
+        coEstipulante: f.coEstipulante || f.CO_ESTIPULANTE || "",
+        apolice: f.apolice || f.APOLICE || "",
+        comercial: f.comercial || f.COMERCIAL || "",
+        recibo: f.recibo || f.RECIBO || "",
+      }));
 
-      const todasComissoes = comissoesResult.flat();
+      const todasComissoes = faturasResult.flatMap((fatura) => {
+        const coms = fatura.comissoes || fatura.COMISSOES || [];
+        return coms.map((comissao) => ({
+          id: comissao.id || comissao.ID || comissao.codigo || comissao.CODIGO,
+          competencia: comissao.competencia || comissao.COMPETENCIA || "",
+          produto: comissao.produto || comissao.PRODUTO || "",
+          cliente: comissao.cliente || comissao.CLIENTE || "",
+          data: comissao.data || comissao.DATA || "",
+          valor: Number(
+            comissao.valor || comissao.VALOR || comissao.valorComissao || 0
+          ),
+          faturaId: fatura.id,
+          faturaNumero: fatura.numero,
+          favorecido: fatura.favorecido,
+        }));
+      });
 
       setFaturas(faturasResult);
       setComissoes(todasComissoes);
@@ -216,6 +251,7 @@ export function useEmissaoRecibosComissoes() {
     isSearching,
     issueDocument,
     lastEmission,
+    pessoas,
     previewDocument,
     printPaidValue,
     retentionSummary,

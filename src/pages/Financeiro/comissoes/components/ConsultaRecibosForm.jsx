@@ -1,4 +1,5 @@
 import { FaEraser, FaSearch, FaSlidersH } from "react-icons/fa";
+import { PessoaSelect } from "./PessoaSelect";
 
 export function ConsultaRecibosForm({
   filters,
@@ -7,6 +8,7 @@ export function ConsultaRecibosForm({
   onFilterChange,
   onSearch,
   onToggleAdvanced,
+  pessoas,
   showAdvancedFilters,
 }) {
   function handleSubmit(event) {
@@ -27,12 +29,10 @@ export function ConsultaRecibosForm({
         <div className="recibos-form-grid">
           <label>
             Favorecido
-            <input
-              type="text"
+            <PessoaSelect
+              pessoas={pessoas}
               value={filters.favorecido}
-              onChange={(event) =>
-                onFilterChange("favorecido", event.target.value)
-              }
+              onChange={(value) => onFilterChange("favorecido", value)}
               placeholder="Nome, código ou documento"
             />
           </label>

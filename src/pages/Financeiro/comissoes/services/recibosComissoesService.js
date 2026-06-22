@@ -1,54 +1,47 @@
-import {
-  recibosMockComissoes,
-  recibosMockFaturas,
-} from "../data/recibosComissoesMock";
+import api from "../../../../services/api";
 
-function matchesDateRange(value, start, end) {
-  if (!value) return true;
-  if (start && value < start) return false;
-  if (end && value > end) return false;
-  return true;
-}
+function mapFilters(filters) {
+  const mapping = {
+    favorecido: "favorecido",
+    fatura: "fatura",
+    vencimentoInicial: "vencimento_inicial",
+    vencimentoFinal: "vencimento_final",
+    status: "status",
+    tipo: "tipo",
+    coEstipulante: "co_estipulante",
+    apolice: "apolice",
+    comercial: "comercial",
+    recibo: "recibo",
+    vigenciaInicial: "vigencia_inicial",
+    vigenciaFinal: "vigencia_final",
+  };
 
-function matchesText(value, term) {
-  if (!term) return true;
-  return String(value || "").toLowerCase().includes(term.toLowerCase());
-}
-
-function matchesInvoiceStatus(status, filterStatus) {
-  if (!filterStatus || filterStatus === "todas") return true;
-  if (filterStatus === "baixadas") return status === "baixada";
-  if (filterStatus === "pendentes") return status === "pendente";
-  return true;
+  const params = {};
+  for (const [frontKey, backKey] of Object.entries(mapping)) {
+    const value = filters[frontKey];
+    if (value !== "" && value !== null && value !== undefined) {
+      params[backKey] = value;
+    }
+  }
+  return params;
 }
 
 export async function buscarFaturasComissao(filters) {
-  return recibosMockFaturas.filter((fatura) => {
-    return (
-      matchesText(fatura.favorecido, filters.favorecido) &&
-      matchesText(fatura.numero, filters.fatura) &&
-      matchesDateRange(
-        fatura.vencimento,
-        filters.vencimentoInicial,
-        filters.vencimentoFinal
-      ) &&
-      matchesDateRange(
-        fatura.vigencia,
-        filters.vigenciaInicial,
-        filters.vigenciaFinal
-      ) &&
-      matchesText(fatura.coEstipulante, filters.coEstipulante) &&
-      matchesText(fatura.apolice, filters.apolice) &&
-      matchesText(fatura.comercial, filters.comercial) &&
-      matchesText(fatura.recibo, filters.recibo) &&
-      matchesInvoiceStatus(fatura.status, filters.status) &&
-      (!filters.tipo || fatura.tipo === filters.tipo)
-    );
-  });
+  const params = mapFilters(filters);
+  params.limit = 10000;
+  params.offset = 0;
+
+  const response = await api.get("/comissoes/search/", { params });
+  return response.data;
 }
 
 export async function buscarComissoesPorFatura(faturaId) {
-  return recibosMockComissoes[faturaId] || [];
+  return [];
+}
+
+export async function buscarPessoas(params = {}) {
+  const response = await api.get("/pessoas/");
+  return response.data;
 }
 
 export async function emitirDocumentoComissoes(payload) {
