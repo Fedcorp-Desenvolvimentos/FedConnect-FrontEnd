@@ -11,9 +11,10 @@ export const cancelarBoletoFedBNK = async (payload) => {
 
     // Payload: sempre com metodo, fatura e documento (documento pode ser null)
     const requestPayload = {
-      metodo: payload.metodo,      // "INDIVIDUAL" ou "TODOS"
-      fatura: payload.fatura,      // número da fatura
+      metodo: payload.metodo,
+      fatura: payload.fatura,
       documento: payload.documento || null,
+      nossoNumero: payload.nossoNumero || null,
       motivo: payload.motivo,
       mail: payload.mail
     };

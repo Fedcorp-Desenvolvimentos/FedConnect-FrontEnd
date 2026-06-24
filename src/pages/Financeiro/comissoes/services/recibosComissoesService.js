@@ -31,12 +31,17 @@ export async function buscarFaturasComissao(filters) {
   params.limit = 10000;
   params.offset = 0;
 
-  const response = await api.get("/comissoes/search/", { params });
+  const response = await api.get("/comissoes/faturas/", { params });
   return response.data;
 }
 
 export async function buscarComissoesPorFatura(faturaId) {
-  return [];
+  try {
+    const response = await api.get(`/comissoes/faturas/${faturaId}/comissoes/`);
+    return response.data?.data || [];
+  } catch {
+    return [];
+  }
 }
 
 export async function buscarPessoas(params = {}) {
@@ -45,10 +50,15 @@ export async function buscarPessoas(params = {}) {
 }
 
 export async function emitirDocumentoComissoes(payload) {
-  return {
-    id: Date.now(),
-    numero: `RC-${String(Date.now()).slice(-6)}`,
-    emitidoEm: new Date().toISOString(),
-    ...payload,
-  };
+  try {
+    const response = await api.post("/comissoes/emitir/", {
+      fatura: payload.faturasIds?.[0],
+      parcela: 1,
+      tipo_fat: "F",
+      tipo_documento: payload.tipoDocumento,
+    });
+    return response.data?.data || response.data;
+  } catch {
+    return null;
+  }
 }

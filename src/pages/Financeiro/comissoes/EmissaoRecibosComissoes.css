@@ -1,3 +1,37 @@
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  border-radius: 8px;
+  background: linear-gradient(90deg, #f0f2f5 25%, #e4e8ee 37%, #f0f2f5 63%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+.shimmer-input {
+  height: 40px;
+  width: 100%;
+}
+
+.shimmer-select {
+  height: 40px;
+  width: 100%;
+}
+
+.shimmer-text {
+  height: 14px;
+  width: 60%;
+  margin-bottom: 6px;
+}
+
+.shimmer-label {
+  height: 12px;
+  width: 40%;
+  margin-bottom: 10px;
+}
+
 .recibos-page {
   width: 100%;
   padding-bottom: 32px;

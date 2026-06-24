@@ -66,6 +66,13 @@ export function PessoaSelect({ pessoas = [], value, onChange, placeholder }) {
     onChange(pessoa.codigo);
   }
 
+  function handleKeyDown(e) {
+    if (e.key === "Tab" && mostrarDropdown && filtradas.length === 1) {
+      e.preventDefault();
+      selecionarPessoa(filtradas[0]);
+    }
+  }
+
   return (
     <div ref={wrapperRef} style={{ position: "relative", width: "100%" }}>
       <input
@@ -73,6 +80,7 @@ export function PessoaSelect({ pessoas = [], value, onChange, placeholder }) {
         value={termo}
         onChange={handleChange}
         onFocus={handleFocus}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder || "Nome, código ou documento"}
         autoComplete="off"
         style={{

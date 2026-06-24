@@ -29,6 +29,7 @@ export function useEmissaoRecibosComissoes() {
   const [lastEmission, setLastEmission] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
   const [isIssuing, setIsIssuing] = useState(false);
+  const [pessoasLoading, setPessoasLoading] = useState(true);
 
   const allInvoicesSelected =
     faturas.length > 0 && selectedInvoices.length === faturas.length;
@@ -72,6 +73,7 @@ export function useEmissaoRecibosComissoes() {
   }
 
   useEffect(() => {
+    setPessoasLoading(true);
     buscarPessoas({ status: "A", limit: 7000 })
       .then((response) => {
         const lista = Array.isArray(response)
@@ -79,7 +81,8 @@ export function useEmissaoRecibosComissoes() {
           : response?.data || response?.results || [];
         setPessoas(lista);
       })
-      .catch(() => setPessoas([]));
+      .catch(() => setPessoas([]))
+      .finally(() => setPessoasLoading(false));
   }, []);
 
   async function searchInvoices() {
@@ -93,40 +96,76 @@ export function useEmissaoRecibosComissoes() {
         ? data
         : data?.results || data?.data || [];
 
-      const faturasResult = rawList.map((f) => ({
-        ...f,
-        id: f.id || f.ID || f.codigo || f.CODIGO,
-        numero: f.numero || f.NUMERO || f.NUMERO_FATURA,
-        favorecido: f.favorecido || f.FAVORECIDO || f.NOME || "",
-        vencimento: f.vencimento || f.VENCIMENTO,
-        vigencia: f.vigencia || f.VIGENCIA,
-        valorLiquido: f.valorLiquido || f.VALOR_LIQUIDO || f.VALOR || 0,
-        status: f.status || f.STATUS || "pendente",
-        tipo: f.tipo || f.TIPO || "",
-        coEstipulante: f.coEstipulante || f.CO_ESTIPULANTE || "",
-        apolice: f.apolice || f.APOLICE || "",
-        comercial: f.comercial || f.COMERCIAL || "",
-        recibo: f.recibo || f.RECIBO || "",
+      const linhas = rawList.map((r) => ({
+        id: r.ID || r.id || `${r.FATURA}-${r.PARCELA}`,
+        numero: r.FATURA || r.fatura || "",
+        tipo_fat: r.TIPO_FAT || "",
+        favorecido: r.NOME || r.nome || "",
+        vencimento: r.VENCIMENTO || r.vencimento,
+        vigencia: r.DT_INI_VIG || r.dt_ini_vig,
+        parcela: r.PARCELA || r.parcela || 1,
+        valorLiquido: Number(r.VALOR_LIQ ?? r.valor_liq ?? 0),
+        valor: Number(r.VALOR ?? r.valor ?? 0),
+        quitado: Number(r.QUITADO ?? r.quitado ?? 0),
+        comissao: Number(r.COMISSAO ?? r.comissao ?? 0),
+        imposto: Number(r.IMPOSTO ?? r.imposto ?? 0),
+        status: r.voucher || r.VOUCHER ? "baixada" : "pendente",
+        tipo: r.TIPO || r.tipo || "",
+        coEstipulante: r.CO_ESTIP || r.co_estip || "",
+        apolice: r.APOLICE || "",
+        recibo: r.VOUCHER || r.voucher || "",
+        produto: r.PRODUTO || r.produto || "",
+        documento: r.DOCUMENTO || "",
+        dt_baixa: r.DT_BAIXA || "",
+        premio_bruto: Number(r.PREMIO_BRUTO ?? 0),
+        premio_liq: Number(r.PREMIO_LIQ ?? 0),
+        favor: r.FAVOR || "",
+        conta: r.BC_AG_CC || "",
+        chave_pix: r.CHAVE_PIX || "",
       }));
 
-      const todasComissoes = faturasResult.flatMap((fatura) => {
-        const coms = fatura.comissoes || fatura.COMISSOES || [];
-        return coms.map((comissao) => ({
-          id: comissao.id || comissao.ID || comissao.codigo || comissao.CODIGO,
-          competencia: comissao.competencia || comissao.COMPETENCIA || "",
-          produto: comissao.produto || comissao.PRODUTO || "",
-          cliente: comissao.cliente || comissao.CLIENTE || "",
-          data: comissao.data || comissao.DATA || "",
-          valor: Number(
-            comissao.valor || comissao.VALOR || comissao.valorComissao || 0
-          ),
-          faturaId: fatura.id,
-          faturaNumero: fatura.numero,
-          favorecido: fatura.favorecido,
-        }));
-      });
+      const faturasUnicas = [];
+      const faturasMap = new Map();
+      for (const linha of linhas) {
+        if (!faturasMap.has(linha.numero)) {
+          faturasMap.set(linha.numero, {
+            id: linha.numero,
+            numero: linha.numero,
+            tipo: linha.tipo || linha.tipo_fat,
+            favorecido: linha.favorecido,
+            vencimento: linha.vencimento,
+            vigencia: linha.vigencia,
+            parcela: linha.parcela,
+            valorLiquido: linha.valorLiquido,
+            status: linha.status,
+            coEstipulante: linha.coEstipulante,
+            apolice: linha.apolice,
+            recibo: linha.recibo,
+          });
+        }
+      }
+      for (const fatura of faturasMap.values()) {
+        faturasUnicas.push(fatura);
+      }
 
-      setFaturas(faturasResult);
+      const todasComissoes = linhas.map((linha) => ({
+        id: linha.id,
+        competencia: linha.vencimento
+          ? new Date(linha.vencimento).toLocaleString("pt-BR", {
+              month: "short",
+              year: "numeric",
+            }).replace(/ de /, "/").toUpperCase()
+          : "",
+        produto: linha.produto,
+        cliente: linha.coEstipulante || linha.favorecido,
+        data: linha.vencimento,
+        valor: linha.valor,
+        faturaId: linha.numero,
+        faturaNumero: linha.numero,
+        favorecido: linha.favorecido,
+      }));
+
+      setFaturas(faturasUnicas);
       setComissoes(todasComissoes);
 
       setSelectedInvoices([]);
@@ -134,13 +173,13 @@ export function useEmissaoRecibosComissoes() {
       setSelectedRetentions([]);
       setLastEmission(null);
 
-      if (!faturasResult.length) {
+      if (!faturasUnicas.length) {
         setStatusMessage("Nenhuma fatura encontrada");
         return;
       }
 
       setStatusMessage(
-        `${faturasResult.length} fatura(s) e ${todasComissoes.length} comissão(ões) encontrada(s)`
+        `${faturasUnicas.length} fatura(s) e ${todasComissoes.length} comissão(ões) encontrada(s)`
       );
     } finally {
       setIsSearching(false);
@@ -252,6 +291,7 @@ export function useEmissaoRecibosComissoes() {
     issueDocument,
     lastEmission,
     pessoas,
+    pessoasLoading,
     previewDocument,
     printPaidValue,
     retentionSummary,

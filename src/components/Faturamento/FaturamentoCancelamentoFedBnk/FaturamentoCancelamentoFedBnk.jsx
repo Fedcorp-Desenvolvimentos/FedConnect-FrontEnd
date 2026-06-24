@@ -163,6 +163,7 @@ const FaturamentoCancelamentoFedBnk = () => {
       metodo: confirmData.tipo === "BOLETO" ? "INDIVIDUAL" : "TODOS",
       fatura: dadosFatura?.FATURA || fatura.trim(),
       documento: confirmData.tipo === "BOLETO" ? confirmData.documento : null,
+      nossoNumero: confirmData.tipo === "BOLETO" ? confirmData.nossoNumero : null,
       motivo: confirmData.motivo,
       mail: user?.email || "danielmello@condomed.com.br",
     };
@@ -177,16 +178,22 @@ const FaturamentoCancelamentoFedBnk = () => {
             type: "success", 
             message: `Boleto ${confirmData.documento} cancelado com sucesso!` 
           });
+          if (dadosFatura) {
+            setDadosFatura(prev => ({ 
+              ...prev, 
+              boletosAtivos: prev.boletosAtivos - 1,
+              STATUS: prev.boletosAtivos - 1 <= 0 ? "C" : prev.STATUS
+            }));
+          }
         } else {
           setBoletos([]);
           setStatus({ 
             type: "success", 
             message: `Fatura #${fatura} e seus ${confirmData.quantidade} boleto(s) cancelados com sucesso!` 
           });
-        }
-        
-        if (dadosFatura) {
-          setDadosFatura(prev => ({ ...prev, STATUS: "C" }));
+          if (dadosFatura) {
+            setDadosFatura(prev => ({ ...prev, STATUS: "C" }));
+          }
         }
       } else {
         setStatus({ 
@@ -194,8 +201,6 @@ const FaturamentoCancelamentoFedBnk = () => {
           message: response.message || "Erro ao realizar o cancelamento." 
         });
       }
-      
-      setConfirmOpen(false);
       
     } catch (err) {
       console.error("Erro no cancelamento:", err);
@@ -205,6 +210,7 @@ const FaturamentoCancelamentoFedBnk = () => {
       });
     } finally {
       setCancelando(false);
+      setConfirmOpen(false);
     }
   };
 

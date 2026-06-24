@@ -9,6 +9,7 @@ export function ConsultaRecibosForm({
   onSearch,
   onToggleAdvanced,
   pessoas,
+  pessoasLoading,
   showAdvancedFilters,
 }) {
   function handleSubmit(event) {
@@ -29,12 +30,16 @@ export function ConsultaRecibosForm({
         <div className="recibos-form-grid">
           <label>
             Favorecido
-            <PessoaSelect
-              pessoas={pessoas}
-              value={filters.favorecido}
-              onChange={(value) => onFilterChange("favorecido", value)}
-              placeholder="Nome, código ou documento"
-            />
+            {pessoasLoading ? (
+              <div className="shimmer shimmer-input" />
+            ) : (
+              <PessoaSelect
+                pessoas={pessoas}
+                value={filters.favorecido}
+                onChange={(value) => onFilterChange("favorecido", value)}
+                placeholder="Nome, código ou documento"
+              />
+            )}
           </label>
 
           <label>
