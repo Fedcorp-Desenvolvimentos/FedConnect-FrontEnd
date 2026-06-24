@@ -1,0 +1,169 @@
+// src/pages/Financeiro/voucher/components/PessoaSelect.jsx
+
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import styled from 'styled-components';
+
+const Container = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #2b6cb0;
+    box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.1);
+  }
+`;
+
+const Dropdown = styled.ul`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 250px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  z-index: 1000;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+`;
+
+const DropdownItem = styled.li`
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #f7fafc;
+  }
+
+  strong {
+    display: block;
+    font-size: 14px;
+    color: #2d3748;
+  }
+
+  span {
+    font-size: 12px;
+    color: #718096;
+  }
+`;
+
+const EmptyMessage = styled.div`
+  padding: 10px 12px;
+  text-align: center;
+  color: #718096;
+  font-size: 13px;
+`;
+
+export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => {
+  const [termo, setTermo] = useState(value || '');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const wrapperRef = useRef(null);
+
+  const pessoasNormalizadas = useMemo(() => {
+    return pessoas.map((p) => ({
+      ...p,
+      nome: p.nome || p.razao_social || p.nome_fantasia || p.NOME || '',
+      codigo: p.codigo || p.id || p.cod_pessoa || p.PESSOA || '',
+      documento: p.documento || p.cpf_cnpj || p.cnpj || p.cpf || p.CPF_CNPJ || '',
+    }));
+  }, [pessoas]);
+
+  const filtradas = useMemo(() => {
+    if (!termo || termo.length < 2) return [];
+    const t = termo.toLowerCase();
+    return pessoasNormalizadas.filter(
+      (p) =>
+        p.nome.toLowerCase().includes(t) ||
+        String(p.codigo).toLowerCase().includes(t) ||
+        String(p.documento).toLowerCase().includes(t)
+    );
+  }, [pessoasNormalizadas, termo]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (value && pessoasNormalizadas.length > 0) {
+      const encontrada = pessoasNormalizadas.find((p) => p.codigo === value);
+      if (encontrada) {
+        setTermo(encontrada.nome);
+      }
+    }
+  }, [value, pessoasNormalizadas]);
+
+  const handleChange = (e) => {
+    const novoTermo = e.target.value;
+    setTermo(novoTermo);
+    setShowDropdown(novoTermo.length >= 2);
+
+    if (!novoTermo) {
+      onChange('');
+    }
+  };
+
+  const handleFocus = () => {
+    if (termo.length >= 2) {
+      setShowDropdown(true);
+    }
+  };
+
+  const selecionarPessoa = (pessoa) => {
+    setTermo(pessoa.nome);
+    setShowDropdown(false);
+    onChange(pessoa.codigo);
+  };
+
+  return (
+    <Container ref={wrapperRef}>
+      <Input
+        type="text"
+        value={termo}
+        onChange={handleChange}
+        onFocus={handleFocus}
+        placeholder={placeholder || 'Nome, código ou documento'}
+        autoComplete="off"
+      />
+
+      {showDropdown && filtradas.length > 0 && (
+        <Dropdown>
+          {filtradas.map((pessoa, index) => (
+            <DropdownItem key={pessoa.codigo || index} onClick={() => selecionarPessoa(pessoa)}>
+              <strong>{pessoa.nome}</strong>
+              {[pessoa.codigo, pessoa.documento].filter(Boolean).length > 0 && (
+                <span> | {[pessoa.codigo, pessoa.documento].filter(Boolean).join(' | ')}</span>
+              )}
+            </DropdownItem>
+          ))}
+        </Dropdown>
+      )}
+
+      {showDropdown && filtradas.length === 0 && termo.length >= 2 && (
+        <EmptyMessage>Nenhuma pessoa encontrada para "{termo}"</EmptyMessage>
+      )}
+    </Container>
+  );
+};
