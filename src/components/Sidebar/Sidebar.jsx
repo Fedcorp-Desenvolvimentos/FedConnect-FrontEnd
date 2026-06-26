@@ -67,6 +67,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
 
   const emailsPermitidosAutomacao = [
     "leonan.thomaz@gmail.com",
+    "leonanthomaz.fedcorp@gmail.com",
     "operacional@grupofedcorp.com.br",
     "danielmello0110@gmail.com",
     "ingrydaylana@gmail.com"
