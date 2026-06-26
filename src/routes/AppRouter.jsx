@@ -104,6 +104,7 @@ import TratamentoErrosBOAT from '../components/TratamentoErros/TratamentoErrosBO
 
 import FormatosArquivos from '../pages/FormatosArquivos/FormatosArquivos';
 import ConverterBoletoCSV from '../components/FormatosArquivos/ConverterBoletoCSV';
+import MapaRedes from '../pages/MapaRedes/MapaRedes.jsx';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -207,6 +208,8 @@ const AppRouter = () => {
           {/* Formatos de Arquivos */}
           <Route path="/formatos-arquivos" element={<FormatosArquivos />} />
           <Route path="/formatos-arquivos/converter-boleto-csv" element={<ConverterBoletoCSV />} />
+
+          <Route path="/mapa-redes" element={<MapaRedes />} />
 
         </Route>
       </Route>
