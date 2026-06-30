@@ -31,6 +31,7 @@ export const ComissoesPanel = ({
           <div>
             <FaReceipt />
             <h2>3. Comissões</h2>
+            <span>Carregando...</span>
           </div>
         </CardHeader>
         <EmptyState>Carregando comissões...</EmptyState>
@@ -44,9 +45,7 @@ export const ComissoesPanel = ({
         <div>
           <FaReceipt />
           <h2>3. Comissões</h2>
-          <span style={{ fontSize: 13, color: '#718096' }}>
-            ({comissoes.length} encontradas)
-          </span>
+          <span>({comissoes.length} encontradas)</span>
         </div>
         {comissoes.length > 0 && (
           <button type="button" className="link-button" onClick={onToggleAllComissoes}>
@@ -61,9 +60,10 @@ export const ComissoesPanel = ({
         <>
           <ComissaoList>
             {comissoes.map((comissao) => {
-              const id = comissao.FATURA || comissao.id;
+              // 🔥 ID ÚNICO baseado na FATURA
+              const id = String(comissao.FATURA || comissao.fatura || comissao.id || comissao.DOCUMENTO || '');
               const isSelected = selectedComissoes.includes(id);
-              const valorComissao = comissao.VALOR_COMISSAO || comissao.valor_comissao || comissao.VALOR || 0;
+              const valorComissao = comissao.VALOR || comissao.valor || comissao.VALOR_COMISSAO || comissao.valor_comissao || 0;
               const nomeFavorecido = comissao.NOME || comissao.nome || 'Favorecido';
 
               return (
@@ -86,9 +86,7 @@ export const ComissoesPanel = ({
                       {comissao.PRODUTO || comissao.produto || '-'}
                     </span>
                   </div>
-                  <span className="value">
-                    {formatMoney(valorComissao)}
-                  </span>
+                  <span className="value">{formatMoney(valorComissao)}</span>
                 </ComissaoItem>
               );
             })}

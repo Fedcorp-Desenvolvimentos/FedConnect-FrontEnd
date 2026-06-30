@@ -15,13 +15,15 @@ import {
   BackButton,
   Title,
   WorkflowGrid,
-  LoadingOverlay,
+  SkeletonCard,
+  SkeletonRow,
 } from './EmissaoRecibosVoucherStyles';
 
 export default function EmissaoRecibosVoucher() {
   const navigate = useNavigate();
   const {
     loading,
+    loadingFaturas,
     filters,
     showAdvancedFilters,
     comissoes,
@@ -46,24 +48,11 @@ export default function EmissaoRecibosVoucher() {
     previewDocument,
   } = useEmissaoRecibos();
 
-  // Carrega os dados ao montar
   useEffect(() => {
     buscarTudo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const canIssue = selectedComissoes.length > 0 || selectedFaturas.length > 0;
-
-  if (loading && comissoes.length === 0 && faturas.length === 0) {
-    return (
-      <Container>
-        <LoadingOverlay>
-          <span className="spinner">⏳</span>
-          Carregando dados...
-        </LoadingOverlay>
-      </Container>
-    );
-  }
 
   return (
     <Container>
@@ -100,22 +89,39 @@ export default function EmissaoRecibosVoucher() {
       />
 
       <WorkflowGrid>
-        <FaturasTable
-          faturas={faturas}
-          selectedFaturas={selectedFaturas}
-          onToggleFatura={toggleFatura}
-          onToggleAllFaturas={toggleAllFaturas}
-          loading={loading}
-        />
+        {loading ? (
+          <SkeletonCard>
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+          </SkeletonCard>
+        ) : (
+          <FaturasTable
+            faturas={faturas}
+            selectedFaturas={selectedFaturas}
+            onToggleFatura={toggleFatura}
+            onToggleAllFaturas={toggleAllFaturas}
+            loading={loadingFaturas}
+          />
+        )}
 
-        <ComissoesPanel
-          comissoes={comissoes}
-          selectedComissoes={selectedComissoes}
-          onToggleComissao={toggleComissao}
-          onToggleAllComissoes={toggleAllComissoes}
-          totals={totals}
-          loading={loading}
-        />
+        {loading ? (
+          <SkeletonCard>
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+          </SkeletonCard>
+        ) : (
+          <ComissoesPanel
+            comissoes={comissoes}
+            selectedComissoes={selectedComissoes}
+            onToggleComissao={toggleComissao}
+            onToggleAllComissoes={toggleAllComissoes}
+            totals={totals}
+            loading={loading}
+          />
+        )}
       </WorkflowGrid>
 
       <EmissaoPanel

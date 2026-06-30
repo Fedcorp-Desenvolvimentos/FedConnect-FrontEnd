@@ -2,10 +2,12 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useSnackbar } from 'notistack';
+import { useLoading } from '../../../../hooks/useLoading';
 import { 
-  buscarComissoesPorDataCorte, 
+  buscarComissoesPorDataCorte,
   buscarPessoas, 
-  buscarFaturamento
+  buscarFaturamento,
+  emitirDocumento as emitirDocumentoApi
 } from '../../../../services/comissoesService';
 
 const INITIAL_FILTERS = {
@@ -25,9 +27,8 @@ const INITIAL_FILTERS = {
 
 export const useEmissaoRecibos = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const { withLoading, loading } = useLoading();
   
-  // Estados
-  const [loading, setLoading] = useState(false);
   const [loadingFaturas, setLoadingFaturas] = useState(false);
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -48,146 +49,126 @@ export const useEmissaoRecibos = () => {
     const loadPessoas = async () => {
       try {
         const response = await buscarPessoas({ status: 'A', limit: 7000 });
-        const lista = response?.data || response?.results || [];
+        let lista = [];
+        if (response?.data) {
+          if (Array.isArray(response.data)) {
+            lista = response.data;
+          } else if (response.data.data && Array.isArray(response.data.data)) {
+            lista = response.data.data;
+          }
+        }
         setPessoas(lista);
       } catch (error) {
-        console.error('Erro ao carregar pessoas:', error);
         enqueueSnackbar('Erro ao carregar lista de pessoas', { variant: 'error' });
       }
     };
     loadPessoas();
   }, [enqueueSnackbar]);
 
-  // 🔥 BUSCAR COMISSÕES - APENAS V2 (NUNCA usa /comissoes/faturas/)
+  // Buscar comissões - V2
   const buscarComissoes = useCallback(async (novosFiltros = {}) => {
-    setLoading(true);
-    try {
-      const filtrosAtualizados = { ...filters, ...novosFiltros };
-      
-      const filtrosLimpos = {};
-      Object.keys(filtrosAtualizados).forEach(key => {
-        const val = filtrosAtualizados[key];
-        if (val !== '' && val !== null && val !== undefined && val !== 'null') {
-          filtrosLimpos[key] = val;
-        }
-      });
-
-      console.log('🔍 Buscando comissões com filtros:', filtrosLimpos);
-
-      // 🔥 FORÇA A V2 - ÚNICA ROTA DE COMISSÕES
-      const response = await buscarComissoesPorDataCorte(dataCorte, filtrosLimpos);
-      
-      console.log('📦 Resposta do serviço:', response);
-
-      if (response.sucesso) {
-        const dados = response.dados;
-        const lista = dados?.data || [];
-        
-        setComissoes(lista);
-        setTotalRegistros(dados?.total_registros || dados?.total_retornados || lista.length);
-        setHasMore(dados?.has_more || false);
-
-        enqueueSnackbar(
-          `${lista.length} comissões carregadas (Total: ${dados?.total_registros || lista.length})`,
-          { variant: 'success' }
-        );
-      } else {
-        throw new Error(response.erro || 'Erro ao buscar comissões');
+    const filtrosAtualizados = { ...filters, ...novosFiltros };
+    
+    const filtrosLimpos = {};
+    Object.keys(filtrosAtualizados).forEach(key => {
+      const val = filtrosAtualizados[key];
+      if (val !== '' && val !== null && val !== undefined && val !== 'null') {
+        filtrosLimpos[key] = val;
       }
-    } catch (error) {
-      console.error('❌ Erro ao buscar comissões:', error);
-      enqueueSnackbar(error.message || 'Erro ao buscar comissões', { variant: 'error' });
-      setComissoes([]);
-      setTotalRegistros(0);
-      setHasMore(false);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, dataCorte, enqueueSnackbar]);
+    });
 
-  // 🔥 BUSCAR FATURAS - APENAS USANDO FATURAMENTO (NUNCA /comissoes/faturas/)
-  const buscarFaturasLista = useCallback(async (novosFiltros = {}) => {
+    const result = await withLoading(
+      async () => {
+        const response = await buscarComissoesPorDataCorte(dataCorte, filtrosLimpos);
+        return response;
+      },
+      'Buscando comissões...'
+    );
+
+    if (result?.sucesso) {
+      const dados = result.dados;
+      const lista = dados?.data || [];
+      setComissoes(lista);
+      setTotalRegistros(dados?.total_registros || lista.length);
+      setHasMore(dados?.has_more || false);
+
+      if (lista.length === 0) {
+        enqueueSnackbar('Nenhuma comissão encontrada com os filtros informados', { variant: 'info' });
+      }
+      return lista;
+    }
+    return [];
+  }, [filters, dataCorte, withLoading, enqueueSnackbar]);
+
+  // Buscar faturas - via faturamento
+  const buscarFaturas = useCallback(async (novosFiltros = {}) => {
+    const temFiltro = filters.fatura || filters.vencimento_inicial || filters.vencimento_final || novosFiltros?.fatura;
+    
+    if (!temFiltro) {
+      setFaturas([]);
+      return [];
+    }
+
     setLoadingFaturas(true);
     try {
-      // Só busca faturas se tiver filtro específico (evita chamadas desnecessárias)
-      const temFiltroEspecifico = filters.fatura || filters.vencimento_inicial || filters.vencimento_final;
-      
-      if (!temFiltroEspecifico && !novosFiltros?.fatura) {
-        console.log('ℹ️ Nenhum filtro específico para faturas - pulando busca');
-        setFaturas([]);
-        setLoadingFaturas(false);
-        return;
-      }
-
       const filtrosBusca = { 
         page: 1, 
         page_size: 50,
         ...novosFiltros 
       };
 
-      if (filters.fatura) {
-        filtrosBusca.fatura = filters.fatura;
-      }
-      
-      if (filters.vencimento_inicial) {
-        filtrosBusca.data_ini = filters.vencimento_inicial;
-      }
-      if (filters.vencimento_final) {
-        filtrosBusca.data_fim = filters.vencimento_final;
-      }
+      if (filters.fatura) filtrosBusca.fatura = filters.fatura;
+      if (filters.vencimento_inicial) filtrosBusca.data_ini = filters.vencimento_inicial;
+      if (filters.vencimento_final) filtrosBusca.data_fim = filters.vencimento_final;
 
       if (filters.status && filters.status !== 'todas') {
-        if (filters.status === 'baixadas') {
-          filtrosBusca.status = 'B';
-        } else if (filters.status === 'pendentes') {
-          filtrosBusca.status = 'A';
-        }
+        filtrosBusca.status = filters.status === 'baixadas' ? 'B' : 'A';
       }
 
-      // 🔥 USA FATURAMENTO (funciona) - NUNCA USA /comissoes/faturas/
       const response = await buscarFaturamento(filtrosBusca);
-      
-      console.log('📦 Resposta faturamento:', response);
       
       if (response.sucesso) {
         const dados = response.resultado?.data || response.data || [];
         setFaturas(dados);
-        enqueueSnackbar(
-          `${dados.length || 0} faturas carregadas`,
-          { variant: 'success' }
-        );
-      } else {
-        throw new Error(response.erro || 'Erro ao buscar faturas');
+        return dados;
       }
+      return [];
     } catch (error) {
-      console.error('Erro ao buscar faturas:', error);
-      enqueueSnackbar(error.message || 'Erro ao buscar faturas', { variant: 'error' });
       setFaturas([]);
+      return [];
     } finally {
       setLoadingFaturas(false);
     }
-  }, [filters, enqueueSnackbar]);
+  }, [filters]);
 
-  // Buscar tudo (comissões + faturas)
+  // Buscar tudo
   const buscarTudo = useCallback(async () => {
-    // Busca comissões primeiro (mais importante)
     await buscarComissoes();
     
-    // Depois busca faturas se tiver filtros
-    await buscarFaturasLista();
-  }, [buscarComissoes, buscarFaturasLista]);
+    if (filters.fatura) {
+      await buscarFaturas();
+    } else {
+      setFaturas([]);
+    }
+  }, [buscarComissoes, buscarFaturas, filters.fatura]);
+
+  // Buscar por favorecido
+  const buscarPorFavorecido = useCallback(async (codigoFavorecido) => {
+    if (!codigoFavorecido) {
+      await buscarComissoes({ favorecido: '' });
+      return;
+    }
+    await buscarComissoes({ favorecido: codigoFavorecido });
+  }, [buscarComissoes]);
 
   // Atualizar filtro
   const updateFilter = useCallback((field, value) => {
     setFilters(prev => {
       const newFilters = { ...prev, [field]: value };
-      
-      // Se mudou o campo de busca, reseta a seleção
-      if (['favorecido', 'fatura', 'status'].includes(field)) {
+      if (['favorecido', 'fatura', 'status', 'tipo'].includes(field)) {
         setSelectedComissoes([]);
         setSelectedFaturas([]);
       }
-      
       return newFilters;
     });
   }, []);
@@ -204,10 +185,11 @@ export const useEmissaoRecibos = () => {
     enqueueSnackbar('Filtros limpos', { variant: 'info' });
   }, [enqueueSnackbar]);
 
-  // Selecionar comissão
+  // Selecionar comissão - CORRIGIDO: usa FATURA como ID único
   const toggleComissao = useCallback((id) => {
     setSelectedComissoes(prev => {
-      if (prev.includes(id)) {
+      const isSelected = prev.includes(id);
+      if (isSelected) {
         return prev.filter(item => item !== id);
       }
       return [...prev, id];
@@ -216,17 +198,19 @@ export const useEmissaoRecibos = () => {
 
   // Selecionar todas comissões
   const toggleAllComissoes = useCallback(() => {
-    if (selectedComissoes.length === comissoes.length && comissoes.length > 0) {
-      setSelectedComissoes([]);
-    } else {
-      setSelectedComissoes(comissoes.map(c => c.FATURA || c.fatura || c.id));
-    }
+    if (comissoes.length === 0) return;
+    
+    const allIds = comissoes.map(c => c.FATURA || c.fatura || c.id || c.DOCUMENTO);
+    const allSelected = selectedComissoes.length === allIds.length;
+    
+    setSelectedComissoes(allSelected ? [] : allIds);
   }, [comissoes, selectedComissoes]);
 
   // Selecionar fatura
   const toggleFatura = useCallback((id) => {
     setSelectedFaturas(prev => {
-      if (prev.includes(id)) {
+      const isSelected = prev.includes(id);
+      if (isSelected) {
         return prev.filter(item => item !== id);
       }
       return [...prev, id];
@@ -235,29 +219,28 @@ export const useEmissaoRecibos = () => {
 
   // Selecionar todas faturas
   const toggleAllFaturas = useCallback(() => {
-    if (selectedFaturas.length === faturas.length && faturas.length > 0) {
-      setSelectedFaturas([]);
-    } else {
-      setSelectedFaturas(faturas.map(f => f.FATURA || f.fatura || f.id));
-    }
+    if (faturas.length === 0) return;
+    
+    const allIds = faturas.map(f => f.FATURA || f.fatura || f.id);
+    const allSelected = selectedFaturas.length === allIds.length;
+    
+    setSelectedFaturas(allSelected ? [] : allIds);
   }, [faturas, selectedFaturas]);
 
-  // 🔥 EMITIR DOCUMENTO - COM CONSOLE.LOG PARA TESTE
+  // Emitir documento - envia JSON para o backend
   const emitirDocumento = useCallback(async () => {
     if (selectedComissoes.length === 0 && selectedFaturas.length === 0) {
       enqueueSnackbar('Selecione pelo menos uma comissão ou fatura', { variant: 'warning' });
       return;
     }
 
-    setLoading(true);
-    
     try {
-      // Busca as comissões selecionadas com todos os dados
-      const comissoesSelecionadas = comissoes.filter(c => 
-        selectedComissoes.includes(c.FATURA || c.fatura || c.id)
-      );
+      const comissoesSelecionadas = comissoes.filter(c => {
+        const id = c.FATURA || c.fatura || c.id || c.DOCUMENTO;
+        return selectedComissoes.includes(id);
+      });
       
-      // Busca detalhes das faturas selecionadas usando faturamento
+      // Buscar detalhes das faturas selecionadas
       let faturasDetalhadas = [];
       for (const id of selectedFaturas) {
         try {
@@ -266,113 +249,83 @@ export const useEmissaoRecibos = () => {
             faturasDetalhadas.push(...response.resultado.data);
           }
         } catch (e) {
-          console.warn(`Erro ao buscar detalhes da fatura ${id}:`, e);
+          // Silencia erro
         }
       }
 
-      // 🔥 CONSTRUIR PAYLOAD PARA EMISSÃO
+      const valorTotal = comissoesSelecionadas.reduce(
+        (sum, c) => sum + Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0), 
+        0
+      );
+
+      // 🔥 Payload para o backend
       const payload = {
         tipoDocumento: documentType,
         dataCorte,
         dataEmissao: new Date().toISOString(),
         totalComissoes: comissoesSelecionadas.length,
         totalFaturas: selectedFaturas.length,
-        valorTotalBruto: comissoesSelecionadas.reduce(
-          (sum, c) => sum + Number(c.VALOR_COMISSAO || c.valor_comissao || c.VALOR || 0), 
-          0
-        ),
+        valorTotalBruto: valorTotal,
         comissoes: comissoesSelecionadas.map(c => ({
-          fatura: c.FATURA || c.fatura,
-          parcela: c.PARCELA || c.parcela,
-          favorecido: c.FAVOR || c.favor,
-          favorecidoNome: c.NOME || c.nome,
-          favorecidoDocumento: c.DOC_FAVORECIDO || c.doc_favorecido,
-          valorComissao: c.VALOR_COMISSAO || c.valor_comissao || c.VALOR,
-          percentual: c.COMISSAO || c.comissao,
-          imposto: c.IMPOSTO || c.imposto,
-          voucher: c.VOUCHER || c.voucher,
-          dataRepasse: c.DT_REPASSE || c.dt_repasse,
-          produto: c.PRODUTO || c.produto,
-          coEstipulante: c.CO_ESTIP || c.co_estip,
-          bancoAgenciaConta: c.BC_AG_CC || c.bc_ag_cc,
-          chavePix: c.CHAVE_PIX || c.chave_pix,
+          fatura: c.FATURA || c.fatura || c.DOCUMENTO || '',
+          parcela: c.PARCELA || c.parcela || '1',
+          favorecido: c.FAVOR || c.favor || '',
+          favorecidoNome: c.NOME || c.nome || '',
+          favorecidoDocumento: c.DOC_FAVORECIDO || c.doc_favorecido || '',
+          valorComissao: Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0),
+          percentual: c.COMISSAO || c.comissao || 0,
+          imposto: c.IMPOSTO || c.imposto || 0,
+          voucher: c.VOUCHER || c.voucher || null,
+          dataRepasse: c.DT_REPASSE || c.dt_repasse || null,
+          produto: c.PRODUTO || c.produto || '',
+          coEstipulante: c.CO_ESTIP || c.co_estip || '',
+          bancoAgenciaConta: c.BC_AG_CC || c.bc_ag_cc || '',
+          chavePix: c.CHAVE_PIX || c.chave_pix || null,
+          vencimento: c.VENCIMENTO || c.vencimento || null,
+          dataFat: c.DATA_FAT || c.data_fat || null,
+          tipoFatura: c.TIPO_FAT || c.tipo_fat || '',
+          premioBruto: Number(c.PREMIO_BRUTO || c.premio_bruto || 0),
+          premioLiquido: Number(c.PREMIO_LIQ || c.premio_liq || 0),
+          quitado: c.QUITADO || c.quitado || 0,
+          status: c.STATUS || c.status || '',
         })),
         faturas: faturasDetalhadas.map(f => ({
-          fatura: f.FATURA || f.fatura,
-          apolice: f.APOLICE || f.apolice,
-          administradora: f.ADMINISTRADORA || f.administradora,
-          seguradora: f.SEGURADORA || f.seguradora,
-          dataFat: f.DATA_FAT || f.data_fat,
-          vencimento: f.VENCIMENTO || f.vencimento,
-          status: f.STATUS || f.status,
-          premioBruto: f.PREMIO_BRUTO || f.premio_bruto,
-          premioLiquido: f.PREMIO_LIQ || f.premio_liq,
+          fatura: f.FATURA || f.fatura || '',
+          apolice: f.APOLICE || f.apolice || '',
+          administradora: f.ADMINISTRADORA || f.administradora || '',
+          seguradora: f.SEGURADORA || f.seguradora || '',
+          dataFat: f.DATA_FAT || f.data_fat || '',
+          vencimento: f.VENCIMENTO || f.vencimento || '',
+          status: f.STATUS || f.status || '',
+          premioBruto: Number(f.PREMIO_BRUTO || f.premio_bruto || 0),
+          premioLiquido: Number(f.PREMIO_LIQ || f.premio_liq || 0),
           boletos: f.BOLETOS || [],
+          parcelas: f.PARCELAS || [],
+          baixas: f.BAIXAS || [],
         })),
       };
 
-      // 🔥 LOG PARA DEBUG - INFORMAÇÕES PARA GERAR A GUIA
-      console.log('═══════════════════════════════════════════════════');
-      console.log('📄 EMISSÃO DE DOCUMENTO');
-      console.log('═══════════════════════════════════════════════════');
-      console.log(`📌 Tipo: ${payload.tipoDocumento.toUpperCase()}`);
-      console.log(`📅 Data de Corte: ${payload.dataCorte}`);
-      console.log(`📅 Data Emissão: ${payload.dataEmissao}`);
-      console.log(`📊 Total de Comissões: ${payload.totalComissoes}`);
-      console.log(`📊 Total de Faturas: ${payload.totalFaturas}`);
-      console.log(`💰 Valor Total Bruto: R$ ${payload.valorTotalBruto.toFixed(2)}`);
-      console.log('───────────────────────────────────────────────────');
+      // 🔥 Envia para o backend
+      const response = await emitirDocumentoApi(payload);
       
-      console.log('📋 COMISSÕES SELECIONADAS:');
-      payload.comissoes.forEach((c, i) => {
-        console.log(`  ${i+1}. Fatura ${c.fatura} | ${c.favorecidoNome}`);
-        console.log(`     Valor: R$ ${Number(c.valorComissao).toFixed(2)} | %: ${c.percentual}%`);
-        console.log(`     Produto: ${c.produto || '-'}`);
-        console.log(`     Voucher: ${c.voucher || 'Não emitido'}`);
-        console.log(`     Banco: ${c.bancoAgenciaConta || '-'}`);
-        if (c.chavePix) console.log(`     PIX: ${c.chavePix}`);
-        console.log('───────────────────────────────────────────────────');
-      });
-
-      if (payload.faturas.length > 0) {
-        console.log('📋 FATURAS DETALHADAS:');
-        payload.faturas.forEach((f, i) => {
-          console.log(`  ${i+1}. Fatura ${f.fatura} | ${f.administradora}`);
-          console.log(`     Apólice: ${f.apolice} | Status: ${f.status}`);
-          console.log(`     Prêmio Bruto: R$ ${Number(f.premioBruto).toFixed(2)}`);
-          console.log(`     Vencimento: ${f.vencimento}`);
-          if (f.boletos && f.boletos.length > 0) {
-            console.log(`     Boletos: ${f.boletos.length} boletos`);
-          }
-          console.log('───────────────────────────────────────────────────');
+      if (response.sucesso) {
+        setLastEmission({
+          numero: response.data?.numero || `RC-${String(Date.now()).slice(-6)}`,
+          emitidoEm: response.data?.emitidoEm || new Date().toISOString(),
+          tipo: documentType,
+          total: valorTotal,
+          quantidade: comissoesSelecionadas.length,
         });
+
+        enqueueSnackbar(
+          `✅ ${documentType === 'voucher' ? 'Voucher' : 'Recibo'} emitido! ${comissoesSelecionadas.length} comissões, R$ ${valorTotal.toFixed(2)}`,
+          { variant: 'success' }
+        );
+      } else {
+        throw new Error(response.erro || 'Erro ao emitir documento');
       }
-
-      console.log('📝 PAYLOAD COMPLETO:');
-      console.log(JSON.stringify(payload, null, 2));
-      console.log('═══════════════════════════════════════════════════');
-
-      // Simula emissão
-      setLastEmission({
-        numero: `RC-${String(Date.now()).slice(-6)}`,
-        emitidoEm: new Date().toISOString(),
-        tipo: documentType,
-        total: payload.valorTotalBruto,
-        quantidade: payload.totalComissoes,
-      });
-
-      enqueueSnackbar(
-        `✅ ${documentType === 'voucher' ? 'Voucher' : 'Recibo'} emitido! ${payload.totalComissoes} comissões, R$ ${payload.valorTotalBruto.toFixed(2)}`,
-        { variant: 'success' }
-      );
-
-      console.log('💡 Abra o console (F12) para ver todos os detalhes da emissão.');
-
     } catch (error) {
-      console.error('❌ Erro ao emitir documento:', error);
-      enqueueSnackbar('Erro ao emitir documento', { variant: 'error' });
-    } finally {
-      setLoading(false);
+      enqueueSnackbar(error.message || 'Erro ao emitir documento', { variant: 'error' });
     }
   }, [documentType, selectedComissoes, selectedFaturas, comissoes, dataCorte, enqueueSnackbar]);
 
@@ -383,55 +336,42 @@ export const useEmissaoRecibos = () => {
       return;
     }
     
-    const comissoesSelecionadas = comissoes.filter(c => 
-      selectedComissoes.includes(c.FATURA || c.fatura || c.id)
-    );
+    const comissoesSelecionadas = comissoes.filter(c => {
+      const id = c.FATURA || c.fatura || c.id || c.DOCUMENTO;
+      return selectedComissoes.includes(id);
+    });
     
     const total = comissoesSelecionadas.reduce(
-      (sum, c) => sum + Number(c.VALOR_COMISSAO || c.valor_comissao || c.VALOR || 0), 
+      (sum, c) => sum + Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0), 
       0
     );
     
-    const count = comissoesSelecionadas.length;
-    
-    console.log('👁️ PRÉ-VISUALIZAÇÃO:');
-    console.log(`  ${count} comissões selecionadas`);
-    console.log(`  Total: R$ ${total.toFixed(2)}`);
-    console.log(`  Faturas: ${selectedFaturas.length}`);
-    console.log(`  Tipo: ${documentType}`);
-    
     enqueueSnackbar(
-      `Pré-visualização: ${count} comissões, R$ ${total.toFixed(2)} (ver console)`,
+      `Pré-visualização: ${comissoesSelecionadas.length} comissões, R$ ${total.toFixed(2)}`,
       { variant: 'info' }
     );
-  }, [selectedComissoes, selectedFaturas, comissoes, documentType, enqueueSnackbar]);
+  }, [selectedComissoes, selectedFaturas, comissoes, enqueueSnackbar]);
 
   // Totais
   const totals = useMemo(() => {
-    const comissoesSelecionadas = comissoes.filter(c => 
-      selectedComissoes.includes(c.FATURA || c.fatura || c.id)
-    );
+    const comissoesSelecionadas = comissoes.filter(c => {
+      const id = c.FATURA || c.fatura || c.id || c.DOCUMENTO;
+      return selectedComissoes.includes(id);
+    });
     
     const grossTotal = comissoesSelecionadas.reduce(
-      (sum, c) => sum + Number(c.VALOR_COMISSAO || c.valor_comissao || c.VALOR || 0), 
+      (sum, c) => sum + Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0), 
       0
     );
     
-    // Retenção de imposto (exemplo: 5%)
     const retentionTotal = grossTotal * 0.05;
     const netTotal = grossTotal - retentionTotal;
 
-    return {
-      grossTotal,
-      retentionTotal,
-      netTotal,
-      count: comissoesSelecionadas.length,
-    };
+    return { grossTotal, retentionTotal, netTotal, count: comissoesSelecionadas.length };
   }, [comissoes, selectedComissoes]);
 
   return {
-    // Estados
-    loading: loading || loadingFaturas,
+    loading,
     loadingFaturas,
     filters,
     showAdvancedFilters,
@@ -447,10 +387,10 @@ export const useEmissaoRecibos = () => {
     dataCorte,
     totals,
 
-    // Ações
     buscarComissoes,
-    buscarFaturasLista,
+    buscarFaturas,
     buscarTudo,
+    buscarPorFavorecido,
     updateFilter,
     clearFilters,
     setShowAdvancedFilters,

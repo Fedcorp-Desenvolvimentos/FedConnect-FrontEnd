@@ -1,23 +1,23 @@
-// src/pages/Financeiro/voucher/components/FilterForm.jsx
+// src/pages/Financeiro/voucher/components/ConsultaRecibosForm.jsx (ou similar)
 
 import React, { useCallback } from 'react';
 import { FaSearch, FaEraser, FaSlidersH } from 'react-icons/fa';
 import { Card, CardHeader, FormGrid, FormGroup, Actions, Button } from '../EmissaoRecibosVoucherStyles';
 import { PessoaSelect } from './PessoaSelect';
 
-export const FilterForm = ({
+export const ConsultaRecibosForm = ({
   filters,
   pessoas,
   loading,
   showAdvanced,
   onFilterChange,
-  onSearch,
+  onSearch,        // 🔥 Recebe a função do hook
   onClear,
   onToggleAdvanced,
 }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch();
+    onSearch();  // 🔥 Chama a função do hook
   };
 
   const handlePessoaChange = useCallback((value) => {

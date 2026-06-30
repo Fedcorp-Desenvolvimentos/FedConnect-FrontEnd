@@ -72,22 +72,37 @@ const EmptyMessage = styled.div`
 `;
 
 export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => {
-  const [termo, setTermo] = useState(value || '');
+  const [termo, setTermo] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const wrapperRef = useRef(null);
 
   const pessoasNormalizadas = useMemo(() => {
     return pessoas.map((p) => ({
       ...p,
-      nome: p.nome || p.razao_social || p.nome_fantasia || p.NOME || '',
-      codigo: p.codigo || p.id || p.cod_pessoa || p.PESSOA || '',
-      documento: p.documento || p.cpf_cnpj || p.cnpj || p.cpf || p.CPF_CNPJ || '',
+      nome: p.NOME || p.nome || p.razao_social || p.nome_fantasia || '',
+      codigo: p.PESSOA || p.pessoa || p.codigo || p.id || p.cod_pessoa || '',
+      documento: p.CPF_CNPJ || p.cpf_cnpj || p.documento || p.cnpj || p.cpf || '',
     }));
   }, [pessoas]);
 
+  useEffect(() => {
+    if (value && pessoasNormalizadas.length > 0) {
+      const encontrada = pessoasNormalizadas.find((p) => 
+        String(p.codigo) === String(value)
+      );
+      if (encontrada) {
+        setTermo(encontrada.nome);
+      } else {
+        setTermo(value);
+      }
+    } else if (!value) {
+      setTermo('');
+    }
+  }, [value, pessoasNormalizadas]);
+
   const filtradas = useMemo(() => {
     if (!termo || termo.length < 2) return [];
-    const t = termo.toLowerCase();
+    const t = termo.toLowerCase().trim();
     return pessoasNormalizadas.filter(
       (p) =>
         p.nome.toLowerCase().includes(t) ||
@@ -106,15 +121,6 @@ export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (value && pessoasNormalizadas.length > 0) {
-      const encontrada = pessoasNormalizadas.find((p) => p.codigo === value);
-      if (encontrada) {
-        setTermo(encontrada.nome);
-      }
-    }
-  }, [value, pessoasNormalizadas]);
-
   const handleChange = (e) => {
     const novoTermo = e.target.value;
     setTermo(novoTermo);
@@ -131,6 +137,18 @@ export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => 
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      setShowDropdown(false);
+      if (filtradas.length === 1) {
+        selecionarPessoa(filtradas[0]);
+      }
+    }
+    if (e.key === 'Escape') {
+      setShowDropdown(false);
+    }
+  };
+
   const selecionarPessoa = (pessoa) => {
     setTermo(pessoa.nome);
     setShowDropdown(false);
@@ -144,6 +162,7 @@ export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => 
         value={termo}
         onChange={handleChange}
         onFocus={handleFocus}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder || 'Nome, código ou documento'}
         autoComplete="off"
       />
@@ -151,11 +170,15 @@ export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => 
       {showDropdown && filtradas.length > 0 && (
         <Dropdown>
           {filtradas.map((pessoa, index) => (
-            <DropdownItem key={pessoa.codigo || index} onClick={() => selecionarPessoa(pessoa)}>
+            <DropdownItem 
+              key={pessoa.codigo || index} 
+              onClick={() => selecionarPessoa(pessoa)}
+            >
               <strong>{pessoa.nome}</strong>
-              {[pessoa.codigo, pessoa.documento].filter(Boolean).length > 0 && (
-                <span> | {[pessoa.codigo, pessoa.documento].filter(Boolean).join(' | ')}</span>
-              )}
+              <span>
+                Código: {pessoa.codigo || '-'}
+                {pessoa.documento && ` | CNPJ/CPF: ${pessoa.documento}`}
+              </span>
             </DropdownItem>
           ))}
         </Dropdown>
