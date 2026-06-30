@@ -19,6 +19,7 @@ export const FaturasTable = ({
   selectedFaturas,
   onToggleFatura,
   onToggleAllFaturas,
+  loading,
 }) => {
   const allSelected = faturas.length > 0 && selectedFaturas.length === faturas.length;
 
@@ -26,10 +27,25 @@ export const FaturasTable = ({
     const statusMap = {
       'P': { label: 'Pendente', className: 'pending' },
       'B': { label: 'Baixada', className: 'paid' },
-      'A': { label: 'Atrasada', className: 'overdue' },
+      'A': { label: 'Ativa', className: 'paid' },
+      'C': { label: 'Cancelada', className: 'overdue' },
     };
     return statusMap[status] || { label: status || 'Desconhecido', className: 'pending' };
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <div>
+            <FaFileInvoiceDollar />
+            <h2>2. Faturas</h2>
+          </div>
+        </CardHeader>
+        <EmptyState>Carregando faturas...</EmptyState>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -37,6 +53,9 @@ export const FaturasTable = ({
         <div>
           <FaFileInvoiceDollar />
           <h2>2. Faturas</h2>
+          <span style={{ fontSize: 13, color: '#718096' }}>
+            ({faturas.length} encontradas)
+          </span>
         </div>
         {faturas.length > 0 && (
           <button type="button" className="link-button" onClick={onToggleAllFaturas}>
@@ -63,7 +82,7 @@ export const FaturasTable = ({
                 <th>Administradora</th>
                 <th>Apólice</th>
                 <th>Vencimento</th>
-                <th>Valor</th>
+                <th>Prêmio Líquido</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -86,7 +105,7 @@ export const FaturasTable = ({
                     <td>{fatura.ADMINISTRADORA || fatura.administradora || '-'}</td>
                     <td>{fatura.APOLICE || fatura.apolice || '-'}</td>
                     <td>{formatDate(fatura.VENCIMENTO || fatura.vencimento)}</td>
-                    <td>{formatMoney(fatura.VALOR || fatura.valor || fatura.PREMIO_LIQ)}</td>
+                    <td>{formatMoney(fatura.PREMIO_LIQ || fatura.premio_liq || fatura.VALOR || 0)}</td>
                     <td>
                       <StatusBadge className={statusInfo.className}>
                         {statusInfo.label}

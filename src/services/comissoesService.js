@@ -29,9 +29,7 @@ export const buscarPessoaPorCodigo = async (codigo) => {
 };
 
 /**
- * Busca comissões por data de corte (Endpoint principal)
- * 
- * Este endpoint retorna faturas com comissões para emissão de recibos/vouchers.
+ * 🔥 BUSCA COMISSÕES - V2 (100% consistente)
  * 
  * @param {string} dataCorte - Data de corte no formato YYYY-MM-DD (OBRIGATÓRIO)
  * @param {Object} filtros - Filtros opcionais
@@ -50,21 +48,16 @@ export const buscarPessoaPorCodigo = async (codigo) => {
  */
 export const buscarComissoesPorDataCorte = async (dataCorte, filtros = {}) => {
   try {
-    // Valida formato da data
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!dateRegex.test(dataCorte)) {
       throw new Error("Formato de data inválido. Use YYYY-MM-DD");
     }
 
-    // Monta os parâmetros
     const params = new URLSearchParams();
-    params.append('data_corte', dataCorte);
     
-    // Adiciona os filtros (remove vazios)
     Object.keys(filtros).forEach(key => {
       const value = filtros[key];
       if (value !== null && value !== undefined && value !== '' && value !== 'null') {
-        // Converte com_voucher para string booleana
         if (key === 'com_voucher' && typeof value === 'boolean') {
           params.append(key, String(value));
         } else {
@@ -73,80 +66,47 @@ export const buscarComissoesPorDataCorte = async (dataCorte, filtros = {}) => {
       }
     });
 
-    // 🔥 CORREÇÃO: Usa a rota correta do Django que faz proxy para o FastAPI
-    // O Django tem: /comissoes/por-data/<data_corte>/
-    // Que chama o FastAPI: /api/vouchers/buscar-faturas-comissoes
-    const url = `/comissoes/por-data/${dataCorte}/?${params.toString()}`;
+    // 🔥 ROTA V2 - ÚNICA QUE DEVE SER USADA PARA COMISSÕES
+    const url = `/comissoes/por-data-v2/${dataCorte}/?${params.toString()}`;
     
-    console.log(`📡 Buscando comissões: ${url}`);
+    console.log(`📡 Buscando comissões V2: ${url}`);
     
     const response = await api.get(url);
-    
-    // Verifica a estrutura da resposta
     const result = response.data;
     
-    console.log('📦 Resposta completa:', result);
+    console.log('📦 Resposta V2:', result);
 
-    // Normaliza a resposta para o formato esperado pelo frontend
-    // O Django retorna: { sucesso: true, dados: { status: "success", data: [...], total_registros: ... } }
-    // O frontend espera: { sucesso: true, dados: { data: [...], total_registros: ... } }
-    
     if (result.sucesso === false) {
       throw new Error(result.erro || "Erro ao buscar comissões");
     }
 
-    // Extrai os dados corretamente
-    let dados = null;
-    let totalRegistros = 0;
-    
-    if (result.dados) {
-      // Caso 1: Resposta do Django com dados aninhados
-      if (result.dados.status === "success") {
-        dados = result.dados.data || [];
-        totalRegistros = result.dados.total_registros || 0;
-      } else {
-        // Caso 2: Resposta direta do FastAPI
-        dados = result.dados.data || [];
-        totalRegistros = result.dados.total_registros || 0;
-      }
-    } else if (result.status === "success") {
-      // Caso 3: Resposta direta do FastAPI
-      dados = result.data || [];
-      totalRegistros = result.total_registros || 0;
-    }
+    const dados = result.dados || result;
+    const lista = dados.data || [];
+    const total = dados.total_registros || dados.total_retornados || lista.length;
+    const hasMore = dados.has_more || false;
 
-    // Garante que dados seja um array
-    if (!Array.isArray(dados)) {
-      dados = [];
-    }
+    console.log(`✅ ${lista.length} comissões carregadas (Total: ${total})`);
 
-    console.log(`✅ ${dados.length} comissões carregadas (Total: ${totalRegistros})`);
-
-    // Retorna no formato esperado pelo frontend
     return {
       sucesso: true,
       dados: {
-        data: dados,
-        total_registros: totalRegistros,
-        has_more: result.dados?.has_more || result.has_more || false,
-        status: "success"
+        data: lista,
+        total_registros: total,
+        has_more: hasMore,
+        status: dados.status || "success",
+        versao: result.versao || "v2"
       }
     };
 
   } catch (error) {
-    console.error('❌ Erro ao buscar comissões:', error);
+    console.error('❌ Erro ao buscar comissões V2:', error);
     
-    // Extrai a mensagem de erro da resposta
     let errorMessage = error.message || "Erro ao buscar comissões";
     if (error.response?.data) {
       const data = error.response.data;
-      if (data.erro) {
-        errorMessage = data.erro;
-      } else if (data.message) {
-        errorMessage = data.message;
-      } else if (data.detail) {
-        errorMessage = data.detail;
-      }
+      if (data.erro) errorMessage = data.erro;
+      else if (data.message) errorMessage = data.message;
+      else if (data.detail) errorMessage = data.detail;
     }
     
     throw new Error(errorMessage);
@@ -154,9 +114,7 @@ export const buscarComissoesPorDataCorte = async (dataCorte, filtros = {}) => {
 };
 
 /**
- * Busca faturas (para a lista de faturas)
- * 
- * @param {Object} filtros - Filtros para busca de faturas
+ * 🔥 BUSCA FATURAS - Usa o endpoint de faturamento (NUNCA usa /comissoes/faturas/)
  */
 export const buscarFaturas = async (filtros = {}) => {
   try {
@@ -169,7 +127,8 @@ export const buscarFaturas = async (filtros = {}) => {
       }
     });
 
-    const response = await api.get(`/consultas/faturas/?${params.toString()}`);
+    // 🔥 USA FATURAMENTO - FUNCIONA
+    const response = await api.get(`/consultas/faturamento/?${params.toString()}`);
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar faturas:', error);

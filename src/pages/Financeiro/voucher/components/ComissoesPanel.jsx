@@ -9,14 +9,34 @@ const formatMoney = (value) => {
   return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
 };
 
+const formatDate = (date) => {
+  if (!date) return '-';
+  return new Date(date).toLocaleDateString('pt-BR');
+};
+
 export const ComissoesPanel = ({
   comissoes,
   selectedComissoes,
   onToggleComissao,
   onToggleAllComissoes,
   totals,
+  loading,
 }) => {
   const allSelected = comissoes.length > 0 && selectedComissoes.length === comissoes.length;
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <div>
+            <FaReceipt />
+            <h2>3. Comissões</h2>
+          </div>
+        </CardHeader>
+        <EmptyState>Carregando comissões...</EmptyState>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -24,6 +44,9 @@ export const ComissoesPanel = ({
         <div>
           <FaReceipt />
           <h2>3. Comissões</h2>
+          <span style={{ fontSize: 13, color: '#718096' }}>
+            ({comissoes.length} encontradas)
+          </span>
         </div>
         {comissoes.length > 0 && (
           <button type="button" className="link-button" onClick={onToggleAllComissoes}>
@@ -40,6 +63,8 @@ export const ComissoesPanel = ({
             {comissoes.map((comissao) => {
               const id = comissao.FATURA || comissao.id;
               const isSelected = selectedComissoes.includes(id);
+              const valorComissao = comissao.VALOR_COMISSAO || comissao.valor_comissao || comissao.VALOR || 0;
+              const nomeFavorecido = comissao.NOME || comissao.nome || 'Favorecido';
 
               return (
                 <ComissaoItem key={id} checked={isSelected}>
@@ -49,16 +74,20 @@ export const ComissoesPanel = ({
                     onChange={() => onToggleComissao(id)}
                   />
                   <div className="info">
-                    <strong>{comissao.NOME || comissao.favorecido || 'Favorecido'}</strong>
+                    <strong>{nomeFavorecido}</strong>
                     <span>
-                      Fatura {id} | {comissao.PRODUTO || comissao.produto || '-'}
+                      Fatura {id} | Parcela {comissao.PARCELA || comissao.parcela || 1}
                     </span>
                     <span>
-                      Vencimento: {comissao.VENCIMENTO || comissao.vencimento || '-'}
+                      Vencimento: {formatDate(comissao.VENCIMENTO || comissao.vencimento)}
+                      {comissao.VOUCHER && ` | Voucher: ${comissao.VOUCHER}`}
+                    </span>
+                    <span style={{ fontSize: 12, color: '#a0aec0' }}>
+                      {comissao.PRODUTO || comissao.produto || '-'}
                     </span>
                   </div>
                   <span className="value">
-                    {formatMoney(comissao.VALOR_COMISSAO || comissao.valor || 0)}
+                    {formatMoney(valorComissao)}
                   </span>
                 </ComissaoItem>
               );
@@ -70,10 +99,13 @@ export const ComissoesPanel = ({
               Total: <strong>{formatMoney(totals.grossTotal)}</strong>
             </span>
             <span>
-              Retenções: <strong>{formatMoney(totals.retentionTotal)}</strong>
+              Retenções (5%): <strong>{formatMoney(totals.retentionTotal)}</strong>
             </span>
             <span className="net">
               Líquido: <strong>{formatMoney(totals.netTotal)}</strong>
+            </span>
+            <span>
+              Selecionadas: <strong>{totals.count}</strong>
             </span>
           </TotalsBar>
         </>

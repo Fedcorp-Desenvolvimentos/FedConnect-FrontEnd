@@ -57,8 +57,8 @@ export const FilterForm = ({
             onChange={(e) => onFilterChange('status', e.target.value)}
           >
             <option value="">Todos</option>
-            <option value="baixadas">Baixadas</option>
             <option value="pendentes">Pendentes</option>
+            <option value="baixadas">Baixadas</option>
           </select>
         </FormGroup>
 
@@ -69,14 +69,9 @@ export const FilterForm = ({
             onChange={(e) => onFilterChange('tipo', e.target.value)}
           >
             <option value="">Todos</option>
-            <option value="A">Peaga</option>
-            <option value="B">Outros</option>
-            <option value="C">Fedcorp</option>
-            <option value="D">Corretora</option>
-            <option value="E">Lider</option>
-            <option value="F">Condocorp</option>
-            <option value="G">Cartão</option>
-            <option value="H">Benefício</option>
+            <option value="BENEFICIO">Benefício</option>
+            <option value="CONDOCORP">Condocorp</option>
+            <option value="PEAGA">Peaga</option>
           </select>
         </FormGroup>
       </FormGrid>
@@ -92,8 +87,8 @@ export const FilterForm = ({
             Co-estipulante
             <input
               type="text"
-              value={filters.coEstipulante}
-              onChange={(e) => onFilterChange('coEstipulante', e.target.value)}
+              value={filters.co_estipulante || ''}
+              onChange={(e) => onFilterChange('co_estipulante', e.target.value)}
               placeholder="Co-estipulante"
             />
           </FormGroup>
@@ -102,19 +97,19 @@ export const FilterForm = ({
             Apólice
             <input
               type="text"
-              value={filters.apolice}
+              value={filters.apolice || ''}
               onChange={(e) => onFilterChange('apolice', e.target.value)}
               placeholder="Número da apólice"
             />
           </FormGroup>
 
           <FormGroup>
-            Recibo
+            Recibo/Voucher
             <input
               type="text"
-              value={filters.recibo}
+              value={filters.recibo || ''}
               onChange={(e) => onFilterChange('recibo', e.target.value)}
-              placeholder="Número do recibo"
+              placeholder="Número do recibo/voucher"
             />
           </FormGroup>
 
@@ -122,8 +117,8 @@ export const FilterForm = ({
             Vencimento Inicial
             <input
               type="date"
-              value={filters.vencimentoInicial}
-              onChange={(e) => onFilterChange('vencimentoInicial', e.target.value)}
+              value={filters.vencimento_inicial || ''}
+              onChange={(e) => onFilterChange('vencimento_inicial', e.target.value)}
             />
           </FormGroup>
 
@@ -131,18 +126,18 @@ export const FilterForm = ({
             Vencimento Final
             <input
               type="date"
-              value={filters.vencimentoFinal}
-              onChange={(e) => onFilterChange('vencimentoFinal', e.target.value)}
+              value={filters.vencimento_final || ''}
+              onChange={(e) => onFilterChange('vencimento_final', e.target.value)}
             />
           </FormGroup>
 
           <FormGroup>
             Com Voucher
             <select
-              value={filters.comVoucher === null ? '' : String(filters.comVoucher)}
+              value={filters.com_voucher === null ? '' : String(filters.com_voucher)}
               onChange={(e) => {
                 const val = e.target.value;
-                onFilterChange('comVoucher', val === '' ? null : val === 'true');
+                onFilterChange('com_voucher', val === '' ? null : val === 'true');
               }}
             >
               <option value="">Todos</option>
