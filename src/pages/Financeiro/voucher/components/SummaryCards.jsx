@@ -1,7 +1,7 @@
 // src/pages/Financeiro/voucher/components/SummaryCards.jsx
 
 import React from 'react';
-import { FaFileInvoiceDollar, FaReceipt, FaSlidersH, FaCheckCircle, FaFileInvoice } from 'react-icons/fa';
+import { FaFileInvoiceDollar, FaReceipt, FaCheckCircle, FaFileInvoice } from 'react-icons/fa';
 import { SummaryGrid, SummaryCard } from '../EmissaoRecibosVoucherStyles';
 
 export const SummaryCards = ({ totals, count }) => {

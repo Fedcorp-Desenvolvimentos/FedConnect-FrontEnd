@@ -21,18 +21,29 @@ const INITIAL_FILTERS = {
   apolice: '',
   recibo: '',
   com_voucher: null,
+  data_corte: '',
   limit: 100,
   offset: 0
 };
 
-// 🔥 Gera chave única para comissão (FATURA + PARCELA)
+// Opções de retenção
+const RETENTION_OPTIONS = [
+  { id: 'iss', label: 'ISS', rate: 0.02 },
+  { id: 'ir', label: 'IR', rate: 0.015 },
+  { id: 'cofins', label: 'COFINS', rate: 0.03 },
+  { id: 'csll', label: 'CSLL', rate: 0.01 },
+  { id: 'pis', label: 'PIS', rate: 0.0065 },
+  { id: 'inss', label: 'INSS', rate: 0.11 },
+];
+
+// Gera chave única para comissão (FATURA + PARCELA)
 const getComissaoKey = (comissao) => {
   const fatura = comissao.FATURA || comissao.fatura || comissao.DOCUMENTO || '';
   const parcela = comissao.PARCELA || comissao.parcela || '1';
   return `${fatura}|${parcela}`;
 };
 
-// 🔥 Gera chave única para fatura
+// Gera chave única para fatura
 const getFaturaKey = (fatura) => {
   return String(fatura.FATURA || fatura.fatura || fatura.id || '');
 };
@@ -45,7 +56,7 @@ const getCurrentMonthDate = () => {
 
 export const useEmissaoRecibos = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { withLoading, loading } = useLoading();
+  const { withLoading, loading, startLoading, stopLoading } = useLoading();
   
   const [loadingFaturas, setLoadingFaturas] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -54,17 +65,19 @@ export const useEmissaoRecibos = () => {
   const [comissoes, setComissoes] = useState([]);
   const [faturas, setFaturas] = useState([]);
   const [pessoas, setPessoas] = useState([]);
-  const [selectedComissoes, setSelectedComissoes] = useState(new Set()); // 🔥 Usando Set para melhor performance
+  const [selectedComissoes, setSelectedComissoes] = useState(new Set());
   const [selectedFaturas, setSelectedFaturas] = useState(new Set());
+  const [selectedRetentions, setSelectedRetentions] = useState([]);
   const [documentType, setDocumentType] = useState('recibo');
   const [lastEmission, setLastEmission] = useState(null);
   const [totalRegistros, setTotalRegistros] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [currentOffset, setCurrentOffset] = useState(0);
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
   
-  // Data de corte dinâmica (mês atual)
-  const dataCorte = useMemo(() => getCurrentMonthDate(), []);
+  // Data de corte - usa do filtro ou mês atual como fallback
+  const dataCorte = useMemo(() => {
+    return filters.data_corte || getCurrentMonthDate();
+  }, [filters.data_corte]);
 
   // Carregar pessoas ao montar
   useEffect(() => {
@@ -87,16 +100,14 @@ export const useEmissaoRecibos = () => {
     loadPessoas();
   }, [enqueueSnackbar]);
 
-  // 🔥 Buscar comissões com paginação
+  // Buscar comissões com paginação
   const buscarComissoes = useCallback(async (novosFiltros = {}, append = false) => {
     const filtrosAtualizados = { ...filters, ...novosFiltros };
     
-    // Remove status 'todas'
     if (filtrosAtualizados.status === 'todas') {
       delete filtrosAtualizados.status;
     }
     
-    // 🔥 Define offset para paginação
     const offset = append ? currentOffset + filters.limit : 0;
     filtrosAtualizados.offset = offset;
     
@@ -108,10 +119,12 @@ export const useEmissaoRecibos = () => {
       }
     });
 
+    const dataParaBusca = dataCorte;
+
     try {
       const result = await withLoading(
         async () => {
-          const response = await buscarComissoesPorDataCorte(dataCorte, filtrosLimpos);
+          const response = await buscarComissoesPorDataCorte(dataParaBusca, filtrosLimpos);
           return response;
         },
         append ? 'Carregando mais comissões...' : 'Buscando comissões...'
@@ -122,23 +135,21 @@ export const useEmissaoRecibos = () => {
         const lista = dados?.data || [];
         const total = dados?.total_registros || lista.length;
         
-        // 🔥 Se for append, concatena, senão substitui
         setComissoes(prev => append ? [...prev, ...lista] : lista);
         setTotalRegistros(total);
         setHasMore(lista.length === filters.limit && (offset + lista.length) < total);
         setCurrentOffset(offset);
         
-        // 🔥 Se não for append (nova busca), limpa seleções
         if (!append) {
           setSelectedComissoes(new Set());
           setSelectedFaturas(new Set());
-          setIsFirstLoad(false);
+          setSelectedRetentions([]);
         }
 
         if (lista.length === 0 && !append) {
-          enqueueSnackbar('Nenhuma comissão encontrada com os filtros informados', { variant: 'info' });
+          enqueueSnackbar(`Nenhuma comissão encontrada para ${dataParaBusca}`, { variant: 'info' });
         } else if (lista.length > 0 && !append) {
-          enqueueSnackbar(`${lista.length} comissões encontradas`, { variant: 'success' });
+          enqueueSnackbar(`${lista.length} comissões encontradas para ${dataParaBusca}`, { variant: 'success' });
         }
         return lista;
       }
@@ -149,10 +160,9 @@ export const useEmissaoRecibos = () => {
     }
   }, [filters, dataCorte, currentOffset, withLoading, enqueueSnackbar]);
 
-  // 🔥 Carregar mais comissões (próxima página)
+  // Carregar mais comissões
   const carregarMais = useCallback(async () => {
     if (loadingMore || !hasMore) return;
-    
     setLoadingMore(true);
     try {
       await buscarComissoes({}, true);
@@ -191,7 +201,7 @@ export const useEmissaoRecibos = () => {
       if (response.sucesso) {
         const dados = response.resultado?.data || response.data || [];
         setFaturas(dados);
-        setSelectedFaturas(new Set()); // 🔥 Reseta seleções de faturas
+        setSelectedFaturas(new Set());
         return dados;
       }
       return [];
@@ -208,6 +218,7 @@ export const useEmissaoRecibos = () => {
     setCurrentOffset(0);
     await buscarComissoes({}, false);
     
+    // Se tiver filtro de fatura, buscar faturas
     if (filters.fatura) {
       await buscarFaturas();
     } else {
@@ -219,12 +230,12 @@ export const useEmissaoRecibos = () => {
   const updateFilter = useCallback((field, value) => {
     setFilters(prev => {
       const newFilters = { ...prev, [field]: value };
-      // 🔥 Reset seleções ao mudar filtros importantes
-      if (['favorecido', 'fatura', 'status', 'tipo'].includes(field)) {
+      // Resetar seleções quando mudar filtros principais
+      if (['favorecido', 'fatura', 'status', 'tipo', 'data_corte'].includes(field)) {
         setSelectedComissoes(new Set());
         setSelectedFaturas(new Set());
+        setSelectedRetentions([]);
       }
-      // 🔥 Reseta offset quando muda filtro
       setCurrentOffset(0);
       return newFilters;
     });
@@ -232,19 +243,22 @@ export const useEmissaoRecibos = () => {
 
   // Limpar filtros
   const clearFilters = useCallback(() => {
-    setFilters(INITIAL_FILTERS);
+    setFilters({
+      ...INITIAL_FILTERS,
+      data_corte: '',
+    });
     setComissoes([]);
     setFaturas([]);
     setSelectedComissoes(new Set());
     setSelectedFaturas(new Set());
+    setSelectedRetentions([]);
     setTotalRegistros(0);
     setHasMore(false);
     setCurrentOffset(0);
-    setIsFirstLoad(true);
     enqueueSnackbar('Filtros limpos', { variant: 'info' });
   }, [enqueueSnackbar]);
 
-  // 🔥 CORRIGIDO: Selecionar comissão usando compound key
+  // Selecionar comissão
   const toggleComissao = useCallback((comissao) => {
     const key = getComissaoKey(comissao);
     setSelectedComissoes(prev => {
@@ -258,28 +272,25 @@ export const useEmissaoRecibos = () => {
     });
   }, []);
 
-  // 🔥 CORRIGIDO: Selecionar todas comissões
+  // Selecionar todas comissões
   const toggleAllComissoes = useCallback(() => {
     if (comissoes.length === 0) return;
     
-    // 🔥 Obtém todas as keys das comissões visíveis
     const allKeys = comissoes.map(c => getComissaoKey(c));
     const allSelected = allKeys.every(key => selectedComissoes.has(key));
     
     setSelectedComissoes(prev => {
       const newSet = new Set(prev);
       if (allSelected) {
-        // Desmarca todas
         allKeys.forEach(key => newSet.delete(key));
       } else {
-        // Marca todas
         allKeys.forEach(key => newSet.add(key));
       }
       return newSet;
     });
   }, [comissoes, selectedComissoes]);
 
-  // 🔥 CORRIGIDO: Selecionar fatura
+  // Selecionar fatura
   const toggleFatura = useCallback((fatura) => {
     const key = getFaturaKey(fatura);
     setSelectedFaturas(prev => {
@@ -293,7 +304,7 @@ export const useEmissaoRecibos = () => {
     });
   }, []);
 
-  // 🔥 CORRIGIDO: Selecionar todas faturas
+  // Selecionar todas faturas
   const toggleAllFaturas = useCallback(() => {
     if (faturas.length === 0) return;
     
@@ -311,6 +322,74 @@ export const useEmissaoRecibos = () => {
     });
   }, [faturas, selectedFaturas]);
 
+  // Toggle retenção
+  const toggleRetention = useCallback((retentionId) => {
+    setSelectedRetentions(prev => {
+      if (prev.includes(retentionId)) {
+        return prev.filter(id => id !== retentionId);
+      }
+      return [...prev, retentionId];
+    });
+  }, []);
+
+  // Calcular resumo com retenções - USA AS COMISSOES SELECIONADAS
+  const retentionSummary = useMemo(() => {
+    // Pega as comissões que estão selecionadas
+    const comissoesSelecionadas = comissoes.filter(c => {
+      const key = getComissaoKey(c);
+      return selectedComissoes.has(key);
+    });
+    
+    // Soma os valores das comissões selecionadas
+    const grossTotal = comissoesSelecionadas.reduce(
+      (sum, c) => sum + Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0), 
+      0
+    );
+
+    // Aplica as retenções selecionadas sobre o total bruto
+    const retentionRows = RETENTION_OPTIONS
+      .filter(opt => selectedRetentions.includes(opt.id))
+      .map(opt => ({
+        ...opt,
+        value: grossTotal * opt.rate,
+      }));
+
+    const retentionTotal = retentionRows.reduce((sum, item) => sum + item.value, 0);
+
+    return {
+      grossTotal,
+      retentionRows,
+      retentionTotal,
+      netTotal: grossTotal - retentionTotal,
+      count: comissoesSelecionadas.length,
+    };
+  }, [comissoes, selectedComissoes, selectedRetentions]);
+
+  // Totais para os cards - USA AS COMISSOES SELECIONADAS
+  const totals = useMemo(() => {
+    const comissoesSelecionadas = comissoes.filter(c => {
+      const key = getComissaoKey(c);
+      return selectedComissoes.has(key);
+    });
+    
+    const grossTotal = comissoesSelecionadas.reduce(
+      (sum, c) => sum + Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0), 
+      0
+    );
+    
+    // Retenção padrão de 5% para os cards
+    const retentionTotal = grossTotal * 0.05;
+    const netTotal = grossTotal - retentionTotal;
+
+    return { 
+      grossTotal, 
+      retentionTotal, 
+      netTotal, 
+      count: comissoesSelecionadas.length,
+      selectedFaturasCount: selectedFaturas.size
+    };
+  }, [comissoes, selectedComissoes, selectedFaturas]);
+
   // Emitir documento
   const emitirDocumento = useCallback(async () => {
     if (selectedComissoes.size === 0 && selectedFaturas.size === 0) {
@@ -318,14 +397,17 @@ export const useEmissaoRecibos = () => {
       return;
     }
 
+    // Iniciar loading
+    startLoading('Emitindo documento...');
+
     try {
-      // 🔥 Filtra comissões selecionadas
+      // Pega as comissões selecionadas
       const comissoesSelecionadas = comissoes.filter(c => {
         const key = getComissaoKey(c);
         return selectedComissoes.has(key);
       });
       
-      // Buscar detalhes das faturas selecionadas
+      // Busca detalhes das faturas selecionadas
       let faturasDetalhadas = [];
       for (const faturaKey of selectedFaturas) {
         try {
@@ -338,19 +420,16 @@ export const useEmissaoRecibos = () => {
         }
       }
 
-      const valorTotal = comissoesSelecionadas.reduce(
-        (sum, c) => sum + Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0), 
-        0
-      );
-
-      // Payload para o backend
+      // Monta payload
       const payload = {
         tipoDocumento: documentType,
         dataCorte,
         dataEmissao: new Date().toISOString(),
         totalComissoes: comissoesSelecionadas.length,
         totalFaturas: selectedFaturas.size,
-        valorTotalBruto: valorTotal,
+        valorTotalBruto: retentionSummary.grossTotal,
+        valorLiquido: retentionSummary.netTotal,
+        retencoes: retentionSummary.retentionRows,
         comissoes: comissoesSelecionadas.map(c => ({
           fatura: c.FATURA || c.fatura || c.DOCUMENTO || '',
           parcela: c.PARCELA || c.parcela || '1',
@@ -388,6 +467,14 @@ export const useEmissaoRecibos = () => {
           parcelas: f.PARCELAS || [],
           baixas: f.BAIXAS || [],
         })),
+        // Adiciona filtros aplicados para contexto
+        filtrosAplicados: {
+          dataCorte,
+          favorecido: filters.favorecido,
+          fatura: filters.fatura,
+          status: filters.status,
+          tipo: filters.tipo,
+        }
       };
 
       const response = await emitirDocumentoApi(payload);
@@ -397,25 +484,28 @@ export const useEmissaoRecibos = () => {
           numero: response.data?.numero || `RC-${String(Date.now()).slice(-6)}`,
           emitidoEm: response.data?.emitidoEm || new Date().toISOString(),
           tipo: documentType,
-          total: valorTotal,
+          total: retentionSummary.grossTotal,
           quantidade: comissoesSelecionadas.length,
         });
 
         enqueueSnackbar(
-          `✅ ${documentType === 'voucher' ? 'Voucher' : 'Recibo'} emitido! ${comissoesSelecionadas.length} comissões, R$ ${valorTotal.toFixed(2)}`,
+          `✅ ${documentType === 'voucher' ? 'Voucher' : 'Recibo'} emitido! ${comissoesSelecionadas.length} comissões, R$ ${retentionSummary.grossTotal.toFixed(2)}`,
           { variant: 'success' }
         );
         
-        // 🔥 Limpa seleções após emissão
+        // Limpa seleções após emissão
         setSelectedComissoes(new Set());
         setSelectedFaturas(new Set());
+        setSelectedRetentions([]);
       } else {
         throw new Error(response.erro || 'Erro ao emitir documento');
       }
     } catch (error) {
       enqueueSnackbar(error.message || 'Erro ao emitir documento', { variant: 'error' });
+    } finally {
+      stopLoading();
     }
-  }, [documentType, selectedComissoes, selectedFaturas, comissoes, dataCorte, enqueueSnackbar]);
+  }, [documentType, selectedComissoes, selectedFaturas, comissoes, dataCorte, filters, retentionSummary, enqueueSnackbar, startLoading, stopLoading]);
 
   // Pré-visualizar
   const previewDocument = useCallback(() => {
@@ -440,30 +530,6 @@ export const useEmissaoRecibos = () => {
     );
   }, [selectedComissoes, selectedFaturas, comissoes, enqueueSnackbar]);
 
-  // Totais
-  const totals = useMemo(() => {
-    const comissoesSelecionadas = comissoes.filter(c => {
-      const key = getComissaoKey(c);
-      return selectedComissoes.has(key);
-    });
-    
-    const grossTotal = comissoesSelecionadas.reduce(
-      (sum, c) => sum + Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0), 
-      0
-    );
-    
-    const retentionTotal = grossTotal * 0.05;
-    const netTotal = grossTotal - retentionTotal;
-
-    return { 
-      grossTotal, 
-      retentionTotal, 
-      netTotal, 
-      count: comissoesSelecionadas.length,
-      selectedFaturasCount: selectedFaturas.size
-    };
-  }, [comissoes, selectedComissoes, selectedFaturas]);
-
   return {
     loading,
     loadingFaturas,
@@ -475,6 +541,7 @@ export const useEmissaoRecibos = () => {
     pessoas,
     selectedComissoes,
     selectedFaturas,
+    selectedRetentions,
     documentType,
     lastEmission,
     totalRegistros,
@@ -482,7 +549,7 @@ export const useEmissaoRecibos = () => {
     currentOffset,
     dataCorte,
     totals,
-    isFirstLoad,
+    retentionSummary,
 
     buscarComissoes,
     buscarFaturas,
@@ -495,6 +562,7 @@ export const useEmissaoRecibos = () => {
     toggleAllComissoes,
     toggleFatura,
     toggleAllFaturas,
+    toggleRetention,
     setDocumentType,
     emitirDocumento,
     previewDocument,

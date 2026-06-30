@@ -1,7 +1,7 @@
 // src/pages/Financeiro/voucher/components/FilterForm.jsx
 
 import React, { useCallback } from 'react';
-import { FaSearch, FaEraser, FaSlidersH } from 'react-icons/fa';
+import { FaSearch, FaEraser, FaSlidersH, FaCalendar } from 'react-icons/fa';
 import { Card, CardHeader, FormGrid, FormGroup, Actions, Button } from '../EmissaoRecibosVoucherStyles';
 import { PessoaSelect } from './PessoaSelect';
 
@@ -35,7 +35,7 @@ export const FilterForm = ({
 
       <FormGrid>
         <FormGroup>
-          Favorecido
+          <label>Favorecido</label>
           <PessoaSelect
             pessoas={pessoas}
             value={filters.favorecido}
@@ -45,7 +45,7 @@ export const FilterForm = ({
         </FormGroup>
 
         <FormGroup>
-          Fatura
+          <label>Fatura</label>
           <input
             type="text"
             value={filters.fatura || ''}
@@ -55,7 +55,7 @@ export const FilterForm = ({
         </FormGroup>
 
         <FormGroup>
-          Status
+          <label>Status</label>
           <select
             value={filters.status || ''}
             onChange={(e) => onFilterChange('status', e.target.value)}
@@ -67,7 +67,7 @@ export const FilterForm = ({
         </FormGroup>
 
         <FormGroup>
-          Tipo
+          <label>Tipo</label>
           <select
             value={filters.tipo || ''}
             onChange={(e) => onFilterChange('tipo', e.target.value)}
@@ -80,6 +80,23 @@ export const FilterForm = ({
         </FormGroup>
       </FormGrid>
 
+      <FormGrid style={{ marginTop: '12px' }}>
+        <FormGroup>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FaCalendar style={{ color: '#2b6cb0' }} />
+            Data de Corte
+          </label>
+          <input
+            type="date"
+            value={filters.data_corte || ''}
+            onChange={(e) => onFilterChange('data_corte', e.target.value)}
+          />
+          <small style={{ color: '#a0aec0', fontSize: '11px' }}>
+            {filters.data_corte ? `Usando: ${filters.data_corte}` : 'Padrão: mês atual'}
+          </small>
+        </FormGroup>
+      </FormGrid>
+
       <Button type="button" className="ghost" onClick={onToggleAdvanced}>
         <FaSlidersH />
         {showAdvanced ? 'Ocultar filtros avançados' : 'Exibir filtros avançados'}
@@ -88,7 +105,7 @@ export const FilterForm = ({
       {showAdvanced && (
         <FormGrid>
           <FormGroup>
-            Co-estipulante
+            <label>Co-estipulante</label>
             <input
               type="text"
               value={filters.co_estipulante || ''}
@@ -98,7 +115,7 @@ export const FilterForm = ({
           </FormGroup>
 
           <FormGroup>
-            Apólice
+            <label>Apólice</label>
             <input
               type="text"
               value={filters.apolice || ''}
@@ -108,7 +125,7 @@ export const FilterForm = ({
           </FormGroup>
 
           <FormGroup>
-            Recibo/Voucher
+            <label>Recibo/Voucher</label>
             <input
               type="text"
               value={filters.recibo || ''}
@@ -118,7 +135,7 @@ export const FilterForm = ({
           </FormGroup>
 
           <FormGroup>
-            Vencimento Inicial
+            <label>Vencimento Inicial</label>
             <input
               type="date"
               value={filters.vencimento_inicial || ''}
@@ -127,7 +144,7 @@ export const FilterForm = ({
           </FormGroup>
 
           <FormGroup>
-            Vencimento Final
+            <label>Vencimento Final</label>
             <input
               type="date"
               value={filters.vencimento_final || ''}
@@ -136,7 +153,7 @@ export const FilterForm = ({
           </FormGroup>
 
           <FormGroup>
-            Com Voucher
+            <label>Com Voucher</label>
             <select
               value={filters.com_voucher === null ? '' : String(filters.com_voucher)}
               onChange={(e) => {

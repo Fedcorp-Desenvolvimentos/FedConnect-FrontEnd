@@ -18,7 +18,6 @@ const formatDate = (date) => {
   }
 };
 
-// 🔥 Gera chave única para comissão
 const getComissaoKey = (comissao) => {
   const fatura = comissao.FATURA || comissao.fatura || comissao.DOCUMENTO || '';
   const parcela = comissao.PARCELA || comissao.parcela || '1';
@@ -37,7 +36,6 @@ export const ComissoesPanel = ({
   onLoadMore,
   totalRegistros = 0,
 }) => {
-  // 🔥 Verifica se todas as comissões VISÍVEIS estão selecionadas
   const allSelected = comissoes.length > 0 && comissoes.every(c => {
     const key = getComissaoKey(c);
     return selectedComissoes.has(key);
@@ -88,19 +86,24 @@ export const ComissoesPanel = ({
         <>
           <ComissaoList>
             {comissoes.map((comissao, index) => {
-              // 🔥 Usa compound key (FATURA + PARCELA)
               const key = getComissaoKey(comissao);
               const isSelected = selectedComissoes.has(key);
-              const valorComissao = comissao.VALOR || comissao.valor || comissao.VALOR_COMISSAO || comissao.valor_comissao || 0;
+              // 🔥 PEGA O VALOR CORRETO
+              const valorComissao = Number(comissao.VALOR || comissao.valor || comissao.VALOR_COMISSAO || comissao.valor_comissao || 0);
               const nomeFavorecido = comissao.NOME || comissao.nome || 'Favorecido';
               const fatura = comissao.FATURA || comissao.fatura || comissao.DOCUMENTO || '-';
 
               return (
-                <ComissaoItem key={`comissao-${key}-${index}`} checked={isSelected}>
+                <ComissaoItem 
+                  key={`comissao-${key}-${index}`} 
+                  checked={isSelected}
+                  onClick={() => onToggleComissao(comissao)}
+                >
                   <input
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => onToggleComissao(comissao)}
+                    onClick={(e) => e.stopPropagation()}
                   />
                   <div className="info">
                     <strong>{nomeFavorecido}</strong>
@@ -121,7 +124,6 @@ export const ComissoesPanel = ({
             })}
           </ComissaoList>
 
-          {/* 🔥 Botão de carregar mais */}
           {hasMore && (
             <div style={{ textAlign: 'center', padding: '16px 0' }}>
               <button
@@ -144,7 +146,7 @@ export const ComissoesPanel = ({
                     Carregando mais...
                   </>
                 ) : (
-                  'Carregar mais comissões'
+                  `Carregar mais (${comissoes.length}/${totalRegistros})`
                 )}
               </button>
             </div>

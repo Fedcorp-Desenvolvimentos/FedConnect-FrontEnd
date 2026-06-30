@@ -18,7 +18,6 @@ const formatMoney = (value) => {
   return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
 };
 
-// 🔥 Gera chave única para fatura
 const getFaturaKey = (fatura) => {
   return String(fatura.FATURA || fatura.fatura || fatura.id || '');
 };
@@ -30,7 +29,6 @@ export const FaturasTable = ({
   onToggleAllFaturas,
   loading,
 }) => {
-  // 🔥 Verifica se todas as faturas VISÍVEIS estão selecionadas
   const allSelected = faturas.length > 0 && faturas.every(f => {
     const key = getFaturaKey(f);
     return selectedFaturas.has(key);
@@ -53,6 +51,7 @@ export const FaturasTable = ({
           <div>
             <FaFileInvoiceDollar />
             <h2>2. Faturas</h2>
+            <span>Carregando...</span>
           </div>
         </CardHeader>
         <EmptyState>Carregando faturas...</EmptyState>
@@ -111,8 +110,13 @@ export const FaturasTable = ({
                 const statusInfo = getStatusInfo(fatura.STATUS || fatura.status);
 
                 return (
-                  <tr key={`fatura-${key}-${index}`} className={isSelected ? 'selected' : ''}>
-                    <td>
+                  <tr 
+                    key={`fatura-${key}-${index}`} 
+                    className={isSelected ? 'selected' : ''}
+                    onClick={() => onToggleFatura(fatura)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         checked={isSelected}

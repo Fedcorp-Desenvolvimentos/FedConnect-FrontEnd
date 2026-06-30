@@ -15,11 +15,17 @@ const formatDate = (date) => {
   });
 };
 
+const formatMoney = (value) => {
+  if (value === null || value === undefined) return 'R$ 0,00';
+  return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
+};
+
 export const EmissaoPanel = ({
   canIssue,
   documentType,
   loading,
   lastEmission,
+  totals,
   onDocumentTypeChange,
   onEmitir,
   onPreview,
@@ -44,6 +50,42 @@ export const EmissaoPanel = ({
         </label>
       </EmissaoOptions>
 
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: '10px',
+        marginTop: '12px',
+        marginBottom: '12px',
+        padding: '12px',
+        background: '#f7fafc',
+        borderRadius: '8px'
+      }}>
+        <div>
+          <span style={{ fontSize: 12, color: '#718096' }}>Total Bruto</span>
+          <strong style={{ display: 'block', color: '#2d3748' }}>
+            {formatMoney(totals?.grossTotal || 0)}
+          </strong>
+        </div>
+        <div>
+          <span style={{ fontSize: 12, color: '#718096' }}>Retenções</span>
+          <strong style={{ display: 'block', color: '#dd6b20' }}>
+            {formatMoney(totals?.retentionTotal || 0)}
+          </strong>
+        </div>
+        <div>
+          <span style={{ fontSize: 12, color: '#718096' }}>Líquido</span>
+          <strong style={{ display: 'block', color: '#2b6cb0' }}>
+            {formatMoney(totals?.netTotal || 0)}
+          </strong>
+        </div>
+        <div>
+          <span style={{ fontSize: 12, color: '#718096' }}>Comissões</span>
+          <strong style={{ display: 'block', color: '#2d3748' }}>
+            {totals?.count || 0}
+          </strong>
+        </div>
+      </div>
+
       {lastEmission && (
         <EmissionResult>
           <strong>✓ {documentType === 'voucher' ? 'Voucher' : 'Recibo'} emitido!</strong>
@@ -51,6 +93,8 @@ export const EmissaoPanel = ({
           Número: {lastEmission.numero}
           <br />
           Emitido em: {formatDate(lastEmission.emitidoEm)}
+          <br />
+          Total: {formatMoney(lastEmission.total)} | {lastEmission.quantidade} comissões
         </EmissionResult>
       )}
 

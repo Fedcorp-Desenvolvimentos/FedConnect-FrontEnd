@@ -9,6 +9,7 @@ import { FilterForm } from './components/FilterForm';
 import { FaturasTable } from './components/FaturasTable';
 import { ComissoesPanel } from './components/ComissoesPanel';
 import { EmissaoPanel } from './components/EmissaoPanel';
+import { RetencoesPanel } from './components/RetencoesPanel';
 import {
   Container,
   Header,
@@ -32,9 +33,11 @@ export default function EmissaoRecibosVoucher() {
     pessoas,
     selectedComissoes,
     selectedFaturas,
+    selectedRetentions,
     documentType,
     lastEmission,
     totals,
+    retentionSummary,
     dataCorte,
     totalRegistros,
     hasMore,
@@ -47,15 +50,15 @@ export default function EmissaoRecibosVoucher() {
     toggleAllComissoes,
     toggleFatura,
     toggleAllFaturas,
+    toggleRetention,
     setDocumentType,
     emitirDocumento,
     previewDocument,
   } = useEmissaoRecibos();
 
-  // Busca automática ao montar
   useEffect(() => {
     buscarTudo();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line
 
   const canIssue = selectedComissoes.size > 0 || selectedFaturas.size > 0;
 
@@ -71,7 +74,7 @@ export default function EmissaoRecibosVoucher() {
           <span>Financeiro / Comissões</span>
           <h1>Emissão de Recibos de Comissões</h1>
           <p>
-            Consulte faturas, selecione comissões e emita recibos ou vouchers.
+            Consulte faturas, selecione comissões, aplique retenções e emita recibos ou vouchers.
             <br />
             <small>Data de corte: {dataCorte}</small>
             <br />
@@ -93,8 +96,14 @@ export default function EmissaoRecibosVoucher() {
         onToggleAdvanced={() => setShowAdvancedFilters(!showAdvancedFilters)}
       />
 
+      <RetencoesPanel
+        selectedRetentions={selectedRetentions}
+        totals={retentionSummary}
+        onToggleRetention={toggleRetention}
+      />
+
       <WorkflowGrid>
-        {loading ? (
+        {loadingFaturas ? (
           <SkeletonCard>
             <SkeletonRow />
             <SkeletonRow />
@@ -138,6 +147,7 @@ export default function EmissaoRecibosVoucher() {
         documentType={documentType}
         loading={loading}
         lastEmission={lastEmission}
+        totals={retentionSummary}
         onDocumentTypeChange={setDocumentType}
         onEmitir={emitirDocumento}
         onPreview={previewDocument}
