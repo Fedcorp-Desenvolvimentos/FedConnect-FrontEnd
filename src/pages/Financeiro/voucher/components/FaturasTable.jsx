@@ -6,12 +6,21 @@ import { Card, CardHeader, TableWrapper, Table, StatusBadge, EmptyState } from '
 
 const formatDate = (date) => {
   if (!date) return '-';
-  return new Date(date).toLocaleDateString('pt-BR');
+  try {
+    return new Date(date).toLocaleDateString('pt-BR');
+  } catch {
+    return '-';
+  }
 };
 
 const formatMoney = (value) => {
   if (value === null || value === undefined) return 'R$ 0,00';
   return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
+};
+
+// 🔥 Gera chave única para fatura
+const getFaturaKey = (fatura) => {
+  return String(fatura.FATURA || fatura.fatura || fatura.id || '');
 };
 
 export const FaturasTable = ({
@@ -21,7 +30,11 @@ export const FaturasTable = ({
   onToggleAllFaturas,
   loading,
 }) => {
-  const allSelected = faturas.length > 0 && selectedFaturas.length === faturas.length;
+  // 🔥 Verifica se todas as faturas VISÍVEIS estão selecionadas
+  const allSelected = faturas.length > 0 && faturas.every(f => {
+    const key = getFaturaKey(f);
+    return selectedFaturas.has(key);
+  });
 
   const getStatusInfo = (status) => {
     const statusMap = {
@@ -56,6 +69,11 @@ export const FaturasTable = ({
           <span style={{ fontSize: 13, color: '#718096' }}>
             ({faturas.length} encontradas)
           </span>
+          {selectedFaturas.size > 0 && (
+            <span style={{ color: '#2b6cb0', fontWeight: 600 }}>
+              | {selectedFaturas.size} selecionadas
+            </span>
+          )}
         </div>
         {faturas.length > 0 && (
           <button type="button" className="link-button" onClick={onToggleAllFaturas}>
@@ -87,21 +105,21 @@ export const FaturasTable = ({
               </tr>
             </thead>
             <tbody>
-              {faturas.map((fatura) => {
-                const id = fatura.FATURA || fatura.id;
-                const isSelected = selectedFaturas.includes(id);
+              {faturas.map((fatura, index) => {
+                const key = getFaturaKey(fatura);
+                const isSelected = selectedFaturas.has(key);
                 const statusInfo = getStatusInfo(fatura.STATUS || fatura.status);
 
                 return (
-                  <tr key={id} className={isSelected ? 'selected' : ''}>
+                  <tr key={`fatura-${key}-${index}`} className={isSelected ? 'selected' : ''}>
                     <td>
                       <input
                         type="checkbox"
                         checked={isSelected}
-                        onChange={() => onToggleFatura(id)}
+                        onChange={() => onToggleFatura(fatura)}
                       />
                     </td>
-                    <td>{id}</td>
+                    <td>{key}</td>
                     <td>{fatura.ADMINISTRADORA || fatura.administradora || '-'}</td>
                     <td>{fatura.APOLICE || fatura.apolice || '-'}</td>
                     <td>{formatDate(fatura.VENCIMENTO || fatura.vencimento)}</td>

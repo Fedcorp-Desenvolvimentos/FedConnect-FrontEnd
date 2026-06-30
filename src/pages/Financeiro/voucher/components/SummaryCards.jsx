@@ -1,7 +1,7 @@
 // src/pages/Financeiro/voucher/components/SummaryCards.jsx
 
 import React from 'react';
-import { FaFileInvoiceDollar, FaReceipt, FaCheckCircle, FaSlidersH } from 'react-icons/fa';
+import { FaFileInvoiceDollar, FaReceipt, FaSlidersH, FaCheckCircle, FaFileInvoice } from 'react-icons/fa';
 import { SummaryGrid, SummaryCard } from '../EmissaoRecibosVoucherStyles';
 
 export const SummaryCards = ({ totals, count }) => {
@@ -10,21 +10,25 @@ export const SummaryCards = ({ totals, count }) => {
       label: 'Comissões encontradas',
       value: count || 0,
       icon: <FaReceipt />,
+      color: '#2b6cb0'
+    },
+    {
+      label: 'Faturas selecionadas',
+      value: totals.selectedFaturasCount || 0,
+      icon: <FaFileInvoice />,
+      color: '#805ad5'
     },
     {
       label: 'Valor Bruto',
-      value: `R$ ${totals.grossTotal?.toFixed(2) || '0,00'}`,
+      value: `R$ ${(totals.grossTotal || 0).toFixed(2).replace('.', ',')}`,
       icon: <FaFileInvoiceDollar />,
-    },
-    {
-      label: 'Retenções',
-      value: `R$ ${totals.retentionTotal?.toFixed(2) || '0,00'}`,
-      icon: <FaSlidersH />,
+      color: '#38a169'
     },
     {
       label: 'Valor Líquido',
-      value: `R$ ${totals.netTotal?.toFixed(2) || '0,00'}`,
+      value: `R$ ${(totals.netTotal || 0).toFixed(2).replace('.', ',')}`,
       icon: <FaCheckCircle />,
+      color: '#2b6cb0'
     },
   ];
 
@@ -32,7 +36,9 @@ export const SummaryCards = ({ totals, count }) => {
     <SummaryGrid>
       {cards.map((card) => (
         <SummaryCard key={card.label}>
-          <span className="icon">{card.icon}</span>
+          <div className="icon" style={{ backgroundColor: `${card.color}15`, color: card.color }}>
+            {card.icon}
+          </div>
           <div>
             <span>{card.label}</span>
             <strong>{card.value}</strong>

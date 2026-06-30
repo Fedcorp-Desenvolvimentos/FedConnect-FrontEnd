@@ -504,3 +504,14 @@ export const Button = styled.button`
     cursor: not-allowed;
   }
 `;
+
+export const GlobalStyle = styled.div`
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;

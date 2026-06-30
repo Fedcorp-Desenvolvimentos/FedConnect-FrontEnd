@@ -136,10 +136,8 @@ export const buscarFaturamento = async (filtros = {}) => {
   }
 };
 
-// src/services/comissoesService.js - ADICIONAR NO FINAL
-
 /**
- * 🔥 EMITIR DOCUMENTO (Recibo/Voucher)
+ * EMITIR DOCUMENTO (Recibo/Voucher)
  * POST /comissoes/emitir/
  */
 export const emitirDocumento = async (payload) => {

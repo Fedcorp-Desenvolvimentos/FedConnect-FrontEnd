@@ -1,4 +1,4 @@
-// src/pages/Financeiro/voucher/index.jsx
+// src/pages/Financeiro/voucher/EmissaoRecibosVoucher.jsx
 
 import React, { useEffect } from 'react';
 import { FaArrowLeft } from 'react-icons/fa';
@@ -24,6 +24,7 @@ export default function EmissaoRecibosVoucher() {
   const {
     loading,
     loadingFaturas,
+    loadingMore,
     filters,
     showAdvancedFilters,
     comissoes,
@@ -35,7 +36,10 @@ export default function EmissaoRecibosVoucher() {
     lastEmission,
     totals,
     dataCorte,
+    totalRegistros,
+    hasMore,
     buscarTudo,
+    carregarMais,
     updateFilter,
     clearFilters,
     setShowAdvancedFilters,
@@ -48,11 +52,12 @@ export default function EmissaoRecibosVoucher() {
     previewDocument,
   } = useEmissaoRecibos();
 
+  // Busca automática ao montar
   useEffect(() => {
     buscarTudo();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const canIssue = selectedComissoes.length > 0 || selectedFaturas.length > 0;
+  const canIssue = selectedComissoes.size > 0 || selectedFaturas.size > 0;
 
   return (
     <Container>
@@ -70,7 +75,7 @@ export default function EmissaoRecibosVoucher() {
             <br />
             <small>Data de corte: {dataCorte}</small>
             <br />
-            <small>Total de registros: {comissoes.length} comissões</small>
+            <small>Total de registros: {totalRegistros} comissões</small>
           </p>
         </Title>
       </Header>
@@ -120,6 +125,10 @@ export default function EmissaoRecibosVoucher() {
             onToggleAllComissoes={toggleAllComissoes}
             totals={totals}
             loading={loading}
+            loadingMore={loadingMore}
+            hasMore={hasMore}
+            onLoadMore={carregarMais}
+            totalRegistros={totalRegistros}
           />
         )}
       </WorkflowGrid>
