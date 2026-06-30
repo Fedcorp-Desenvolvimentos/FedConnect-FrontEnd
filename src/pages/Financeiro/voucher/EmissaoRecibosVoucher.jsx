@@ -1,7 +1,7 @@
 // src/pages/Financeiro/voucher/EmissaoRecibosVoucher.jsx
 
 import React, { useEffect } from 'react';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaInfoCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useEmissaoRecibos } from './hooks/useEmissaoRecibos';
 import { SummaryCards } from './components/SummaryCards';
@@ -18,6 +18,7 @@ import {
   WorkflowGrid,
   SkeletonCard,
   SkeletonRow,
+  InfoBanner,
 } from './EmissaoRecibosVoucherStyles';
 
 export default function EmissaoRecibosVoucher() {
@@ -26,10 +27,12 @@ export default function EmissaoRecibosVoucher() {
     loading,
     loadingFaturas,
     loadingMore,
+    loadingFaturaDetalhes,
     filters,
     showAdvancedFilters,
     comissoes,
     faturas,
+    faturasDetalhadas,
     pessoas,
     selectedComissoes,
     selectedFaturas,
@@ -54,6 +57,7 @@ export default function EmissaoRecibosVoucher() {
     setDocumentType,
     emitirDocumento,
     previewDocument,
+    buscarDetalhesFatura,
   } = useEmissaoRecibos();
 
   useEffect(() => {
@@ -61,6 +65,19 @@ export default function EmissaoRecibosVoucher() {
   }, []); // eslint-disable-line
 
   const canIssue = selectedComissoes.size > 0 || selectedFaturas.size > 0;
+
+  // Formata a data de corte para exibição
+  const formatDataCorte = (data) => {
+    if (!data) return 'Mês atual';
+    try {
+      const partes = data.split('-');
+      const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+      return `${meses[parseInt(partes[1]) - 1]} de ${partes[0]}`;
+    } catch {
+      return data;
+    }
+  };
 
   return (
     <Container>
@@ -75,13 +92,21 @@ export default function EmissaoRecibosVoucher() {
           <h1>Emissão de Recibos de Comissões</h1>
           <p>
             Consulte faturas, selecione comissões, aplique retenções e emita recibos ou vouchers.
-            <br />
-            <small>Data de corte: {dataCorte}</small>
-            <br />
-            <small>Total de registros: {totalRegistros} comissões</small>
           </p>
         </Title>
       </Header>
+
+      <InfoBanner>
+        <FaInfoCircle />
+        <div>
+          <strong>Período de consulta: {formatDataCorte(dataCorte)}</strong>
+          <span>
+            {comissoes.length > 0 
+              ? `Exibindo ${comissoes.length} comissões${totalRegistros > comissoes.length ? ` de ${totalRegistros}` : ''}`
+              : 'Nenhuma comissão encontrada para este período'}
+          </span>
+        </div>
+      </InfoBanner>
 
       <SummaryCards totals={totals} count={comissoes.length} />
 
@@ -112,9 +137,12 @@ export default function EmissaoRecibosVoucher() {
         ) : (
           <FaturasTable
             faturas={faturas}
+            faturasDetalhadas={faturasDetalhadas}
             selectedFaturas={selectedFaturas}
+            loadingFaturaDetalhes={loadingFaturaDetalhes}
             onToggleFatura={toggleFatura}
             onToggleAllFaturas={toggleAllFaturas}
+            onBuscarDetalhes={buscarDetalhesFatura}
             loading={loadingFaturas}
           />
         )}
@@ -138,6 +166,7 @@ export default function EmissaoRecibosVoucher() {
             hasMore={hasMore}
             onLoadMore={carregarMais}
             totalRegistros={totalRegistros}
+            dataCorte={dataCorte}
           />
         )}
       </WorkflowGrid>

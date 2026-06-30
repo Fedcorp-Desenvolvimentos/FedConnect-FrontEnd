@@ -60,10 +60,12 @@ export const useEmissaoRecibos = () => {
   
   const [loadingFaturas, setLoadingFaturas] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [loadingFaturaDetalhes, setLoadingFaturaDetalhes] = useState(false);
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [comissoes, setComissoes] = useState([]);
   const [faturas, setFaturas] = useState([]);
+  const [faturasDetalhadas, setFaturasDetalhadas] = useState({});
   const [pessoas, setPessoas] = useState([]);
   const [selectedComissoes, setSelectedComissoes] = useState(new Set());
   const [selectedFaturas, setSelectedFaturas] = useState(new Set());
@@ -144,6 +146,7 @@ export const useEmissaoRecibos = () => {
           setSelectedComissoes(new Set());
           setSelectedFaturas(new Set());
           setSelectedRetentions([]);
+          setFaturasDetalhadas({});
         }
 
         if (lista.length === 0 && !append) {
@@ -177,6 +180,7 @@ export const useEmissaoRecibos = () => {
     
     if (!temFiltro) {
       setFaturas([]);
+      setFaturasDetalhadas({});
       return [];
     }
 
@@ -202,6 +206,14 @@ export const useEmissaoRecibos = () => {
         const dados = response.resultado?.data || response.data || [];
         setFaturas(dados);
         setSelectedFaturas(new Set());
+        setFaturasDetalhadas({});
+        
+        // Se tiver apenas uma fatura, busca detalhes automaticamente
+        if (dados.length === 1) {
+          const faturaKey = getFaturaKey(dados[0]);
+          await buscarDetalhesFatura(faturaKey);
+        }
+        
         return dados;
       }
       return [];
@@ -213,6 +225,31 @@ export const useEmissaoRecibos = () => {
     }
   }, [filters]);
 
+  // Buscar detalhes de uma fatura específica
+  const buscarDetalhesFatura = useCallback(async (faturaKey) => {
+    if (!faturaKey) return;
+    
+    setLoadingFaturaDetalhes(true);
+    try {
+      const response = await buscarFaturamento({ fatura: faturaKey });
+      
+      if (response.sucesso) {
+        const dados = response.resultado?.data || [];
+        if (dados.length > 0) {
+          setFaturasDetalhadas(prev => ({
+            ...prev,
+            [faturaKey]: dados[0]
+          }));
+          enqueueSnackbar(`Detalhes da fatura ${faturaKey} carregados`, { variant: 'success' });
+        }
+      }
+    } catch (error) {
+      enqueueSnackbar(`Erro ao carregar detalhes da fatura ${faturaKey}`, { variant: 'error' });
+    } finally {
+      setLoadingFaturaDetalhes(false);
+    }
+  }, [enqueueSnackbar]);
+
   // Buscar tudo
   const buscarTudo = useCallback(async () => {
     setCurrentOffset(0);
@@ -223,6 +260,7 @@ export const useEmissaoRecibos = () => {
       await buscarFaturas();
     } else {
       setFaturas([]);
+      setFaturasDetalhadas({});
     }
   }, [buscarComissoes, buscarFaturas, filters.fatura]);
 
@@ -235,6 +273,7 @@ export const useEmissaoRecibos = () => {
         setSelectedComissoes(new Set());
         setSelectedFaturas(new Set());
         setSelectedRetentions([]);
+        setFaturasDetalhadas({});
       }
       setCurrentOffset(0);
       return newFilters;
@@ -249,6 +288,7 @@ export const useEmissaoRecibos = () => {
     });
     setComissoes([]);
     setFaturas([]);
+    setFaturasDetalhadas({});
     setSelectedComissoes(new Set());
     setSelectedFaturas(new Set());
     setSelectedRetentions([]);
@@ -297,12 +337,20 @@ export const useEmissaoRecibos = () => {
       const newSet = new Set(prev);
       if (newSet.has(key)) {
         newSet.delete(key);
+        // Remove detalhes se desselecionar
+        setFaturasDetalhadas(prevDet => {
+          const newDet = { ...prevDet };
+          delete newDet[key];
+          return newDet;
+        });
       } else {
         newSet.add(key);
+        // Busca detalhes ao selecionar
+        buscarDetalhesFatura(key);
       }
       return newSet;
     });
-  }, []);
+  }, [buscarDetalhesFatura]);
 
   // Selecionar todas faturas
   const toggleAllFaturas = useCallback(() => {
@@ -315,12 +363,17 @@ export const useEmissaoRecibos = () => {
       const newSet = new Set(prev);
       if (allSelected) {
         allKeys.forEach(key => newSet.delete(key));
+        // Limpa detalhes
+        setFaturasDetalhadas({});
       } else {
-        allKeys.forEach(key => newSet.add(key));
+        allKeys.forEach(key => {
+          newSet.add(key);
+          buscarDetalhesFatura(key);
+        });
       }
       return newSet;
     });
-  }, [faturas, selectedFaturas]);
+  }, [faturas, selectedFaturas, buscarDetalhesFatura]);
 
   // Toggle retenção
   const toggleRetention = useCallback((retentionId) => {
@@ -397,30 +450,27 @@ export const useEmissaoRecibos = () => {
       return;
     }
 
-    // Iniciar loading
     startLoading('Emitindo documento...');
 
     try {
-      // Pega as comissões selecionadas
       const comissoesSelecionadas = comissoes.filter(c => {
         const key = getComissaoKey(c);
         return selectedComissoes.has(key);
       });
       
       // Busca detalhes das faturas selecionadas
-      let faturasDetalhadas = [];
+      let faturasDetalhadasList = [];
       for (const faturaKey of selectedFaturas) {
         try {
           const response = await buscarFaturamento({ fatura: faturaKey });
           if (response.sucesso && response.resultado?.data) {
-            faturasDetalhadas.push(...response.resultado.data);
+            faturasDetalhadasList.push(...response.resultado.data);
           }
         } catch (e) {
           console.error(`Erro ao buscar fatura ${faturaKey}:`, e);
         }
       }
 
-      // Monta payload
       const payload = {
         tipoDocumento: documentType,
         dataCorte,
@@ -453,7 +503,7 @@ export const useEmissaoRecibos = () => {
           quitado: c.QUITADO || c.quitado || 0,
           status: c.STATUS || c.status || '',
         })),
-        faturas: faturasDetalhadas.map(f => ({
+        faturas: faturasDetalhadasList.map(f => ({
           fatura: f.FATURA || f.fatura || '',
           apolice: f.APOLICE || f.apolice || '',
           administradora: f.ADMINISTRADORA || f.administradora || '',
@@ -467,7 +517,6 @@ export const useEmissaoRecibos = () => {
           parcelas: f.PARCELAS || [],
           baixas: f.BAIXAS || [],
         })),
-        // Adiciona filtros aplicados para contexto
         filtrosAplicados: {
           dataCorte,
           favorecido: filters.favorecido,
@@ -493,10 +542,10 @@ export const useEmissaoRecibos = () => {
           { variant: 'success' }
         );
         
-        // Limpa seleções após emissão
         setSelectedComissoes(new Set());
         setSelectedFaturas(new Set());
         setSelectedRetentions([]);
+        setFaturasDetalhadas({});
       } else {
         throw new Error(response.erro || 'Erro ao emitir documento');
       }
@@ -534,10 +583,12 @@ export const useEmissaoRecibos = () => {
     loading,
     loadingFaturas,
     loadingMore,
+    loadingFaturaDetalhes,
     filters,
     showAdvancedFilters,
     comissoes,
     faturas,
+    faturasDetalhadas,
     pessoas,
     selectedComissoes,
     selectedFaturas,
@@ -566,5 +617,6 @@ export const useEmissaoRecibos = () => {
     setDocumentType,
     emitirDocumento,
     previewDocument,
+    buscarDetalhesFatura,
   };
 };

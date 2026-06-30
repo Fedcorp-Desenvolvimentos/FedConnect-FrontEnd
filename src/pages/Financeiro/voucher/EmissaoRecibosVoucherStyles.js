@@ -19,7 +19,7 @@ export const Header = styled.div`
   display: flex;
   align-items: center;
   gap: 24px;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
   background: white;
   padding: 20px 24px;
   border-radius: 12px;
@@ -64,6 +64,38 @@ export const Title = styled.div`
   small {
     color: #a0aec0;
     font-size: 12px;
+  }
+`;
+
+export const InfoBanner = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  background: #ebf8ff;
+  border: 1px solid #bee3f8;
+  border-radius: 8px;
+  color: #2b6cb0;
+
+  svg {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      font-size: 14px;
+    }
+
+    span {
+      font-size: 13px;
+      color: #2c5282;
+    }
   }
 `;
 
@@ -124,6 +156,16 @@ export const CardHeader = styled.div`
     &:hover {
       color: #1a365d;
     }
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    background: #ebf8ff;
+    color: #2b6cb0;
   }
 `;
 
@@ -282,6 +324,7 @@ export const Table = styled.table`
     tr {
       border-bottom: 1px solid #edf2f7;
       transition: background 0.15s;
+      cursor: pointer;
 
       &:hover {
         background: #f7fafc;
@@ -325,6 +368,11 @@ export const StatusBadge = styled.span`
     background: #e2e8f0;
     color: #4a5568;
   }
+
+  &.active {
+    background: #bee3f8;
+    color: #2a69ac;
+  }
 `;
 
 export const ComissaoList = styled.div`
@@ -340,6 +388,7 @@ export const ComissaoItem = styled.div`
   border-bottom: 1px solid #edf2f7;
   transition: background 0.15s;
   background: ${props => (props.checked ? '#ebf8ff' : 'transparent')};
+  cursor: pointer;
 
   &:hover {
     background: #f7fafc;

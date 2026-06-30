@@ -1,8 +1,22 @@
 // src/pages/Financeiro/voucher/components/ComissoesPanel.jsx
 
 import React from 'react';
-import { FaReceipt, FaSpinner } from 'react-icons/fa';
+import { FaReceipt, FaSpinner, FaCalendar } from 'react-icons/fa';
 import { Card, CardHeader, ComissaoList, ComissaoItem, TotalsBar, EmptyState } from '../EmissaoRecibosVoucherStyles';
+import styled from 'styled-components';
+
+const PeriodInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #718096;
+  margin-left: 8px;
+
+  svg {
+    font-size: 14px;
+  }
+`;
 
 const formatMoney = (value) => {
   if (value === null || value === undefined) return 'R$ 0,00';
@@ -24,6 +38,18 @@ const getComissaoKey = (comissao) => {
   return `${fatura}|${parcela}`;
 };
 
+const formatPeriodo = (dataCorte) => {
+  if (!dataCorte) return 'Último mês';
+  try {
+    const partes = dataCorte.split('-');
+    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    return `${meses[parseInt(partes[1]) - 1]} de ${partes[0]}`;
+  } catch {
+    return dataCorte;
+  }
+};
+
 export const ComissoesPanel = ({
   comissoes,
   selectedComissoes,
@@ -35,6 +61,7 @@ export const ComissoesPanel = ({
   hasMore = false,
   onLoadMore,
   totalRegistros = 0,
+  dataCorte,
 }) => {
   const allSelected = comissoes.length > 0 && comissoes.every(c => {
     const key = getComissaoKey(c);
@@ -68,10 +95,14 @@ export const ComissoesPanel = ({
             ({comissoes.length} de {totalRegistros || comissoes.length} encontradas)
           </span>
           {totalSelecionadas > 0 && (
-            <span style={{ color: '#2b6cb0', fontWeight: 600 }}>
-              | {totalSelecionadas} selecionadas
+            <span className="badge">
+              {totalSelecionadas} selecionadas
             </span>
           )}
+          <PeriodInfo>
+            <FaCalendar />
+            {formatPeriodo(dataCorte)}
+          </PeriodInfo>
         </div>
         {comissoes.length > 0 && (
           <button type="button" className="link-button" onClick={onToggleAllComissoes}>
@@ -81,14 +112,20 @@ export const ComissoesPanel = ({
       </CardHeader>
 
       {comissoes.length === 0 ? (
-        <EmptyState>Nenhuma comissão encontrada.</EmptyState>
+        <EmptyState>
+          <p style={{ fontSize: 16, color: '#718096', marginBottom: 8 }}>
+            Nenhuma comissão encontrada para {formatPeriodo(dataCorte)}
+          </p>
+          <p style={{ fontSize: 13, color: '#a0aec0' }}>
+            Tente ajustar os filtros ou alterar a data de corte
+          </p>
+        </EmptyState>
       ) : (
         <>
           <ComissaoList>
             {comissoes.map((comissao, index) => {
               const key = getComissaoKey(comissao);
               const isSelected = selectedComissoes.has(key);
-              // 🔥 PEGA O VALOR CORRETO
               const valorComissao = Number(comissao.VALOR || comissao.valor || comissao.VALOR_COMISSAO || comissao.valor_comissao || 0);
               const nomeFavorecido = comissao.NOME || comissao.nome || 'Favorecido';
               const fatura = comissao.FATURA || comissao.fatura || comissao.DOCUMENTO || '-';
