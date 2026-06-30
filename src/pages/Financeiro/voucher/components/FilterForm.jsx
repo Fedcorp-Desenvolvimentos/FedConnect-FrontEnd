@@ -91,6 +91,7 @@ export const FilterForm = ({
             type="date"
             value={filters.data_corte || ''}
             onChange={(e) => onFilterChange('data_corte', e.target.value)}
+            required
           />
           <small>
             {filters.data_corte ? `Usando: ${filters.data_corte}` : 'Padrão: mês vigente'}
