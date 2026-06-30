@@ -1,12 +1,9 @@
-// src/pages/Financeiro/voucher/EmissaoRecibosVoucher.jsx
-
 import React, { useEffect } from 'react';
 import { FaArrowLeft, FaInfoCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useEmissaoRecibos } from './hooks/useEmissaoRecibos';
 import { SummaryCards } from './components/SummaryCards';
 import { FilterForm } from './components/FilterForm';
-import { FaturasTable } from './components/FaturasTable';
 import { ComissoesPanel } from './components/ComissoesPanel';
 import { EmissaoPanel } from './components/EmissaoPanel';
 import { RetencoesPanel } from './components/RetencoesPanel';
@@ -15,7 +12,7 @@ import {
   Header,
   BackButton,
   Title,
-  WorkflowGrid,
+  SingleColumnGrid,
   SkeletonCard,
   SkeletonRow,
   InfoBanner,
@@ -23,25 +20,23 @@ import {
 
 export default function EmissaoRecibosVoucher() {
   const navigate = useNavigate();
+
   const {
     loading,
-    loadingFaturas,
+    loadingInitial,
     loadingMore,
-    loadingFaturaDetalhes,
     filters,
     showAdvancedFilters,
     comissoes,
-    faturas,
-    faturasDetalhadas,
     pessoas,
     selectedComissoes,
-    selectedFaturas,
     selectedRetentions,
     documentType,
     lastEmission,
     totals,
     retentionSummary,
     dataCorte,
+    dataCorteFormatada,
     totalRegistros,
     hasMore,
     buscarTudo,
@@ -51,33 +46,19 @@ export default function EmissaoRecibosVoucher() {
     setShowAdvancedFilters,
     toggleComissao,
     toggleAllComissoes,
-    toggleFatura,
-    toggleAllFaturas,
     toggleRetention,
     setDocumentType,
     emitirDocumento,
     previewDocument,
-    buscarDetalhesFatura,
+    isUsingFilteredData,
+    hasActiveFilters,
   } = useEmissaoRecibos();
 
   useEffect(() => {
-    buscarTudo();
+    buscarTudo({ forceDefault: true });
   }, []); // eslint-disable-line
 
-  const canIssue = selectedComissoes.size > 0 || selectedFaturas.size > 0;
-
-  // Formata a data de corte para exibição
-  const formatDataCorte = (data) => {
-    if (!data) return 'Mês atual';
-    try {
-      const partes = data.split('-');
-      const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
-                     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-      return `${meses[parseInt(partes[1]) - 1]} de ${partes[0]}`;
-    } catch {
-      return data;
-    }
-  };
+  const canIssue = selectedComissoes.size > 0;
 
   return (
     <Container>
@@ -91,24 +72,35 @@ export default function EmissaoRecibosVoucher() {
           <span>Financeiro / Comissões</span>
           <h1>Emissão de Recibos de Comissões</h1>
           <p>
-            Consulte faturas, selecione comissões, aplique retenções e emita recibos ou vouchers.
+            Consulte comissões, aplique retenções e prepare recibos ou vouchers
+            com base no período de corte.
           </p>
         </Title>
       </Header>
 
-      <InfoBanner>
+      <InfoBanner isFiltered={hasActiveFilters || isUsingFilteredData}>
         <FaInfoCircle />
         <div>
-          <strong>Período de consulta: {formatDataCorte(dataCorte)}</strong>
+          <strong>
+            {isUsingFilteredData ? 'Resultado filtrado' : 'Base padrão do período'}: {dataCorteFormatada}
+          </strong>
           <span>
-            {comissoes.length > 0 
-              ? `Exibindo ${comissoes.length} comissões${totalRegistros > comissoes.length ? ` de ${totalRegistros}` : ''}`
-              : 'Nenhuma comissão encontrada para este período'}
+            {loadingInitial
+              ? 'Carregando comissões do período...'
+              : comissoes.length > 0
+                ? `Exibindo ${comissoes.length} comissão(ões)${
+                    totalRegistros > comissoes.length ? ` de ${totalRegistros}` : ''
+                  }`
+                : 'Nenhuma comissão encontrada para este período'}
           </span>
         </div>
       </InfoBanner>
 
-      <SummaryCards totals={totals} count={comissoes.length} />
+      <SummaryCards
+        totals={totals}
+        count={comissoes.length}
+        isUsingFilteredData={isUsingFilteredData}
+      />
 
       <FilterForm
         filters={filters}
@@ -127,27 +119,8 @@ export default function EmissaoRecibosVoucher() {
         onToggleRetention={toggleRetention}
       />
 
-      <WorkflowGrid>
-        {loadingFaturas ? (
-          <SkeletonCard>
-            <SkeletonRow />
-            <SkeletonRow />
-            <SkeletonRow />
-          </SkeletonCard>
-        ) : (
-          <FaturasTable
-            faturas={faturas}
-            faturasDetalhadas={faturasDetalhadas}
-            selectedFaturas={selectedFaturas}
-            loadingFaturaDetalhes={loadingFaturaDetalhes}
-            onToggleFatura={toggleFatura}
-            onToggleAllFaturas={toggleAllFaturas}
-            onBuscarDetalhes={buscarDetalhesFatura}
-            loading={loadingFaturas}
-          />
-        )}
-
-        {loading ? (
+      <SingleColumnGrid>
+        {loadingInitial ? (
           <SkeletonCard>
             <SkeletonRow />
             <SkeletonRow />
@@ -160,16 +133,18 @@ export default function EmissaoRecibosVoucher() {
             selectedComissoes={selectedComissoes}
             onToggleComissao={toggleComissao}
             onToggleAllComissoes={toggleAllComissoes}
-            totals={totals}
+            totals={retentionSummary}
             loading={loading}
             loadingMore={loadingMore}
             hasMore={hasMore}
             onLoadMore={carregarMais}
             totalRegistros={totalRegistros}
             dataCorte={dataCorte}
+            dataCorteFormatada={dataCorteFormatada}
+            isUsingFilteredData={isUsingFilteredData}
           />
         )}
-      </WorkflowGrid>
+      </SingleColumnGrid>
 
       <EmissaoPanel
         canIssue={canIssue}

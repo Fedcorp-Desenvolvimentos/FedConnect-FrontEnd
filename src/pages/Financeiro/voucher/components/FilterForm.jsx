@@ -1,5 +1,3 @@
-// src/pages/Financeiro/voucher/components/FilterForm.jsx
-
 import React, { useCallback } from 'react';
 import { FaSearch, FaEraser, FaSlidersH, FaCalendar } from 'react-icons/fa';
 import { Card, CardHeader, FormGrid, FormGroup, Actions, Button } from '../EmissaoRecibosVoucherStyles';
@@ -20,9 +18,12 @@ export const FilterForm = ({
     onSearch();
   };
 
-  const handlePessoaChange = useCallback((value) => {
-    onFilterChange('favorecido', value);
-  }, [onFilterChange]);
+  const handlePessoaChange = useCallback(
+    (value) => {
+      onFilterChange('favorecido', value);
+    },
+    [onFilterChange]
+  );
 
   return (
     <Card as="form" onSubmit={handleSubmit}>
@@ -60,9 +61,9 @@ export const FilterForm = ({
             value={filters.status || ''}
             onChange={(e) => onFilterChange('status', e.target.value)}
           >
-            <option value="todas">Todas</option>
             <option value="pendentes">Pendentes</option>
             <option value="baixadas">Baixadas</option>
+            <option value="todas">Todas</option>
           </select>
         </FormGroup>
 
@@ -91,8 +92,8 @@ export const FilterForm = ({
             value={filters.data_corte || ''}
             onChange={(e) => onFilterChange('data_corte', e.target.value)}
           />
-          <small style={{ color: '#a0aec0', fontSize: '11px' }}>
-            {filters.data_corte ? `Usando: ${filters.data_corte}` : 'Padrão: mês atual'}
+          <small>
+            {filters.data_corte ? `Usando: ${filters.data_corte}` : 'Padrão: mês vigente'}
           </small>
         </FormGroup>
       </FormGrid>
@@ -103,7 +104,7 @@ export const FilterForm = ({
       </Button>
 
       {showAdvanced && (
-        <FormGrid>
+        <FormGrid style={{ marginTop: '12px' }}>
           <FormGroup>
             <label>Co-estipulante</label>
             <input
@@ -175,7 +176,7 @@ export const FilterForm = ({
           {loading ? 'Buscando...' : 'Buscar'}
         </Button>
 
-        <Button type="button" className="ghost" onClick={onClear}>
+        <Button type="button" className="ghost" onClick={onClear} disabled={loading}>
           <FaEraser />
           Limpar filtros
         </Button>

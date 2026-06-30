@@ -1,12 +1,10 @@
-// src/pages/Financeiro/voucher/components/RetencoesPanel.jsx
-
 import React from 'react';
 import { FaExclamationTriangle } from 'react-icons/fa';
 import { Card, CardHeader } from '../EmissaoRecibosVoucherStyles';
 import styled from 'styled-components';
 
 const WarningCard = styled(Card)`
-  border-color: #fed7aa;
+  border: 1px solid #fed7aa;
   background: #fff7ed;
   margin-bottom: 16px;
 `;
@@ -15,23 +13,24 @@ const WarningContent = styled.div`
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  
+
   svg {
     margin-top: 3px;
     color: #f97316;
     font-size: 20px;
   }
-  
+
   h2 {
     margin: 0;
     font-size: 17px;
     color: #92400e;
   }
-  
+
   p {
     margin: 5px 0 0;
     color: #9a3412;
     font-size: 14px;
+    line-height: 1.5;
   }
 `;
 
@@ -39,8 +38,8 @@ const RetentionList = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 8px;
-  
+  margin-top: 12px;
+
   label {
     display: flex;
     align-items: center;
@@ -48,8 +47,12 @@ const RetentionList = styled.div`
     font-size: 13px;
     color: #334155;
     cursor: pointer;
-    
-    input[type="checkbox"] {
+    padding: 8px 10px;
+    border: 1px solid #fed7aa;
+    border-radius: 8px;
+    background: #ffffffaa;
+
+    input[type='checkbox'] {
       cursor: pointer;
     }
   }
@@ -82,9 +85,9 @@ export function RetencoesPanel({ selectedRetentions, totals, onToggleRetention }
       <WarningContent>
         <div>
           <p>
-            Total bruto: <strong>{formatMoney(totals.grossTotal)}</strong> | 
-            Total retido: <strong>{formatMoney(totals.retentionTotal)}</strong> | 
-            Líquido: <strong>{formatMoney(totals.netTotal)}</strong>
+            Total bruto: <strong>{formatMoney(totals.grossTotal)}</strong> | Total retido:{' '}
+            <strong>{formatMoney(totals.retentionTotal)}</strong> | Líquido:{' '}
+            <strong>{formatMoney(totals.netTotal)}</strong>
             {totals.count > 0 && ` | ${totals.count} comissão(ões) selecionada(s)`}
           </p>
         </div>
@@ -98,7 +101,7 @@ export function RetencoesPanel({ selectedRetentions, totals, onToggleRetention }
               checked={selectedRetentions.includes(item.id)}
               onChange={() => onToggleRetention(item.id)}
             />
-            {item.label} ({item.rate * 100}%)
+            {item.label} ({(item.rate * 100).toFixed(item.rate * 100 % 1 ? 2 : 0)}%)
           </label>
         ))}
       </RetentionList>

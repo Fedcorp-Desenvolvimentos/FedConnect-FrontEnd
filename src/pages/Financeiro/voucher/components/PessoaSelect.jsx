@@ -1,5 +1,3 @@
-// src/pages/Financeiro/voucher/components/PessoaSelect.jsx
-
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -26,15 +24,14 @@ const Input = styled.input`
 
 const Dropdown = styled.ul`
   position: absolute;
-  top: 100%;
+  top: calc(100% + 4px);
   left: 0;
   right: 0;
   max-height: 250px;
   overflow-y: auto;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-top: none;
-  border-radius: 0 0 8px 8px;
+  border-radius: 8px;
   z-index: 1000;
   margin: 0;
   padding: 0;
@@ -52,6 +49,10 @@ const DropdownItem = styled.li`
     background: #f7fafc;
   }
 
+  &:last-child {
+    border-bottom: none;
+  }
+
   strong {
     display: block;
     font-size: 14px;
@@ -65,10 +66,18 @@ const DropdownItem = styled.li`
 `;
 
 const EmptyMessage = styled.div`
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
   padding: 10px 12px;
   text-align: center;
   color: #718096;
   font-size: 13px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  z-index: 1000;
 `;
 
 export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => {
@@ -87,9 +96,7 @@ export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => 
 
   useEffect(() => {
     if (value && pessoasNormalizadas.length > 0) {
-      const encontrada = pessoasNormalizadas.find((p) => 
-        String(p.codigo) === String(value)
-      );
+      const encontrada = pessoasNormalizadas.find((p) => String(p.codigo) === String(value));
       if (encontrada) {
         setTermo(encontrada.nome);
       } else {
@@ -101,14 +108,18 @@ export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => 
   }, [value, pessoasNormalizadas]);
 
   const filtradas = useMemo(() => {
-    if (!termo || termo.length < 2) return [];
+    if (!termo || termo.trim().length < 2) return [];
+
     const t = termo.toLowerCase().trim();
-    return pessoasNormalizadas.filter(
-      (p) =>
-        p.nome.toLowerCase().includes(t) ||
-        String(p.codigo).toLowerCase().includes(t) ||
-        String(p.documento).toLowerCase().includes(t)
-    );
+
+    return pessoasNormalizadas
+      .filter(
+        (p) =>
+          p.nome.toLowerCase().includes(t) ||
+          String(p.codigo).toLowerCase().includes(t) ||
+          String(p.documento).toLowerCase().includes(t)
+      )
+      .slice(0, 30);
   }, [pessoasNormalizadas, termo]);
 
   useEffect(() => {
@@ -117,42 +128,46 @@ export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => 
         setShowDropdown(false);
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const selecionarPessoa = (pessoa) => {
+    setTermo(pessoa.nome);
+    setShowDropdown(false);
+    onChange(pessoa.codigo);
+  };
+
   const handleChange = (e) => {
     const novoTermo = e.target.value;
     setTermo(novoTermo);
-    setShowDropdown(novoTermo.length >= 2);
+    setShowDropdown(novoTermo.trim().length >= 2);
 
-    if (!novoTermo) {
+    if (!novoTermo.trim()) {
       onChange('');
     }
   };
 
   const handleFocus = () => {
-    if (termo.length >= 2) {
+    if (termo.trim().length >= 2) {
       setShowDropdown(true);
     }
   };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      setShowDropdown(false);
+      e.preventDefault();
       if (filtradas.length === 1) {
         selecionarPessoa(filtradas[0]);
+      } else {
+        setShowDropdown(false);
       }
     }
+
     if (e.key === 'Escape') {
       setShowDropdown(false);
     }
-  };
-
-  const selecionarPessoa = (pessoa) => {
-    setTermo(pessoa.nome);
-    setShowDropdown(false);
-    onChange(pessoa.codigo);
   };
 
   return (
@@ -170,21 +185,21 @@ export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => 
       {showDropdown && filtradas.length > 0 && (
         <Dropdown>
           {filtradas.map((pessoa, index) => (
-            <DropdownItem 
-              key={pessoa.codigo || index} 
+            <DropdownItem
+              key={pessoa.codigo || index}
               onClick={() => selecionarPessoa(pessoa)}
             >
               <strong>{pessoa.nome}</strong>
               <span>
                 Código: {pessoa.codigo || '-'}
-                {pessoa.documento && ` | CNPJ/CPF: ${pessoa.documento}`}
+                {pessoa.documento ? ` | CNPJ/CPF: ${pessoa.documento}` : ''}
               </span>
             </DropdownItem>
           ))}
         </Dropdown>
       )}
 
-      {showDropdown && filtradas.length === 0 && termo.length >= 2 && (
+      {showDropdown && filtradas.length === 0 && termo.trim().length >= 2 && (
         <EmptyMessage>Nenhuma pessoa encontrada para "{termo}"</EmptyMessage>
       )}
     </Container>

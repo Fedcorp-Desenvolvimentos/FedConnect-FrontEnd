@@ -1,34 +1,36 @@
-// src/pages/Financeiro/voucher/components/SummaryCards.jsx
-
 import React from 'react';
-import { FaFileInvoiceDollar, FaReceipt, FaCheckCircle, FaFileInvoice } from 'react-icons/fa';
+import { FaFileInvoiceDollar, FaReceipt, FaCheckCircle, FaFilter } from 'react-icons/fa';
 import { SummaryGrid, SummaryCard } from '../EmissaoRecibosVoucherStyles';
 
-export const SummaryCards = ({ totals, count }) => {
+export const SummaryCards = ({ totals, count, isUsingFilteredData }) => {
   const cards = [
     {
-      label: 'Comissões encontradas',
+      label: 'Comissões exibidas',
       value: count || 0,
       icon: <FaReceipt />,
-      color: '#2b6cb0'
+      color: '#2b6cb0',
+      helper: isUsingFilteredData ? 'Resultado filtrado' : 'Base padrão',
     },
     {
-      label: 'Faturas selecionadas',
-      value: totals.selectedFaturasCount || 0,
-      icon: <FaFileInvoice />,
-      color: '#805ad5'
+      label: 'Selecionadas',
+      value: totals.count || 0,
+      icon: <FaFilter />,
+      color: '#805ad5',
+      helper: 'Prontas para emissão',
     },
     {
-      label: 'Valor Bruto',
+      label: 'Valor bruto',
       value: `R$ ${(totals.grossTotal || 0).toFixed(2).replace('.', ',')}`,
       icon: <FaFileInvoiceDollar />,
-      color: '#38a169'
+      color: '#38a169',
+      helper: 'Soma das selecionadas',
     },
     {
-      label: 'Valor Líquido',
+      label: 'Valor líquido',
       value: `R$ ${(totals.netTotal || 0).toFixed(2).replace('.', ',')}`,
       icon: <FaCheckCircle />,
-      color: '#2b6cb0'
+      color: '#2b6cb0',
+      helper: 'Após retenções',
     },
   ];
 
@@ -42,6 +44,7 @@ export const SummaryCards = ({ totals, count }) => {
           <div>
             <span>{card.label}</span>
             <strong>{card.value}</strong>
+            <small>{card.helper}</small>
           </div>
         </SummaryCard>
       ))}

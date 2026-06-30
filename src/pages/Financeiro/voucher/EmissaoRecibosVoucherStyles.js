@@ -1,10 +1,13 @@
-// src/pages/Financeiro/voucher/EmissaoRecibosVoucherStyles.js
-
 import styled, { keyframes } from 'styled-components';
 
 const pulse = keyframes`
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+`;
+
+const spin = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 `;
 
 export const Container = styled.div`
@@ -24,6 +27,11 @@ export const Header = styled.div`
   padding: 20px 24px;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 
 export const BackButton = styled.button`
@@ -48,6 +56,16 @@ export const BackButton = styled.button`
 export const Title = styled.div`
   flex: 1;
 
+  span {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #718096;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
   h1 {
     font-size: 24px;
     font-weight: 700;
@@ -60,23 +78,18 @@ export const Title = styled.div`
     color: #718096;
     margin: 4px 0 0 0;
   }
-
-  small {
-    color: #a0aec0;
-    font-size: 12px;
-  }
 `;
 
 export const InfoBanner = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 20px;
+  padding: 14px 20px;
   margin-bottom: 20px;
-  background: #ebf8ff;
-  border: 1px solid #bee3f8;
-  border-radius: 8px;
-  color: #2b6cb0;
+  background: ${(props) => (props.isFiltered ? '#fffbeb' : '#ebf8ff')};
+  border: 1px solid ${(props) => (props.isFiltered ? '#fde68a' : '#bee3f8')};
+  border-radius: 10px;
+  color: ${(props) => (props.isFiltered ? '#92400e' : '#2b6cb0')};
 
   svg {
     font-size: 20px;
@@ -94,9 +107,16 @@ export const InfoBanner = styled.div`
 
     span {
       font-size: 13px;
-      color: #2c5282;
+      color: ${(props) => (props.isFiltered ? '#78350f' : '#2c5282')};
     }
   }
+`;
+
+export const SingleColumnGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
 `;
 
 export const WorkflowGrid = styled.div`
@@ -125,11 +145,14 @@ export const CardHeader = styled.div`
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid #edf2f7;
+  gap: 12px;
+  flex-wrap: wrap;
 
   > div {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
 
     h2 {
       font-size: 16px;
@@ -155,6 +178,11 @@ export const CardHeader = styled.div`
 
     &:hover {
       color: #1a365d;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
   }
 
@@ -183,16 +211,6 @@ export const SkeletonRow = styled.div`
   &:last-child {
     margin-bottom: 0;
   }
-
-  &.small {
-    height: 14px;
-    width: 60%;
-  }
-
-  &.medium {
-    height: 16px;
-    width: 80%;
-  }
 `;
 
 export const SummaryGrid = styled.div`
@@ -201,7 +219,7 @@ export const SummaryGrid = styled.div`
   gap: 16px;
   margin-bottom: 24px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -247,6 +265,12 @@ export const SummaryCard = styled.div`
       font-weight: 700;
       color: #1a202c;
     }
+
+    small {
+      font-size: 11px;
+      color: #a0aec0;
+      margin-top: 4px;
+    }
   }
 `;
 
@@ -283,6 +307,7 @@ export const FormGroup = styled.div`
     border-radius: 8px;
     font-size: 14px;
     transition: border-color 0.2s;
+    background: white;
 
     &:focus {
       outline: none;
@@ -295,103 +320,36 @@ export const FormGroup = styled.div`
       cursor: not-allowed;
     }
   }
-`;
 
-export const TableWrapper = styled.div`
-  overflow-x: auto;
-  margin-top: 8px;
-`;
-
-export const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-
-  thead {
-    background: #f7fafc;
-
-    th {
-      padding: 10px 12px;
-      text-align: left;
-      font-weight: 600;
-      color: #4a5568;
-      border-bottom: 2px solid #e2e8f0;
-      white-space: nowrap;
-    }
-  }
-
-  tbody {
-    tr {
-      border-bottom: 1px solid #edf2f7;
-      transition: background 0.15s;
-      cursor: pointer;
-
-      &:hover {
-        background: #f7fafc;
-      }
-
-      &.selected {
-        background: #ebf8ff;
-      }
-
-      td {
-        padding: 10px 12px;
-        vertical-align: middle;
-      }
-    }
-  }
-`;
-
-export const StatusBadge = styled.span`
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-
-  &.paid {
-    background: #c6f6d5;
-    color: #22543d;
-  }
-
-  &.pending {
-    background: #fefcbf;
-    color: #744210;
-  }
-
-  &.overdue {
-    background: #fed7d7;
-    color: #9b2c2c;
-  }
-
-  &.canceled {
-    background: #e2e8f0;
-    color: #4a5568;
-  }
-
-  &.active {
-    background: #bee3f8;
-    color: #2a69ac;
+  small {
+    color: #a0aec0;
+    font-size: 11px;
   }
 `;
 
 export const ComissaoList = styled.div`
-  max-height: 500px;
+  max-height: 560px;
   overflow-y: auto;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
 `;
 
 export const ComissaoItem = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
+  padding: 12px;
   border-bottom: 1px solid #edf2f7;
   transition: background 0.15s;
-  background: ${props => (props.checked ? '#ebf8ff' : 'transparent')};
+  background: ${(props) => (props.checked ? '#ebf8ff' : 'transparent')};
   cursor: pointer;
 
   &:hover {
-    background: #f7fafc;
+    background: ${(props) => (props.checked ? '#dbeafe' : '#f7fafc')};
+  }
+
+  &:last-child {
+    border-bottom: none;
   }
 
   input[type='checkbox'] {
@@ -406,7 +364,8 @@ export const ComissaoItem = styled.div`
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
+    min-width: 0;
 
     strong {
       font-size: 14px;
@@ -416,11 +375,12 @@ export const ComissaoItem = styled.div`
     span {
       font-size: 13px;
       color: #4a5568;
+      word-break: break-word;
     }
   }
 
   .value {
-    font-weight: 600;
+    font-weight: 700;
     color: #2b6cb0;
     font-size: 15px;
     white-space: nowrap;
@@ -451,18 +411,12 @@ export const TotalsBar = styled.div`
   }
 `;
 
-export const EmptyState = styled.div`
-  text-align: center;
-  padding: 40px 20px;
-  color: #a0aec0;
-  font-size: 14px;
-`;
-
 export const EmissaoOptions = styled.div`
   display: flex;
   gap: 24px;
   margin-bottom: 16px;
   align-items: center;
+  flex-wrap: wrap;
 
   label {
     display: flex;
@@ -470,6 +424,7 @@ export const EmissaoOptions = styled.div`
     gap: 8px;
     font-size: 14px;
     color: #4a5568;
+    flex-wrap: wrap;
 
     select {
       height: 36px;
@@ -477,6 +432,7 @@ export const EmissaoOptions = styled.div`
       border: 1px solid #e2e8f0;
       border-radius: 8px;
       font-size: 14px;
+      background: white;
     }
   }
 `;
@@ -501,6 +457,7 @@ export const Actions = styled.div`
 export const Button = styled.button`
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 10px 20px;
   border: none;
@@ -509,6 +466,7 @@ export const Button = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  min-height: 42px;
 
   &.primary {
     background: #2b6cb0;
@@ -539,28 +497,38 @@ export const Button = styled.button`
     }
   }
 
-  &.danger {
-    background: #e53e3e;
-    color: white;
-
-    &:hover:not(:disabled) {
-      background: #c53030;
-    }
-  }
-
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .spin {
+    animation: ${spin} 1s linear infinite;
   }
 `;
 
-export const GlobalStyle = styled.div`
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+export const EmptyState = styled.div`
+  text-align: center;
+  padding: 40px 20px;
+  color: #a0aec0;
+  font-size: 14px;
+`;
+
+export const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  gap: 12px;
+  color: #718096;
+
+  svg,
+  .spin {
+    font-size: 28px;
+    color: #2b6cb0;
+    animation: ${spin} 1s linear infinite;
   }
 `;
