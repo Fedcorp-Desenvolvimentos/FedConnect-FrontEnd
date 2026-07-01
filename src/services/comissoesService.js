@@ -29,7 +29,6 @@ export const buscarPessoaPorCodigo = async (codigo) => {
 };
 
 /**
- * 🔥 BUSCA COMISSÕES - V2
  * ROTA: /comissoes/por-data-v2/{data_corte}/
  * NUNCA usa /comissoes/faturas/
  */

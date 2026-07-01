@@ -57,9 +57,6 @@ export default function EmissaoRecibosVoucher() {
     hasActiveFilters,
   } = useEmissaoRecibos();
 
-  // 🔥 NÃO CARREGA MAIS AUTOMATICAMENTE - APENAS QUANDO O USUÁRIO CLICAR EM "BUSCAR"
-  // useEffect removido!
-
   const canIssue = selectedComissoes.size > 0;
   const hasResults = comissoes.length > 0;
   const isEmpty = !loading && !loadingInitial && !hasResults && hasSearched;
@@ -82,7 +79,7 @@ export default function EmissaoRecibosVoucher() {
         </Title>
       </Header>
 
-      {/* Banner de informação - mostra estado atual */}
+      {/* Banner de informação */}
       <InfoBanner isFiltered={hasActiveFilters || isUsingFilteredData}>
         <FaInfoCircle />
         <div>
