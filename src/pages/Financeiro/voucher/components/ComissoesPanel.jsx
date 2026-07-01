@@ -106,7 +106,12 @@ const formatDate = (date) => {
 };
 
 const getComissaoKey = (comissao) => {
-  const fatura = comissao.FATURA || comissao.fatura || comissao.DOCUMENTO || '';
+  // Prioriza DOCUMENTO, que é único
+  if (comissao.DOCUMENTO || comissao.documento) {
+    return String(comissao.DOCUMENTO || comissao.documento);
+  }
+  // Fallback para FATURA|PARCELA
+  const fatura = comissao.FATURA || comissao.fatura || '';
   const parcela = comissao.PARCELA || comissao.parcela || '1';
   return `${fatura}|${parcela}`;
 };
