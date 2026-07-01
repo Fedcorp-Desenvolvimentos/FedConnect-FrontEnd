@@ -1,5 +1,5 @@
-// EmissaoRecibosVoucher.jsx - VERSÃO REFATORADA
-import React, { useEffect } from 'react';
+// EmissaoRecibosVoucher.jsx - VERSÃO REFATORADA (layout em duas colunas)
+import React from 'react';
 import { FaArrowLeft, FaInfoCircle, FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useEmissaoRecibos } from './hooks/useEmissaoRecibos';
@@ -8,12 +8,15 @@ import { FilterForm } from './components/FilterForm';
 import { ComissoesPanel } from './components/ComissoesPanel';
 import { EmissaoPanel } from './components/EmissaoPanel';
 import { RetencoesPanel } from './components/RetencoesPanel';
+import { PreviewModal } from './components/PreviewModal';
 import {
   Container,
   Header,
   BackButton,
   Title,
-  SingleColumnGrid,
+  PageLayout,
+  MainColumn,
+  Sidebar,
   SkeletonCard,
   SkeletonRow,
   InfoBanner,
@@ -43,6 +46,8 @@ export default function EmissaoRecibosVoucher() {
     dataCorteFormatada,
     totalRegistros,
     hasSearched,
+    previewOpen,
+    previewData,
     buscarTudo,
     updateFilter,
     clearFilters,
@@ -53,6 +58,7 @@ export default function EmissaoRecibosVoucher() {
     setDocumentType,
     emitirDocumento,
     previewDocument,
+    closePreview,
     isUsingFilteredData,
     hasActiveFilters,
   } = useEmissaoRecibos();
@@ -86,9 +92,9 @@ export default function EmissaoRecibosVoucher() {
           <strong>
             {hasSearched
               ? isUsingFilteredData
-                ? '✅ Resultado da consulta'
-                : '✅ Comissões do período'
-              : '🔍 Aguardando consulta'}
+                ? 'Resultado da consulta'
+                : 'Comissões do período'
+              : '  Aguardando consulta'}
           </strong>
           <span>
             {loadingInitial
@@ -109,82 +115,94 @@ export default function EmissaoRecibosVoucher() {
         hasSearched={hasSearched}
       />
 
-      <FilterForm
-        filters={filters}
-        pessoas={pessoas}
-        loading={loading}
-        showAdvanced={showAdvancedFilters}
-        onFilterChange={updateFilter}
-        onSearch={buscarTudo}
-        onClear={clearFilters}
-        onToggleAdvanced={() => setShowAdvancedFilters(!showAdvancedFilters)}
-      />
-
-      <RetencoesPanel
-        selectedRetentions={selectedRetentions}
-        totals={retentionSummary}
-        onToggleRetention={toggleRetention}
-        hasResults={hasResults}
-      />
-
-      <SingleColumnGrid>
-        {loadingInitial ? (
-          <SkeletonCard>
-            <SkeletonRow />
-            <SkeletonRow />
-            <SkeletonRow />
-            <SkeletonRow />
-          </SkeletonCard>
-        ) : isEmpty ? (
-          <EmptyStateContainer>
-            <EmptyStateIcon>
-              <FaSearch />
-            </EmptyStateIcon>
-            <EmptyStateTitle>Nenhuma comissão encontrada</EmptyStateTitle>
-            <EmptyStateText>
-              {hasActiveFilters
-                ? 'Tente ajustar os filtros ou alterar a data de corte'
-                : 'Selecione uma data de corte e clique em "Buscar" para consultar as comissões'}
-            </EmptyStateText>
-          </EmptyStateContainer>
-        ) : !hasSearched ? (
-          <EmptyStateContainer>
-            <EmptyStateIcon>
-              <FaSearch />
-            </EmptyStateIcon>
-            <EmptyStateTitle>Faça uma consulta</EmptyStateTitle>
-            <EmptyStateText>
-              Preencha os filtros acima e clique em <strong>Buscar</strong> para visualizar as comissões
-            </EmptyStateText>
-          </EmptyStateContainer>
-        ) : (
-          <ComissoesPanel
-            comissoes={comissoes}
-            selectedComissoes={selectedComissoes}
-            onToggleComissao={toggleComissao}
-            onToggleAllComissoes={toggleAllComissoes}
-            totals={retentionSummary}
+      {/*
+        Layout principal: a coluna da esquerda concentra o fluxo de consulta
+        (filtros -> lista de comissões). A barra lateral fixa mantém retenções
+        e as ações de emissão sempre visíveis, sem precisar rolar a página
+        depois de selecionar as comissões.
+      */}
+      <PageLayout>
+        <MainColumn>
+          <FilterForm
+            filters={filters}
+            pessoas={pessoas}
             loading={loading}
-            totalRegistros={totalRegistros}
-            dataCorte={dataCorte}
-            dataCorteFormatada={dataCorteFormatada}
-            isUsingFilteredData={isUsingFilteredData}
-            hasSearched={hasSearched}
+            showAdvanced={showAdvancedFilters}
+            onFilterChange={updateFilter}
+            onSearch={buscarTudo}
+            onClear={clearFilters}
+            onToggleAdvanced={() => setShowAdvancedFilters(!showAdvancedFilters)}
           />
-        )}
-      </SingleColumnGrid>
 
-      <EmissaoPanel
-        canIssue={canIssue && hasResults}
-        documentType={documentType}
-        loading={loading}
-        lastEmission={lastEmission}
-        totals={retentionSummary}
-        onDocumentTypeChange={setDocumentType}
-        onEmitir={emitirDocumento}
-        onPreview={previewDocument}
-        onSair={() => navigate('/financeiro')}
-      />
+          {loadingInitial ? (
+            <SkeletonCard>
+              <SkeletonRow />
+              <SkeletonRow />
+              <SkeletonRow />
+              <SkeletonRow />
+            </SkeletonCard>
+          ) : isEmpty ? (
+            <EmptyStateContainer>
+              <EmptyStateIcon>
+                <FaSearch />
+              </EmptyStateIcon>
+              <EmptyStateTitle>Nenhuma comissão encontrada</EmptyStateTitle>
+              <EmptyStateText>
+                {hasActiveFilters
+                  ? 'Tente ajustar os filtros ou alterar a data de corte'
+                  : 'Selecione uma data de corte e clique em "Buscar" para consultar as comissões'}
+              </EmptyStateText>
+            </EmptyStateContainer>
+          ) : !hasSearched ? (
+            <EmptyStateContainer>
+              <EmptyStateIcon>
+                <FaSearch />
+              </EmptyStateIcon>
+              <EmptyStateTitle>Faça uma consulta</EmptyStateTitle>
+              <EmptyStateText>
+                Preencha os filtros acima e clique em <strong>Buscar</strong> para visualizar as comissões
+              </EmptyStateText>
+            </EmptyStateContainer>
+          ) : (
+            <ComissoesPanel
+              comissoes={comissoes}
+              selectedComissoes={selectedComissoes}
+              onToggleComissao={toggleComissao}
+              onToggleAllComissoes={toggleAllComissoes}
+              totals={retentionSummary}
+              loading={loading}
+              totalRegistros={totalRegistros}
+              dataCorte={dataCorte}
+              dataCorteFormatada={dataCorteFormatada}
+              isUsingFilteredData={isUsingFilteredData}
+              hasSearched={hasSearched}
+            />
+          )}
+        </MainColumn>
+
+        <Sidebar>
+          <RetencoesPanel
+            selectedRetentions={selectedRetentions}
+            totals={retentionSummary}
+            onToggleRetention={toggleRetention}
+            hasResults={hasResults}
+          />
+
+          <EmissaoPanel
+            canIssue={canIssue && hasResults}
+            documentType={documentType}
+            loading={loading}
+            lastEmission={lastEmission}
+            totals={retentionSummary}
+            onDocumentTypeChange={setDocumentType}
+            onEmitir={emitirDocumento}
+            onPreview={previewDocument}
+            onSair={() => navigate('/financeiro')}
+          />
+        </Sidebar>
+      </PageLayout>
+
+      <PreviewModal open={previewOpen} data={previewData} onClose={closePreview} />
     </Container>
   );
 }

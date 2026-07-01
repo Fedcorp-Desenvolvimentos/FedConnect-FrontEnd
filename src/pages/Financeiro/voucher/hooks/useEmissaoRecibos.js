@@ -125,6 +125,9 @@ export const useEmissaoRecibos = () => {
   const [lastEmission, setLastEmission] = useState(null);
   const [totalRegistros, setTotalRegistros] = useState(0);
 
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewData, setPreviewData] = useState(null);
+
   const dataCorte = useMemo(() => {
     return filters.data_corte || getCurrentMonthDate();
   }, [filters.data_corte]);
@@ -323,6 +326,72 @@ export const useEmissaoRecibos = () => {
     };
   }, [retentionSummary]);
 
+  // Monta o payload completo (documento + comissões + retenções) reaproveitado
+  // tanto pela emissão real quanto pela pré-visualização.
+  const buildDocumentPayload = useCallback(() => {
+    const comissoesSelecionadas = comissoes.filter((c) => selectedComissoes.has(getComissaoKey(c)));
+
+    return {
+      tipoDocumento: documentType,
+      dataCorte,
+      dataCorteFormatada,
+      dataEmissao: new Date().toISOString(),
+      totalComissoes: comissoesSelecionadas.length,
+      valorTotalBruto: retentionSummary.grossTotal,
+      valorLiquido: retentionSummary.netTotal,
+      retencoesAplicadas: retentionSummary.retentionRows.map((r) => ({
+        tipo: r.label,
+        aliquota: `${(r.rate * 100).toFixed(2)}%`,
+        valor: r.value,
+      })),
+      comissoes: comissoesSelecionadas.map((c) => ({
+        fatura: c.FATURA || c.fatura || c.DOCUMENTO || '',
+        parcela: c.PARCELA || c.parcela || '1',
+        favorecido: c.FAVOR || c.favor || '',
+        favorecidoNome: c.NOME || c.nome || '',
+        favorecidoDocumento: c.DOC_FAVORECIDO || c.doc_favorecido || '',
+        valorComissao: Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0),
+        percentual: c.COMISSAO || c.comissao || 0,
+        imposto: c.IMPOSTO || c.imposto || 0,
+        voucher: c.VOUCHER || c.voucher || null,
+        dataRepasse: c.DT_REPASSE || c.dt_repasse || null,
+        produto: c.PRODUTO || c.produto || '',
+        coEstipulante: c.CO_ESTIP || c.co_estip || '',
+        bancoAgenciaConta: c.BC_AG_CC || c.bc_ag_cc || '',
+        chavePix: c.CHAVE_PIX || c.chave_pix || null,
+        vencimento: c.VENCIMENTO || c.vencimento || null,
+        dataFat: c.DATA_FAT || c.data_fat || null,
+        tipoFatura: c.TIPO_FAT || c.tipo_fat || '',
+        premioBruto: Number(c.PREMIO_BRUTO || c.premio_bruto || 0),
+        premioLiquido: Number(c.PREMIO_LIQ || c.premio_liq || 0),
+        quitado: c.QUITADO || c.quitado || 0,
+        status: c.STATUS || c.status || '',
+        documento: c.DOCUMENTO || c.documento || '',
+        produtoOriginal: c.PRODUTO_ORI || c.produto_ori || '',
+      })),
+      filtrosAplicados: {
+        dataCorte,
+        favorecido: filters.favorecido,
+        fatura: filters.fatura,
+        status: filters.status,
+        tipo: filters.tipo,
+        co_estipulante: filters.co_estipulante,
+        apolice: filters.apolice,
+        recibo: filters.recibo,
+        com_voucher: filters.com_voucher,
+      },
+      resumoGeral: {
+        totalComissoesSelecionadas: comissoesSelecionadas.length,
+        valorTotalBruto: retentionSummary.grossTotal,
+        totalRetencoes: retentionSummary.retentionTotal,
+        valorLiquidoFinal: retentionSummary.netTotal,
+      },
+      // Amostra dos registros crus recebidos da API (Resposta V2), útil para
+      // conferência rápida dos dados de origem dentro da pré-visualização.
+      registrosBrutos: comissoesSelecionadas,
+    };
+  }, [comissoes, selectedComissoes, documentType, dataCorte, dataCorteFormatada, retentionSummary, filters]);
+
   const emitirDocumento = useCallback(async () => {
     if (selectedComissoes.size === 0) {
       enqueueSnackbar('Selecione pelo menos uma comissão', { variant: 'warning' });
@@ -332,64 +401,7 @@ export const useEmissaoRecibos = () => {
     startLoading('Preparando dados para emissão...');
 
     try {
-      const comissoesSelecionadas = comissoes.filter((c) => selectedComissoes.has(getComissaoKey(c)));
-
-      const payload = {
-        tipoDocumento: documentType,
-        dataCorte,
-        dataCorteFormatada,
-        dataEmissao: new Date().toISOString(),
-        totalComissoes: comissoesSelecionadas.length,
-        valorTotalBruto: retentionSummary.grossTotal,
-        valorLiquido: retentionSummary.netTotal,
-        retencoesAplicadas: retentionSummary.retentionRows.map((r) => ({
-          tipo: r.label,
-          aliquota: `${(r.rate * 100).toFixed(2)}%`,
-          valor: r.value,
-        })),
-        comissoes: comissoesSelecionadas.map((c) => ({
-          fatura: c.FATURA || c.fatura || c.DOCUMENTO || '',
-          parcela: c.PARCELA || c.parcela || '1',
-          favorecido: c.FAVOR || c.favor || '',
-          favorecidoNome: c.NOME || c.nome || '',
-          favorecidoDocumento: c.DOC_FAVORECIDO || c.doc_favorecido || '',
-          valorComissao: Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0),
-          percentual: c.COMISSAO || c.comissao || 0,
-          imposto: c.IMPOSTO || c.imposto || 0,
-          voucher: c.VOUCHER || c.voucher || null,
-          dataRepasse: c.DT_REPASSE || c.dt_repasse || null,
-          produto: c.PRODUTO || c.produto || '',
-          coEstipulante: c.CO_ESTIP || c.co_estip || '',
-          bancoAgenciaConta: c.BC_AG_CC || c.bc_ag_cc || '',
-          chavePix: c.CHAVE_PIX || c.chave_pix || null,
-          vencimento: c.VENCIMENTO || c.vencimento || null,
-          dataFat: c.DATA_FAT || c.data_fat || null,
-          tipoFatura: c.TIPO_FAT || c.tipo_fat || '',
-          premioBruto: Number(c.PREMIO_BRUTO || c.premio_bruto || 0),
-          premioLiquido: Number(c.PREMIO_LIQ || c.premio_liq || 0),
-          quitado: c.QUITADO || c.quitado || 0,
-          status: c.STATUS || c.status || '',
-          documento: c.DOCUMENTO || c.documento || '',
-          produtoOriginal: c.PRODUTO_ORI || c.produto_ori || '',
-        })),
-        filtrosAplicados: {
-          dataCorte,
-          favorecido: filters.favorecido,
-          fatura: filters.fatura,
-          status: filters.status,
-          tipo: filters.tipo,
-          co_estipulante: filters.co_estipulante,
-          apolice: filters.apolice,
-          recibo: filters.recibo,
-          com_voucher: filters.com_voucher,
-        },
-        resumoGeral: {
-          totalComissoesSelecionadas: comissoesSelecionadas.length,
-          valorTotalBruto: retentionSummary.grossTotal,
-          totalRetencoes: retentionSummary.retentionTotal,
-          valorLiquidoFinal: retentionSummary.netTotal,
-        },
-      };
+      const payload = buildDocumentPayload();
 
       console.info('Payload de emissão preparado:', payload);
 
@@ -398,17 +410,18 @@ export const useEmissaoRecibos = () => {
         emitidoEm: new Date().toISOString(),
         tipo: documentType,
         total: retentionSummary.netTotal,
-        quantidade: comissoesSelecionadas.length,
+        quantidade: payload.totalComissoes,
       });
 
       enqueueSnackbar(
         `${documentType === 'voucher' ? 'Voucher' : 'Recibo'} preparado com ${
-          comissoesSelecionadas.length
+          payload.totalComissoes
         } comissão(ões). Dados disponíveis no console.`,
         { variant: 'success' }
       );
 
       resetSelections();
+      setPreviewOpen(false);
     } catch (error) {
       enqueueSnackbar(error.message || 'Erro ao preparar dados', { variant: 'error' });
     } finally {
@@ -419,12 +432,9 @@ export const useEmissaoRecibos = () => {
     enqueueSnackbar,
     startLoading,
     stopLoading,
-    comissoes,
+    buildDocumentPayload,
     documentType,
-    dataCorte,
-    dataCorteFormatada,
     retentionSummary,
-    filters,
     resetSelections,
   ]);
 
@@ -434,13 +444,13 @@ export const useEmissaoRecibos = () => {
       return;
     }
 
-    enqueueSnackbar(
-      `Pré-visualização: ${retentionSummary.count} comissão(ões), líquido ${Number(
-        retentionSummary.netTotal || 0
-      ).toFixed(2).replace('.', ',')}`,
-      { variant: 'info' }
-    );
-  }, [selectedComissoes, retentionSummary, enqueueSnackbar]);
+    setPreviewData(buildDocumentPayload());
+    setPreviewOpen(true);
+  }, [selectedComissoes, enqueueSnackbar, buildDocumentPayload]);
+
+  const closePreview = useCallback(() => {
+    setPreviewOpen(false);
+  }, []);
 
   return {
     loading,
@@ -461,6 +471,8 @@ export const useEmissaoRecibos = () => {
     isUsingFilteredData,
     hasActiveFilters,
     hasSearched,
+    previewOpen,
+    previewData,
 
     buscarTudo,
     updateFilter,
@@ -472,5 +484,6 @@ export const useEmissaoRecibos = () => {
     setDocumentType,
     emitirDocumento,
     previewDocument,
+    closePreview,
   };
 };

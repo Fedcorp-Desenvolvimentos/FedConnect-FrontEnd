@@ -1,6 +1,13 @@
 import React from 'react';
 import { FaPrint, FaEye, FaSpinner } from 'react-icons/fa';
-import { Card, CardHeader, EmissaoOptions, EmissionResult, Actions, Button } from '../EmissaoRecibosVoucherStyles';
+import {
+  Card,
+  CardHeader,
+  EmissaoOptions,
+  EmissionResult,
+  Actions,
+  Button,
+} from '../EmissaoRecibosVoucherStyles';
 
 const formatDate = (date) => {
   if (!date) return '-';
@@ -39,7 +46,8 @@ export const EmissaoPanel = ({
       <CardHeader>
         <div>
           <FaPrint />
-          <h2>3. Emissão</h2>
+          <h2>Emissão</h2>
+          <span>{totals?.count || 0} selecionada(s) · {formatMoney(totals?.netTotal || 0)}</span>
         </div>
       </CardHeader>
 
@@ -53,62 +61,19 @@ export const EmissaoPanel = ({
         </label>
       </EmissaoOptions>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-          gap: '12px',
-          marginTop: '12px',
-          marginBottom: '12px',
-          padding: '14px',
-          background: '#f7fafc',
-          borderRadius: '10px',
-          border: '1px solid #edf2f7',
-        }}
-      >
-        <div>
-          <span style={{ fontSize: 12, color: '#718096' }}>Total bruto</span>
-          <strong style={{ display: 'block', color: '#2d3748', marginTop: 4 }}>
-            {formatMoney(totals?.grossTotal || 0)}
-          </strong>
-        </div>
-
-        <div>
-          <span style={{ fontSize: 12, color: '#718096' }}>Retenções</span>
-          <strong style={{ display: 'block', color: '#dd6b20', marginTop: 4 }}>
-            {formatMoney(totals?.retentionTotal || 0)}
-          </strong>
-        </div>
-
-        <div>
-          <span style={{ fontSize: 12, color: '#718096' }}>Líquido</span>
-          <strong style={{ display: 'block', color: '#2b6cb0', marginTop: 4 }}>
-            {formatMoney(totals?.netTotal || 0)}
-          </strong>
-        </div>
-
-        <div>
-          <span style={{ fontSize: 12, color: '#718096' }}>Comissões</span>
-          <strong style={{ display: 'block', color: '#2d3748', marginTop: 4 }}>
-            {totals?.count || 0}
-          </strong>
-        </div>
-      </div>
-
       {!canIssue && (
         <div
           style={{
-            marginTop: '10px',
-            marginBottom: '10px',
+            marginBottom: '4px',
             padding: '10px 12px',
-            borderRadius: '8px',
+            borderRadius: '9px',
             background: '#fffaf0',
             border: '1px solid #fbd38d',
             color: '#975a16',
-            fontSize: '13px',
+            fontSize: '12.5px',
           }}
         >
-          Selecione ao menos uma comissão para preparar a emissão.
+          Selecione ao menos uma comissão na lista para liberar a emissão.
         </div>
       )}
 
@@ -124,9 +89,9 @@ export const EmissaoPanel = ({
         </EmissionResult>
       )}
 
-      <Actions>
+      <Actions style={{ flexDirection: 'column' }}>
         <Button
-          className="primary"
+          className="primary block"
           disabled={!canIssue || loading}
           onClick={onEmitir}
         >
@@ -134,12 +99,12 @@ export const EmissaoPanel = ({
           {loading ? 'Preparando...' : `Preparar ${documentType === 'voucher' ? 'Voucher' : 'Recibo'}`}
         </Button>
 
-        <Button className="secondary" disabled={!canIssue || loading} onClick={onPreview}>
+        <Button className="secondary block" disabled={!canIssue || loading} onClick={onPreview}>
           <FaEye />
           Pré-visualizar
         </Button>
 
-        <Button className="ghost" onClick={onSair} disabled={loading}>
+        <Button className="ghost block" onClick={onSair} disabled={loading}>
           Sair
         </Button>
       </Actions>
