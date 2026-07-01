@@ -1,5 +1,7 @@
+// components/ComissoesPanel.jsx - REMOVER BOTÃO DE CARREGAR MAIS
+
 import React from 'react';
-import { FaReceipt, FaSpinner, FaCalendar, FaPlus } from 'react-icons/fa';
+import { FaReceipt, FaSpinner, FaCalendar } from 'react-icons/fa';
 import {
   Card,
   CardHeader,
@@ -24,73 +26,6 @@ const PeriodInfo = styled.div`
   }
 `;
 
-const LoadMoreContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 16px 0 8px 0;
-  border-top: 1px solid #edf2f7;
-  margin-top: 12px;
-`;
-
-const LoadMoreButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 12px 32px;
-  background: #f7fafc;
-  border: 2px dashed #cbd5e0;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #2d3748;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  min-width: 200px;
-
-  &:hover:not(:disabled) {
-    background: #edf2f7;
-    border-color: #2b6cb0;
-    color: #2b6cb0;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(43, 108, 176, 0.15);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0px);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  svg {
-    font-size: 16px;
-  }
-
-  .spin {
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-`;
-
-const LoadMoreInfo = styled.span`
-  font-size: 12px;
-  color: #a0aec0;
-  margin-left: 6px;
-  font-weight: 400;
-`;
-
 const formatMoney = (value) => {
   if (value === null || value === undefined) return 'R$ 0,00';
   return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
@@ -105,15 +40,14 @@ const formatDate = (date) => {
   }
 };
 
-const getComissaoKey = (comissao) => {
-  // Prioriza DOCUMENTO, que é único
-  if (comissao.DOCUMENTO || comissao.documento) {
-    return String(comissao.DOCUMENTO || comissao.documento);
-  }
-  // Fallback para FATURA|PARCELA
-  const fatura = comissao.FATURA || comissao.fatura || '';
-  const parcela = comissao.PARCELA || comissao.parcela || '1';
-  return `${fatura}|${parcela}`;
+const getComissaoKey = (c) => {
+  const documento = c.DOCUMENTO ?? '';
+  const favor = c.FAVOR ?? '';
+  const tipo = c.TIPO ?? '';
+  const parcela = c.PARCELA ?? '1';
+  const valor = Number(c.VALOR ?? 0).toFixed(2);
+
+  return [documento, favor, tipo, parcela, valor].join('|');
 };
 
 export const ComissoesPanel = ({
@@ -123,12 +57,10 @@ export const ComissoesPanel = ({
   onToggleAllComissoes,
   totals,
   loading,
-  loadingMore = false,
-  hasMore = false,
-  onLoadMore,
   totalRegistros = 0,
   dataCorteFormatada,
   isUsingFilteredData,
+  hasSearched,
 }) => {
   const allSelected =
     comissoes.length > 0 &&
@@ -164,7 +96,7 @@ export const ComissoesPanel = ({
           <FaReceipt />
           <h2>2. Comissões</h2>
           <span>
-            ({comissoes.length} de {totalRegistros || comissoes.length} encontradas)
+            ({comissoes.length} {totalRegistros > comissoes.length ? `de ${totalRegistros}` : ''} encontradas)
           </span>
 
           {totalSelecionadas > 0 && (
@@ -193,10 +125,14 @@ export const ComissoesPanel = ({
       {comissoes.length === 0 ? (
         <EmptyState>
           <p style={{ fontSize: 16, color: '#718096', marginBottom: 8 }}>
-            Nenhuma comissão encontrada para {dataCorteFormatada || 'este período'}
+            {hasSearched
+              ? 'Nenhuma comissão encontrada para os filtros selecionados'
+              : 'Faça uma consulta para exibir as comissões'}
           </p>
           <p style={{ fontSize: 13, color: '#a0aec0' }}>
-            Tente ajustar os filtros ou alterar a data de corte
+            {hasSearched
+              ? 'Tente ajustar os filtros ou alterar a data de corte'
+              : 'Utilize o formulário de consulta acima'}
           </p>
         </EmptyState>
       ) : (
@@ -245,40 +181,6 @@ export const ComissoesPanel = ({
               );
             })}
           </ComissaoList>
-
-          {/* ============================================= */}
-          {/* BOTÃO "CARREGAR MAIS" - AQUI É ONDE ELE FICA */}
-          {/* ============================================= */}
-          {hasMore && !loading && (
-            <LoadMoreContainer>
-              <LoadMoreButton onClick={onLoadMore} disabled={loadingMore}>
-                {loadingMore ? (
-                  <>
-                    <FaSpinner className="spin" />
-                    Carregando mais...
-                  </>
-                ) : (
-                  <>
-                    <FaPlus />
-                    Carregar mais
-                    <LoadMoreInfo>
-                      ({comissoes.length} de {totalRegistros})
-                    </LoadMoreInfo>
-                  </>
-                )}
-              </LoadMoreButton>
-            </LoadMoreContainer>
-          )}
-
-          {/* Mostra o estado de carregamento quando está carregando mais */}
-          {loadingMore && !hasMore && (
-            <LoadMoreContainer>
-              <LoadMoreButton disabled>
-                <FaSpinner className="spin" />
-                Carregando mais comissões...
-              </LoadMoreButton>
-            </LoadMoreContainer>
-          )}
 
           <TotalsBar>
             <span>

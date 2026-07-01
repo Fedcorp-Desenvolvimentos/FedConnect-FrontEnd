@@ -532,3 +532,42 @@ export const LoadingContainer = styled.div`
     animation: ${spin} 1s linear infinite;
   }
 `;
+
+// styles/EmissaoRecibosVoucherStyles.js - ADICIONAR NOVOS ESTILOS
+
+export const EmptyStateContainer = styled.div`
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+`;
+
+export const EmptyStateIcon = styled.div`
+  font-size: 48px;
+  color: #cbd5e0;
+  margin-bottom: 16px;
+
+  svg {
+    display: inline-block;
+  }
+`;
+
+export const EmptyStateTitle = styled.h3`
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 8px 0;
+`;
+
+export const EmptyStateText = styled.p`
+  font-size: 14px;
+  color: #718096;
+  margin: 0;
+  max-width: 400px;
+  margin: 0 auto;
+
+  strong {
+    color: #2b6cb0;
+  }
+`;

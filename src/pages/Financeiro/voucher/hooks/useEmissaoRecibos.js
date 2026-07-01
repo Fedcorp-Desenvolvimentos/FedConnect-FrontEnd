@@ -1,3 +1,5 @@
+// hooks/useEmissaoRecibos.js - VERSÃO REFATORADA SEM PAGINAÇÃO
+
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useSnackbar } from 'notistack';
 import { useLoading } from '../../../../hooks/useLoading';
@@ -11,15 +13,13 @@ const INITIAL_FILTERS = {
   fatura: '',
   vencimento_inicial: '',
   vencimento_final: '',
-  status: 'pendentes',
+  status: 'baixadas',
   tipo: '',
   co_estipulante: '',
   apolice: '',
   recibo: '',
   com_voucher: null,
   data_corte: '',
-  limit: 100,
-  offset: 0,
 };
 
 const RETENTION_OPTIONS = [
@@ -31,15 +31,14 @@ const RETENTION_OPTIONS = [
   { id: 'inss', label: 'INSS', rate: 0.11 },
 ];
 
-const getComissaoKey = (comissao) => {
-  // Prioriza DOCUMENTO, que é único
-  if (comissao.DOCUMENTO || comissao.documento) {
-    return String(comissao.DOCUMENTO || comissao.documento);
-  }
-  // Fallback para FATURA|PARCELA
-  const fatura = comissao.FATURA || comissao.fatura || '';
-  const parcela = comissao.PARCELA || comissao.parcela || '1';
-  return `${fatura}|${parcela}`;
+const getComissaoKey = (c) => {
+  const documento = c.DOCUMENTO ?? '';
+  const favor = c.FAVOR ?? '';
+  const tipo = c.TIPO ?? '';
+  const parcela = c.PARCELA ?? '1';
+  const valor = Number(c.VALOR ?? 0).toFixed(2);
+
+  return [documento, favor, tipo, parcela, valor].join('|');
 };
 
 const getCurrentMonthDate = () => {
@@ -73,15 +72,12 @@ const formatDataCorte = (data) => {
   }
 };
 
-const normalizeFilters = (filters, offset = 0) => {
+const normalizeFilters = (filters) => {
   const next = { ...filters };
 
   if (next.status === 'todas') {
     delete next.status;
   }
-
-  next.limit = 100;
-  next.offset = offset;
 
   const cleaned = {};
   Object.keys(next).forEach((key) => {
@@ -105,7 +101,7 @@ const hasMeaningfulFilters = (filters) => {
       filters.apolice ||
       filters.recibo ||
       filters.com_voucher !== null ||
-      (filters.status && filters.status !== 'pendentes') ||
+      (filters.status && filters.status !== 'baixadas') ||
       filters.data_corte
   );
 };
@@ -114,14 +110,13 @@ export const useEmissaoRecibos = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { withLoading, loading, startLoading, stopLoading } = useLoading();
 
-  const [loadingInitial, setLoadingInitial] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadingInitial, setLoadingInitial] = useState(false);
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
-  const [defaultComissoes, setDefaultComissoes] = useState([]);
-  const [filteredComissoes, setFilteredComissoes] = useState([]);
+  const [comissoes, setComissoes] = useState([]);
   const [isUsingFilteredData, setIsUsingFilteredData] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const [pessoas, setPessoas] = useState([]);
   const [selectedComissoes, setSelectedComissoes] = useState(new Set());
@@ -129,8 +124,6 @@ export const useEmissaoRecibos = () => {
   const [documentType, setDocumentType] = useState('recibo');
   const [lastEmission, setLastEmission] = useState(null);
   const [totalRegistros, setTotalRegistros] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
-  const [currentOffset, setCurrentOffset] = useState(0);
 
   const dataCorte = useMemo(() => {
     return filters.data_corte || getCurrentMonthDate();
@@ -143,10 +136,6 @@ export const useEmissaoRecibos = () => {
   const hasActiveFilters = useMemo(() => {
     return hasMeaningfulFilters(filters);
   }, [filters]);
-
-  const comissoes = useMemo(() => {
-    return isUsingFilteredData ? filteredComissoes : defaultComissoes;
-  }, [isUsingFilteredData, filteredComissoes, defaultComissoes]);
 
   useEffect(() => {
     const loadPessoas = async () => {
@@ -177,106 +166,86 @@ export const useEmissaoRecibos = () => {
   }, []);
 
   const buscarComissoes = useCallback(
-    async ({ novosFiltros = {}, append = false, forceDefault = false } = {}) => {
+    async (novosFiltros = {}) => {
       const filtrosAtualizados = { ...filters, ...novosFiltros };
-      const usingFilteredMode = !forceDefault && hasMeaningfulFilters(filtrosAtualizados);
-      const offset = append ? currentOffset + 100 : 0;
-      const filtrosLimpos = normalizeFilters(filtrosAtualizados, offset);
+      const usingFilteredMode = hasMeaningfulFilters(filtrosAtualizados);
+      const filtrosLimpos = normalizeFilters(filtrosAtualizados);
       const dataParaBusca = filtrosAtualizados.data_corte || getCurrentMonthDate();
+
+      setLoadingInitial(true);
 
       try {
         const result = await withLoading(
           async () => buscarComissoesPorDataCorte(dataParaBusca, filtrosLimpos),
-          append ? 'Carregando mais comissões...' : 'Buscando comissões...'
+          'Buscando comissões...'
         );
 
         if (!result?.sucesso) {
-          return [];
+          setComissoes([]);
+          setTotalRegistros(0);
+          setHasSearched(true);
+          return;
         }
 
         const dados = result.dados || {};
         const lista = dados.data || [];
         const total = dados.total_registros || lista.length;
 
-        if (usingFilteredMode) {
-          setFilteredComissoes((prev) => (append ? [...prev, ...lista] : lista));
-          setIsUsingFilteredData(true);
-        } else {
-          setDefaultComissoes((prev) => (append ? [...prev, ...lista] : lista));
-          setIsUsingFilteredData(false);
-          setFilteredComissoes([]);
-        }
-
+        setComissoes(lista);
         setTotalRegistros(total);
-        setHasMore(lista.length === 100 && offset + lista.length < total);
-        setCurrentOffset(offset);
+        setIsUsingFilteredData(usingFilteredMode);
+        setHasSearched(true);
 
-        if (!append) {
+        if (!usingFilteredMode) {
           resetSelections();
         }
 
-        if (!append && lista.length === 0) {
+        if (lista.length === 0) {
           enqueueSnackbar(`Nenhuma comissão encontrada para ${formatDataCorte(dataParaBusca)}`, {
             variant: 'info',
           });
+        } else {
+          enqueueSnackbar(`${lista.length} comissão(ões) encontrada(s)`, {
+            variant: 'success',
+          });
         }
-
-        return lista;
       } catch {
         enqueueSnackbar('Erro ao buscar comissões', { variant: 'error' });
-        return [];
+        setComissoes([]);
+        setTotalRegistros(0);
+        setHasSearched(true);
       } finally {
         setLoadingInitial(false);
       }
     },
-    [filters, currentOffset, withLoading, enqueueSnackbar, resetSelections]
+    [filters, withLoading, enqueueSnackbar, resetSelections]
   );
 
-  const buscarTudo = useCallback(
-    async ({ forceDefault = false } = {}) => {
-      setCurrentOffset(0);
-      await buscarComissoes({ append: false, forceDefault });
-    },
-    [buscarComissoes]
-  );
-
-  const carregarMais = useCallback(async () => {
-    if (loadingMore || !hasMore) return;
-
-    setLoadingMore(true);
-    try {
-      await buscarComissoes({ append: true });
-    } finally {
-      setLoadingMore(false);
-    }
-  }, [buscarComissoes, hasMore, loadingMore]);
+  const buscarTudo = useCallback(async () => {
+    await buscarComissoes();
+  }, [buscarComissoes]);
 
   const updateFilter = useCallback((field, value) => {
-    setFilters((prev) => {
-      const next = { ...prev, [field]: value };
-      return next;
-    });
-
-    setCurrentOffset(0);
+    setFilters((prev) => ({ ...prev, [field]: value }));
   }, []);
 
   const clearFilters = useCallback(() => {
     setFilters({
       ...INITIAL_FILTERS,
       data_corte: '',
+      status: 'baixadas',
     });
 
-    setFilteredComissoes([]);
+    setComissoes([]);
+    setTotalRegistros(0);
     setIsUsingFilteredData(false);
-    setTotalRegistros(defaultComissoes.length);
-    setHasMore(false);
-    setCurrentOffset(0);
+    setHasSearched(false);
     resetSelections();
 
-    enqueueSnackbar('Filtros limpos. Exibindo a base padrão do mês vigente.', {
+    enqueueSnackbar('Filtros limpos. Faça uma nova consulta.', {
       variant: 'info',
     });
-  }, [defaultComissoes.length, enqueueSnackbar, resetSelections]);
+  }, [enqueueSnackbar, resetSelections]);
 
   const toggleComissao = useCallback((comissao) => {
     const key = getComissaoKey(comissao);
@@ -476,7 +445,6 @@ export const useEmissaoRecibos = () => {
   return {
     loading,
     loadingInitial,
-    loadingMore,
     filters,
     showAdvancedFilters,
     comissoes,
@@ -486,18 +454,15 @@ export const useEmissaoRecibos = () => {
     documentType,
     lastEmission,
     totalRegistros,
-    hasMore,
-    currentOffset,
     dataCorte,
     dataCorteFormatada,
     totals,
     retentionSummary,
     isUsingFilteredData,
     hasActiveFilters,
+    hasSearched,
 
-    buscarComissoes,
     buscarTudo,
-    carregarMais,
     updateFilter,
     clearFilters,
     setShowAdvancedFilters,

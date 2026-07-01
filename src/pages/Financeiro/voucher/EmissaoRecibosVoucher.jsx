@@ -1,5 +1,6 @@
+// EmissaoRecibosVoucher.jsx - VERSÃO REFATORADA
 import React, { useEffect } from 'react';
-import { FaArrowLeft, FaInfoCircle } from 'react-icons/fa';
+import { FaArrowLeft, FaInfoCircle, FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useEmissaoRecibos } from './hooks/useEmissaoRecibos';
 import { SummaryCards } from './components/SummaryCards';
@@ -16,6 +17,10 @@ import {
   SkeletonCard,
   SkeletonRow,
   InfoBanner,
+  EmptyStateContainer,
+  EmptyStateIcon,
+  EmptyStateTitle,
+  EmptyStateText,
 } from './EmissaoRecibosVoucherStyles';
 
 export default function EmissaoRecibosVoucher() {
@@ -24,7 +29,6 @@ export default function EmissaoRecibosVoucher() {
   const {
     loading,
     loadingInitial,
-    loadingMore,
     filters,
     showAdvancedFilters,
     comissoes,
@@ -38,9 +42,8 @@ export default function EmissaoRecibosVoucher() {
     dataCorte,
     dataCorteFormatada,
     totalRegistros,
-    hasMore,
+    hasSearched,
     buscarTudo,
-    carregarMais,
     updateFilter,
     clearFilters,
     setShowAdvancedFilters,
@@ -54,11 +57,12 @@ export default function EmissaoRecibosVoucher() {
     hasActiveFilters,
   } = useEmissaoRecibos();
 
-  useEffect(() => {
-    buscarTudo({ forceDefault: true });
-  }, []); // eslint-disable-line
+  // 🔥 NÃO CARREGA MAIS AUTOMATICAMENTE - APENAS QUANDO O USUÁRIO CLICAR EM "BUSCAR"
+  // useEffect removido!
 
   const canIssue = selectedComissoes.size > 0;
+  const hasResults = comissoes.length > 0;
+  const isEmpty = !loading && !loadingInitial && !hasResults && hasSearched;
 
   return (
     <Container>
@@ -78,20 +82,25 @@ export default function EmissaoRecibosVoucher() {
         </Title>
       </Header>
 
+      {/* Banner de informação - mostra estado atual */}
       <InfoBanner isFiltered={hasActiveFilters || isUsingFilteredData}>
         <FaInfoCircle />
         <div>
           <strong>
-            {isUsingFilteredData ? 'Resultado filtrado' : 'Base padrão do período'}: {dataCorteFormatada}
+            {hasSearched
+              ? isUsingFilteredData
+                ? '✅ Resultado da consulta'
+                : '✅ Comissões do período'
+              : '🔍 Aguardando consulta'}
           </strong>
           <span>
             {loadingInitial
-              ? 'Carregando comissões do período...'
-              : comissoes.length > 0
-                ? `Exibindo ${comissoes.length} comissão(ões)${
-                    totalRegistros > comissoes.length ? ` de ${totalRegistros}` : ''
-                  }`
-                : 'Nenhuma comissão encontrada para este período'}
+              ? 'Carregando comissões...'
+              : hasSearched && comissoes.length > 0
+                ? `Exibindo ${comissoes.length} comissão(ões)${totalRegistros > comissoes.length ? ` de ${totalRegistros}` : ''}`
+                : hasSearched && comissoes.length === 0
+                  ? 'Nenhuma comissão encontrada para os filtros selecionados'
+                  : 'Utilize os filtros abaixo para consultar comissões'}
           </span>
         </div>
       </InfoBanner>
@@ -100,6 +109,7 @@ export default function EmissaoRecibosVoucher() {
         totals={totals}
         count={comissoes.length}
         isUsingFilteredData={isUsingFilteredData}
+        hasSearched={hasSearched}
       />
 
       <FilterForm
@@ -117,6 +127,7 @@ export default function EmissaoRecibosVoucher() {
         selectedRetentions={selectedRetentions}
         totals={retentionSummary}
         onToggleRetention={toggleRetention}
+        hasResults={hasResults}
       />
 
       <SingleColumnGrid>
@@ -127,6 +138,28 @@ export default function EmissaoRecibosVoucher() {
             <SkeletonRow />
             <SkeletonRow />
           </SkeletonCard>
+        ) : isEmpty ? (
+          <EmptyStateContainer>
+            <EmptyStateIcon>
+              <FaSearch />
+            </EmptyStateIcon>
+            <EmptyStateTitle>Nenhuma comissão encontrada</EmptyStateTitle>
+            <EmptyStateText>
+              {hasActiveFilters
+                ? 'Tente ajustar os filtros ou alterar a data de corte'
+                : 'Selecione uma data de corte e clique em "Buscar" para consultar as comissões'}
+            </EmptyStateText>
+          </EmptyStateContainer>
+        ) : !hasSearched ? (
+          <EmptyStateContainer>
+            <EmptyStateIcon>
+              <FaSearch />
+            </EmptyStateIcon>
+            <EmptyStateTitle>Faça uma consulta</EmptyStateTitle>
+            <EmptyStateText>
+              Preencha os filtros acima e clique em <strong>Buscar</strong> para visualizar as comissões
+            </EmptyStateText>
+          </EmptyStateContainer>
         ) : (
           <ComissoesPanel
             comissoes={comissoes}
@@ -135,19 +168,17 @@ export default function EmissaoRecibosVoucher() {
             onToggleAllComissoes={toggleAllComissoes}
             totals={retentionSummary}
             loading={loading}
-            loadingMore={loadingMore}
-            hasMore={hasMore}
-            onLoadMore={carregarMais}
             totalRegistros={totalRegistros}
             dataCorte={dataCorte}
             dataCorteFormatada={dataCorteFormatada}
             isUsingFilteredData={isUsingFilteredData}
+            hasSearched={hasSearched}
           />
         )}
       </SingleColumnGrid>
 
       <EmissaoPanel
-        canIssue={canIssue}
+        canIssue={canIssue && hasResults}
         documentType={documentType}
         loading={loading}
         lastEmission={lastEmission}

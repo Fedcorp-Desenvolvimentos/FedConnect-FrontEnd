@@ -106,6 +106,9 @@ import FormatosArquivos from '../pages/FormatosArquivos/FormatosArquivos';
 import ConverterBoletoCSV from '../components/FormatosArquivos/ConverterBoletoCSV';
 import MapaRedes from '../pages/MapaRedes/MapaRedes.jsx';
 
+
+import CadastroEmpresa from '../pages/CadastrosGerais/CadastroEmpresa';
+
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
 
@@ -210,6 +213,8 @@ const AppRouter = () => {
           <Route path="/formatos-arquivos/converter-boleto-csv" element={<ConverterBoletoCSV />} />
 
           <Route path="/mapa-redes" element={<MapaRedes />} />
+          
+          <Route path="/cadastro-empresa" element={<CadastroEmpresa />} />
 
         </Route>
       </Route>
