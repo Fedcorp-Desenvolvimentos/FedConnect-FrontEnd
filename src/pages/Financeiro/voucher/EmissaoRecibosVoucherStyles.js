@@ -837,7 +837,7 @@ export const ModalHeader = styled.div`
 `;
 
 export const ModalBody = styled.div`
-  padding: 22px 24px 6px;
+  padding: 23px 24px 6px;
   max-height: 62vh;
   overflow-y: auto;
 `;
