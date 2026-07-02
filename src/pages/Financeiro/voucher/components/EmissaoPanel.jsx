@@ -92,14 +92,14 @@ export const EmissaoPanel = ({
       <Actions style={{ flexDirection: 'column' }}>
         <Button
           className="primary block"
-          disabled={!canIssue || loading}
+          disabled={!canIssue || loading || documentType === 'voucher'}
           onClick={onEmitir}
         >
           {loading ? <FaSpinner className="spin" /> : <FaPrint />}
-          {loading ? 'Preparando...' : `Preparar ${documentType === 'voucher' ? 'Voucher' : 'Recibo'}`}
+          {loading ? 'Preparando...' : `Emitir ${documentType === 'voucher' ? 'Voucher' : 'Recibo'}`}
         </Button>
 
-        <Button className="secondary block" disabled={!canIssue || loading} onClick={onPreview}>
+        <Button className="secondary block" disabled={!canIssue || loading || documentType === 'voucher'} onClick={onPreview}>
           <FaEye />
           Pré-visualizar
         </Button>

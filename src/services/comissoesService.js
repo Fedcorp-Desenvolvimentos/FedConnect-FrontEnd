@@ -136,15 +136,25 @@ export const buscarFaturamento = async (filtros = {}) => {
 };
 
 /**
- * EMITIR DOCUMENTO (Recibo/Voucher)
- * POST /comissoes/emitir/
+ * EMITIR RECIBO
+ * POST /comissoes/emitir-recibo/
  */
-export const emitirDocumento = async (payload) => {
+export const emitirRecibo = async (payload) => {
   try {
-    const response = await api.post('/comissoes/emitir/', payload);
+    const response = await api.post('comissoes/emitir-recibo/', payload);
     return response.data;
   } catch (error) {
-    console.error('Erro ao emitir documento:', error);
+    console.error('Erro ao emitir recibo:', error);
+    throw error;
+  }
+};
+
+export const emitirVoucher = async (payload) => {
+  try {
+    const response = await api.post('comissoes/emitir-voucher/', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao emitir voucher:', error);
     throw error;
   }
 };

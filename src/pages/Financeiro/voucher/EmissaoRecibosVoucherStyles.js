@@ -795,6 +795,7 @@ export const ModalCard = styled.div`
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.3);
   animation: ${slideUp} 0.18s ease-out;
+  margin-top: 60px;
 `;
 
 export const ModalHeader = styled.div`
@@ -803,8 +804,6 @@ export const ModalHeader = styled.div`
   justify-content: space-between;
   gap: 12px;
   padding: 20px 24px;
-  background: ${tokens.primaryDark};
-  color: white;
 
   h2 {
     margin: 0 0 3px 0;

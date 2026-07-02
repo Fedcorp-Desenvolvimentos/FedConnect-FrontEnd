@@ -197,7 +197,7 @@ export default function EmissaoRecibosVoucher() {
             onDocumentTypeChange={setDocumentType}
             onEmitir={emitirDocumento}
             onPreview={previewDocument}
-            onSair={() => navigate('/financeiro')}
+            onSair={() => navigate('/')}
           />
         </Sidebar>
       </PageLayout>

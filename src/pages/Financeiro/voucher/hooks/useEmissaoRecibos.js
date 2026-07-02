@@ -6,7 +6,10 @@ import { useLoading } from '../../../../hooks/useLoading';
 import {
   buscarComissoesPorDataCorte,
   buscarPessoas,
+  emitirRecibo,
+  emitirVoucher,
 } from '../../../../services/comissoesService';
+import { useAuth } from '../../../../context/AuthContext';
 
 const INITIAL_FILTERS = {
   favorecido: '',
@@ -127,6 +130,10 @@ export const useEmissaoRecibos = () => {
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewData, setPreviewData] = useState(null);
+
+  const { user } = useAuth();
+
+  console.log("🚀 User context:", user);
 
   const dataCorte = useMemo(() => {
     return filters.data_corte || getCurrentMonthDate();
@@ -401,40 +408,125 @@ export const useEmissaoRecibos = () => {
     startLoading('Preparando dados para emissão...');
 
     try {
-      const payload = buildDocumentPayload();
-
-      console.info('Payload de emissão preparado:', payload);
-
-      setLastEmission({
-        numero: `RC-${String(Date.now()).slice(-6)}`,
-        emitidoEm: new Date().toISOString(),
-        tipo: documentType,
-        total: retentionSummary.netTotal,
-        quantidade: payload.totalComissoes,
-      });
-
-      enqueueSnackbar(
-        `${documentType === 'voucher' ? 'Voucher' : 'Recibo'} preparado com ${
-          payload.totalComissoes
-        } comissão(ões). Dados disponíveis no console.`,
-        { variant: 'success' }
+      const comissoesSelecionadas = comissoes.filter((c) => 
+        selectedComissoes.has(getComissaoKey(c))
       );
 
-      resetSelections();
-      setPreviewOpen(false);
+      // Monta o payload para o backend
+      const payload = {
+        tipo_documento: documentType, // 'recibo' ou 'voucher'
+        data_corte: dataCorte,
+        data_emissao: new Date().toISOString().split('T')[0],
+        usuario: user?.nome_completo || user?.email,
+        comissoes: comissoesSelecionadas.map((c) => ({
+          fatura: Number(c.FATURA || c.fatura),
+          parcela: Number(c.PARCELA || c.parcela || 1),
+          tipo_fat: c.TIPO_FAT || c.tipo_fat || 'A',
+          favorecido: c.FAVOR || c.favor || '',
+          favorecido_nome: c.NOME || c.nome || '',
+          favorecido_documento: c.DOC_FAVORECIDO || c.doc_favorecido || '',
+          valor_comissao: Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0),
+          percentual: Number(c.COMISSAO || c.comissao || 0),
+          imposto: Number(c.IMPOSTO || c.imposto || 0),
+          voucher: c.VOUCHER || c.voucher || null,
+          data_repasse: c.DT_REPASSE || c.dt_repasse || null,
+          produto: c.PRODUTO || c.produto || '',
+          co_estipulante: c.CO_ESTIP || c.co_estip || '',
+          banco_agencia_conta: c.BC_AG_CC || c.bc_ag_cc || '',
+          chave_pix: c.CHAVE_PIX || c.chave_pix || null,
+          vencimento: c.VENCIMENTO || c.vencimento || null,
+          data_fat: c.DATA_FAT || c.data_fat || null,
+          premio_bruto: Number(c.PREMIO_BRUTO || c.premio_bruto || 0),
+          premio_liquido: Number(c.PREMIO_LIQ || c.premio_liq || 0),
+          documento: c.DOCUMENTO || c.documento || '',
+          valor_liq: Number(c.VALOR_LIQ || c.valor_liq || 0),
+          quitado: Number(c.QUITADO || c.quitado || 0),
+          prc_quitado: Number(c.PRC_QUITADO || c.prc_quitado || 0),
+          inclui_manual: c.INCLUI_MANUAL || c.inclui_manual || 'N',
+          parc_manual: Number(c.PARC_MANUAL || c.parc_manual || 0),
+          tipo: c.TIPO || c.tipo || 'BENEFICIO',
+          parcelas_fat: Number(c.PARCELAS_FAT || c.parcelas_fat || 1),
+          iof: c.IOF || c.iof || 'N',
+          perc_iof: Number(c.PERC_IOF || c.perc_iof || 0),
+          cofins: c.COFINS || c.cofins || 'N',
+          perc_cofins: Number(c.PERC_COFINS || c.perc_cofins || 0),
+          csll: c.CSLL || c.csll || 'N',
+          perc_csll: Number(c.PERC_CSLL || c.perc_csll || 0),
+          pis: c.PIS || c.pis || 'N',
+          perc_pis: Number(c.PERC_PIS || c.perc_pis || 0),
+        })),
+        retencoes: selectedRetentions.map((id) => {
+          const opt = RETENTION_OPTIONS.find((o) => o.id === id);
+          return {
+            tipo: opt?.label || id,
+            aliquota: opt?.rate || 0,
+            valor: retentionSummary.grossTotal * (opt?.rate || 0),
+          };
+        }),
+        resumo: {
+          total_comissoes: comissoesSelecionadas.length,
+          valor_total_bruto: retentionSummary.grossTotal,
+          total_retencoes: retentionSummary.retentionTotal,
+          valor_liquido_final: retentionSummary.netTotal,
+        },
+      };
+
+      console.log('📄 Payload para emissão:', payload);
+
+      // Chama a API correta baseada no tipo de documento
+      let response;
+
+      if (documentType === 'voucher') {
+        response = await emitirVoucher(payload);
+      } else {
+        response = await emitirRecibo(payload);
+      }
+
+      console.log('📄 Resposta da emissão:', response);
+
+      if (response?.sucesso) {
+
+        if (response.pdf_base64) {
+          const link = document.createElement('a');
+          link.href = `data:application/pdf;base64,${response.pdf_base64}`;
+          link.download = response.nome_arquivo || `recibo_${Date.now()}.pdf`;
+          link.click();
+        }
+
+        setLastEmission({
+          numero: response.numero_documento || `RC-${String(Date.now()).slice(-6)}`,
+          emitidoEm: new Date().toISOString(),
+          tipo: documentType,
+          total: retentionSummary.netTotal,
+          quantidade: payload.resumo.total_comissoes,
+        });
+
+        enqueueSnackbar(
+          `${documentType === 'voucher' ? 'Voucher' : 'Recibo'} emitido com sucesso!`,
+          { variant: 'success' }
+        );
+
+        resetSelections();
+
+      } else {
+        throw new Error(response?.erro || 'Erro ao emitir documento');
+      }
     } catch (error) {
-      enqueueSnackbar(error.message || 'Erro ao preparar dados', { variant: 'error' });
+      console.error('❌ Erro ao emitir documento:', error);
+      enqueueSnackbar(error.message || 'Erro ao emitir documento', { variant: 'error' });
     } finally {
       stopLoading();
     }
   }, [
     selectedComissoes,
+    comissoes,
+    documentType,
+    dataCorte,
+    retentionSummary,
+    selectedRetentions,
     enqueueSnackbar,
     startLoading,
     stopLoading,
-    buildDocumentPayload,
-    documentType,
-    retentionSummary,
     resetSelections,
   ]);
 

@@ -98,10 +98,10 @@ export const FilterForm = ({
           Limpar filtros
         </Button>
 
-        <Button type="button" className="ghost" onClick={onToggleAdvanced} style={{ marginLeft: 'auto' }}>
+        {/* <Button type="button" className="ghost" onClick={onToggleAdvanced} style={{ marginLeft: 'auto' }}>
           <FaSlidersH />
           {showAdvanced ? 'Ocultar filtros avançados' : 'Filtros avançados'}
-        </Button>
+        </Button> */}
       </Actions>
 
       {showAdvanced && (
