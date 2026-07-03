@@ -93,7 +93,8 @@ export const EmissaoPanel = ({
       <Actions style={{ flexDirection: 'column' }}>
         <Button
           className="primary block"
-          disabled={!canIssue || loading || documentType === 'voucher'}
+          // disabled={!canIssue || loading || documentType === 'voucher'}
+          disabled={!canIssue || loading}
           onClick={onEmitir}
         >
           {loading ? <FaSpinner className="spin" /> : <FaPrint />}
