@@ -56,6 +56,7 @@ export const EmissaoPanel = ({
           Tipo de documento
           <select value={documentType} onChange={(e) => onDocumentTypeChange(e.target.value)}>
             <option value="recibo">Recibo</option>
+            <option value="recibo_corretor">Recibo do Corretor</option>
             <option value="voucher">Voucher</option>
           </select>
         </label>

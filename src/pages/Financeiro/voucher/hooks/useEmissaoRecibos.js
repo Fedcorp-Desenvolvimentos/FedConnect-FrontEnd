@@ -8,6 +8,7 @@ import {
   buscarPessoas,
   emitirRecibo,
   emitirVoucher,
+  emitirReciboCorretor
 } from '../../../../services/comissoesService';
 import { useAuth } from '../../../../context/AuthContext';
 
@@ -333,10 +334,10 @@ export const useEmissaoRecibos = () => {
     };
   }, [retentionSummary]);
 
-  // Monta o payload completo (documento + comissões + retenções) reaproveitado
-  // tanto pela emissão real quanto pela pré-visualização.
   const buildDocumentPayload = useCallback(() => {
-    const comissoesSelecionadas = comissoes.filter((c) => selectedComissoes.has(getComissaoKey(c)));
+    const comissoesSelecionadas = comissoes.filter((c) => 
+      selectedComissoes.has(getComissaoKey(c))
+    );
 
     return {
       tipoDocumento: documentType,
@@ -351,31 +352,75 @@ export const useEmissaoRecibos = () => {
         aliquota: `${(r.rate * 100).toFixed(2)}%`,
         valor: r.value,
       })),
+      
       comissoes: comissoesSelecionadas.map((c) => ({
-        fatura: c.FATURA || c.fatura || c.DOCUMENTO || '',
+        // ---- DADOS BÁSICOS DA COMISSÃO ----
+        fatura: c.FATURA || c.fatura || '',
         parcela: c.PARCELA || c.parcela || '1',
-        favorecido: c.FAVOR || c.favor || '',
-        favorecidoNome: c.NOME || c.nome || '',
-        favorecidoDocumento: c.DOC_FAVORECIDO || c.doc_favorecido || '',
-        valorComissao: Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0),
-        percentual: c.COMISSAO || c.comissao || 0,
-        imposto: c.IMPOSTO || c.imposto || 0,
-        voucher: c.VOUCHER || c.voucher || null,
-        dataRepasse: c.DT_REPASSE || c.dt_repasse || null,
-        produto: c.PRODUTO || c.produto || '',
-        coEstipulante: c.CO_ESTIP || c.co_estip || '',
-        bancoAgenciaConta: c.BC_AG_CC || c.bc_ag_cc || '',
-        chavePix: c.CHAVE_PIX || c.chave_pix || null,
-        vencimento: c.VENCIMENTO || c.vencimento || null,
-        dataFat: c.DATA_FAT || c.data_fat || null,
-        tipoFatura: c.TIPO_FAT || c.tipo_fat || '',
-        premioBruto: Number(c.PREMIO_BRUTO || c.premio_bruto || 0),
-        premioLiquido: Number(c.PREMIO_LIQ || c.premio_liq || 0),
-        quitado: c.QUITADO || c.quitado || 0,
-        status: c.STATUS || c.status || '',
+        tipo_fat: c.TIPO_FAT || c.tipo_fat || 'A',
         documento: c.DOCUMENTO || c.documento || '',
-        produtoOriginal: c.PRODUTO_ORI || c.produto_ori || '',
+        vencimento: c.VENCIMENTO || c.vencimento || null,
+        data_fat: c.DATA_FAT || c.data_fat || null,
+
+        nome_segurado: c.NOME_SEGURADO || c.nome_segurado || 'NÃO INFORMADO',
+        doc_segurado: c.DOC_SEGURADO || c.doc_segurado || '',
+        tp_segurado: c.TP_SEGURADO || c.tp_segurado || '',
+        cod_segurado: c.COD_SEGURADO || c.cod_segurado || '',
+        
+        // ---- DADOS DO FAVORECIDO (Corretor/Administradora) ----
+        favorecido: c.FAVOR || c.favor || '',
+        favorecido_nome: c.NOME || c.nome || '',
+        favorecido_documento: c.DOC_FAVORECIDO || c.doc_favorecido || '',
+        banco_agencia_conta: c.BC_AG_CC || c.bc_ag_cc || '',
+        chave_pix: c.CHAVE_PIX || c.chave_pix || null,
+        
+        // ---- VALORES ----
+        valor_comissao: Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0),
+        percentual: Number(c.COMISSAO || c.comissao || 0),
+        imposto: Number(c.IMPOSTO || c.imposto || 0),
+        valor_liq: Number(c.VALOR_LIQ || c.valor_liq || 0),
+        
+        // ---- PRODUTO ----
+        produto: c.PRODUTO || c.produto || '',
+        produto_original: c.PRODUTO_ORI || c.produto_ori || '',
+        co_estipulante: c.CO_ESTIP || c.co_estip || '',
+        
+        // ---- STATUS ----
+        voucher: c.VOUCHER || c.voucher || null,
+        data_repasse: c.DT_REPASSE || c.dt_repasse || null,
+        status: c.STATUS || c.status || '',
+        quitado: Number(c.QUITADO || c.quitado || 0),
+        prc_quitado: Number(c.PRC_QUITADO || c.prc_quitado || 0),
+        
+        // ---- PARCELAS ----
+        parcelas_fat: Number(c.PARCELAS || c.parcelas || 1),
+        inclui_manual: c.INCLUI_MANUAL || c.inclui_manual || 'N',
+        parc_manual: Number(c.PARC_MANUAL || c.parc_manual || 0),
+        tipo: c.TIPO || c.tipo || 'BENEFICIO',
+        
+        // ---- IMPOSTOS DA APÓLICE ----
+        iof: c.IOF || c.iof || 'N',
+        perc_iof: Number(c.PERC_IOF || c.perc_iof || 0),
+        cofins: c.COFINS || c.cofins || 'N',
+        perc_cofins: Number(c.PERC_COFINS || c.perc_cofins || 0),
+        csll: c.CSLL || c.csll || 'N',
+        perc_csll: Number(c.PERC_CSLL || c.perc_csll || 0),
+        pis: c.PIS || c.pis || 'N',
+        perc_pis: Number(c.PERC_PIS || c.perc_pis || 0),
+        
+        // ---- APÓLICE ----
+        apolice: c.APOLICE || c.apolice || '',
+        premio_bruto: Number(c.PREMIO_BRUTO || c.premio_bruto || 0),
+        premio_liquido: Number(c.PREMIO_LIQ || c.premio_liq || 0),
+        conta_apolice: c.CONTA_APOLICE || c.conta_apolice || '',
+        pri_cor: c.PRI_COR || c.pri_cor || '',
+        sec_cor: c.SEC_COR || c.sec_cor || '',
+        fat_col_posto: c.FAT_COL_POSTO || c.fat_col_posto || 'N',
+        valor_assist: Number(c.VALOR_ASSIST || c.valor_assist || 0),
+        assist: c.ASSIST || c.assist || 'N',
+        qtd_vidas: Number(c.QTD_VIDAS || c.qtd_vidas || 0),
       })),
+      
       filtrosAplicados: {
         dataCorte,
         favorecido: filters.favorecido,
@@ -387,17 +432,26 @@ export const useEmissaoRecibos = () => {
         recibo: filters.recibo,
         com_voucher: filters.com_voucher,
       },
+      
       resumoGeral: {
         totalComissoesSelecionadas: comissoesSelecionadas.length,
         valorTotalBruto: retentionSummary.grossTotal,
         totalRetencoes: retentionSummary.retentionTotal,
         valorLiquidoFinal: retentionSummary.netTotal,
       },
-      // Amostra dos registros crus recebidos da API (Resposta V2), útil para
-      // conferência rápida dos dados de origem dentro da pré-visualização.
+      
       registrosBrutos: comissoesSelecionadas,
     };
-  }, [comissoes, selectedComissoes, documentType, dataCorte, dataCorteFormatada, retentionSummary, filters]);
+  }, [
+    comissoes, 
+    selectedComissoes, 
+    documentType, 
+    dataCorte, 
+    dataCorteFormatada, 
+    retentionSummary, 
+    filters
+  ]);
+
 
   const emitirDocumento = useCallback(async () => {
     if (selectedComissoes.size === 0) {
@@ -414,38 +468,57 @@ export const useEmissaoRecibos = () => {
 
       // Monta o payload para o backend
       const payload = {
-        tipo_documento: documentType, // 'recibo' ou 'voucher'
+        tipo_documento: documentType,
         data_corte: dataCorte,
         data_emissao: new Date().toISOString().split('T')[0],
         usuario: user?.nome_completo || user?.email,
         comissoes: comissoesSelecionadas.map((c) => ({
+          // ---- DADOS BÁSICOS ----
           fatura: Number(c.FATURA || c.fatura),
           parcela: Number(c.PARCELA || c.parcela || 1),
           tipo_fat: c.TIPO_FAT || c.tipo_fat || 'A',
+          documento: c.DOCUMENTO || c.documento || '',
+          vencimento: c.VENCIMENTO || c.vencimento || null,
+          data_fat: c.DATA_FAT || c.data_fat || null,
+          
+          // ---- ⭐ DADOS DO SEGURADO (Cliente Final) - ESSENCIAL PARA O RECIBO ----
+          nome_segurado: c.NOME_SEGURADO || c.nome_segurado || 'NÃO INFORMADO',
+          doc_segurado: c.DOC_SEGURADO || c.doc_segurado || '',
+          tp_segurado: c.TP_SEGURADO || c.tp_segurado || '',
+          cod_segurado: c.COD_SEGURADO || c.cod_segurado || '',
+          
+          // ---- DADOS DO FAVORECIDO (Corretor/Administradora) ----
           favorecido: c.FAVOR || c.favor || '',
           favorecido_nome: c.NOME || c.nome || '',
           favorecido_documento: c.DOC_FAVORECIDO || c.doc_favorecido || '',
+          banco_agencia_conta: c.BC_AG_CC || c.bc_ag_cc || '',
+          chave_pix: c.CHAVE_PIX || c.chave_pix || null,
+          
+          // ---- VALORES ----
           valor_comissao: Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0),
           percentual: Number(c.COMISSAO || c.comissao || 0),
           imposto: Number(c.IMPOSTO || c.imposto || 0),
+          valor_liq: Number(c.VALOR_LIQ || c.valor_liq || 0),
+          
+          // ---- PRODUTO ----
+          produto: c.PRODUTO || c.produto || '',
+          produto_original: c.PRODUTO_ORI || c.produto_ori || '',
+          co_estipulante: c.CO_ESTIP || c.co_estip || '',
+          
+          // ---- STATUS ----
           voucher: c.VOUCHER || c.voucher || null,
           data_repasse: c.DT_REPASSE || c.dt_repasse || null,
-          produto: c.PRODUTO || c.produto || '',
-          co_estipulante: c.CO_ESTIP || c.co_estip || '',
-          banco_agencia_conta: c.BC_AG_CC || c.bc_ag_cc || '',
-          chave_pix: c.CHAVE_PIX || c.chave_pix || null,
-          vencimento: c.VENCIMENTO || c.vencimento || null,
-          data_fat: c.DATA_FAT || c.data_fat || null,
-          premio_bruto: Number(c.PREMIO_BRUTO || c.premio_bruto || 0),
-          premio_liquido: Number(c.PREMIO_LIQ || c.premio_liq || 0),
-          documento: c.DOCUMENTO || c.documento || '',
-          valor_liq: Number(c.VALOR_LIQ || c.valor_liq || 0),
+          status: c.STATUS || c.status || '',
           quitado: Number(c.QUITADO || c.quitado || 0),
           prc_quitado: Number(c.PRC_QUITADO || c.prc_quitado || 0),
+          
+          // ---- PARCELAS ----
+          parcelas_fat: Number(c.PARCELAS || c.parcelas || 1),
           inclui_manual: c.INCLUI_MANUAL || c.inclui_manual || 'N',
           parc_manual: Number(c.PARC_MANUAL || c.parc_manual || 0),
           tipo: c.TIPO || c.tipo || 'BENEFICIO',
-          parcelas_fat: Number(c.PARCELAS_FAT || c.parcelas_fat || 1),
+          
+          // ---- IMPOSTOS DA APÓLICE ----
           iof: c.IOF || c.iof || 'N',
           perc_iof: Number(c.PERC_IOF || c.perc_iof || 0),
           cofins: c.COFINS || c.cofins || 'N',
@@ -454,6 +527,18 @@ export const useEmissaoRecibos = () => {
           perc_csll: Number(c.PERC_CSLL || c.perc_csll || 0),
           pis: c.PIS || c.pis || 'N',
           perc_pis: Number(c.PERC_PIS || c.perc_pis || 0),
+          
+          // ---- APÓLICE ----
+          apolice: c.APOLICE || c.apolice || '',
+          premio_bruto: Number(c.PREMIO_BRUTO || c.premio_bruto || 0),
+          premio_liquido: Number(c.PREMIO_LIQ || c.premio_liq || 0),
+          conta_apolice: c.CONTA_APOLICE || c.conta_apolice || '',
+          pri_cor: c.PRI_COR || c.pri_cor || '',
+          sec_cor: c.SEC_COR || c.sec_cor || '',
+          fat_col_posto: c.FAT_COL_POSTO || c.fat_col_posto || 'N',
+          valor_assist: Number(c.VALOR_ASSIST || c.valor_assist || 0),
+          assist: c.ASSIST || c.assist || 'N',
+          qtd_vidas: Number(c.QTD_VIDAS || c.qtd_vidas || 0),
         })),
         retencoes: selectedRetentions.map((id) => {
           const opt = RETENTION_OPTIONS.find((o) => o.id === id);
@@ -478,6 +563,8 @@ export const useEmissaoRecibos = () => {
 
       if (documentType === 'voucher') {
         response = await emitirVoucher(payload);
+      } else if (documentType === 'recibo_corretor') {
+        response = await emitirReciboCorretor(payload);
       } else {
         response = await emitirRecibo(payload);
       }
@@ -485,7 +572,6 @@ export const useEmissaoRecibos = () => {
       console.log('📄 Resposta da emissão:', response);
 
       if (response?.sucesso) {
-
         if (response.pdf_base64) {
           const link = document.createElement('a');
           link.href = `data:application/pdf;base64,${response.pdf_base64}`;
@@ -507,7 +593,6 @@ export const useEmissaoRecibos = () => {
         );
 
         resetSelections();
-
       } else {
         throw new Error(response?.erro || 'Erro ao emitir documento');
       }
@@ -528,6 +613,7 @@ export const useEmissaoRecibos = () => {
     startLoading,
     stopLoading,
     resetSelections,
+    user,
   ]);
 
   const previewDocument = useCallback(() => {
