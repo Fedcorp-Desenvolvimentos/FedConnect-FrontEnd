@@ -24,7 +24,7 @@ import { useSnackbar } from "notistack";
 import "./EmailAutomation.css";
 
 // Componentes Modais
-import PreviewModal from "./PreviewModal";
+import PreviewModalDetails from "./PreviewModalDetails";
 import HistoryModal from "./HistoryModal";
 
 const EmailAutomacao = () => {
@@ -544,7 +544,7 @@ const EmailAutomacao = () => {
         )}
 
         {/* Modal de Preview */}
-        <PreviewModal 
+        <PreviewModalDetails 
           isOpen={showPreview}
           onClose={() => setShowPreview(false)}
           emailData={emailData}

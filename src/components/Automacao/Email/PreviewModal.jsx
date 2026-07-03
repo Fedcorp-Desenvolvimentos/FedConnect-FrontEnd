@@ -1,6 +1,6 @@
 import { TbEye, TbX, TbMail, TbPaperclip, TbUsers } from "react-icons/tb";
 
-const PreviewModal = ({ isOpen, onClose, emailData }) => {
+const PreviewModalDetails = ({ isOpen, onClose, emailData }) => {
   if (!isOpen) return null;
 
   return (
@@ -63,4 +63,4 @@ const PreviewModal = ({ isOpen, onClose, emailData }) => {
   );
 };
 
-export default PreviewModal;
+export default PreviewModalDetails;

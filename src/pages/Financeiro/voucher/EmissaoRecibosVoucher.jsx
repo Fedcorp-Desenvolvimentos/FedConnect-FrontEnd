@@ -8,7 +8,7 @@ import { FilterForm } from './components/FilterForm';
 import { ComissoesPanel } from './components/ComissoesPanel';
 import { EmissaoPanel } from './components/EmissaoPanel';
 import { RetencoesPanel } from './components/RetencoesPanel';
-import { PreviewModalDetails } from './components/PreviewModalDetails';
+import { PreviewModalDetailsDetails } from './components/PreviewModalDetailsDetails';
 import {
   Container,
   Header,
@@ -202,7 +202,7 @@ export default function EmissaoRecibosVoucher() {
         </Sidebar>
       </PageLayout>
 
-      <PreviewModal open={previewOpen} data={previewData} onClose={closePreview} />
+      <PreviewModalDetails open={previewOpen} data={previewData} onClose={closePreview} />
     </Container>
   );
 }
