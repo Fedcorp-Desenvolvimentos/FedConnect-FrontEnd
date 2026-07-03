@@ -8,7 +8,7 @@ import { FilterForm } from './components/FilterForm';
 import { ComissoesPanel } from './components/ComissoesPanel';
 import { EmissaoPanel } from './components/EmissaoPanel';
 import { RetencoesPanel } from './components/RetencoesPanel';
-import { PreviewModal } from './components/PreviewModal';
+import { PreviewModalDetails } from './components/PreviewModalDetails';
 import {
   Container,
   Header,

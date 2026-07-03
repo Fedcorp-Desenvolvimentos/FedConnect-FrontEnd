@@ -44,7 +44,7 @@ const formatDateTime = (date) => {
  * payload que seria enviado na emissão real, exibido de forma legível
  * antes de confirmar.
  */
-export const PreviewModal = ({ open, data, onClose }) => {
+export const PreviewModalDetails = ({ open, data, onClose }) => {
   if (!open || !data) return null;
 
   const tituloDocumento = data.tipoDocumento === 'voucher' ? 'Voucher' : 'Recibo';
