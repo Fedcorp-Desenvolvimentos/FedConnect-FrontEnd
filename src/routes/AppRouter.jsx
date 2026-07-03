@@ -79,7 +79,7 @@ import PrivateRouter from './PrivateRouter';
 import AutomacaoHome from '../components/Automacao/AutomacaoHome';
 import PDFAutomacao from '../components/Automacao/PDF/PDFAutomacao';
 import BBZAutomacao from '../pages/Automacao/BBZ/BBZAutomacao';
-import EmailAutomacao from '../components/Automacao/Email/EmailAutomacao';
+// import EmailAutomacao from '../components/Automacao/Email/EmailAutomacao';
 
 // Questionario
 import Questionario from '../pages/Questionarios/Questionarios';
@@ -186,7 +186,7 @@ const AppRouter = () => {
           <Route path="/automacao" element={<AutomacaoHome />} />
           <Route path="/automacao/bbz" element={<BBZAutomacao />} />
           <Route path="/automacao/pdf" element={<PDFAutomacao />} />
-          <Route path="/automacao/email" element={<EmailAutomacao />} />
+          {/* <Route path="/automacao/email" element={<EmailAutomacao />} /> */}
 
           <Route path="/mapa" element={<Mapa />} />
 
