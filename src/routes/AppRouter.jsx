@@ -216,7 +216,7 @@ const AppRouter = () => {
           <Route path="/mapa-redes" element={<MapaRedes />} />
           
           <Route path="/cadastro-pessoas" element={<CadastroPessoasHome />} />
-          <Route path="/cadastro-pessoas/registro" element={<CadastroPessoas />} />
+          <Route path="/cadastro-pessoas/:mode" element={<CadastroPessoas />} />
 
         </Route>
       </Route>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaUsers, FaPlus, FaPen, FaTimes, FaEraser, FaSignOutAlt, FaSave, FaFileAlt } from 'react-icons/fa';
+import { FaUsers, FaSignOutAlt, FaSave, FaEraser, FaPen, FaTimes, FaFileAlt } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import { useNavigate, useParams } from 'react-router-dom';
 import PageLayout from '../../Layouts/PageLayout/PageLayout';
@@ -18,14 +18,14 @@ const TAB_SECTIONS = [
   { key: 'agenciamento', label: 'Agenciamento', icon: <FaFileAlt /> },
 ];
 
-const CadastroPessoas = ({ onExit, mode: propMode }) => {
+const CadastroPessoas = ({ onExit }) => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { mode: routeMode } = useParams();
   const [activeTab, setActiveTab] = useState('identificacao');
 
-  const isEditMode = propMode === 'atualizar' || routeMode === 'atualizar';
-  const isNewMode = propMode === 'novo' || routeMode === 'novo';
+  const isEditMode = routeMode === 'atualizar';
+  const isNewMode = routeMode === 'cadastrar';
 
   const {
     pessoas,
@@ -36,26 +36,25 @@ const CadastroPessoas = ({ onExit, mode: propMode }) => {
     isSubmitting,
     selectedCodigo,
     canAlterar,
-    canNovo,
     canCancelar,
     canLimpar,
     updateField,
     toggleCategoria,
     applyCategorias,
     preencherEndereco,
-    startNew,
     startEdit,
     cancelAction,
     clearForm,
     selectPessoa,
     save,
-    setFormData,
   } = usePessoaForm(isNewMode);
 
-  const handleNovo = () => {
-    startNew();
-    enqueueSnackbar('Preencha os dados da nova pessoa', { variant: 'info' });
-    setActiveTab('identificacao');
+  // ===== HANDLERS =====
+  const handleVoltar = () => {
+    if (mode !== 'view' && !window.confirm('Existem alterações não salvas. Deseja realmente sair?')) {
+      return;
+    }
+    navigate('/cadastro-pessoas');
   };
 
   const handleAlterar = () => {
@@ -68,7 +67,7 @@ const CadastroPessoas = ({ onExit, mode: propMode }) => {
     cancelAction();
     enqueueSnackbar('Alterações descartadas', { variant: 'info' });
     if (isNewMode) {
-      navigate('/cadastros/cadastro-pessoas');
+      navigate('/cadastro-pessoas');
     }
   };
 
@@ -76,17 +75,6 @@ const CadastroPessoas = ({ onExit, mode: propMode }) => {
     if (window.confirm('Tem certeza que deseja limpar os campos?')) {
       clearForm();
       enqueueSnackbar('Campos limpos', { variant: 'info' });
-    }
-  };
-
-  const handleSair = () => {
-    if (mode !== 'view' && !window.confirm('Existem alterações não salvas. Deseja realmente sair?')) {
-      return;
-    }
-    if (typeof onExit === 'function') {
-      onExit();
-    } else {
-      navigate('/cadastros/cadastro-pessoas');
     }
   };
 
@@ -128,19 +116,20 @@ const CadastroPessoas = ({ onExit, mode: propMode }) => {
       return;
     }
 
-    enqueueSnackbar('✅ Pessoa cadastrada com sucesso!', { variant: 'success' });
+    enqueueSnackbar('✅ Pessoa salva com sucesso!', { variant: 'success' });
 
     if (isNewMode) {
-      navigate('/cadastros/cadastro-pessoas');
+      navigate('/cadastro-pessoas');
     }
   };
 
   const handleSelectPessoa = (codigo) => {
     selectPessoa(codigo);
     enqueueSnackbar('Pessoa selecionada para edição', { variant: 'info' });
+    setActiveTab('identificacao');
   };
 
-  // Se estiver no modo de atualização e não tiver uma pessoa selecionada, mostra a tabela
+  // ===== RENDER: MODO ATUALIZAÇÃO (seleção) =====
   if (isEditMode && !selectedCodigo && mode === 'view') {
     return (
       <PageLayout
@@ -154,10 +143,7 @@ const CadastroPessoas = ({ onExit, mode: propMode }) => {
                 <FaUsers /> Atualizar Cadastro
               </S.Title>
               <S.HeaderActions>
-                <S.PrimaryButton type="button" onClick={handleNovo} disabled={!canNovo}>
-                  <FaPlus /> Novo
-                </S.PrimaryButton>
-                <S.DangerButton type="button" onClick={handleSair}>
+                <S.DangerButton type="button" onClick={handleVoltar}>
                   <FaSignOutAlt /> Voltar
                 </S.DangerButton>
               </S.HeaderActions>
@@ -178,22 +164,76 @@ const CadastroPessoas = ({ onExit, mode: propMode }) => {
     );
   }
 
+  // ===== RENDER: MODO CADASTRAR =====
+  if (isNewMode) {
+    return (
+      <PageLayout
+        title="Cadastrar"
+        subtitle="Preencha os dados da nova pessoa"
+      >
+        <S.Container>
+          <S.Card>
+            <S.CardHeader>
+              <S.Title>
+                <FaUsers /> Novo Cadastro
+              </S.Title>
+              <S.HeaderActions>
+                <S.SecondaryButton type="button" onClick={handleLimpar} disabled={!canLimpar}>
+                  <FaEraser /> Limpar
+                </S.SecondaryButton>
+                <S.DangerButton type="button" onClick={handleVoltar}>
+                  <FaSignOutAlt /> Voltar
+                </S.DangerButton>
+              </S.HeaderActions>
+            </S.CardHeader>
+
+            <S.Form onSubmit={handleSubmit}>
+              <PessoaFormTabs
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                tabs={TAB_SECTIONS}
+              />
+
+              <PessoaFormFields
+                data={formData}
+                errors={errors}
+                disabled={false}
+                onChange={updateField}
+                onToggleCategoria={toggleCategoria}
+                onAplicarCategorias={handleAplicarCategorias}
+                onBuscarCep={handleBuscarCep}
+                activeTab={activeTab}
+              />
+
+              <S.FormActions>
+                <S.SuccessButton type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? '⏳ Salvando...' : (
+                    <>
+                      <FaSave /> Salvar
+                    </>
+                  )}
+                </S.SuccessButton>
+              </S.FormActions>
+            </S.Form>
+          </S.Card>
+        </S.Container>
+      </PageLayout>
+    );
+  }
+
+  // ===== RENDER: MODO ATUALIZAÇÃO (edição) =====
   return (
     <PageLayout
-      title={isNewMode ? 'Novo Cadastro' : isEditMode ? 'Atualizar Cadastro' : 'Cadastro de Pessoas'}
-      subtitle={isNewMode ? 'Preencha os dados da nova pessoa' : isEditMode ? 'Edite os dados da pessoa selecionada' : 'Cadastre e gerencie as pessoas'}
+      title="Atualizar Cadastro"
+      subtitle="Edite os dados da pessoa selecionada"
     >
       <S.Container>
         <S.Card>
           <S.CardHeader>
             <S.Title>
-              <FaUsers /> {isNewMode ? 'Novo Cadastro' : isEditMode ? 'Atualizar Cadastro' : 'Cadastro de Pessoas'}
+              <FaUsers /> Atualizar Cadastro
             </S.Title>
-
             <S.HeaderActions>
-              <S.PrimaryButton type="button" onClick={handleNovo} disabled={!canNovo}>
-                <FaPlus /> Novo
-              </S.PrimaryButton>
               <S.SecondaryButton type="button" onClick={handleAlterar} disabled={!canAlterar}>
                 <FaPen /> Alterar
               </S.SecondaryButton>
@@ -203,8 +243,8 @@ const CadastroPessoas = ({ onExit, mode: propMode }) => {
               <S.SecondaryButton type="button" onClick={handleLimpar} disabled={!canLimpar}>
                 <FaEraser /> Limpar
               </S.SecondaryButton>
-              <S.DangerButton type="button" onClick={handleSair}>
-                <FaSignOutAlt /> Sair
+              <S.DangerButton type="button" onClick={handleVoltar}>
+                <FaSignOutAlt /> Voltar
               </S.DangerButton>
             </S.HeaderActions>
           </S.CardHeader>
@@ -239,20 +279,6 @@ const CadastroPessoas = ({ onExit, mode: propMode }) => {
               </S.FormActions>
             )}
           </S.Form>
-
-          {!isNewMode && !isEditMode && (
-            <>
-              <S.SectionTitle as="h3" style={{ margin: '1.5rem 0 0.75rem 0', padding: 0 }}>
-                Pessoas Cadastradas
-              </S.SectionTitle>
-              <PessoaTable
-                pessoas={pessoas}
-                selectedCodigo={selectedCodigo}
-                onSelect={selectPessoa}
-                disabled={mode !== 'view'}
-              />
-            </>
-          )}
         </S.Card>
       </S.Container>
     </PageLayout>

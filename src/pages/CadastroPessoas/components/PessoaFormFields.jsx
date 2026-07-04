@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaSearch, FaGlobe, FaFolderOpen, FaImage, FaFileAlt } from 'react-icons/fa';
+import { FaSearch, FaGlobe, FaFolderOpen, FaImage } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
 import CategoriasChecklist from './CategoriasChecklist';
 
@@ -27,7 +27,7 @@ const SECTION_VISIBILITY = {
   endereco: ['endereco'],
   bancario: ['bancario'],
   contato: ['contato'],
-  configuracoes: ['configuracoes', 'portal'],
+  configuracoes: ['configuracoes'],
   agenciamento: ['agenciamento', 'prestador'],
 };
 
@@ -47,14 +47,13 @@ const PessoaFormFields = ({
   activeTab = 'identificacao'
 }) => {
   const renderSection = (section, children) => {
-    const sectionName = section;
-    if (!isSectionVisible(activeTab, sectionName)) return null;
+    if (!isSectionVisible(activeTab, section)) return null;
     return children;
   };
 
   return (
     <>
-      {/* IDENTIFICAÇÃO */}
+      {/* ==================== IDENTIFICAÇÃO ==================== */}
       {renderSection('identificacao', (
         <S.Section disabled={disabled}>
           <S.SectionTitle>Identificação</S.SectionTitle>
@@ -165,7 +164,7 @@ const PessoaFormFields = ({
         </S.Section>
       ))}
 
-      {/* ENDEREÇO */}
+      {/* ==================== ENDEREÇO ==================== */}
       {renderSection('endereco', (
         <S.Section disabled={disabled}>
           <S.SectionTitle>Endereço</S.SectionTitle>
@@ -198,13 +197,49 @@ const PessoaFormFields = ({
               <S.FormSelect name="uf" value={data.uf} onChange={onChange} disabled={disabled}>
                 <option value="">-</option>
                 {ESTADOS.map(uf => (
-                  <option key={uf} value={uf}>
-                    {uf}
-                  </option>
+                  <option key={uf} value={uf}>{uf}</option>
                 ))}
               </S.FormSelect>
             </S.FormGroup>
 
+            <S.FormGroup $flex="1 1 220px">
+              <S.FormLabel>Cidade</S.FormLabel>
+              <S.FormInput
+                type="text"
+                name="cidade"
+                value={data.cidade}
+                onChange={onChange}
+                disabled={disabled}
+              />
+            </S.FormGroup>
+          </S.FormRow>
+
+          <S.FormRow>
+            <S.FormGroup $flex="1 1 200px">
+              <S.FormLabel>Bairro</S.FormLabel>
+              <S.FormInput
+                type="text"
+                name="bairro"
+                value={data.bairro}
+                onChange={onChange}
+                disabled={disabled}
+              />
+            </S.FormGroup>
+
+            <S.FormGroup $flex="1 1 100%">
+              <S.FormLabel>Logradouro</S.FormLabel>
+              <S.FormInput
+                type="text"
+                name="logradouro"
+                value={data.logradouro || data.endereco}
+                onChange={onChange}
+                disabled={disabled}
+                placeholder="Rua, número, complemento"
+              />
+            </S.FormGroup>
+          </S.FormRow>
+
+          <S.FormRow>
             <S.FormGroup $flex="0 1 130px">
               <S.FormLabel>DDD / Telefone</S.FormLabel>
               <S.PhoneGroup>
@@ -251,44 +286,6 @@ const PessoaFormFields = ({
           </S.FormRow>
 
           <S.FormRow>
-            <S.FormGroup $flex="1 1 220px">
-              <S.FormLabel>Cidade</S.FormLabel>
-              <S.FormInput
-                type="text"
-                name="cidade"
-                value={data.cidade}
-                onChange={onChange}
-                disabled={disabled}
-              />
-            </S.FormGroup>
-
-            <S.FormGroup $flex="1 1 220px">
-              <S.FormLabel>Bairro</S.FormLabel>
-              <S.FormInput
-                type="text"
-                name="bairro"
-                value={data.bairro}
-                onChange={onChange}
-                disabled={disabled}
-              />
-            </S.FormGroup>
-          </S.FormRow>
-
-          <S.FormRow>
-            <S.FormGroup $flex="1 1 100%">
-              <S.FormLabel>Logradouro</S.FormLabel>
-              <S.FormInput
-                type="text"
-                name="logradouro"
-                value={data.logradouro || data.endereco}
-                onChange={onChange}
-                disabled={disabled}
-                placeholder="Rua, número, complemento"
-              />
-            </S.FormGroup>
-          </S.FormRow>
-
-          <S.FormRow>
             <S.FormGroup $flex="1 1 100%">
               <S.FormLabel>Complemento</S.FormLabel>
               <S.FormInput
@@ -297,14 +294,14 @@ const PessoaFormFields = ({
                 value={data.complemento}
                 onChange={onChange}
                 disabled={disabled}
-                placeholder="Complemento"
+                placeholder="Complemento (opcional)"
               />
             </S.FormGroup>
           </S.FormRow>
         </S.Section>
       ))}
 
-      {/* DADOS BANCÁRIOS */}
+      {/* ==================== DADOS BANCÁRIOS ==================== */}
       {renderSection('bancario', (
         <S.Section disabled={disabled}>
           <S.SectionTitle>Dados Bancários</S.SectionTitle>
@@ -315,9 +312,7 @@ const PessoaFormFields = ({
               <S.FormSelect name="banco" value={data.banco} onChange={onChange} disabled={disabled}>
                 <option value="">Selecione o banco</option>
                 {BANCOS.map(banco => (
-                  <option key={banco} value={banco}>
-                    {banco}
-                  </option>
+                  <option key={banco} value={banco}>{banco}</option>
                 ))}
               </S.FormSelect>
             </S.FormGroup>
@@ -360,7 +355,7 @@ const PessoaFormFields = ({
         </S.Section>
       ))}
 
-      {/* CONTATO */}
+      {/* ==================== CONTATO ==================== */}
       {renderSection('contato', (
         <S.Section disabled={disabled}>
           <S.SectionTitle>Contato</S.SectionTitle>
@@ -394,18 +389,6 @@ const PessoaFormFields = ({
 
           <S.FormRow>
             <S.FormGroup $flex="1 1 100%">
-              <S.FormLabel>Observações</S.FormLabel>
-              <S.FormTextarea
-                name="observacoes"
-                value={data.observacoes}
-                onChange={onChange}
-                disabled={disabled}
-              />
-            </S.FormGroup>
-          </S.FormRow>
-
-          <S.FormRow>
-            <S.FormGroup $flex="1 1 100%">
               <S.FormLabel>Pessoa de Contato</S.FormLabel>
               <S.FormInput
                 type="text"
@@ -416,14 +399,27 @@ const PessoaFormFields = ({
               />
             </S.FormGroup>
           </S.FormRow>
+
+          <S.FormRow>
+            <S.FormGroup $flex="1 1 100%">
+              <S.FormLabel>Observações</S.FormLabel>
+              <S.FormTextarea
+                name="observacoes"
+                value={data.observacoes}
+                onChange={onChange}
+                disabled={disabled}
+              />
+            </S.FormGroup>
+          </S.FormRow>
         </S.Section>
       ))}
 
-      {/* CONFIGURAÇÕES */}
+      {/* ==================== CONFIGURAÇÕES ==================== */}
       {renderSection('configuracoes', (
         <S.Section disabled={disabled}>
           <S.SectionTitle>Configurações</S.SectionTitle>
 
+          {/* Linha 1: Configurações Gerais */}
           <S.FormRow>
             <S.FormGroup $flex="0 1 160px">
               <S.FormLabel>Abreviação</S.FormLabel>
@@ -433,6 +429,21 @@ const PessoaFormFields = ({
                 value={data.abreviacao}
                 onChange={onChange}
                 disabled={disabled}
+                placeholder="Sigla"
+              />
+            </S.FormGroup>
+
+            <S.FormGroup $flex="0 1 200px">
+              <S.FormLabel>Melhor Dia Pgto.</S.FormLabel>
+              <S.FormInput
+                type="number"
+                min="1"
+                max="31"
+                name="melhor_dia_pagamento"
+                value={data.melhor_dia_pagamento}
+                onChange={onChange}
+                disabled={disabled}
+                placeholder="Dia"
               />
             </S.FormGroup>
 
@@ -449,31 +460,21 @@ const PessoaFormFields = ({
                 Emite Nota Fiscal
               </S.CheckboxWrapper>
             </S.FormGroup>
+          </S.FormRow>
 
-            <S.FormGroup $flex="0 1 170px">
-              <S.FormLabel>Melhor Dia Pgto.</S.FormLabel>
-              <S.FormInput
-                type="number"
-                min="1"
-                max="31"
-                name="melhor_dia_pagamento"
-                value={data.melhor_dia_pagamento}
-                onChange={onChange}
-                disabled={disabled}
-              />
-            </S.FormGroup>
-
-            <S.FormGroup $flex="1 1 220px">
+          {/* Linha 2: Logo */}
+          <S.FormRow>
+            <S.FormGroup $flex="1 1 100%">
               <S.FormLabel>Logo</S.FormLabel>
               <S.LogoBox>
                 <S.LogoPreview>
                   {data.logo_preview ? (
-                    <img src={data.logo_preview} alt="Logo da empresa" />
+                    <img src={data.logo_preview} alt="Logo" />
                   ) : (
                     <FaImage />
                   )}
                 </S.LogoPreview>
-                <S.IconSquareButton as="label" title="Selecionar arquivo" disabled={disabled}>
+                <S.IconSquareButton as="label" title="Selecionar logo" disabled={disabled}>
                   <FaFolderOpen />
                   <input
                     type="file"
@@ -484,10 +485,14 @@ const PessoaFormFields = ({
                     style={{ display: 'none' }}
                   />
                 </S.IconSquareButton>
+                <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                  {data.logo ? data.logo.name : 'Nenhum arquivo selecionado'}
+                </span>
               </S.LogoBox>
             </S.FormGroup>
           </S.FormRow>
 
+          {/* Linha 3: Relacionamento */}
           <S.FormRow>
             <S.FormGroup $flex="1 1 260px">
               <S.FormLabel>Cedente</S.FormLabel>
@@ -508,7 +513,7 @@ const PessoaFormFields = ({
             </S.FormGroup>
           </S.FormRow>
 
-          {/* Portal */}
+          {/* Linha 4: Portal */}
           <S.FormRow>
             <S.FormGroup $flex="1 1 100%">
               <S.CheckboxWrapper disabled={disabled}>
@@ -526,10 +531,10 @@ const PessoaFormFields = ({
 
           <S.FormRow>
             <S.FormGroup $flex="1 1 100%">
-              <S.FormLabel>Portal</S.FormLabel>
+              <S.FormLabel>URL do Portal</S.FormLabel>
               <S.InputWithButton>
                 <S.FormInput
-                  type="text"
+                  type="url"
                   name="portal"
                   value={data.portal}
                   onChange={onChange}
@@ -550,7 +555,7 @@ const PessoaFormFields = ({
         </S.Section>
       ))}
 
-      {/* AGENCIAMENTO */}
+      {/* ==================== AGENCIAMENTO ==================== */}
       {renderSection('agenciamento', (
         <>
           <S.Section disabled={disabled}>
@@ -579,11 +584,13 @@ const PessoaFormFields = ({
             </S.SectionInlineHeader>
 
             <S.FormRow>
-              <S.FormGroup $flex="0 1 180px">
+              <S.FormGroup $flex="0 1 200px">
                 <S.FormLabel>% Agenciamento</S.FormLabel>
                 <S.FormInput
                   type="number"
                   step="0.01"
+                  min="0"
+                  max="100"
                   name="percentual_agenciamento"
                   value={data.percentual_agenciamento}
                   onChange={onChange}
@@ -592,11 +599,13 @@ const PessoaFormFields = ({
                 />
               </S.FormGroup>
 
-              <S.FormGroup $flex="0 1 180px">
+              <S.FormGroup $flex="0 1 200px">
                 <S.FormLabel>Impostos (%)</S.FormLabel>
                 <S.FormInput
                   type="number"
                   step="0.01"
+                  min="0"
+                  max="100"
                   name="impostos"
                   value={data.impostos}
                   onChange={onChange}
@@ -607,7 +616,7 @@ const PessoaFormFields = ({
             </S.FormRow>
           </S.Section>
 
-          {/* Prestador de serviços */}
+          {/* Prestador de Serviços */}
           <S.Section disabled={disabled}>
             <S.SectionInlineHeader>
               <S.CheckboxWrapper disabled={disabled}>

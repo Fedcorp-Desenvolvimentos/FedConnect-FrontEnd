@@ -7,11 +7,11 @@ import { Card, CardBody, IconWrapper, Title, Description, Button } from '../../L
 
 const opcoesCadastro = [
   {
-    key: 'pessoas-registro',
+    key: 'pessoas-cadastrar',
     icon: <FaUserPlus />,
     title: 'Novo Cadastro',
     desc: 'Cadastre uma nova pessoa física ou jurídica no sistema. Preencha todos os dados necessários.',
-    to: '/cadastro-pessoas/registro',
+    to: '/cadastro-pessoas/cadastrar',
     niveis: ['admin', 'usuario', 'comercial', 'faturamento', 'ti'],
     color: '#0f3d5d',
   },
@@ -64,7 +64,7 @@ const CadastroPessoasHome = () => {
                 handleCardClick(opcao.to);
               }}
             >
-              {opcao.key === 'pessoas-registro' ? 'Novo Cadastro' : 'Consultar'}
+              {opcao.key === 'pessoas-cadastrar' ? 'Cadastrar' : 'Consultar'}
             </Button>
           </CardBody>
         </Card>
