@@ -58,7 +58,7 @@ import Produtos from '../components/Produtos/Produtos';
 import Material from '../pages/Comercial/materiais/ComercialMateriais.jsx';
 
 // Financeiro
-import Comissoes from '../pages/Financeiro/Comissoes/Comissoes.jsx';
+import Comissoes from '../pages/Financeiro/comissoes/Comissoes.jsx';
 
 // Faturamento
 // import OperacionalHome from '../components/Faturamento/OperacionalHome';
