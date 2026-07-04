@@ -563,10 +563,8 @@ export const useEmissaoRecibos = () => {
 
       if (documentType === 'voucher') {
         response = await emitirVoucher(payload);
-      } else if (documentType === 'recibo_corretor') {
-        response = await emitirReciboCorretor(payload);
       } else {
-        response = await emitirRecibo(payload);
+        response = await emitirReciboCorretor(payload);
       }
 
       console.log('📄 Resposta da emissão:', response);
