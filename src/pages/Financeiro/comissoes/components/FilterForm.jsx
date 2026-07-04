@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { FaSearch, FaEraser, FaSlidersH, FaCalendarAlt } from 'react-icons/fa';
-import { Card, CardHeader, FormGrid, FormGroup, DataCorteGroup, Divider, Actions, Button } from '../EmissaoRecibosVoucherStyles';
+import { Card, CardHeader, FormGrid, FormGroup, DataCorteGroup, Divider, Actions, Button } from '../ComissoesStyles';
 import { PessoaSelect } from './PessoaSelect';
 
 export const FilterForm = ({

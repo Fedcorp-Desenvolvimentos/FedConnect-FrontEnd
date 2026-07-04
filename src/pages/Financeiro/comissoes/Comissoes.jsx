@@ -1,8 +1,8 @@
-// EmissaoRecibosVoucher.jsx
+// Comissoes.jsx
 import React from 'react';
 import { FaArrowLeft, FaInfoCircle, FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useEmissaoRecibos } from './hooks/useEmissaoRecibos';
+import { useEmissaoRecibos } from './hooks/useComissoes';
 import { SummaryCards } from './components/SummaryCards';
 import { FilterForm } from './components/FilterForm';
 import { ComissoesPanel } from './components/ComissoesPanel';
@@ -24,9 +24,9 @@ import {
   EmptyStateIcon,
   EmptyStateTitle,
   EmptyStateText,
-} from './EmissaoRecibosVoucherStyles';
+} from './ComissoesStyles';
 
-export default function EmissaoRecibosVoucher() {
+export default function Comissoes() {
   const navigate = useNavigate();
 
   const {
@@ -77,7 +77,7 @@ export default function EmissaoRecibosVoucher() {
 
         <Title>
           <span>Financeiro / Comissões</span>
-          <h1>Emissão de Recibos de Comissões</h1>
+          <h1>Comissões</h1>
           <p>
             Consulte comissões, aplique retenções e prepare recibos ou vouchers
             com base no período de corte.

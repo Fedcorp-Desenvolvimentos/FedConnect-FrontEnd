@@ -1,178 +1,207 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import styled from 'styled-components';
 
-export function PessoaSelect({ pessoas = [], value, onChange, placeholder }) {
-  const [termo, setTermo] = useState(value || "");
-  const [mostrarDropdown, setMostrarDropdown] = useState(false);
+const Container = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #2b6cb0;
+    box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.1);
+  }
+`;
+
+const Dropdown = styled.ul`
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 250px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  z-index: 1000;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+`;
+
+const DropdownItem = styled.li`
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #f7fafc;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  strong {
+    display: block;
+    font-size: 14px;
+    color: #2d3748;
+  }
+
+  span {
+    font-size: 12px;
+    color: #718096;
+  }
+`;
+
+const EmptyMessage = styled.div`
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  padding: 10px 12px;
+  text-align: center;
+  color: #718096;
+  font-size: 13px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  z-index: 1000;
+`;
+
+export const PessoaSelect = ({ pessoas = [], value, onChange, placeholder }) => {
+  const [termo, setTermo] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
   const wrapperRef = useRef(null);
 
   const pessoasNormalizadas = useMemo(() => {
     return pessoas.map((p) => ({
       ...p,
-      nome: p.nome || p.razao_social || p.nome_fantasia || p.NOME || "",
-      codigo: p.codigo || p.id || p.cod_pessoa || p.PESSOA || "",
-      documento: p.documento || p.cpf_cnpj || p.cnpj || p.cpf || p.CPF_CNPJ || "",
+      nome: p.NOME || p.nome || p.razao_social || p.nome_fantasia || '',
+      codigo: p.PESSOA || p.pessoa || p.codigo || p.id || p.cod_pessoa || '',
+      documento: p.CPF_CNPJ || p.cpf_cnpj || p.documento || p.cnpj || p.cpf || '',
     }));
   }, [pessoas]);
 
+  useEffect(() => {
+    if (value && pessoasNormalizadas.length > 0) {
+      const encontrada = pessoasNormalizadas.find((p) => String(p.codigo) === String(value));
+      if (encontrada) {
+        setTermo(encontrada.nome);
+      } else {
+        setTermo(value);
+      }
+    } else if (!value) {
+      setTermo('');
+    }
+  }, [value, pessoasNormalizadas]);
+
   const filtradas = useMemo(() => {
-    if (!termo || termo.length < 2) return [];
-    const t = termo.toLowerCase();
-    return pessoasNormalizadas.filter(
-      (p) =>
-        p.nome.toLowerCase().includes(t) ||
-        String(p.codigo).toLowerCase().includes(t) ||
-        String(p.documento).toLowerCase().includes(t)
-    );
+    if (!termo || termo.trim().length < 2) return [];
+
+    const t = termo.toLowerCase().trim();
+
+    return pessoasNormalizadas
+      .filter(
+        (p) =>
+          p.nome.toLowerCase().includes(t) ||
+          String(p.codigo).toLowerCase().includes(t) ||
+          String(p.documento).toLowerCase().includes(t)
+      )
+      .slice(0, 30);
   }, [pessoasNormalizadas, termo]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setMostrarDropdown(false);
+        setShowDropdown(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (value && pessoasNormalizadas.length > 0) {
-      const encontrada = pessoasNormalizadas.find((p) => p.codigo === value);
-      if (encontrada) {
-        setTermo(encontrada.nome);
-      }
-    }
-  }, [value, pessoasNormalizadas]);
+  const selecionarPessoa = (pessoa) => {
+    setTermo(pessoa.nome);
+    setShowDropdown(false);
+    onChange(pessoa.codigo);
+  };
 
-  function handleChange(e) {
+  const handleChange = (e) => {
     const novoTermo = e.target.value;
     setTermo(novoTermo);
-    setMostrarDropdown(novoTermo.length >= 2);
+    setShowDropdown(novoTermo.trim().length >= 2);
 
-    if (!novoTermo) {
-      onChange("");
+    if (!novoTermo.trim()) {
+      onChange('');
     }
-  }
+  };
 
-  function handleFocus() {
-    if (termo.length >= 2) {
-      setMostrarDropdown(true);
+  const handleFocus = () => {
+    if (termo.trim().length >= 2) {
+      setShowDropdown(true);
     }
-  }
+  };
 
-  function selecionarPessoa(pessoa) {
-    setTermo(pessoa.nome);
-    setMostrarDropdown(false);
-    onChange(pessoa.codigo);
-  }
-
-  function handleKeyDown(e) {
-    if (e.key === "Tab" && mostrarDropdown && filtradas.length === 1) {
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      selecionarPessoa(filtradas[0]);
+      if (filtradas.length === 1) {
+        selecionarPessoa(filtradas[0]);
+      } else {
+        setShowDropdown(false);
+      }
     }
-  }
+
+    if (e.key === 'Escape') {
+      setShowDropdown(false);
+    }
+  };
 
   return (
-    <div ref={wrapperRef} style={{ position: "relative", width: "100%" }}>
-      <input
+    <Container ref={wrapperRef}>
+      <Input
         type="text"
         value={termo}
         onChange={handleChange}
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
-        placeholder={placeholder || "Nome, código ou documento"}
+        placeholder={placeholder || 'Nome, código ou documento'}
         autoComplete="off"
-        style={{
-          width: "100%",
-          height: "40px",
-          padding: "0 12px",
-          border: "1px solid #dbe3ef",
-          borderRadius: "8px",
-          background: "#ffffff",
-          color: "#172033",
-          outline: "none",
-          fontSize: "inherit",
-          boxSizing: "border-box",
-        }}
       />
 
-      {mostrarDropdown && filtradas.length > 0 && (
-        <ul
-          style={{
-            position: "absolute",
-            top: "100%",
-            left: 0,
-            right: 0,
-            maxHeight: "250px",
-            overflowY: "auto",
-            backgroundColor: "white",
-            border: "1px solid #dbe3ef",
-            borderTop: "none",
-            borderRadius: "0 0 8px 8px",
-            zIndex: 1000,
-            margin: 0,
-            padding: 0,
-            listStyle: "none",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          }}
-        >
+      {showDropdown && filtradas.length > 0 && (
+        <Dropdown>
           {filtradas.map((pessoa, index) => (
-            <li
+            <DropdownItem
               key={pessoa.codigo || index}
               onClick={() => selecionarPessoa(pessoa)}
-              style={{
-                padding: "10px 12px",
-                cursor: "pointer",
-                borderBottom: "1px solid #f0f0f0",
-                transition: "background 0.15s",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "#f5f5f5")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "white")
-              }
             >
               <strong>{pessoa.nome}</strong>
-              {(pessoa.codigo || pessoa.documento) && (
-                <span
-                  style={{
-                    color: "#64748b",
-                    marginLeft: "8px",
-                    fontSize: "12px",
-                  }}
-                >
-                  {[pessoa.codigo, pessoa.documento].filter(Boolean).join(" | ")}
-                </span>
-              )}
-            </li>
+              <span>
+                Código: {pessoa.codigo || '-'}
+                {pessoa.documento ? ` | CNPJ/CPF: ${pessoa.documento}` : ''}
+              </span>
+            </DropdownItem>
           ))}
-        </ul>
+        </Dropdown>
       )}
 
-      {mostrarDropdown && filtradas.length === 0 && termo.length >= 2 && (
-        <div
-          style={{
-            position: "absolute",
-            top: "100%",
-            left: 0,
-            right: 0,
-            padding: "10px 12px",
-            backgroundColor: "white",
-            border: "1px solid #dbe3ef",
-            borderTop: "none",
-            borderRadius: "0 0 8px 8px",
-            color: "#64748b",
-            textAlign: "center",
-            fontSize: "13px",
-            zIndex: 1000,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          }}
-        >
-          Nenhuma pessoa encontrada para "{termo}"
-        </div>
+      {showDropdown && filtradas.length === 0 && termo.trim().length >= 2 && (
+        <EmptyMessage>Nenhuma pessoa encontrada para "{termo}"</EmptyMessage>
       )}
-    </div>
+    </Container>
   );
-}
+};

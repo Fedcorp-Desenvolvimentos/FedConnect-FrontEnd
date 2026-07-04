@@ -13,7 +13,7 @@ import {
   DocSummary,
   RawDataToggle,
   Button,
-} from '../EmissaoRecibosVoucherStyles';
+} from '../ComissoesStyles';
 
 const formatMoney = (value) => {
   if (value === null || value === undefined) return 'R$ 0,00';

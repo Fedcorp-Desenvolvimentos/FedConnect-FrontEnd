@@ -1,161 +1,168 @@
-import { FaEraser, FaSearch, FaSlidersH } from "react-icons/fa";
-import { PessoaSelect } from "./PessoaSelect";
+// src/pages/Financeiro/voucher/components/ConsultaRecibosForm.jsx (ou similar)
 
-export function ConsultaRecibosForm({
+import React, { useCallback } from 'react';
+import { FaSearch, FaEraser, FaSlidersH } from 'react-icons/fa';
+import { Card, CardHeader, FormGrid, FormGroup, Actions, Button } from '../ComissoesStyles';
+import { PessoaSelect } from './PessoaSelect';
+
+export const ConsultaRecibosForm = ({
   filters,
-  isSearching,
-  onClear,
-  onFilterChange,
-  onSearch,
-  onToggleAdvanced,
   pessoas,
-  pessoasLoading,
-  showAdvancedFilters,
-}) {
-  function handleSubmit(event) {
-    event.preventDefault();
+  loading,
+  showAdvanced,
+  onFilterChange,
+  onSearch,      
+  onClear,
+  onToggleAdvanced,
+}) => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     onSearch();
-  }
+  };
+
+  const handlePessoaChange = useCallback((value) => {
+    onFilterChange('favorecido', value);
+  }, [onFilterChange]);
 
   return (
-    <section className="recibos-card">
-      <div className="recibos-card-header">
+    <Card as="form" onSubmit={handleSubmit}>
+      <CardHeader>
         <div>
           <FaSearch />
-          <h2>1. Consulta de faturas</h2>
+          <h2>1. Consulta</h2>
         </div>
-      </div>
+      </CardHeader>
 
-      <form onSubmit={handleSubmit}>
-        <div className="recibos-form-grid">
-          <label>
-            Favorecido
-            {pessoasLoading ? (
-              <div className="shimmer shimmer-input" />
-            ) : (
-              <PessoaSelect
-                pessoas={pessoas}
-                value={filters.favorecido}
-                onChange={(value) => onFilterChange("favorecido", value)}
-                placeholder="Nome, código ou documento"
-              />
-            )}
-          </label>
+      <FormGrid>
+        <FormGroup>
+          Favorecido
+          <PessoaSelect
+            pessoas={pessoas}
+            value={filters.favorecido}
+            onChange={handlePessoaChange}
+            placeholder="Nome, código ou documento"
+          />
+        </FormGroup>
 
-          <label>
-            Fatura
+        <FormGroup>
+          Fatura
+          <input
+            type="text"
+            value={filters.fatura || ''}
+            onChange={(e) => onFilterChange('fatura', e.target.value)}
+            placeholder="Número da fatura"
+          />
+        </FormGroup>
+
+        <FormGroup>
+          Status
+          <select
+            value={filters.status || ''}
+            onChange={(e) => onFilterChange('status', e.target.value)}
+          >
+            <option value="todas">Todas</option>
+            <option value="pendentes">Pendentes</option>
+            <option value="baixadas">Baixadas</option>
+          </select>
+        </FormGroup>
+
+        <FormGroup>
+          Tipo
+          <select
+            value={filters.tipo || ''}
+            onChange={(e) => onFilterChange('tipo', e.target.value)}
+          >
+            <option value="">Todos</option>
+            <option value="BENEFICIO">Benefício</option>
+            <option value="CONDOCORP">Condocorp</option>
+            <option value="PEAGA">Peaga</option>
+          </select>
+        </FormGroup>
+      </FormGrid>
+
+      <Button type="button" className="ghost" onClick={onToggleAdvanced}>
+        <FaSlidersH />
+        {showAdvanced ? 'Ocultar filtros avançados' : 'Exibir filtros avançados'}
+      </Button>
+
+      {showAdvanced && (
+        <FormGrid>
+          <FormGroup>
+            Co-estipulante
             <input
               type="text"
-              value={filters.fatura}
-              onChange={(event) => onFilterChange("fatura", event.target.value)}
-              placeholder="Filtrar por número da fatura"
+              value={filters.co_estipulante || ''}
+              onChange={(e) => onFilterChange('co_estipulante', e.target.value)}
+              placeholder="Co-estipulante"
             />
-          </label>
+          </FormGroup>
 
-          <label>
-            Status da fatura
-            <select
-              value={filters.status}
-              onChange={(event) => onFilterChange("status", event.target.value)}
-            >
-              <option value="todas">Todas</option>
-              <option value="baixadas">Somente baixadas</option>
-              <option value="pendentes">Somente pendentes</option>
-            </select>
-          </label>
+          <FormGroup>
+            Apólice
+            <input
+              type="text"
+              value={filters.apolice || ''}
+              onChange={(e) => onFilterChange('apolice', e.target.value)}
+              placeholder="Número da apólice"
+            />
+          </FormGroup>
 
-          <label>
-            Tipo de pagamento
+          <FormGroup>
+            Recibo/Voucher
+            <input
+              type="text"
+              value={filters.recibo || ''}
+              onChange={(e) => onFilterChange('recibo', e.target.value)}
+              placeholder="Número do recibo/voucher"
+            />
+          </FormGroup>
+
+          <FormGroup>
+            Vencimento Inicial
+            <input
+              type="date"
+              value={filters.vencimento_inicial || ''}
+              onChange={(e) => onFilterChange('vencimento_inicial', e.target.value)}
+            />
+          </FormGroup>
+
+          <FormGroup>
+            Vencimento Final
+            <input
+              type="date"
+              value={filters.vencimento_final || ''}
+              onChange={(e) => onFilterChange('vencimento_final', e.target.value)}
+            />
+          </FormGroup>
+
+          <FormGroup>
+            Com Voucher
             <select
-              value={filters.tipo}
-              onChange={(event) => onFilterChange("tipo", event.target.value)}
+              value={filters.com_voucher === null ? '' : String(filters.com_voucher)}
+              onChange={(e) => {
+                const val = e.target.value;
+                onFilterChange('com_voucher', val === '' ? null : val === 'true');
+              }}
             >
               <option value="">Todos</option>
-              <option value="A">Peaga</option>
-              <option value="B">Outros</option>
-              <option value="C">Fedcorp</option>
-              <option value="D">Corretora</option>
-              <option value="E">Lider</option>
-              <option value="F">Condocorp</option>
-              <option value="G">Cartão</option>
-              <option value="H">Benefício</option>
+              <option value="true">Com Voucher</option>
+              <option value="false">Sem Voucher</option>
             </select>
-          </label>
-        </div>
+          </FormGroup>
+        </FormGrid>
+      )}
 
-        <button
-          type="button"
-          className="advanced-toggle"
-          onClick={onToggleAdvanced}
-        >
-          <FaSlidersH />
-          {showAdvancedFilters
-            ? "Ocultar filtros avançados"
-            : "Exibir filtros avançados"}
-        </button>
+      <Actions>
+        <Button type="submit" className="primary" disabled={loading}>
+          <FaSearch />
+          {loading ? 'Buscando...' : 'Buscar'}
+        </Button>
 
-        {showAdvancedFilters && (
-          <div className="recibos-form-grid advanced-filters">
-            <label>
-              Co-estipulante
-              <input
-                type="text"
-                value={filters.coEstipulante}
-                onChange={(event) =>
-                  onFilterChange("coEstipulante", event.target.value)
-                }
-                placeholder="Informe o co-estipulante"
-              />
-            </label>
-
-            <label>
-              Recibo
-              <input
-                type="text"
-                value={filters.recibo}
-                onChange={(event) =>
-                  onFilterChange("recibo", event.target.value)
-                }
-                placeholder="Número do recibo"
-              />
-            </label>
-
-            <label>
-              Vigência inicial
-              <input
-                type="date"
-                value={filters.vigenciaInicial}
-                onChange={(event) =>
-                  onFilterChange("vigenciaInicial", event.target.value)
-                }
-              />
-            </label>
-
-            <label>
-              Vigência final
-              <input
-                type="date"
-                value={filters.vigenciaFinal}
-                onChange={(event) =>
-                  onFilterChange("vigenciaFinal", event.target.value)
-                }
-              />
-            </label>
-          </div>
-        )}
-
-        <div className="recibos-actions">
-          <button type="submit" className="primary-button" disabled={isSearching}>
-            <FaSearch />
-            {isSearching ? "Consultando" : "Buscar"}
-          </button>
-
-          <button type="button" className="ghost-button" onClick={onClear}>
-            <FaEraser />
-            Limpar filtros
-          </button>
-        </div>
-      </form>
-    </section>
+        <Button type="button" className="ghost" onClick={onClear}>
+          <FaEraser />
+          Limpar filtros
+        </Button>
+      </Actions>
+    </Card>
   );
-}
+};

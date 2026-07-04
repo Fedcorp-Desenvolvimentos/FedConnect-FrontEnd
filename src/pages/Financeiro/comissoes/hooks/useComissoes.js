@@ -1,4 +1,4 @@
-// hooks/useEmissaoRecibos.js - VERSÃO REFATORADA SEM PAGINAÇÃO
+// hooks/useComissoes.js
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useSnackbar } from 'notistack';

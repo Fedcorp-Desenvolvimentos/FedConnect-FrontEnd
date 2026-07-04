@@ -1,100 +1,114 @@
-import { FaPrint } from "react-icons/fa";
-import { formatDate, formatMoney } from "../utils/recibosComissoesUtils";
+import React from 'react';
+import { FaPrint, FaEye, FaSpinner } from 'react-icons/fa';
+import {
+  Card,
+  CardHeader,
+  EmissaoOptions,
+  EmissionResult,
+  Actions,
+  Button,
+} from '../ComissoesStyles';
 
-export function EmissaoPanel({
+const formatDate = (date) => {
+  if (!date) return '-';
+
+  try {
+    return new Date(date).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return '-';
+  }
+};
+
+const formatMoney = (value) => {
+  if (value === null || value === undefined) return 'R$ 0,00';
+  return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
+};
+
+export const EmissaoPanel = ({
   canIssue,
   documentType,
-  isIssuing,
+  loading,
   lastEmission,
-  printPaidValue,
-  selectedInvoice,
   totals,
   onDocumentTypeChange,
-  onExit,
-  onIssue,
+  onEmitir,
   onPreview,
-  onPrintPaidValueChange,
-}) {
+  onSair,
+}) => {
   return (
-    <section className="recibos-card">
-      <div className="recibos-card-header">
+    <Card>
+      <CardHeader>
         <div>
           <FaPrint />
-          <h2>4. Emissao</h2>
+          <h2>Emissão</h2>
+          <span>{totals?.count || 0} selecionada(s) · {formatMoney(totals?.netTotal || 0)}</span>
         </div>
-      </div>
+      </CardHeader>
 
-      <div className="emissao-options">
+      <EmissaoOptions>
         <label>
           Tipo de documento
-          <select
-            value={documentType}
-            onChange={(event) => onDocumentTypeChange(event.target.value)}
-          >
+          <select value={documentType} onChange={(e) => onDocumentTypeChange(e.target.value)}>
             <option value="recibo">Recibo</option>
             <option value="voucher">Voucher</option>
           </select>
         </label>
+      </EmissaoOptions>
 
-        <label className="checkbox-inline">
-          <input
-            type="checkbox"
-            checked={printPaidValue}
-            onChange={(event) => onPrintPaidValueChange(event.target.checked)}
-          />
-          Imprimir valor quitado
-        </label>
-      </div>
-
-      <div className="emissao-review">
-        {/* <div>
-          <span>Fatura</span>
-          <strong>{selectedInvoice?.numero || "-"}</strong>
-        </div> */}
-        <div>
-          <span>Total bruto</span>
-          <strong>{formatMoney(totals.grossTotal)}</strong>
-        </div>
-        <div>
-          <span>Total retido</span>
-          <strong>{formatMoney(totals.retentionTotal)}</strong>
-        </div>
-        <div>
-          <span>Total liquido</span>
-          <strong>{formatMoney(totals.netTotal)}</strong>
-        </div>
-      </div>
-
-      {lastEmission && (
-        <div className="emissao-result">
-          Documento {lastEmission.numero} emitido em {formatDate(lastEmission.emitidoEm)}.
+      {!canIssue && (
+        <div
+          style={{
+            marginBottom: '4px',
+            padding: '10px 12px',
+            borderRadius: '9px',
+            background: '#fffaf0',
+            border: '1px solid #fbd38d',
+            color: '#975a16',
+            fontSize: '12.5px',
+          }}
+        >
+          Selecione ao menos uma comissão na lista para liberar a emissão.
         </div>
       )}
 
-      <div className="recibos-actions">
-        <button
-          type="button"
-          className="primary-button"
-          disabled={!canIssue || isIssuing}
-          onClick={onIssue}
-        >
-          <FaPrint />
-          {isIssuing ? "Emitindo" : "Emitir documento"}
-        </button>
+      {lastEmission && (
+        <EmissionResult>
+          <strong>✓ {lastEmission.tipo === 'voucher' ? 'Voucher' : 'Recibo'} preparado com sucesso</strong>
+          <br />
+          Número: {lastEmission.numero}
+          <br />
+          Emitido em: {formatDate(lastEmission.emitidoEm)}
+          <br />
+          Total líquido: {formatMoney(lastEmission.total)} | {lastEmission.quantidade} comissão(ões)
+        </EmissionResult>
+      )}
 
-        <button
-          type="button"
-          className="secondary-button"
-          disabled={!canIssue}
-          onClick={onPreview}
+      <Actions style={{ flexDirection: 'column' }}>
+        <Button
+          className="primary block"
+          // disabled={!canIssue || loading || documentType === 'voucher'}
+          disabled={!canIssue || loading}
+          onClick={onEmitir}
         >
-          Pre-visualizar
-        </button>
+          {loading ? <FaSpinner className="spin" /> : <FaPrint />}
+          {loading ? 'Preparando...' : `Emitir ${documentType === 'voucher' ? 'Voucher' : 'Recibo'}`}
+        </Button>
 
-        <button type="button" className="ghost-button" onClick={onExit}>
+        <Button className="secondary block" disabled={!canIssue || loading || documentType === 'voucher'} onClick={onPreview}>
+          <FaEye />
+          Pré-visualizar
+        </Button>
+
+        <Button className="ghost block" onClick={onSair} disabled={loading}>
           Sair
-        </button>
-      </div>
-    </section>
+        </Button>
+      </Actions>
+    </Card>
   );
-}
+};

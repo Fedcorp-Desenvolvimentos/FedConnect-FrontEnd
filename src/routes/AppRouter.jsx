@@ -58,8 +58,8 @@ import Produtos from '../components/Produtos/Produtos';
 import Material from '../pages/Comercial/materiais/ComercialMateriais.jsx';
 
 // Financeiro
-import FinanceiroComissionamento from '../pages/Financeiro/comissoes/EmissaoRecibosComissoes.jsx';
-import EmissaoRecibosVoucher from '../pages/Financeiro/voucher/EmissaoRecibosVoucher.jsx';
+// import FinanceiroComissionamento from '../pages/Financeiro/comissoes/EmissaoRecibosComissoes.jsx';
+import Comissoes from '../pages/Financeiro/Comissoes/Comissoes';
 
 // Faturamento
 // import OperacionalHome from '../components/Faturamento/OperacionalHome';
@@ -180,8 +180,8 @@ const AppRouter = () => {
           <Route path="/faturamento/segunda-via" element={<SegundaVia />} />
           
           {/* Financeiro */}
-           <Route path="/financeiro/comissao" element={<FinanceiroComissionamento />} />
-           <Route path="/financeiro/voucher" element={<EmissaoRecibosVoucher />} />
+           {/* <Route path="/financeiro/comissao" element={<FinanceiroComissionamento />} /> */}
+           <Route path="/financeiro/comissoes" element={<Comissoes />} />
 
           {/* Automação */}
           <Route path="/automacao" element={<AutomacaoHome />} />

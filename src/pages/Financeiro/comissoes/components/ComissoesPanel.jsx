@@ -1,78 +1,203 @@
-import { FaReceipt } from "react-icons/fa";
-import { formatDate, formatMoney } from "../utils/recibosComissoesUtils";
+// components/ComissoesPanel.jsx
 
-export function ComissoesPanel({
+import React from 'react';
+import { FaReceipt, FaSpinner, FaCalendar } from 'react-icons/fa';
+import {
+  Card,
+  CardHeader,
+  ComissaoList,
+  ComissaoItem,
+  TotalsBar,
+  EmptyState,
+  LoadingContainer,
+} from '../ComissoesStyles';
+import styled from 'styled-components';
+
+const PeriodInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #718096;
+  margin-left: 8px;
+
+  svg {
+    font-size: 14px;
+  }
+`;
+
+const formatMoney = (value) => {
+  if (value === null || value === undefined) return 'R$ 0,00';
+  return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
+};
+
+const formatDate = (date) => {
+  if (!date) return '-';
+  try {
+    return new Date(date).toLocaleDateString('pt-BR');
+  } catch {
+    return '-';
+  }
+};
+
+const getComissaoKey = (c) => {
+  const documento = c.DOCUMENTO ?? '';
+  const favor = c.FAVOR ?? '';
+  const tipo = c.TIPO ?? '';
+  const parcela = c.PARCELA ?? '1';
+  const valor = Number(c.VALOR ?? 0).toFixed(2);
+
+  return [documento, favor, tipo, parcela, valor].join('|');
+};
+
+export const ComissoesPanel = ({
   comissoes,
-  selectedCommissions,
+  selectedComissoes,
+  onToggleComissao,
+  onToggleAllComissoes,
   totals,
-  allCommissionsSelected,
-  onToggleAllCommissions,
-  onToggleCommission,
-}) {
+  loading,
+  totalRegistros = 0,
+  dataCorteFormatada,
+  isUsingFilteredData,
+  hasSearched,
+}) => {
+  const allSelected =
+    comissoes.length > 0 &&
+    comissoes.every((c) => {
+      const key = getComissaoKey(c);
+      return selectedComissoes.has(key);
+    });
+
+  const totalSelecionadas = selectedComissoes.size;
+
+  if (loading && comissoes.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <div>
+            <FaReceipt />
+            <h2>2. Comissões</h2>
+            <span>Carregando...</span>
+          </div>
+        </CardHeader>
+        <LoadingContainer>
+          <FaSpinner className="spin" />
+          <span>Carregando comissões...</span>
+        </LoadingContainer>
+      </Card>
+    );
+  }
+
   return (
-    <div className="recibos-card">
-      <div className="recibos-card-header">
+    <Card>
+      <CardHeader>
         <div>
           <FaReceipt />
-          <h2>3. Comissões</h2>
+          <h2>2. Comissões</h2>
+          <span>
+            ({comissoes.length} {totalRegistros > comissoes.length ? `de ${totalRegistros}` : ''} encontradas)
+          </span>
+
+          {totalSelecionadas > 0 && (
+            <span className="badge">
+              {totalSelecionadas} selecionadas
+            </span>
+          )}
+
+          <PeriodInfo>
+            <FaCalendar />
+            {dataCorteFormatada || 'Último mês'}
+          </PeriodInfo>
+
+          <span className="badge" style={{ background: isUsingFilteredData ? '#fffbeb' : '#ebf8ff', color: isUsingFilteredData ? '#92400e' : '#2b6cb0' }}>
+            {isUsingFilteredData ? 'Filtradas' : 'Padrão'}
+          </span>
         </div>
 
         {comissoes.length > 0 && (
-          <button
-            type="button"
-            className="link-button"
-            onClick={onToggleAllCommissions}
-          >
-            {allCommissionsSelected ? "Desmarcar todas" : "Selecionar todas"}
+          <button type="button" className="link-button" onClick={onToggleAllComissoes}>
+            {allSelected ? 'Desmarcar todas' : 'Selecionar todas'}
           </button>
         )}
-      </div>
+      </CardHeader>
 
       {comissoes.length === 0 ? (
-        <div className="empty-state">
-          Nenhuma comissão encontrada para os filtros informados.
-        </div>
+        <EmptyState>
+          <p style={{ fontSize: 16, color: '#718096', marginBottom: 8 }}>
+            {hasSearched
+              ? 'Nenhuma comissão encontrada para os filtros selecionados'
+              : 'Faça uma consulta para exibir as comissões'}
+          </p>
+          <p style={{ fontSize: 13, color: '#a0aec0' }}>
+            {hasSearched
+              ? 'Tente ajustar os filtros ou alterar a data de corte'
+              : 'Utilize o formulário de consulta acima'}
+          </p>
+        </EmptyState>
       ) : (
         <>
-          <div className="commission-toolbar">
-            <strong>
-              {comissoes.length} comissão(ões) encontrada(s)
-            </strong>
+          <ComissaoList>
+            {comissoes.map((comissao, index) => {
+              const key = getComissaoKey(comissao);
+              const isSelected = selectedComissoes.has(key);
+              const valorComissao = Number(
+                comissao.VALOR || comissao.valor || comissao.VALOR_COMISSAO || comissao.valor_comissao || 0
+              );
+              const nomeFavorecido = comissao.NOME || comissao.nome || 'Favorecido';
+              const fatura = comissao.FATURA || comissao.fatura || comissao.DOCUMENTO || '-';
+              const produto = comissao.PRODUTO || comissao.produto || '-';
+              const tipo = comissao.TIPO || comissao.tipo || '-';
 
+              return (
+                <ComissaoItem
+                  key={`comissao-${key}-${index}`}
+                  checked={isSelected}
+                  onClick={() => onToggleComissao(comissao)}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => onToggleComissao(comissao)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+
+                  <div className="info">
+                    <strong>{nomeFavorecido}</strong>
+                    <span>
+                      Fatura {fatura} | Parcela {comissao.PARCELA || comissao.parcela || 1} | Tipo {tipo}
+                    </span>
+                    <span>
+                      Vencimento: {formatDate(comissao.VENCIMENTO || comissao.vencimento)}
+                      {comissao.VOUCHER ? ` | Voucher: ${comissao.VOUCHER}` : ' | Sem voucher'}
+                    </span>
+                    <span style={{ fontSize: 12, color: '#a0aec0' }}>
+                      {produto}
+                    </span>
+                  </div>
+
+                  <span className="value">{formatMoney(valorComissao)}</span>
+                </ComissaoItem>
+              );
+            })}
+          </ComissaoList>
+
+          <TotalsBar>
             <span>
-              {selectedCommissions.length} selecionada(s)
+              Total bruto: <strong>{formatMoney(totals.grossTotal)}</strong>
             </span>
-          </div>
-
-          <div className="commission-list">
-            {comissoes.map((comissao) => (
-              <label key={comissao.id} className="commission-item">
-                <input
-                  type="checkbox"
-                  checked={selectedCommissions.includes(comissao.id)}
-                  onChange={() => onToggleCommission(comissao.id)}
-                />
-
-                <div>
-                  <strong>{comissao.produto}</strong>
-                  <span>
-                    Fatura {comissao.faturaNumero} | {comissao.cliente} |{" "}
-                    {comissao.competencia} | {formatDate(comissao.data)}
-                  </span>
-                </div>
-
-                <strong>{formatMoney(comissao.valor)}</strong>
-              </label>
-            ))}
-          </div>
-
-          <div className="commission-totals">
-            <span>Bruto: {formatMoney(totals.grossTotal)}</span>
-            <span>Retenções: {formatMoney(totals.retentionTotal)}</span>
-            <strong>Líquido: {formatMoney(totals.netTotal)}</strong>
-          </div>
+            <span>
+              Retenções: <strong>{formatMoney(totals.retentionTotal)}</strong>
+            </span>
+            <span className="net">
+              Líquido: <strong>{formatMoney(totals.netTotal)}</strong>
+            </span>
+            <span>
+              Selecionadas: <strong>{totals.count}</strong>
+            </span>
+          </TotalsBar>
         </>
       )}
-    </div>
+    </Card>
   );
-}
+};
