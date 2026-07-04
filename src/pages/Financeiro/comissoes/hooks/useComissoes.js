@@ -134,8 +134,6 @@ export const useEmissaoRecibos = () => {
 
   const { user } = useAuth();
 
-  console.log("🚀 User context:", user);
-
   const dataCorte = useMemo(() => {
     return filters.data_corte || getCurrentMonthDate();
   }, [filters.data_corte]);
