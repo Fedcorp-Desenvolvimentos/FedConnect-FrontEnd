@@ -59,7 +59,7 @@ import Material from '../pages/Comercial/materiais/ComercialMateriais.jsx';
 
 // Financeiro
 // import FinanceiroComissionamento from '../pages/Financeiro/comissoes/EmissaoRecibosComissoes.jsx';
-import Comissoes from '../pages/Financeiro/Comissoes/Comissoes';
+import Comissoes from '../pages/Financeiro/Comissoes/Comissoes.jsx';
 
 // Faturamento
 // import OperacionalHome from '../components/Faturamento/OperacionalHome';
