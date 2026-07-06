@@ -4,7 +4,8 @@ export const NIVEL_ACESSO_OPTIONS = [
   { value: 'comercial', label: 'Comercial' },
   { value: 'moderador', label: 'Moderador' },
   { value: 'faturamento', label: 'Faturamento' },
-  { value: 'ti', label: 'TI' }
+  { value: 'ti', label: 'TI' },
+  { value: 'financeiro', label: 'Financeiro' }
 ];
 
 export const FORM_FIELDS = {
