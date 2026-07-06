@@ -2,6 +2,7 @@ import React from 'react';
 import { FaSearch, FaGlobe, FaFolderOpen, FaImage } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
 import CategoriasChecklist from './CategoriasChecklist';
+import CedenteSelect from './CedenteSelect';
 
 const ESTADOS = [
   'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
@@ -495,21 +496,16 @@ const PessoaFormFields = ({
           {/* Linha 3: Relacionamento */}
           <S.FormRow>
             <S.FormGroup $flex="1 1 260px">
-              <S.FormLabel>Cedente</S.FormLabel>
-              <S.FormSelect name="cedente" value={data.cedente} onChange={onChange} disabled={disabled}>
-                <option value="">Selecione</option>
-                <option value="cedente_1">Cedente Padrão 1</option>
-                <option value="cedente_2">Cedente Padrão 2</option>
-              </S.FormSelect>
-            </S.FormGroup>
-
-            <S.FormGroup $flex="1 1 260px">
-              <S.FormLabel>Comercial</S.FormLabel>
-              <S.FormSelect name="comercial" value={data.comercial} onChange={onChange} disabled={disabled}>
-                <option value="">Selecione</option>
-                <option value="comercial_1">Equipe Comercial 1</option>
-                <option value="comercial_2">Equipe Comercial 2</option>
-              </S.FormSelect>
+              <CedenteSelect
+                value={data.cedente}
+                onChange={onChange}
+                disabled={disabled}
+                error={errors.cedente}
+                onCedenteSelecionado={(cedente) => {
+                  // Opcional: preencher outros campos automaticamente
+                  console.log('Cedente selecionado:', cedente);
+                }}
+              />
             </S.FormGroup>
           </S.FormRow>
 

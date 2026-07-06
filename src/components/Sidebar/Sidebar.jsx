@@ -75,18 +75,18 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
   ];
 
   const navItems = [
-    { path: "/home", label: "Início", icon: <FaHome />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
-    { path: "/consultas", label: "Consultas", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
-    { path: "/consulta-comercial", label: "Comercial", icon: <FaBriefcase />, allowed: ["admin", "comercial"] },
-    { path: "/ferramentas", label: "Ferramentas", icon: <FaTools />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
-    { path: "/faturamento", label: "Faturamento", icon: <FaWallet />, allowed: ["admin", "faturamento", "ti"] },
+    { path: "/home", label: "Início", icon: <FaHome />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"] },
+    { path: "/consultas", label: "Consultas", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"] },
+    { path: "/consulta-comercial", label: "Comercial", icon: <FaBriefcase />, allowed: ["admin", "comercial", "financeiro"] },
+    { path: "/ferramentas", label: "Ferramentas", icon: <FaTools />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"] },
+    { path: "/faturamento", label: "Faturamento", icon: <FaWallet />, allowed: ["admin", "faturamento", "ti", "financeiro"] },
     { path: "/metricas", label: "Métricas", icon: <FaChartBar />, allowed: ["admin"] },
-    { path: "/agenda", label: "Agenda", icon: <FaCalendarAlt />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
-    { path: "/automacao", label: "Automação", icon: <FaCog />, allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin", "faturamento", "ti", "usuario", "comercial"] : ["admin"] },
+    { path: "/agenda", label: "Agenda", icon: <FaCalendarAlt />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"] },
+    { path: "/automacao", label: "Automação", icon: <FaCog />, allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin", "faturamento", "ti", "usuario", "comercial", "financeiro"] : ["admin"] },
     { path: "/analytics", label: "Estatísticas", icon: <FaChartLine />, allowed: ["admin"] },
-    { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
-    { path: "/financeiro/comissoes", label: "Comissões", icon: <FaFileInvoiceDollar  />, allowed: ["admin","ti"] },
-    { path: "/cadastro-pessoas", label: "Cadastro de Pessoas", icon: <FaUserPlus />, allowed: ["admin","ti"] },
+    { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"] },
+    { path: "/financeiro/comissoes", label: "Comissões", icon: <FaFileInvoiceDollar  />, allowed: ["admin", "ti", "financeiro"] },
+    { path: "/cadastro-pessoas", label: "Cadastro de Pessoas", icon: <FaUserPlus />, allowed: ["admin", "ti", "financeiro"] },
     // { path: "/workflow", label: "Workflow", icon: <FaProjectDiagram />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     // { path: "/rh", label: "Recursos Humanos", icon: <FaUsers />, allowed: ["admin"] },
   ];

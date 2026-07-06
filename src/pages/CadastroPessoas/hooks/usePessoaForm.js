@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
+import { criarPessoa } from '../../../services/pessoaService';
 
 export const CATEGORIAS_DISPONIVEIS = [
   'ADMINISTRADORA',
@@ -12,6 +13,8 @@ export const CATEGORIAS_DISPONIVEIS = [
   'FUNCIONARIO'
 ];
 
+const todayISO = () => new Date().toISOString().split('T')[0];
+
 const INITIAL_STATE = {
   codigo: '',
   nome: '',
@@ -21,7 +24,7 @@ const INITIAL_STATE = {
   tipo: 'juridica',
   cpf_cnpj: '',
   sexo: 'masculino',
-  data_cadastro: '',
+  data_cadastro: todayISO(),
 
   cep: '',
   uf: '',
@@ -134,7 +137,6 @@ const MOCK_PESSOAS = [
   }
 ].map(p => ({ ...INITIAL_STATE, ...p }));
 
-const todayISO = () => new Date().toISOString().split('T')[0];
 
 const generateCodigo = pessoas => {
   const maxCodigo = pessoas.reduce((max, p) => {
@@ -290,6 +292,13 @@ export const usePessoaForm = (isNewMode = false) => {
         ...cleanPayload,
         logo: logo ? logo.name : null
       };
+
+      try {
+        await criarPessoa(finalPayload);
+      } catch (error) {
+        console.error("Erro ao criar pessoa:", error);
+        return { success: false, error };
+      }
 
       console.log('📦 Payload Cadastro de Pessoas:', JSON.stringify(finalPayload, null, 2));
 
