@@ -54,12 +54,12 @@ export const buscarComissoesPorDataCorte = async (dataCorte, filtros = {}) => {
 
     const url = `/comissoes/por-data-v2/${dataCorte}/?${params.toString()}`;
     
-    console.log(`📡 Buscando comissões V2: ${url}`);
+    // console.log(`📡 Buscando comissões V2: ${url}`);
     
     const response = await api.get(url);
     const result = response.data;
     
-    console.log('📦 Resposta V2:', result);
+    // console.log('📦 Resposta V2:', result);
 
     if (result.sucesso === false) {
       throw new Error(result.erro || "Erro ao buscar comissões");
@@ -79,7 +79,7 @@ export const buscarComissoesPorDataCorte = async (dataCorte, filtros = {}) => {
     const total = dados.total_registros || dados.total_retornados || lista.length;
     const hasMore = dados.has_more || false;
 
-    console.log(`✅ ${lista.length} comissões carregadas (Total: ${total})`);
+    // console.log(`✅ ${lista.length} comissões carregadas (Total: ${total})`);
 
     return {
       sucesso: true,
@@ -125,7 +125,7 @@ export const buscarFaturamento = async (filtros = {}) => {
     });
 
     const url = `/consultas/faturamento/?${params.toString()}`;
-    console.log(`📡 Buscando faturamento: ${url}`);
+    // console.log(`📡 Buscando faturamento: ${url}`);
     
     const response = await api.get(url);
     return response.data;
