@@ -6,9 +6,8 @@ import { useLoading } from '../../../../hooks/useLoading';
 import {
   buscarComissoesPorDataCorte,
   buscarPessoas,
-  emitirRecibo,
   emitirVoucher,
-  emitirReciboCorretor
+  emitirRecibo
 } from '../../../../services/comissoesService';
 import { useAuth } from '../../../../context/AuthContext';
 
@@ -365,7 +364,7 @@ export const useEmissaoRecibos = () => {
         tp_segurado: c.TP_SEGURADO || c.tp_segurado || '',
         cod_segurado: c.COD_SEGURADO || c.cod_segurado || '',
         
-        // ---- DADOS DO FAVORECIDO (Corretor/Administradora) ----
+        // ---- DADOS DO FAVORECIDO  ----
         favorecido: c.FAVOR || c.favor || '',
         favorecido_nome: c.NOME || c.nome || '',
         favorecido_documento: c.DOC_FAVORECIDO || c.doc_favorecido || '',
@@ -485,7 +484,7 @@ export const useEmissaoRecibos = () => {
           tp_segurado: c.TP_SEGURADO || c.tp_segurado || '',
           cod_segurado: c.COD_SEGURADO || c.cod_segurado || '',
           
-          // ---- DADOS DO FAVORECIDO (Corretor/Administradora) ----
+          // ---- DADOS DO FAVORECIDO ----
           favorecido: c.FAVOR || c.favor || '',
           favorecido_nome: c.NOME || c.nome || '',
           favorecido_documento: c.DOC_FAVORECIDO || c.doc_favorecido || '',
@@ -556,13 +555,12 @@ export const useEmissaoRecibos = () => {
 
       console.log('📄 Payload para emissão:', payload);
 
-      // Chama a API correta baseada no tipo de documento
       let response;
 
       if (documentType === 'voucher') {
         response = await emitirVoucher(payload);
       } else {
-        response = await emitirReciboCorretor(payload);
+        response = await emitirRecibo(payload);
       }
 
       console.log('📄 Resposta da emissão:', response);

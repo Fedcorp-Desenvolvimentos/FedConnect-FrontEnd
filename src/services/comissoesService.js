@@ -109,7 +109,6 @@ export const buscarComissoesPorDataCorte = async (dataCorte, filtros = {}) => {
 };
 
 /**
- * 🔥 BUSCA FATURAS - FATURAMENTO
  * ROTA: /consultas/faturamento/
  * NUNCA usa /comissoes/faturas/
  */
@@ -135,13 +134,15 @@ export const buscarFaturamento = async (filtros = {}) => {
   }
 };
 
+
 /**
- * EMITIR RECIBO
- * POST /comissoes/emitir-recibo/
+ * Emite recibo (agrupado por favorecido)
+ * @param {Object} payload - Dados para emissão
+ * @returns {Promise}
  */
 export const emitirRecibo = async (payload) => {
   try {
-    const response = await api.post('comissoes/emitir-recibo/', payload);
+    const response = await api.post('/comissoes/emitir-recibo/', payload);
     return response.data;
   } catch (error) {
     console.error('Erro ao emitir recibo:', error);
@@ -149,26 +150,9 @@ export const emitirRecibo = async (payload) => {
   }
 };
 
-// src/services/comissoesService.js
-
-/**
- * Emite recibo do corretor (agrupado por favorecido)
- * @param {Object} payload - Dados para emissão
- * @returns {Promise}
- */
-export const emitirReciboCorretor = async (payload) => {
-  try {
-    const response = await api.post('/comissoes/emitir-recibo-corretor/', payload);
-    return response.data;
-  } catch (error) {
-    console.error('Erro ao emitir recibo do corretor:', error);
-    throw error;
-  }
-};
-
 export const emitirVoucher = async (payload) => {
   try {
-    const response = await api.post('comissoes/emitir-voucher/', payload);
+    const response = await api.post('/comissoes/emitir-voucher/', payload);
     return response.data;
   } catch (error) {
     console.error('Erro ao emitir voucher:', error);
