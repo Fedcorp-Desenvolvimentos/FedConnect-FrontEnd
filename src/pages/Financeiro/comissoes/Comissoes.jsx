@@ -70,7 +70,7 @@ export default function Comissoes() {
   return (
     <Container>
       <Header>
-        <BackButton onClick={() => navigate('/financeiro')}>
+        <BackButton onClick={() => navigate('/')}>
           <FaArrowLeft />
           Voltar
         </BackButton>
