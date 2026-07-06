@@ -7,8 +7,8 @@ export const criarPessoa = async (payload) => {
     const response = await api.post(`pessoas/criar/`, payload);
     
     // Log para debug
-    console.log("📦 Payload enviado:", payload);
-    console.log("✅ Resposta da API:", response.data);
+    // console.log("📦 Payload enviado:", payload);
+    // console.log("✅ Resposta da API:", response.data);
     
     // Verifica se a resposta tem a estrutura esperada
     if (response.data && response.data.sucesso) {

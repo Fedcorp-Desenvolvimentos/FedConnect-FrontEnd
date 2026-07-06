@@ -231,7 +231,7 @@ function Questionarios() {
     try {
       const response = await listarQuestionarios();
 
-      console.log("Resposta da API:", response);
+      // console.log("Resposta da API:", response);
 
       // A resposta do Django REST Framework tem a estrutura { count, next, previous, results }
       // Os dados estão em response.results ou response.data.results

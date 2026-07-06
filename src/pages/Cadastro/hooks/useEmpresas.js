@@ -12,7 +12,7 @@ export const useEmpresas = () => {
     try {
       await withLoading(async () => {
         const response = await CompanyService.getAllCompanies();
-        console.log('Empresas recebidas da API:', response);
+        // console.log('Empresas recebidas da API:', response);
         const empresasList = response.data || response || [];
 
         const uniqueEmpresas = [];

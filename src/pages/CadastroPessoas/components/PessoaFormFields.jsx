@@ -503,7 +503,7 @@ const PessoaFormFields = ({
                 error={errors.cedente}
                 onCedenteSelecionado={(cedente) => {
                   // Opcional: preencher outros campos automaticamente
-                  console.log('Cedente selecionado:', cedente);
+                  // console.log('Cedente selecionado:', cedente);
                 }}
               />
             </S.FormGroup>

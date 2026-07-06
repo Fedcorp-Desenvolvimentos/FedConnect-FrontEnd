@@ -129,14 +129,14 @@ const Analytics = () => {
       
       const response = await api.get('consultas/administradoras', { headers });
 
-      console.log("response", response)
+      // console.log("response", response)
       
       if (response.ok) {
         const data = await response.json();
         // Ajuste conforme a resposta real
         const listaAdms = data.data || data.administradoras || [];
         setAdministradoras(listaAdms);
-        console.log('Administradoras carregadas:', listaAdms); // Debug
+        // console.log('Administradoras carregadas:', listaAdms); // Debug
       }
     } catch (err) {
       console.error('Erro ao carregar administradoras:', err);

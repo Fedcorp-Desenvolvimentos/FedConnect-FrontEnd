@@ -553,7 +553,7 @@ export const useEmissaoRecibos = () => {
         },
       };
 
-      console.log('📄 Payload para emissão:', payload);
+      // console.log('📄 Payload para emissão:', payload);
 
       let response;
 
@@ -563,7 +563,7 @@ export const useEmissaoRecibos = () => {
         response = await emitirRecibo(payload);
       }
 
-      console.log('📄 Resposta da emissão:', response);
+      // console.log('📄 Resposta da emissão:', response);
 
       if (response?.sucesso) {
         if (response.pdf_base64) {

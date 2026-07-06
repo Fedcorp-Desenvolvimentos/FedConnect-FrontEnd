@@ -14,10 +14,10 @@ export const downloadBoletosCSV = async (numeroFatura) => {
       }
     });
     
-    console.log("Resposta do servidor:", response);
-    console.log("Headers:", response.headers);
-    console.log("Tipo do dado:", typeof response.data);
-    console.log("É Blob?", response.data instanceof Blob);
+    // console.log("Resposta do servidor:", response);
+    // console.log("Headers:", response.headers);
+    // console.log("Tipo do dado:", typeof response.data);
+    // console.log("É Blob?", response.data instanceof Blob);
     
     // Verifica se a resposta é um blob (arquivo)
     if (response.data instanceof Blob) {

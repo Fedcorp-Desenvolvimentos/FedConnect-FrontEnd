@@ -300,7 +300,7 @@ export const usePessoaForm = (isNewMode = false) => {
         return { success: false, error };
       }
 
-      console.log('📦 Payload Cadastro de Pessoas:', JSON.stringify(finalPayload, null, 2));
+      // console.log('📦 Payload Cadastro de Pessoas:', JSON.stringify(finalPayload, null, 2));
 
       setPessoas(prev => {
         const exists = prev.some(p => p.codigo === payload.codigo);

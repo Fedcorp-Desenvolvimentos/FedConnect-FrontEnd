@@ -43,7 +43,7 @@ const Login = () => {
         setError(null);
         
         try {
-            console.log('Google credential received');
+            // console.log('Google credential received');
             
             const result = await loginGoogle(credentialResponse.credential);
 
