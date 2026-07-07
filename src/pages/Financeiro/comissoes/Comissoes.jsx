@@ -67,6 +67,9 @@ export default function Comissoes() {
   const hasResults = comissoes.length > 0;
   const isEmpty = !loading && !loadingInitial && !hasResults && hasSearched;
 
+
+  console.log("previewData", previewData)
+
   return (
     <Container>
       <Header>
@@ -181,12 +184,16 @@ export default function Comissoes() {
         </MainColumn>
 
         <Sidebar>
+
+          { documentType !== 'recibo' && (
           <RetencoesPanel
             selectedRetentions={selectedRetentions}
             totals={retentionSummary}
             onToggleRetention={toggleRetention}
             hasResults={hasResults}
+            comissoes={comissoes}
           />
+          )}
 
           <EmissaoPanel
             canIssue={canIssue && hasResults}
@@ -198,6 +205,8 @@ export default function Comissoes() {
             onEmitir={emitirDocumento}
             onPreview={previewDocument}
             onSair={() => navigate('/')}
+            selectedComissoes={selectedComissoes}
+            comissoes={comissoes}            
           />
         </Sidebar>
       </PageLayout>

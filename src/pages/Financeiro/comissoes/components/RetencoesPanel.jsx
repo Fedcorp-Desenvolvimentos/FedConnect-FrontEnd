@@ -24,7 +24,7 @@ const formatMoney = (value) => {
 
 const formatRate = (rate) => `${(rate * 100).toFixed(rate * 100 % 1 ? 2 : 0)}%`;
 
-export function RetencoesPanel({ selectedRetentions, totals, onToggleRetention, hasResults }) {
+export function RetencoesPanel({ selectedRetentions, totals, onToggleRetention, hasResults, comissoes }) {  
   return (
     <RetentionCard>
       <CardHeader>
