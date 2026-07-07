@@ -229,6 +229,15 @@ export const useEmissaoRecibos = () => {
     [filters, withLoading, enqueueSnackbar, resetSelections]
   );
 
+  const cancelarComissao = useCallback(async () => {
+    if (selectedComissoes.size === 0) {
+      enqueueSnackbar('Selecione pelo menos uma comissão para cancelar', { variant: 'warning' });
+      return;
+    }
+
+    // Lógica para cancelar comissões selecionadas
+  }, [selectedComissoes, enqueueSnackbar]);
+
   const buscarTudo = useCallback(async () => {
     await buscarComissoes();
   }, [buscarComissoes]);

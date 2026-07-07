@@ -1,6 +1,6 @@
 // components/EmissaoPanel.jsx
 import React from 'react';
-import { FaPrint, FaEye, FaSpinner } from 'react-icons/fa';
+import { FaPrint, FaEye, FaSpinner, FaTimes } from 'react-icons/fa';
 import {
   Card,
   CardHeader,
@@ -68,8 +68,9 @@ export const EmissaoPanel = ({
   onEmitir,
   onPreview,
   onSair,
-  selectedComissoes, // Adicionado
-  comissoes, // Adicionado
+  selectedComissoes,
+  comissoes,
+  onCancel
 }) => {
   // Verifica se todas as comissões selecionadas estão baixadas
   const allSelectedBaixadas = areAllSelectedBaixadas(selectedComissoes, comissoes);
@@ -179,6 +180,15 @@ export const EmissaoPanel = ({
         >
           <FaEye />
           Pré-visualizar
+        </Button>
+
+        <Button 
+          className="secondary block" 
+          disabled={!canIssue || loading || documentType === 'cancel'} 
+          onClick={onCancel}
+        >
+          <FaTimes />
+          Cancelar Comissão
         </Button>
 
         <Button className="ghost block" onClick={onSair} disabled={loading}>
