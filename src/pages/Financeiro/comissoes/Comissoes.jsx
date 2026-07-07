@@ -8,7 +8,7 @@ import { FilterForm } from './components/FilterForm';
 import { ComissoesPanel } from './components/ComissoesPanel';
 import { EmissaoPanel } from './components/EmissaoPanel';
 import { RetencoesPanel } from './components/RetencoesPanel';
-import { PreviewModalDetails } from './components/PreviewModalDetails';
+import { PreviewModalDetails } from './components/PreviewodalDetails';
 import {
   Container,
   Header,
@@ -186,14 +186,14 @@ export default function Comissoes() {
 
         <Sidebar>
 
-          { documentType !== 'recibo' && (
-          <RetencoesPanel
-            selectedRetentions={selectedRetentions}
-            totals={retentionSummary}
-            onToggleRetention={toggleRetention}
-            hasResults={hasResults}
-            comissoes={comissoes}
-          />
+          {documentType !== 'recibo' && (
+            <RetencoesPanel
+              selectedRetentions={selectedRetentions}
+              totals={retentionSummary}
+              onToggleRetention={toggleRetention}
+              hasResults={hasResults}
+              comissoes={comissoes}
+            />
           )}
 
           <EmissaoPanel
@@ -208,7 +208,7 @@ export default function Comissoes() {
             onPreview={previewDocument}
             onSair={() => navigate('/')}
             selectedComissoes={selectedComissoes}
-            comissoes={comissoes}            
+            comissoes={comissoes}
           />
         </Sidebar>
       </PageLayout>

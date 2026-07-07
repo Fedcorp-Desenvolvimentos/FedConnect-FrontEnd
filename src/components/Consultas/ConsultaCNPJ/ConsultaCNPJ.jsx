@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useSnackbar } from "notistack";
 import * as S from "./ConsultaCNPJStyles";
-import { 
-  FiFileText, 
-  FiUsers, 
-  FiCopy, 
+import {
+  FiFileText,
+  FiUsers,
+  FiCopy,
   FiCheck,
   FiSearch,
   FiDownload,
@@ -39,7 +39,7 @@ function isValidCNPJ(raw) {
   const cnpj = String(raw).replace(/\D/g, "");
   if (cnpj.length !== 14) return false;
   if (/^(\d)\1{13}$/.test(cnpj)) return false;
-  
+
   const calcDV = (base) => {
     let soma = 0;
     const pesos = base.length === 12
@@ -51,7 +51,7 @@ function isValidCNPJ(raw) {
     const resto = soma % 11;
     return resto < 2 ? 0 : 11 - resto;
   };
-  
+
   const dv1 = calcDV(cnpj.slice(0, 12));
   const dv2 = calcDV(cnpj.slice(0, 12) + dv1);
   return cnpj.endsWith(`${dv1}${dv2}`);
@@ -118,21 +118,21 @@ const ConsultaCNPJ = () => {
     return root;
   };
 
-const getResultList = (res) => {
-  if (!res) return [];
+  const getResultList = (res) => {
+    if (!res) return [];
 
-  const root = getResultData(res);
+    const root = getResultData(res);
 
-  if (Array.isArray(root?.Result)) {
-    return root.Result.map((item) => item.BasicData ?? item);
-  }
+    if (Array.isArray(root?.Result)) {
+      return root.Result.map((item) => item.BasicData ?? item);
+    }
 
-  if (root?.cnpj || root?.razao_social) {
-    return [root];
-  }
+    if (root?.cnpj || root?.razao_social) {
+      return [root];
+    }
 
-  return [];
-};
+    return [];
+  };
 
   const flatToBasicData = (flat) => {
     if (!flat) return null;
@@ -267,31 +267,31 @@ const getResultList = (res) => {
 
         const total = cnpjsValidos.length;
         startLoading(`Iniciando consulta de ${total} CNPJs...`);
-        
+
         const allResults = [];
         const batchSize = 5;
-        
+
         for (let i = 0; i < cnpjsValidos.length; i += batchSize) {
           const batch = cnpjsValidos.slice(i, i + batchSize);
           const batchNumber = Math.floor(i / batchSize) + 1;
           const totalBatches = Math.ceil(total / batchSize);
-          
+
           // Atualiza progresso real
           const processed = Math.min(i + batchSize, total);
           const percent = Math.round((processed / total) * 100);
-          
+
           updateProgress(
             percent,
             // `Consultando CNPJs - Lote ${batchNumber}/${totalBatches} (${processed}/${total})`
             `Consultando CNPJs - ${processed}/${total} -`
           );
-          
-          const batchPromises = batch.map(item => 
+
+          const batchPromises = batch.map(item =>
             ConsultaService.realizarConsulta({ tipo_consulta: "cnpj", parametro_consulta: item })
           );
-          
+
           const batchResults = await Promise.allSettled(batchPromises);
-          
+
           batchResults.forEach((result, idx) => {
             const data = result.value?.resultado_api ?? result.value?.data ?? {};
             allResults.push({
@@ -303,7 +303,7 @@ const getResultList = (res) => {
               "Atividades Secundárias": Array.isArray(data.cnaes_secundarios)
                 ? data.cnaes_secundarios.map(c => c.descricao).filter(d => d).join(", ")
                 : "N/A",
-              
+
               // ENDEREÇO COMPLETO
               "Logradouro": `${data.descricao_tipo_de_logradouro || ""} ${data.logradouro || ""}`.trim() || "N/A",
               "Número": data.numero || "N/A",
@@ -312,7 +312,7 @@ const getResultList = (res) => {
               "CEP": data.cep || "N/A",
               "Município": data.municipio || "N/A",
               "UF": data.uf || "N/A",
-              
+
               "Telefone": data.ddd_telefone_1 || data.ddd_telefone_2 || "N/A",
               "Email": data.email || "N/A",
               "Porte": data.porte || "N/A",
@@ -325,16 +325,16 @@ const getResultList = (res) => {
             });
           });
         }
-        
+
         // 100% completo
         updateProgress(100, `Gerando planilha com ${allResults.length} registros...`);
 
         const newWorksheet = XLSX.utils.json_to_sheet(allResults);
         const newWorkbook = XLSX.utils.book_new();
-        
+
         XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, "Resultados");
-        XLSX.writeFile(newWorkbook, `resultado-cnpj-${new Date().toISOString().slice(0,19)}.xlsx`);
-        
+        XLSX.writeFile(newWorkbook, `resultado-cnpj-${new Date().toISOString().slice(0, 19)}.xlsx`);
+
         setMassConsultaMessage(`Concluído! ${allResults.length} registros processados.`);
         enqueueSnackbar(`Planilha gerada com ${allResults.length} registros!`, { variant: "success" });
       } catch (err) {
@@ -477,7 +477,7 @@ const getResultList = (res) => {
         {activeTab === "cnpj" && cnpjDataFlat && (
           <S.ResultCard ref={resultadoRef}>
             <S.ResultTitle>Resultado da Consulta</S.ResultTitle>
-            
+
             <S.ResultField>
               <S.ResultLabel>Razão Social</S.ResultLabel>
               <S.ResultValue>
@@ -697,7 +697,7 @@ const getResultList = (res) => {
                     uf: cnpjDataFlat.Address?.State,
                     complemento: cnpjDataFlat.Address?.Complement,
                   });
-                  window.open(`https://www.google.com/maps/place/${encodeURIComponent(endereco)}`, "_blank");
+                  window.open(`https://www.google.com/maps/search/${encodeURIComponent(endereco)}`, "_blank");
                 }}
               >
                 <FiMapPin size={18} />
@@ -714,7 +714,7 @@ const getResultList = (res) => {
             {resultList.map((item, idx) => {
               const data = flatToBasicData(item.BasicData ?? item) || item.BasicData || item;
               const isExpanded = selectedResultIndex === idx;
-              
+
               const enderecoMaps = montarEnderecoParaMaps({
                 cep: data.Address?.ZipCode,
                 tipo: data.Address?.StreetType,
@@ -724,7 +724,7 @@ const getResultList = (res) => {
                 uf: data.Address?.State || data.HeadquarterState,
                 complemento: data.Address?.Complement,
               });
-              
+
               const podeAbrirMapaChaves = enderecoMaps && (data.Address?.ZipCode || data.Address?.Street);
 
               return (
@@ -750,8 +750,8 @@ const getResultList = (res) => {
                       <S.DetailRow><strong>Email:</strong> {data.Contact?.Email || "N/A"}</S.DetailRow>
                       <S.DetailRow><strong>Data de Início:</strong> {formatarDataBrasileira(data.FoundedDate) || "N/A"}</S.DetailRow>
                       <S.DetailRow><strong>CEP:</strong> {data.Address?.ZipCode || "N/A"}</S.DetailRow>
-                      <S.DetailRow><strong>Logradouro:</strong> 
-                        {data.Address?.StreetType || data.Address?.Street ? 
+                      <S.DetailRow><strong>Logradouro:</strong>
+                        {data.Address?.StreetType || data.Address?.Street ?
                           `${data.Address?.StreetType || ""} ${data.Address?.Street || ""}${data.Address?.Number ? `, ${data.Address?.Number}` : ""}`.trim()
                           : "N/A"}
                       </S.DetailRow>
@@ -759,7 +759,7 @@ const getResultList = (res) => {
                       <S.DetailRow><strong>Bairro:</strong> {data.Address?.Neighborhood || "N/A"}</S.DetailRow>
                       <S.DetailRow><strong>Município:</strong> {data.Address?.City || "N/A"}</S.DetailRow>
                       <S.DetailRow><strong>UF:</strong> {data.HeadquarterState || "N/A"}</S.DetailRow>
-                      
+
                       {data.AtividadesSecundarias && data.AtividadesSecundarias.length > 0 && (
                         <S.DetailRow>
                           <strong>Atividades Secundárias:</strong>
@@ -770,7 +770,7 @@ const getResultList = (res) => {
                           </ul>
                         </S.DetailRow>
                       )}
-                      
+
                       {podeAbrirMapaChaves && (
                         <S.MapsButtonFull
                           onClick={() => {
