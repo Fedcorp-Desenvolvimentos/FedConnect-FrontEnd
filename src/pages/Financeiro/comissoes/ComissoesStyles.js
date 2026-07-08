@@ -369,6 +369,7 @@ export const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 5px;
+  min-width: 0;
   grid-column: ${(props) => (props.$span ? `span ${props.$span}` : 'auto')};
 
   label {
@@ -379,6 +380,7 @@ export const FormGroup = styled.div`
 
   input,
   select {
+    width: 100%;
     height: 38px;
     padding: 0 12px;
     border: 1px solid #dbe2ea;
