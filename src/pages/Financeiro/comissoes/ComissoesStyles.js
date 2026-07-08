@@ -369,6 +369,7 @@ export const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 5px;
+  grid-column: ${(props) => (props.$span ? `span ${props.$span}` : 'auto')};
 
   label {
     font-size: 12.5px;

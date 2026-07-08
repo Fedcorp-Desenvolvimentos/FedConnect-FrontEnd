@@ -85,7 +85,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
     { path: "/automacao", label: "Automação", icon: <FaCog />, allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin", "faturamento", "ti", "usuario", "comercial", "financeiro"] : ["admin"] },
     { path: "/analytics", label: "Estatísticas", icon: <FaChartLine />, allowed: ["admin", "ti", "financeiro"] },
     { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"] },
-    { path: "/financeiro/comissoes", label: "Comissões", icon: <FaFileInvoiceDollar  />, allowed: ["admin", "ti", "financeiro"] },
+    { path: "/financeiro", label: "Financeiro", icon: <FaFileInvoiceDollar  />, allowed: ["admin", "ti", "financeiro"] },
     { path: "/cadastro-pessoas", label: "Cadastro", icon: <FaUserPlus />, allowed: ["admin", "ti", "financeiro"] },
     // { path: "/workflow", label: "Workflow", icon: <FaProjectDiagram />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     // { path: "/rh", label: "Recursos Humanos", icon: <FaUsers />, allowed: ["admin"] },
@@ -135,7 +135,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
               if (!item.allowed.includes(nivelAcesso)) return null;
               const isActive = location.pathname === item.path ||
                 (item.path === "/consultas" && location.pathname.startsWith("/consultas")) ||
-                (item.path === "/faturamento" && location.pathname.startsWith("/faturamento"));
+                (item.path === "/faturamento" && location.pathname.startsWith("/faturamento")) ||
+                (item.path === "/financeiro" && location.pathname.startsWith("/financeiro"));
 
               return (
                 <li key={item.path} className={isActive ? "active" : ""}>

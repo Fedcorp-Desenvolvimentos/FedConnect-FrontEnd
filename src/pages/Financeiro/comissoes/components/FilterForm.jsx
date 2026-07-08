@@ -39,16 +39,16 @@ export const FilterForm = ({
         A data de corte é o filtro que mais impacta o resultado, por isso
         abre a grade em destaque, seguida dos filtros de uso mais comum.
       */}
-      <FormGrid>
-        <FormGroup>
-          <label>Favorecido</label>
-          <PessoaSelect
-            pessoas={pessoas}
-            value={filters.favorecido}
-            onChange={handlePessoaChange}
-            placeholder="Nome, código ou documento"
-          />
-        </FormGroup>
+        <FormGrid style={{ gridTemplateColumns: '2fr 1fr 1fr' }}>
+          <FormGroup>
+            <label>Favorecido</label>
+            <PessoaSelect
+              pessoas={pessoas}
+              value={filters.favorecido}
+              onChange={handlePessoaChange}
+              placeholder="Nome, código ou documento"
+            />
+          </FormGroup>
 
         <FormGroup>
           <label>Fatura</label>
