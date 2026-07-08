@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTimes, FaFileInvoice, FaChevronRight } from 'react-icons/fa';
+import { FaTimes, FaFileInvoice, FaChevronRight, FaPrint, FaSpinner } from 'react-icons/fa';
 import {
   ModalOverlay,
   ModalCard,
@@ -44,7 +44,7 @@ const formatDateTime = (date) => {
  * payload que seria enviado na emissão real, exibido de forma legível
  * antes de confirmar.
  */
-export const PreviewModalDetails = ({ open, data, onClose }) => {
+export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) => {
   if (!open || !data) return null;
 
   const tituloDocumento = data.tipoDocumento === 'voucher' ? 'Voucher' : 'Recibo';
@@ -153,6 +153,10 @@ export const PreviewModalDetails = ({ open, data, onClose }) => {
         <ModalFooter>
           <Button className="ghost" onClick={onClose}>
             Fechar
+          </Button>
+          <Button className="primary" onClick={onEmitir} disabled={loading}>
+            {loading ? <FaSpinner className="spin" /> : <FaPrint />}
+            {loading ? 'Emitindo...' : `Emitir ${tituloDocumento}`}
           </Button>
         </ModalFooter>
       </ModalCard>

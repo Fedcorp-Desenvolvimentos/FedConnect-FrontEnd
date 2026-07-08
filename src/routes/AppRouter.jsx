@@ -53,11 +53,12 @@ import Agenda from '../pages/Agenda/Agenda';
 // Comercial
 import Acompanhamento from '../components/Comercial/DashboardComercial';
 import AgendaComercial from '../components/Comercial/AgendaComercial';
-import Financeiro from '../components/Comercial/Financeiro';
 import Produtos from '../components/Produtos/Produtos';
 import Material from '../pages/Comercial/materiais/ComercialMateriais.jsx';
 
 // Financeiro
+import FinanceiroHome from '../pages/Financeiro/Home/FinanceiroHome.jsx';
+import ConsultaComissao from '../pages/Financeiro/consulta/ConsultaComissao.jsx';
 import Comissoes from '../pages/Financeiro/comissoes/Comissoes.jsx';
 
 // Faturamento
@@ -166,7 +167,7 @@ const AppRouter = () => {
 
           {/* Comercial e Financeiro */}
           <Route path="/acompanhamento" element={<Acompanhamento />} />
-          <Route path="/financeiro" element={<Financeiro />} />
+          <Route path="/financeiro" element={<FinanceiroHome />} />
           <Route path="/produtos" element={<Produtos />} />
           <Route path="/material" element={<Material />} />
 
@@ -179,7 +180,8 @@ const AppRouter = () => {
           <Route path="/faturamento/segunda-via" element={<SegundaVia />} />
           
           {/* Financeiro */}
-           <Route path="/financeiro/comissoes" element={<Comissoes />} />
+          <Route path="/financeiro/comissoes" element={<Comissoes />} />
+          <Route path="/financeiro/consulta-comissao" element={<ConsultaComissao />} />
 
           {/* Automação */}
           <Route path="/automacao" element={<AutomacaoHome />} />

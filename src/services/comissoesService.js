@@ -155,3 +155,18 @@ export const emitirVoucher = async (payload) => {
     throw error;
   }
 };
+
+/**
+ * Cancela comissões selecionadas
+ * @param {Object} payload - Dados das comissões a cancelar
+ * @returns {Promise}
+ */
+export const cancelarComissaoApi = async (payload) => {
+  try {
+    const response = await api.post('/comissoes/cancelar/', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao cancelar comissão:', error);
+    throw error;
+  }
+};

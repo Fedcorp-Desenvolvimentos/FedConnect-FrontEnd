@@ -1,9 +1,8 @@
 // Comissoes.jsx
 import React from 'react';
-import { FaArrowLeft, FaInfoCircle, FaSearch } from 'react-icons/fa';
+import { FaArrowLeft, FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useEmissaoRecibos } from './hooks/useComissoes';
-import { SummaryCards } from './components/SummaryCards';
 import { FilterForm } from './components/FilterForm';
 import { ComissoesPanel } from './components/ComissoesPanel';
 import { EmissaoPanel } from './components/EmissaoPanel';
@@ -19,7 +18,6 @@ import {
   Sidebar,
   SkeletonCard,
   SkeletonRow,
-  InfoBanner,
   EmptyStateContainer,
   EmptyStateIcon,
   EmptyStateTitle,
@@ -40,7 +38,6 @@ export default function Comissoes() {
     selectedRetentions,
     documentType,
     lastEmission,
-    totals,
     retentionSummary,
     totalRegistros,
     hasSearched,
@@ -66,9 +63,6 @@ export default function Comissoes() {
   const hasResults = comissoes.length > 0;
   const isEmpty = !loading && !loadingInitial && !hasResults && hasSearched;
 
-
-  console.log("previewData", previewData)
-
   return (
     <Container>
       <Header>
@@ -86,36 +80,6 @@ export default function Comissoes() {
           </p>
         </Title>
       </Header>
-
-      {/* Banner de informação */}
-      <InfoBanner isFiltered={hasActiveFilters || isUsingFilteredData}>
-        <FaInfoCircle />
-        <div>
-          <strong>
-            {hasSearched
-              ? isUsingFilteredData
-                ? 'Resultado da consulta'
-                : 'Comissões do período'
-              : '  Aguardando consulta'}
-          </strong>
-          <span>
-            {loadingInitial
-              ? 'Carregando comissões...'
-              : hasSearched && comissoes.length > 0
-                ? `Exibindo ${comissoes.length} comissão(ões)${totalRegistros > comissoes.length ? ` de ${totalRegistros}` : ''}`
-                : hasSearched && comissoes.length === 0
-                  ? 'Nenhuma comissão encontrada para os filtros selecionados'
-                  : 'Utilize os filtros abaixo para consultar comissões'}
-          </span>
-        </div>
-      </InfoBanner>
-
-      <SummaryCards
-        totals={totals}
-        count={comissoes.length}
-        isUsingFilteredData={isUsingFilteredData}
-        hasSearched={hasSearched}
-      />
 
       {/*
         Layout principal: a coluna da esquerda concentra o fluxo de consulta
@@ -209,7 +173,7 @@ export default function Comissoes() {
         </Sidebar>
       </PageLayout>
 
-      <PreviewModalDetails open={previewOpen} data={previewData} onClose={closePreview} />
+      <PreviewModalDetails open={previewOpen} data={previewData} onClose={closePreview} onEmitir={emitirDocumento} loading={loading} />
     </Container>
   );
 }
