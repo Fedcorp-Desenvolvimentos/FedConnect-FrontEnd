@@ -68,10 +68,6 @@ export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) 
         <ModalBody>
           <DocMetaGrid>
             <div>
-              <span>Período de corte</span>
-              <strong>{data.dataCorteFormatada}</strong>
-            </div>
-            <div>
               <span>Data de emissão</span>
               <strong>{formatDateTime(data.dataEmissao)}</strong>
             </div>
@@ -108,7 +104,7 @@ export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) 
                   {formatDate(c.vencimento)}
                 </div>
 
-                <div className="money-cell">{formatMoney(c.valorComissao)}</div>
+                <div className="money-cell">{formatMoney(c.valor_comissao)}</div>
               </DocTableRow>
             ))}
           </DocTable>
@@ -140,14 +136,6 @@ export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) 
               <strong>{formatMoney(data.valorLiquido)}</strong>
             </div>
           </DocSummary>
-
-          <RawDataToggle as="details">
-            <summary>
-              <FaChevronRight size={10} />
-              Ver dados brutos recebidos da API (Resposta V2)
-            </summary>
-            <pre>{JSON.stringify(data.registrosBrutos, null, 2)}</pre>
-          </RawDataToggle>
         </ModalBody>
 
         <ModalFooter>

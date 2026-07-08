@@ -58,7 +58,6 @@ export default function Comissoes() {
     closePreview,
     isUsingFilteredData,
     hasActiveFilters,
-    cancelarComissao,
   } = useEmissaoRecibos();
 
   const canIssue = selectedComissoes.size > 0;
@@ -167,7 +166,6 @@ export default function Comissoes() {
             totals={retentionSummary}
             onDocumentTypeChange={setDocumentType}
             onEmitir={emitirDocumento}
-            onCancel={cancelarComissao}
             onPreview={previewDocument}
             onSair={() => navigate('/')}
             selectedComissoes={selectedComissoes}
