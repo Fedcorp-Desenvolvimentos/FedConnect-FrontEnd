@@ -105,6 +105,86 @@ export const buscarComissoesPorDataCorte = async (dataCorte, filtros = {}) => {
 };
 
 /**
+ * ROTA: /comissoes/consultar/
+ * Consulta comissões com voucher emitido (histórico)
+ */
+export const consultarComissoes = async (filtros = {}) => {
+  try {
+    const params = new URLSearchParams();
+    
+    Object.keys(filtros).forEach(key => {
+      const value = filtros[key];
+      if (value !== null && value !== undefined && value !== '' && value !== 'null') {
+        params.append(key, String(value));
+      }
+    });
+
+    const url = `/comissoes/consultar/?${params.toString()}`;
+    
+    const response = await api.get(url);
+    const result = response.data;
+
+    if (result.sucesso === false) {
+      throw new Error(result.erro || "Erro ao consultar comissões");
+    }
+
+    const dados = result.dados || result;
+    
+    let lista = [];
+    if (dados.data && Array.isArray(dados.data)) {
+      lista = dados.data;
+    } else if (Array.isArray(dados)) {
+      lista = dados;
+    }
+    
+    const total = dados.total_registros || lista.length;
+
+    return {
+      sucesso: true,
+      dados: {
+        data: lista,
+        total_registros: total,
+        status: dados.status || "success",
+        filtros_aplicados: result.filtros_aplicados || dados.filtros_aplicados || {}
+      }
+    };
+
+  } catch (error) {
+    console.error('Erro ao consultar comissões:', error);
+    
+    let errorMessage = error.message || "Erro ao consultar comissões";
+    if (error.response?.data) {
+      const data = error.response.data;
+      if (data.erro) errorMessage = data.erro;
+      else if (data.message) errorMessage = data.message;
+      else if (data.detail) errorMessage = data.detail;
+    }
+    
+    throw new Error(errorMessage);
+  }
+};
+
+/**
+ * ROTA: /comissoes/produtos-por-favorecido/
+ * Busca produtos distintos para um favorecido
+ */
+export const buscarProdutosPorFavorecido = async (favorecido) => {
+  try {
+    const response = await api.get(`/comissoes/produtos-por-favorecido/?favorecido=${favorecido}`);
+    const result = response.data;
+
+    if (result.sucesso === false) {
+      throw new Error(result.erro || "Erro ao buscar produtos");
+    }
+
+    return result.produtos || [];
+  } catch (error) {
+    console.error('Erro ao buscar produtos por favorecido:', error);
+    return [];
+  }
+};
+
+/**
  * ROTA: /consultas/faturamento/
  * NUNCA usa /comissoes/faturas/
  */

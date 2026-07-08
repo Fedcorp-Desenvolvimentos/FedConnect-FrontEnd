@@ -2,8 +2,9 @@ import { useState, useCallback, useEffect } from 'react';
 import { useSnackbar } from 'notistack';
 import { useLoading } from '../../../../hooks/useLoading';
 import {
-  buscarComissoesPorDataCorte,
+  consultarComissoes,
   buscarPessoas,
+  buscarProdutosPorFavorecido,
   cancelarComissaoApi,
 } from '../../../../services/comissoesService';
 
@@ -11,6 +12,9 @@ const INITIAL_FILTERS = {
   favorecido: '',
   fatura: '',
   voucher: '',
+  produto: '',
+  vigencia_inicial: '',
+  vigencia_final: '',
 };
 
 const SIMULAR_CANCELAMENTO = true;
@@ -22,11 +26,6 @@ const getComissaoKey = (c) => {
   const parcela = c.PARCELA ?? '1';
   const valor = Number(c.VALOR ?? 0).toFixed(2);
   return [documento, favor, tipo, parcela, valor].join('|');
-};
-
-const getCurrentMonthDate = () => {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
 };
 
 const normalizeFilters = (filters) => {
@@ -47,6 +46,7 @@ export const useConsultaComissao = () => {
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [comissoes, setComissoes] = useState([]);
   const [pessoas, setPessoas] = useState([]);
+  const [produtos, setProdutos] = useState([]);
   const [selectedKeys, setSelectedKeys] = useState(new Set());
   const [hasSearched, setHasSearched] = useState(false);
   const [totalRegistros, setTotalRegistros] = useState(0);
@@ -71,13 +71,21 @@ export const useConsultaComissao = () => {
     loadPessoas();
   }, [enqueueSnackbar]);
 
+  useEffect(() => {
+    if (filters.favorecido) {
+      buscarProdutosPorFavorecido(filters.favorecido).then(setProdutos);
+    } else {
+      setProdutos([]);
+    }
+  }, [filters.favorecido]);
+
   const buscar = useCallback(async () => {
     const filtrosLimpos = normalizeFilters(filters);
     setHasSearched(true);
 
     try {
       const result = await withLoading(
-        async () => buscarComissoesPorDataCorte(getCurrentMonthDate(), filtrosLimpos),
+        async () => consultarComissoes(filtrosLimpos),
         'Buscando comissões...'
       );
 
@@ -188,6 +196,7 @@ export const useConsultaComissao = () => {
     filters,
     comissoes,
     pessoas,
+    produtos,
     selectedKeys,
     hasSearched,
     totalRegistros,

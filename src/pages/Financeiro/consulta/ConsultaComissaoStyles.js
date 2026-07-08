@@ -237,7 +237,7 @@ export const Table = styled.div`
 
 export const TableHead = styled.div`
   display: grid;
-  grid-template-columns: 36px 2fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 36px 2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   gap: 8px;
   padding: 10px 14px;
   background: #f4f6f9;
@@ -255,7 +255,7 @@ export const TableHead = styled.div`
 
 export const TableRow = styled.div`
   display: grid;
-  grid-template-columns: 36px 2fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 36px 2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   gap: 8px;
   padding: 11px 14px;
   border-top: 1px solid #e6ebf1;

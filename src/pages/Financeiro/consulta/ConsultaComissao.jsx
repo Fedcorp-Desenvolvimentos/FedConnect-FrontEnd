@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaArrowLeft, FaSearch, FaEraser, FaSpinner, FaTrashAlt, FaFileInvoiceDollar } from 'react-icons/fa';
+import { FaArrowLeft, FaSearch, FaEraser, FaSpinner, FaTrashAlt, FaFileInvoiceDollar, FaCalendarAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { PessoaSelect } from '../comissoes/components/PessoaSelect';
 import { useConsultaComissao } from './hooks/useConsultaComissao';
@@ -26,6 +26,7 @@ const ConsultaComissao = () => {
     filters,
     comissoes,
     pessoas,
+    produtos,
     selectedKeys,
     hasSearched,
     totalRegistros,
@@ -113,6 +114,38 @@ const ConsultaComissao = () => {
               placeholder="Número do voucher"
             />
           </S.FormGroup>
+
+          <S.FormGroup>
+            <span>Produto</span>
+            <select
+              value={filters.produto || ''}
+              onChange={(e) => updateFilter('produto', e.target.value)}
+              disabled={!filters.favorecido || produtos.length === 0}
+            >
+              <option value="">Todos os produtos</option>
+              {produtos.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </S.FormGroup>
+
+          <S.FormGroup>
+            <span><FaCalendarAlt /> Vigência início</span>
+            <input
+              type="date"
+              value={filters.vigencia_inicial || ''}
+              onChange={(e) => updateFilter('vigencia_inicial', e.target.value)}
+            />
+          </S.FormGroup>
+
+          <S.FormGroup>
+            <span><FaCalendarAlt /> Vigência fim</span>
+            <input
+              type="date"
+              value={filters.vigencia_final || ''}
+              onChange={(e) => updateFilter('vigencia_final', e.target.value)}
+            />
+          </S.FormGroup>
         </S.FormGrid>
 
         <S.Actions>
@@ -171,6 +204,7 @@ const ConsultaComissao = () => {
               <span>Parcela</span>
               <span>Valor</span>
               <span>Vencimento</span>
+              <span>Vigência</span>
               <span>Voucher</span>
               <span>Status</span>
             </S.TableHead>
@@ -209,6 +243,7 @@ const ConsultaComissao = () => {
                   <div><S.CellLabel>Parcela </S.CellLabel>{parcela}</div>
                   <div><S.CellLabel>Valor </S.CellLabel><S.MoneyCell>{formatMoney(valor)}</S.MoneyCell></div>
                   <div><S.CellLabel>Vencimento </S.CellLabel>{formatDate(vencimento)}</div>
+                  <div><S.CellLabel>Vigência </S.CellLabel>{formatDate(c.DT_INI_VIG || c.dt_ini_vig)}</div>
                   <div>
                     <S.CellLabel>Voucher </S.CellLabel>
                     {temVoucher ? (
