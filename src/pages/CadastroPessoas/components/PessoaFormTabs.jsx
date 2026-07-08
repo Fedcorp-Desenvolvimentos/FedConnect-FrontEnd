@@ -46,7 +46,6 @@ const TabButton = styled.button`
 
 const PessoaFormTabs = ({ activeTab, onTabChange, tabs }) => {
   const getTabLabel = (tab) => {
-    // Mapeia as chaves para nomes amigáveis
     const labels = {
       identificacao: 'Identificação',
       endereco: 'Endereço',

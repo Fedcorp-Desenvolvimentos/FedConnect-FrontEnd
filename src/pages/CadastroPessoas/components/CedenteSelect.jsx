@@ -1,5 +1,3 @@
-// src/pages/CadastrosGerais/components/CedenteSelect.jsx
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
@@ -10,7 +8,6 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
   const [searchInput, setSearchInput] = useState('');
   const { cedentes, loading, buscarCedentesPorNome, carregarCedentes } = useCedentes();
 
-  // Carrega cedentes quando abre o dropdown
   const handleOpen = useCallback(async () => {
     setIsOpen(true);
     if (cedentes.length === 0) {
@@ -18,12 +15,10 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
     }
   }, [cedentes.length, carregarCedentes]);
 
-  // Fecha dropdown
   const handleClose = () => {
     setIsOpen(false);
   };
 
-  // Busca ao digitar (com debounce)
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchInput.length >= 2) {
@@ -36,7 +31,6 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
     return () => clearTimeout(timer);
   }, [searchInput, buscarCedentesPorNome, carregarCedentes]);
 
-  // Seleciona um cedente
   const handleSelectCedente = (cedente) => {
     const nomeCedente = cedente.cedente || '';
     onChange({
@@ -45,7 +39,6 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
         value: nomeCedente
       }
     });
-    // Callback para passar o objeto completo se necessário
     if (onCedenteSelecionado) {
       onCedenteSelecionado(cedente);
     }
@@ -53,7 +46,6 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
     setIsOpen(false);
   };
 
-  // Limpa seleção
   const handleClear = () => {
     onChange({
       target: {
@@ -99,7 +91,6 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
           </S.IconSquareButton>
         </S.InputWithButton>
 
-        {/* Dropdown de resultados */}
         {isOpen && !disabled && (
           <div
             style={{

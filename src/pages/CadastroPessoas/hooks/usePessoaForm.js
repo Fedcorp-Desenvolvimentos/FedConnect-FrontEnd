@@ -1,26 +1,11 @@
 import { useState, useCallback, useMemo } from 'react';
 import { criarPessoa } from '../../../services/pessoaService';
 
-export const CATEGORIAS_DISPONIVEIS = [
-  'ADMINISTRADORA',
-  'IMOBILIARIA',
-  'CONDOMINIO',
-  'CORRETOR(A)',
-  'PRODUTOR (PF)',
-  'TERCEIRIZADA',
-  'PF FATURADO',
-  'FORNECEDOR',
-  'FUNCIONARIO'
-];
-
 const todayISO = () => new Date().toISOString().split('T')[0];
 
 const INITIAL_STATE = {
   codigo: '',
   nome: '',
-  nivel: '5',
-  fiscal: 'MATR',
-  agente: 'CORP',
   tipo: 'juridica',
   cpf_cnpj: '',
   sexo: 'masculino',
@@ -34,44 +19,44 @@ const INITIAL_STATE = {
   logradouro: '',
   complemento: '',
 
-  telefone1_ddd: '',
-  telefone1_numero: '',
-  telefone2_ddd: '',
-  telefone2_numero: '',
-
+  // Dados Bancários
   banco: '',
   agencia: '',
   conta: '',
   favorecido: '',
-
-  email: '',
   chave_pix: '',
 
+  // Contato
+  telefone1_ddd: '',
+  telefone1_numero: '',
+  telefone2_ddd: '',
+  telefone2_numero: '',
+  email: '',
   observacoes: '',
   contato: '',
 
-  abreviacao: '',
+  // Configurações
   emite_nota_fiscal: false,
   melhor_dia_pagamento: '',
-  logo: null,
-  logo_preview: null,
-
   cedente: '',
   comercial: '',
-
   possui_portal: false,
   portal: '',
 
+  // Agenciamento
   agenciador: false,
   percentual_agenciamento: '',
   impostos: '',
   optante_simples: false,
-
   prestador_servicos: false,
   credenciado: '',
   codigo_credenciado: '',
 
-  categorias: []
+  comissao: '',
+  produto: 'individual',
+
+  // ✅ Categoria agora é string (select)
+  categoria: ''
 };
 
 // Mock inicial
@@ -82,14 +67,14 @@ const MOCK_PESSOAS = [
     tipo: 'juridica',
     cpf_cnpj: '39914151000190',
     endereco: 'RUA BARAO DO FLAMENGO, 22 SALA 501',
-    nivel: '5',
-    fiscal: 'MATR',
-    agente: 'CORP',
     banco: 'NU PAGAMENTOS',
     agencia: '0001',
     conta: '70586169-7',
     favorecido: '2L ASSESSORIA ADM E FINANCEIRA L',
-    categorias: ['PRODUTOR (PF)']
+    chave_pix: '39914151000190',
+    comissao: '5.00',
+    produto: 'individual',
+    categoria: 'PRODUTOR (PF)'
   },
   {
     codigo: '0000000002',
@@ -97,10 +82,14 @@ const MOCK_PESSOAS = [
     tipo: 'juridica',
     cpf_cnpj: '68613678000183',
     endereco: 'RUA DA ASSEMBLEIA, 58 / 13 ANDAR',
-    nivel: '4',
-    fiscal: 'MATR',
-    agente: 'CORP',
-    categorias: ['ADMINISTRADORA']
+    banco: '341 - Itaú',
+    agencia: '1234',
+    conta: '56789-0',
+    favorecido: 'AMBIENTE ADMINISTRACAO',
+    chave_pix: '68613678000183',
+    comissao: '3.50',
+    produto: 'coletivo',
+    categoria: 'ADMINISTRADORA'
   },
   {
     codigo: '0000000003',
@@ -108,10 +97,14 @@ const MOCK_PESSOAS = [
     tipo: 'juridica',
     cpf_cnpj: '40314403000120',
     endereco: 'AV. FRANKLIN ROOSEVELT, 39/SL. 1505',
-    nivel: '4',
-    fiscal: 'MATR',
-    agente: 'CORP',
-    categorias: ['TERCEIRIZADA']
+    banco: '237 - Bradesco',
+    agencia: '5678',
+    conta: '12345-6',
+    favorecido: 'CCY CONSULTORIA',
+    chave_pix: '40314403000120',
+    comissao: '4.00',
+    produto: 'individual',
+    categoria: 'TERCEIRIZADA'
   },
   {
     codigo: '0000000004',
@@ -119,10 +112,14 @@ const MOCK_PESSOAS = [
     tipo: 'juridica',
     cpf_cnpj: '33519497000108',
     endereco: 'AV. DAS AMERICAS, 500/BL.16-SL.223/2',
-    nivel: '4',
-    fiscal: 'MATR',
-    agente: 'CORP',
-    categorias: ['CONDOMINIO']
+    banco: '104 - Caixa Econômica Federal',
+    agencia: '9012',
+    conta: '34567-8',
+    favorecido: 'SECAL ALGARVIA',
+    chave_pix: '33519497000108',
+    comissao: '2.75',
+    produto: 'coletivo',
+    categoria: 'CONDOMINIO'
   },
   {
     codigo: '0000000005',
@@ -130,10 +127,14 @@ const MOCK_PESSOAS = [
     tipo: 'juridica',
     cpf_cnpj: '30314330000112',
     endereco: 'R. CAMBAUBA, 803/GR. 201',
-    nivel: '4',
-    fiscal: 'MATR',
-    agente: 'CORP',
-    categorias: ['FORNECEDOR']
+    banco: '001 - Banco do Brasil',
+    agencia: '3456',
+    conta: '78901-2',
+    favorecido: 'CONCORDE ASSESSORIA',
+    chave_pix: '30314330000112',
+    comissao: '6.00',
+    produto: 'individual',
+    categoria: 'FORNECEDOR'
   }
 ].map(p => ({ ...INITIAL_STATE, ...p }));
 
@@ -171,14 +172,6 @@ export const usePessoaForm = (isNewMode = false) => {
         [name]: type === 'checkbox' ? checked : type === 'file' ? files?.[0] || null : value
       }));
 
-      if (type === 'file' && files?.[0]) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          setFormData(prev => ({ ...prev, logo_preview: reader.result }));
-        };
-        reader.readAsDataURL(files[0]);
-      }
-
       if (errors[name]) {
         setErrors(prev => ({ ...prev, [name]: '' }));
       }
@@ -186,21 +179,7 @@ export const usePessoaForm = (isNewMode = false) => {
     [errors]
   );
 
-  const toggleCategoria = useCallback(categoria => {
-    setFormData(prev => {
-      const has = prev.categorias.includes(categoria);
-      return {
-        ...prev,
-        categorias: has
-          ? prev.categorias.filter(c => c !== categoria)
-          : [...prev.categorias, categoria]
-      };
-    });
-  }, []);
-
-  const applyCategorias = useCallback(() => {
-    return true;
-  }, []);
+  // ✅ REMOVIDO: toggleCategoria e applyCategorias (não são mais necessários com select)
 
   const preencherEndereco = useCallback(dadosCep => {
     setFormData(prev => ({
@@ -219,9 +198,23 @@ export const usePessoaForm = (isNewMode = false) => {
     if (!formData.nome?.trim()) {
       newErrors.nome = 'Nome é obrigatório';
     }
+
     if (!formData.cpf_cnpj?.trim()) {
       newErrors.cpf_cnpj = formData.tipo === 'juridica' ? 'CNPJ é obrigatório' : 'CPF é obrigatório';
     }
+
+    // ✅ Categoria obrigatória (agora é string)
+    if (!formData.categoria) {
+      newErrors.categoria = 'Selecione uma categoria';
+    }
+
+    // Comissão obrigatória
+    if (!formData.comissao && formData.comissao !== 0) {
+      newErrors.comissao = 'Comissão é obrigatória';
+    } else if (formData.comissao && (isNaN(formData.comissao) || parseFloat(formData.comissao) < 0)) {
+      newErrors.comissao = 'Comissão deve ser um número válido';
+    }
+
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'E-mail inválido';
     }
@@ -286,21 +279,12 @@ export const usePessoaForm = (isNewMode = false) => {
     try {
       const payload = { ...formData };
 
-      // Remove o logo_preview para não enviar base64 grande, mantém apenas o arquivo
-      const { logo_preview, logo, ...cleanPayload } = payload;
-      const finalPayload = {
-        ...cleanPayload,
-        logo: logo ? logo.name : null
-      };
-
       try {
-        await criarPessoa(finalPayload);
+        await criarPessoa(payload);
       } catch (error) {
         console.error("Erro ao criar pessoa:", error);
         return { success: false, error };
       }
-
-      // console.log('📦 Payload Cadastro de Pessoas:', JSON.stringify(finalPayload, null, 2));
 
       setPessoas(prev => {
         const exists = prev.some(p => p.codigo === payload.codigo);
@@ -337,8 +321,6 @@ export const usePessoaForm = (isNewMode = false) => {
     canCancelar,
     canLimpar,
     updateField,
-    toggleCategoria,
-    applyCategorias,
     preencherEndereco,
     startNew,
     startEdit,

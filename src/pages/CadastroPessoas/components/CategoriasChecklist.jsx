@@ -3,13 +3,11 @@ import { FaCheckDouble, FaEllipsisH } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
 import { CATEGORIAS_DISPONIVEIS } from '../hooks/usePessoaForm';
 
-const CategoriasChecklist = ({ categoriasSelecionadas, onToggle, onAplicar, disabled }) => {
+const CategoriasChecklist = ({ categoriasSelecionadas, onToggle, onAplicar, disabled, error }) => {
   return (
     <S.FormGroup $flex="1 1 100%">
-      <S.FormLabel>Categorias</S.FormLabel>
-
       <S.InputWithButton>
-        <S.ChecklistBox>
+        <S.ChecklistBox $error={error}>
           {CATEGORIAS_DISPONIVEIS.map(categoria => (
             <S.ChecklistItem key={categoria} disabled={disabled}>
               <input
@@ -33,6 +31,7 @@ const CategoriasChecklist = ({ categoriasSelecionadas, onToggle, onAplicar, disa
           <FaCheckDouble /> Aplicar
         </S.SecondaryButton>
       </S.ChecklistFooter>
+      {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
     </S.FormGroup>
   );
 };

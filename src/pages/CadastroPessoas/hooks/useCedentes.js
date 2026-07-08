@@ -1,5 +1,3 @@
-// src/pages/CadastrosGerais/hooks/useCedentes.js
-
 import { useState, useEffect, useCallback } from 'react';
 import { pessoaService } from '../../../services/cedenteService';
 
@@ -8,7 +6,6 @@ export const useCedentes = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Busca todos os cedentes (inicial)
   const carregarCedentes = useCallback(async () => {
     setLoading(true);
     try {
@@ -26,10 +23,8 @@ export const useCedentes = () => {
     }
   }, []);
 
-  // Busca cedentes por nome (autocomplete)
   const buscarCedentesPorNome = useCallback(async (nome) => {
     if (!nome || nome.length < 2) {
-      // Se não tem termo, carrega todos
       return carregarCedentes();
     }
     
@@ -49,7 +44,6 @@ export const useCedentes = () => {
     }
   }, [carregarCedentes]);
 
-  // Carregar automaticamente na montagem
   useEffect(() => {
     carregarCedentes();
   }, [carregarCedentes]);

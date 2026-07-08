@@ -39,8 +39,6 @@ const CadastroPessoas = ({ onExit }) => {
     canCancelar,
     canLimpar,
     updateField,
-    toggleCategoria,
-    applyCategorias,
     preencherEndereco,
     startEdit,
     cancelAction,
@@ -78,11 +76,6 @@ const CadastroPessoas = ({ onExit }) => {
     }
   };
 
-  const handleAplicarCategorias = () => {
-    applyCategorias();
-    enqueueSnackbar('Categorias aplicadas', { variant: 'success' });
-  };
-
   const handleBuscarCep = async () => {
     const cep = formData.cep?.replace(/\D/g, '');
     if (!cep || cep.length !== 8) {
@@ -108,6 +101,18 @@ const CadastroPessoas = ({ onExit }) => {
 
   const handleSubmit = async e => {
     e.preventDefault();
+
+    // Validação para categoria (agora é string)
+    if (!formData.categoria) {
+      enqueueSnackbar('⚠️ Selecione uma categoria', { variant: 'warning' });
+      return;
+    }
+
+    // Validação para comissão
+    if (!formData.comissao && formData.comissao !== 0) {
+      enqueueSnackbar('⚠️ Comissão é obrigatória', { variant: 'warning' });
+      return;
+    }
 
     const { success } = await save();
 
@@ -199,8 +204,6 @@ const CadastroPessoas = ({ onExit }) => {
                 errors={errors}
                 disabled={false}
                 onChange={updateField}
-                onToggleCategoria={toggleCategoria}
-                onAplicarCategorias={handleAplicarCategorias}
                 onBuscarCep={handleBuscarCep}
                 activeTab={activeTab}
               />
