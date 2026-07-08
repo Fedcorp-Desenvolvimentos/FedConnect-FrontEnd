@@ -6,6 +6,8 @@ export const useCedentes = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
+  console.log("useCedentes Hook - Cedentes:", cedentes);
+
   const carregarCedentes = useCallback(async () => {
     setLoading(true);
     try {

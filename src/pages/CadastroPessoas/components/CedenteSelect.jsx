@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
 import { useCedentes } from '../hooks/useCedentes';
@@ -7,6 +7,13 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
   const [isOpen, setIsOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const { cedentes, loading, buscarCedentesPorNome, carregarCedentes } = useCedentes();
+
+  const selectedCedente = useMemo(() => {
+    if (!value) return null;
+    return cedentes.find((item) => String(item.codigo) === String(value)) || null;
+  }, [cedentes, value]);
+
+  const displayValue = searchInput || selectedCedente?.cedente || value || '';
 
   const handleOpen = useCallback(async () => {
     setIsOpen(true);
@@ -32,11 +39,12 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
   }, [searchInput, buscarCedentesPorNome, carregarCedentes]);
 
   const handleSelectCedente = (cedente) => {
+    const codigoCedente = cedente.codigo ? String(cedente.codigo) : '';
     const nomeCedente = cedente.cedente || '';
     onChange({
       target: {
         name: 'cedente',
-        value: nomeCedente
+        value: codigoCedente
       }
     });
     if (onCedenteSelecionado) {
@@ -64,7 +72,7 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
         <S.InputWithButton>
           <S.FormInput
             type="text"
-            value={searchInput || value || ''}
+            value={displayValue}
             onChange={(e) => setSearchInput(e.target.value)}
             onFocus={handleOpen}
             disabled={disabled}

@@ -242,7 +242,7 @@ const PessoaFormFields = ({
           </S.FormRow>
 
           <S.FormRow>
-            <S.FormGroup $flex="0 1 175px">
+            <S.FormGroup $flex="0 1 220px">
               <S.FormLabel>DDD / Telefone</S.FormLabel>
               <S.PhoneGroup>
                 <S.FormInput
@@ -264,7 +264,7 @@ const PessoaFormFields = ({
               </S.PhoneGroup>
             </S.FormGroup>
 
-            <S.FormGroup $flex="0 1 175px">
+            <S.FormGroup $flex="0 1 220px">
               <S.FormLabel>DDD / Celular</S.FormLabel>
               <S.PhoneGroup>
                 <S.FormInput

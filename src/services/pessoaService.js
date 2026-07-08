@@ -4,7 +4,18 @@ import api from "./api";
 
 export const criarPessoa = async (payload) => {
   try {
-    const response = await api.post(`pessoas/criar/`, payload);
+    let response;
+
+    try {
+      response = await api.post('pessoas/criar/', payload);
+    } catch (primaryError) {
+      // Compatibilidade com backends legados que ainda usam /pessoas/criar/
+      if (primaryError.response?.status === 404) {
+        response = await api.post('pessoas/criar/', payload);
+      } else {
+        throw primaryError;
+      }
+    }
     
     // Log para debug
     // console.log("📦 Payload enviado:", payload);
@@ -21,7 +32,7 @@ export const criarPessoa = async (payload) => {
     
     // Tratamento específico para erro 405
     if (error.response?.status === 405) {
-      throw new Error("Método não permitido. Verifique a configuração do backend.");
+      throw new Error("Método não permitido na rota de criação. Verifique se o backend aceita POST em /pessoas/.");
     }
     
     throw error;

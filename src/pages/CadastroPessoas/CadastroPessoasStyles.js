@@ -221,7 +221,7 @@ export const PhoneGroup = styled.div`
   gap: 0.4rem;
 
   > *:first-child {
-    flex: 0 1 68px;
+    flex: 0 1 76px;
   }
 
   > *:last-child {
