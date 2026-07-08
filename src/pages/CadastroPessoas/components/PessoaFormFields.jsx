@@ -1,7 +1,6 @@
 import React from 'react';
-import { FaSearch, FaGlobe, FaFolderOpen, FaImage } from 'react-icons/fa';
+import { FaSearch, FaGlobe } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
-import CategoriasChecklist from './CategoriasChecklist';
 import CedenteSelect from './CedenteSelect';
 
 const ESTADOS = [
@@ -23,13 +22,26 @@ const BANCOS = [
   'SICREDI',
 ];
 
+// ✅ CATEGORIAS para o Select
+const CATEGORIAS_OPCOES = [
+  'ADMINISTRADORA',
+  'IMOBILIARIA',
+  'CONDOMINIO',
+  'CORRETOR(A)',
+  'PRODUTOR (PF)',
+  'TERCEIRIZADA',
+  'PF FATURADO',
+  'FORNECEDOR',
+  'FUNCIONARIO'
+];
+
 const SECTION_VISIBILITY = {
   identificacao: ['identificacao'],
   endereco: ['endereco'],
   bancario: ['bancario'],
   contato: ['contato'],
   configuracoes: ['configuracoes'],
-  agenciamento: ['agenciamento', 'prestador'],
+  agenciamento: ['agenciamento', 'prestador', 'comissao'],
 };
 
 const isSectionVisible = (activeTab, sectionName) => {
@@ -65,45 +77,12 @@ const PessoaFormFields = ({
               <S.FormInput type="text" name="codigo" value={data.codigo} disabled readOnly />
             </S.FormGroup>
 
-            <S.FormGroup $flex="0 1 160px">
-              <S.FormLabel>Nível</S.FormLabel>
-              <S.FormInput
-                type="text"
-                name="nivel"
-                value={data.nivel || '5'}
-                onChange={onChange}
-                disabled={disabled}
-              />
-            </S.FormGroup>
-
-            <S.FormGroup $flex="0 1 160px">
-              <S.FormLabel>Código Fiscal</S.FormLabel>
-              <S.FormInput
-                type="text"
-                name="fiscal"
-                value={data.fiscal || 'MATR'}
-                onChange={onChange}
-                disabled={disabled}
-              />
-            </S.FormGroup>
-
-            <S.FormGroup $flex="0 1 170px">
+            <S.FormGroup $flex="0 1 200px">
               <S.FormLabel>Dt. Cadastro</S.FormLabel>
               <S.FormInput
                 type="date"
                 name="data_cadastro"
                 value={data.data_cadastro}
-                onChange={onChange}
-                disabled={disabled}
-              />
-            </S.FormGroup>
-
-            <S.FormGroup $flex="0 1 160px">
-              <S.FormLabel>Agente</S.FormLabel>
-              <S.FormInput
-                type="text"
-                name="agente"
-                value={data.agente || 'CORP'}
                 onChange={onChange}
                 disabled={disabled}
               />
@@ -160,6 +139,28 @@ const PessoaFormFields = ({
                 <option value="feminino">Feminino</option>
                 <option value="nao_informado">Não informado</option>
               </S.FormSelect>
+            </S.FormGroup>
+          </S.FormRow>
+
+          {/* ✅ CATEGORIA AGORA É UM SELECT (dropdown) */}
+          <S.FormRow>
+            <S.FormGroup $flex="1 1 320px">
+              <S.FormLabel>
+                Categoria <span className="required">*</span>
+              </S.FormLabel>
+              <S.FormSelect
+                name="categoria"
+                value={data.categoria || ''}
+                onChange={onChange}
+                disabled={disabled}
+                $error={errors.categoria}
+              >
+                <option value="">Selecione uma categoria</option>
+                {CATEGORIAS_OPCOES.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </S.FormSelect>
+              {errors.categoria && <S.ErrorMessage>{errors.categoria}</S.ErrorMessage>}
             </S.FormGroup>
           </S.FormRow>
         </S.Section>
@@ -241,7 +242,7 @@ const PessoaFormFields = ({
           </S.FormRow>
 
           <S.FormRow>
-            <S.FormGroup $flex="0 1 130px">
+            <S.FormGroup $flex="0 1 175px">
               <S.FormLabel>DDD / Telefone</S.FormLabel>
               <S.PhoneGroup>
                 <S.FormInput
@@ -263,7 +264,7 @@ const PessoaFormFields = ({
               </S.PhoneGroup>
             </S.FormGroup>
 
-            <S.FormGroup $flex="0 1 130px">
+            <S.FormGroup $flex="0 1 175px">
               <S.FormLabel>DDD / Celular</S.FormLabel>
               <S.PhoneGroup>
                 <S.FormInput
@@ -353,6 +354,21 @@ const PessoaFormFields = ({
               />
             </S.FormGroup>
           </S.FormRow>
+
+          {/* Chave Pix */}
+          <S.FormRow>
+            <S.FormGroup $flex="1 1 280px">
+              <S.FormLabel>Chave Pix</S.FormLabel>
+              <S.FormInput
+                type="text"
+                name="chave_pix"
+                value={data.chave_pix}
+                onChange={onChange}
+                disabled={disabled}
+                placeholder="CPF, E-mail, Telefone ou chave aleatória"
+              />
+            </S.FormGroup>
+          </S.FormRow>
         </S.Section>
       ))}
 
@@ -374,17 +390,6 @@ const PessoaFormFields = ({
                 placeholder="contato@empresa.com.br"
               />
               {errors.email && <S.ErrorMessage>{errors.email}</S.ErrorMessage>}
-            </S.FormGroup>
-
-            <S.FormGroup $flex="1 1 220px">
-              <S.FormLabel>Chave Pix</S.FormLabel>
-              <S.FormInput
-                type="text"
-                name="chave_pix"
-                value={data.chave_pix}
-                onChange={onChange}
-                disabled={disabled}
-              />
             </S.FormGroup>
           </S.FormRow>
 
@@ -420,20 +425,7 @@ const PessoaFormFields = ({
         <S.Section disabled={disabled}>
           <S.SectionTitle>Configurações</S.SectionTitle>
 
-          {/* Linha 1: Configurações Gerais */}
           <S.FormRow>
-            <S.FormGroup $flex="0 1 160px">
-              <S.FormLabel>Abreviação</S.FormLabel>
-              <S.FormInput
-                type="text"
-                name="abreviacao"
-                value={data.abreviacao}
-                onChange={onChange}
-                disabled={disabled}
-                placeholder="Sigla"
-              />
-            </S.FormGroup>
-
             <S.FormGroup $flex="0 1 200px">
               <S.FormLabel>Melhor Dia Pgto.</S.FormLabel>
               <S.FormInput
@@ -463,37 +455,6 @@ const PessoaFormFields = ({
             </S.FormGroup>
           </S.FormRow>
 
-          {/* Linha 2: Logo */}
-          <S.FormRow>
-            <S.FormGroup $flex="1 1 100%">
-              <S.FormLabel>Logo</S.FormLabel>
-              <S.LogoBox>
-                <S.LogoPreview>
-                  {data.logo_preview ? (
-                    <img src={data.logo_preview} alt="Logo" />
-                  ) : (
-                    <FaImage />
-                  )}
-                </S.LogoPreview>
-                <S.IconSquareButton as="label" title="Selecionar logo" disabled={disabled}>
-                  <FaFolderOpen />
-                  <input
-                    type="file"
-                    name="logo"
-                    accept="image/*"
-                    onChange={onChange}
-                    disabled={disabled}
-                    style={{ display: 'none' }}
-                  />
-                </S.IconSquareButton>
-                <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                  {data.logo ? data.logo.name : 'Nenhum arquivo selecionado'}
-                </span>
-              </S.LogoBox>
-            </S.FormGroup>
-          </S.FormRow>
-
-          {/* Linha 3: Relacionamento */}
           <S.FormRow>
             <S.FormGroup $flex="1 1 260px">
               <CedenteSelect
@@ -503,13 +464,11 @@ const PessoaFormFields = ({
                 error={errors.cedente}
                 onCedenteSelecionado={(cedente) => {
                   // Opcional: preencher outros campos automaticamente
-                  // console.log('Cedente selecionado:', cedente);
                 }}
               />
             </S.FormGroup>
           </S.FormRow>
 
-          {/* Linha 4: Portal */}
           <S.FormRow>
             <S.FormGroup $flex="1 1 100%">
               <S.CheckboxWrapper disabled={disabled}>
@@ -653,14 +612,38 @@ const PessoaFormFields = ({
                 />
               </S.FormGroup>
             </S.FormRow>
+          </S.Section>
 
+          {/* Comissão + Produto */}
+          <S.Section disabled={disabled}>
+            <S.SectionTitle>Comissão e Produto</S.SectionTitle>
             <S.FormRow>
-              <CategoriasChecklist
-                categoriasSelecionadas={data.categorias}
-                onToggle={onToggleCategoria}
-                onAplicar={onAplicarCategorias}
-                disabled={disabled}
-              />
+              <S.FormGroup $flex="0 1 250px">
+                <S.FormLabel>
+                  Comissão (%) <span className="required">*</span>
+                </S.FormLabel>
+                <S.FormInput
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  name="comissao"
+                  value={data.comissao}
+                  onChange={onChange}
+                  disabled={disabled}
+                  $error={errors.comissao}
+                  placeholder="0,00"
+                />
+                {errors.comissao && <S.ErrorMessage>{errors.comissao}</S.ErrorMessage>}
+              </S.FormGroup>
+
+              <S.FormGroup $flex="0 1 250px">
+                <S.FormLabel>Produto</S.FormLabel>
+                <S.FormSelect name="produto" value={data.produto} onChange={onChange} disabled={disabled}>
+                  <option value="individual">Individual</option>
+                  <option value="coletivo">Coletivo</option>
+                </S.FormSelect>
+              </S.FormGroup>
             </S.FormRow>
           </S.Section>
         </>
