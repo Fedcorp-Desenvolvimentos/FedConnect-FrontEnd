@@ -6,6 +6,7 @@ import { PessoaSelect } from './PessoaSelect';
 export const FilterForm = ({
   filters,
   pessoas,
+  produtos,
   loading,
   showAdvanced,
   onFilterChange,
@@ -69,6 +70,20 @@ export const FilterForm = ({
             <option value="pendentes">Pendentes</option>
             <option value="baixadas">Baixadas</option>
             <option value="todas">Todas</option>
+          </select>
+        </FormGroup>
+
+        <FormGroup>
+          <label>Produto</label>
+          <select
+            value={filters.produto || ''}
+            onChange={(e) => onFilterChange('produto', e.target.value)}
+            disabled={!filters.favorecido || produtos.length === 0}
+          >
+            <option value="">Todos os produtos</option>
+            {produtos.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
           </select>
         </FormGroup>
       </FormGrid>

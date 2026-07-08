@@ -38,7 +38,9 @@ export default function Comissoes() {
     selectedRetentions,
     documentType,
     lastEmission,
+    totals,
     retentionSummary,
+    produtos,
     totalRegistros,
     hasSearched,
     previewOpen,
@@ -92,6 +94,7 @@ export default function Comissoes() {
           <FilterForm
             filters={filters}
             pessoas={pessoas}
+            produtos={produtos}
             loading={loading}
             showAdvanced={showAdvancedFilters}
             onFilterChange={updateFilter}

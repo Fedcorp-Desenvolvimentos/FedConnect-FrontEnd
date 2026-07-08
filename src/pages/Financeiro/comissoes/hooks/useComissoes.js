@@ -6,6 +6,7 @@ import { useLoading } from '../../../../hooks/useLoading';
 import {
   buscarComissoesPorDataCorte,
   buscarPessoas,
+  buscarProdutosPorFavorecido,
   emitirVoucher,
   emitirRecibo
 } from '../../../../services/comissoesService';
@@ -21,6 +22,7 @@ const INITIAL_FILTERS = {
   co_estipulante: '',
   apolice: '',
   recibo: '',
+  produto: '',
 };
 
 const RETENTION_OPTIONS = [
@@ -118,6 +120,7 @@ export const useEmissaoRecibos = () => {
   const [hasSearched, setHasSearched] = useState(false);
 
   const [pessoas, setPessoas] = useState([]);
+  const [produtos, setProdutos] = useState([]);
   const [selectedComissoes, setSelectedComissoes] = useState(new Set());
   const [selectedRetentions, setSelectedRetentions] = useState([]);
   const [documentType, setDocumentType] = useState('recibo');
@@ -155,6 +158,14 @@ export const useEmissaoRecibos = () => {
 
     loadPessoas();
   }, [enqueueSnackbar]);
+
+  useEffect(() => {
+    if (filters.favorecido) {
+      buscarProdutosPorFavorecido(filters.favorecido).then(setProdutos);
+    } else {
+      setProdutos([]);
+    }
+  }, [filters.favorecido]);
 
   const resetSelections = useCallback(() => {
     setSelectedComissoes(new Set());
@@ -618,6 +629,7 @@ export const useEmissaoRecibos = () => {
     showAdvancedFilters,
     comissoes,
     pessoas,
+    produtos,
     selectedComissoes,
     selectedRetentions,
     documentType,
