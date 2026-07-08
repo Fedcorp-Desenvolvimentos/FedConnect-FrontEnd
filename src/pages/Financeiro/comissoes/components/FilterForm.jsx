@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import { FaSearch, FaEraser, FaSlidersH, FaCalendarAlt } from 'react-icons/fa';
-import { Card, CardHeader, FormGrid, FormGroup, DataCorteGroup, Divider, Actions, Button } from '../ComissoesStyles';
+import { FaSearch, FaEraser, FaSlidersH } from 'react-icons/fa';
+import { Card, CardHeader, FormGrid, FormGroup, Divider, Actions, Button } from '../ComissoesStyles';
 import { PessoaSelect } from './PessoaSelect';
 
 export const FilterForm = ({
@@ -40,20 +40,6 @@ export const FilterForm = ({
         abre a grade em destaque, seguida dos filtros de uso mais comum.
       */}
       <FormGrid>
-        <DataCorteGroup>
-          <label>
-            <FaCalendarAlt style={{ marginRight: 5, position: 'relative', top: 1 }} />
-            Data de corte
-          </label>
-          <input
-            type="date"
-            value={filters.data_corte || ''}
-            onChange={(e) => onFilterChange('data_corte', e.target.value)}
-            required
-          />
-          <small>{filters.data_corte ? `Usando ${filters.data_corte}` : 'Padrão: mês vigente'}</small>
-        </DataCorteGroup>
-
         <FormGroup>
           <label>Favorecido</label>
           <PessoaSelect
@@ -169,20 +155,6 @@ export const FilterForm = ({
               />
             </FormGroup>
 
-            <FormGroup>
-              <label>Com voucher</label>
-              <select
-                value={filters.com_voucher === null ? '' : String(filters.com_voucher)}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  onFilterChange('com_voucher', val === '' ? null : val === 'true');
-                }}
-              >
-                <option value="">Todos</option>
-                <option value="true">Com voucher</option>
-                <option value="false">Sem voucher</option>
-              </select>
-            </FormGroup>
           </FormGrid>
         </>
       )}

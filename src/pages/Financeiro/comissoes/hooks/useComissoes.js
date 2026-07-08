@@ -21,8 +21,6 @@ const INITIAL_FILTERS = {
   co_estipulante: '',
   apolice: '',
   recibo: '',
-  com_voucher: null,
-  data_corte: '',
 };
 
 const RETENTION_OPTIONS = [
@@ -103,9 +101,7 @@ const hasMeaningfulFilters = (filters) => {
       filters.co_estipulante ||
       filters.apolice ||
       filters.recibo ||
-      filters.com_voucher !== null ||
-      (filters.status && filters.status !== 'baixadas') ||
-      filters.data_corte
+      (filters.status && filters.status !== 'baixadas')
   );
 };
 
@@ -132,14 +128,6 @@ export const useEmissaoRecibos = () => {
   const [previewData, setPreviewData] = useState(null);
 
   const { user } = useAuth();
-
-  const dataCorte = useMemo(() => {
-    return filters.data_corte || getCurrentMonthDate();
-  }, [filters.data_corte]);
-
-  const dataCorteFormatada = useMemo(() => {
-    return formatDataCorte(dataCorte);
-  }, [dataCorte]);
 
   const hasActiveFilters = useMemo(() => {
     return hasMeaningfulFilters(filters);
@@ -178,13 +166,12 @@ export const useEmissaoRecibos = () => {
       const filtrosAtualizados = { ...filters, ...novosFiltros };
       const usingFilteredMode = hasMeaningfulFilters(filtrosAtualizados);
       const filtrosLimpos = normalizeFilters(filtrosAtualizados);
-      const dataParaBusca = filtrosAtualizados.data_corte || getCurrentMonthDate();
 
       setLoadingInitial(true);
 
       try {
         const result = await withLoading(
-          async () => buscarComissoesPorDataCorte(dataParaBusca, filtrosLimpos),
+          async () => buscarComissoesPorDataCorte(getCurrentMonthDate(), filtrosLimpos),
           'Buscando comissões...'
         );
 
@@ -209,7 +196,7 @@ export const useEmissaoRecibos = () => {
         }
 
         if (lista.length === 0) {
-          enqueueSnackbar(`Nenhuma comissão encontrada para ${formatDataCorte(dataParaBusca)}`, {
+          enqueueSnackbar(`Nenhuma comissão encontrada para ${formatDataCorte(getCurrentMonthDate())}`, {
             variant: 'info',
           });
         } else {
@@ -249,7 +236,6 @@ export const useEmissaoRecibos = () => {
   const clearFilters = useCallback(() => {
     setFilters({
       ...INITIAL_FILTERS,
-      data_corte: '',
       status: 'baixadas',
     });
 
@@ -347,8 +333,6 @@ export const useEmissaoRecibos = () => {
 
     return {
       tipoDocumento: documentType,
-      dataCorte,
-      dataCorteFormatada,
       dataEmissao: new Date().toISOString(),
       totalComissoes: comissoesSelecionadas.length,
       valorTotalBruto: retentionSummary.grossTotal,
@@ -428,7 +412,6 @@ export const useEmissaoRecibos = () => {
       })),
       
       filtrosAplicados: {
-        dataCorte,
         favorecido: filters.favorecido,
         fatura: filters.fatura,
         status: filters.status,
@@ -436,7 +419,6 @@ export const useEmissaoRecibos = () => {
         co_estipulante: filters.co_estipulante,
         apolice: filters.apolice,
         recibo: filters.recibo,
-        com_voucher: filters.com_voucher,
       },
       
       resumoGeral: {
@@ -452,8 +434,6 @@ export const useEmissaoRecibos = () => {
     comissoes, 
     selectedComissoes, 
     documentType, 
-    dataCorte, 
-    dataCorteFormatada, 
     retentionSummary, 
     filters
   ]);
@@ -475,7 +455,6 @@ export const useEmissaoRecibos = () => {
       // Monta o payload para o backend
       const payload = {
         tipo_documento: documentType,
-        data_corte: dataCorte,
         data_emissao: new Date().toISOString().split('T')[0],
         usuario: user?.nome_completo || user?.email,
         comissoes: comissoesSelecionadas.map((c) => ({
@@ -609,7 +588,6 @@ export const useEmissaoRecibos = () => {
     selectedComissoes,
     comissoes,
     documentType,
-    dataCorte,
     retentionSummary,
     selectedRetentions,
     enqueueSnackbar,
@@ -645,8 +623,6 @@ export const useEmissaoRecibos = () => {
     documentType,
     lastEmission,
     totalRegistros,
-    dataCorte,
-    dataCorteFormatada,
     totals,
     retentionSummary,
     isUsingFilteredData,

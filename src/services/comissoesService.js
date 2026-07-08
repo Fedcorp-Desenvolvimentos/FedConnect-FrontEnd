@@ -44,11 +44,7 @@ export const buscarComissoesPorDataCorte = async (dataCorte, filtros = {}) => {
     Object.keys(filtros).forEach(key => {
       const value = filtros[key];
       if (value !== null && value !== undefined && value !== '' && value !== 'null') {
-        if (key === 'com_voucher' && typeof value === 'boolean') {
-          params.append(key, String(value));
-        } else {
-          params.append(key, String(value));
-        }
+        params.append(key, String(value));
       }
     });
 

@@ -1,7 +1,7 @@
 // components/ComissoesPanel.jsx
 
 import React from 'react';
-import { FaReceipt, FaSpinner, FaCalendar } from 'react-icons/fa';
+import { FaReceipt, FaSpinner } from 'react-icons/fa';
 import {
   Card,
   CardHeader,
@@ -13,18 +13,7 @@ import {
 } from '../ComissoesStyles';
 import styled from 'styled-components';
 
-const PeriodInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #718096;
-  margin-left: 8px;
 
-  svg {
-    font-size: 14px;
-  }
-`;
 
 const formatMoney = (value) => {
   if (value === null || value === undefined) return 'R$ 0,00';
@@ -58,7 +47,6 @@ export const ComissoesPanel = ({
   totals,
   loading,
   totalRegistros = 0,
-  dataCorteFormatada,
   isUsingFilteredData,
   hasSearched,
 }) => {
@@ -104,11 +92,6 @@ export const ComissoesPanel = ({
               {totalSelecionadas} selecionadas
             </span>
           )}
-
-          <PeriodInfo>
-            <FaCalendar />
-            {dataCorteFormatada || 'Último mês'}
-          </PeriodInfo>
 
           <span className="badge" style={{ background: isUsingFilteredData ? '#fffbeb' : '#ebf8ff', color: isUsingFilteredData ? '#92400e' : '#2b6cb0' }}>
             {isUsingFilteredData ? 'Filtradas' : 'Padrão'}

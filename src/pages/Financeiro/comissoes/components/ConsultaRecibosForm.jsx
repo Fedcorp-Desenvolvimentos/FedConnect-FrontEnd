@@ -135,20 +135,6 @@ export const ConsultaRecibosForm = ({
             />
           </FormGroup>
 
-          <FormGroup>
-            Com Voucher
-            <select
-              value={filters.com_voucher === null ? '' : String(filters.com_voucher)}
-              onChange={(e) => {
-                const val = e.target.value;
-                onFilterChange('com_voucher', val === '' ? null : val === 'true');
-              }}
-            >
-              <option value="">Todos</option>
-              <option value="true">Com Voucher</option>
-              <option value="false">Sem Voucher</option>
-            </select>
-          </FormGroup>
         </FormGrid>
       )}
 

@@ -42,8 +42,6 @@ export default function Comissoes() {
     lastEmission,
     totals,
     retentionSummary,
-    dataCorte,
-    dataCorteFormatada,
     totalRegistros,
     hasSearched,
     previewOpen,
@@ -153,8 +151,8 @@ export default function Comissoes() {
               <EmptyStateTitle>Nenhuma comissão encontrada</EmptyStateTitle>
               <EmptyStateText>
                 {hasActiveFilters
-                  ? 'Tente ajustar os filtros ou alterar a data de corte'
-                  : 'Selecione uma data de corte e clique em "Buscar" para consultar as comissões'}
+                  ? 'Tente ajustar os filtros'
+                  : 'Clique em "Buscar" para consultar as comissões'}
               </EmptyStateText>
             </EmptyStateContainer>
           ) : !hasSearched ? (
@@ -176,8 +174,6 @@ export default function Comissoes() {
               totals={retentionSummary}
               loading={loading}
               totalRegistros={totalRegistros}
-              dataCorte={dataCorte}
-              dataCorteFormatada={dataCorteFormatada}
               isUsingFilteredData={isUsingFilteredData}
               hasSearched={hasSearched}
             />
