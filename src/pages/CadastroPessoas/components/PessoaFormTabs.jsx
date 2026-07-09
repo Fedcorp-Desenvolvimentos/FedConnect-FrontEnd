@@ -16,17 +16,17 @@ const TabButton = styled.button`
   gap: 0.5rem;
   padding: 0.6rem 1.25rem;
   border: none;
-  background: ${props => props.active ? '#0f3d5d' : 'transparent'};
-  color: ${props => props.active ? 'white' : '#64748b'};
+  background: ${props => props.$active ? '#0f3d5d' : 'transparent'};
+  color: ${props => props.$active ? 'white' : '#64748b'};
   border-radius: 10px 10px 0 0;
-  font-weight: ${props => props.active ? '600' : '500'};
+  font-weight: ${props => props.$active ? '600' : '500'};
   font-size: 0.82rem;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${props => props.active ? '#0f3d5d' : '#f1f5f9'};
-    color: ${props => props.active ? 'white' : '#0f3d5d'};
+    background: ${props => props.$active ? '#0f3d5d' : '#f1f5f9'};
+    color: ${props => props.$active ? 'white' : '#0f3d5d'};
   }
 
   svg {
@@ -62,7 +62,7 @@ const PessoaFormTabs = ({ activeTab, onTabChange, tabs }) => {
       {tabs.map((tab) => (
         <TabButton
           key={tab.key}
-          active={activeTab === tab.key}
+          $active={activeTab === tab.key}
           onClick={() => onTabChange(tab.key)}
           type="button"
         >
