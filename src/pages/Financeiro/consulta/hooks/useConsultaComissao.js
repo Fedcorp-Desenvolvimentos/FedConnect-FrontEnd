@@ -164,7 +164,7 @@ export const useConsultaComissao = () => {
 
       const selected = comissoes.filter((c) => selectedKeys.has(getComissaoKey(c)));
 
-      console.log('Comissões selecionadas para cancelamento:', selected);
+      // console.log('Comissões selecionadas para cancelamento:', selected);
 
       const payload = {
         comissoes: selected.map((c) => ({
@@ -188,7 +188,7 @@ export const useConsultaComissao = () => {
 
       enqueueSnackbar(`${selectedKeys.size} comissão(ões) cancelada(s) com sucesso!`, { variant: 'success' });
 
-      console.log('Resposta do cancelamento:', response);
+      // console.log('Resposta do cancelamento:', response);
 
       // setSelectedKeys(new Set());
       // buscar();

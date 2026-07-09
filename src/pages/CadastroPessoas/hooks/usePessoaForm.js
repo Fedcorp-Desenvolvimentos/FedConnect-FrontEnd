@@ -186,7 +186,7 @@ export const usePessoaForm = (isNewMode = false) => {
         search: search || searchTerm
       });
       
-      console.log("📦 Pessoas buscadas (paginado):", response);
+      // console.log("📦 Pessoas buscadas (paginado):", response);
       
       let pessoasList = [];
       let total = 0;
@@ -222,7 +222,7 @@ export const usePessoaForm = (isNewMode = false) => {
         setAllLoaded(pessoasList.length < pagination.pageSize);
       }
       
-      console.log(`✅ ${normalizedPessoas.length} pessoas carregadas (total: ${total})`);
+      // console.log(`✅ ${normalizedPessoas.length} pessoas carregadas (total: ${total})`);
       
     } catch (error) {
       console.error("❌ Erro ao buscar pessoas:", error);
@@ -372,7 +372,7 @@ export const usePessoaForm = (isNewMode = false) => {
         console.warn(`❌ Pessoa com código ${codigo} não encontrada`);
         return;
       }
-      console.log(`✅ Selecionando pessoa:`, pessoa);
+      // console.log(`✅ Selecionando pessoa:`, pessoa);
       setFormData({ ...INITIAL_STATE, ...pessoa });
       setSelectedCodigo(codigo);
       setMode('edit');
