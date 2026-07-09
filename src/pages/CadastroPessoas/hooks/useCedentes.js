@@ -1,24 +1,36 @@
+// src/pages/CadastroPessoas/hooks/useCedentes.js
+
 import { useState, useEffect, useCallback } from 'react';
-import { pessoaService } from '../../../services/cedenteService';
+import { buscarCedentes, buscarCedentePorNome } from '../../../services/cedenteService';
 
 export const useCedentes = () => {
   const [cedentes, setCedentes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-
-  console.log("useCedentes Hook - Cedentes:", cedentes);
+  const [error, setError] = useState(null);
 
   const carregarCedentes = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const response = await pessoaService.buscarCedentes();
-      if (response.sucesso) {
-        setCedentes(response.data || []);
-        return response.data;
+      const response = await buscarCedentes();
+      console.log("📦 Cedentes carregados:", response);
+      
+      // Extrai o array da resposta
+      let cedentesList = [];
+      if (response?.sucesso && Array.isArray(response.data)) {
+        cedentesList = response.data;
+      } else if (Array.isArray(response)) {
+        cedentesList = response;
+      } else if (response?.data && Array.isArray(response.data)) {
+        cedentesList = response.data;
       }
-      return [];
+      
+      setCedentes(cedentesList);
+      return cedentesList;
     } catch (error) {
-      console.error('Erro ao carregar cedentes:', error);
+      console.error('❌ Erro ao carregar cedentes:', error);
+      setError(error.message);
+      setCedentes([]);
       return [];
     } finally {
       setLoading(false);
@@ -31,15 +43,25 @@ export const useCedentes = () => {
     }
     
     setLoading(true);
+    setError(null);
     try {
-      const response = await pessoaService.buscarCedentePorNome(nome);
-      if (response.sucesso) {
-        setCedentes(response.data || []);
-        return response.data;
+      const response = await buscarCedentePorNome(nome);
+      
+      let cedentesList = [];
+      if (response?.sucesso && Array.isArray(response.data)) {
+        cedentesList = response.data;
+      } else if (Array.isArray(response)) {
+        cedentesList = response;
+      } else if (response?.data && Array.isArray(response.data)) {
+        cedentesList = response.data;
       }
-      return [];
+      
+      setCedentes(cedentesList);
+      return cedentesList;
     } catch (error) {
-      console.error('Erro ao buscar cedentes por nome:', error);
+      console.error('❌ Erro ao buscar cedentes por nome:', error);
+      setError(error.message);
+      setCedentes([]);
       return [];
     } finally {
       setLoading(false);
@@ -53,8 +75,7 @@ export const useCedentes = () => {
   return {
     cedentes,
     loading,
-    searchTerm,
-    setSearchTerm,
+    error,
     carregarCedentes,
     buscarCedentesPorNome
   };

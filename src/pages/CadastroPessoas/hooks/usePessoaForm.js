@@ -1,9 +1,23 @@
-import { useState, useCallback, useMemo } from 'react';
-import { criarPessoa } from '../../../services/pessoaService';
+// src/pages/CadastroPessoas/hooks/usePessoaForm.js
+
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { buscarPessoas, criarPessoa, atualizarPessoa } from '../../../services/pessoaService';
+
+export const CATEGORIAS_DISPONIVEIS = [
+  'ADMINISTRADORA',
+  'IMOBILIARIA',
+  'CONDOMINIO',
+  'CORRETOR(A)',
+  'PRODUTOR (PF)',
+  'TERCEIRIZADA',
+  'PF FATURADO',
+  'FORNECEDOR',
+  'FUNCIONARIO'
+];
 
 const todayISO = () => new Date().toISOString().split('T')[0];
 
-const INITIAL_STATE = {
+export const INITIAL_STATE = {
   codigo: '',
   nome: '',
   tipo: 'juridica',
@@ -19,14 +33,12 @@ const INITIAL_STATE = {
   logradouro: '',
   complemento: '',
 
-  // Dados Bancários
   banco: '',
   agencia: '',
   conta: '',
   favorecido: '',
   chave_pix: '',
 
-  // Contato
   telefone1_ddd: '',
   telefone1_numero: '',
   telefone2_ddd: '',
@@ -35,7 +47,6 @@ const INITIAL_STATE = {
   observacoes: '',
   contato: '',
 
-  // Configurações
   emite_nota_fiscal: false,
   melhor_dia_pagamento: '',
   cedente: '',
@@ -43,7 +54,6 @@ const INITIAL_STATE = {
   possui_portal: false,
   portal: '',
 
-  // Agenciamento
   agenciador: false,
   percentual_agenciamento: '',
   impostos: '',
@@ -54,92 +64,72 @@ const INITIAL_STATE = {
 
   comissao: '',
   produto: 'individual',
-
-  // ✅ Categoria agora é string (select)
   categoria: ''
 };
 
-// Mock inicial
-const MOCK_PESSOAS = [
-  {
-    codigo: '0000000001',
-    nome: '2L ASSESSORIA ADM E FINANCEIRA LTDA',
-    tipo: 'juridica',
-    cpf_cnpj: '39914151000190',
-    endereco: 'RUA BARAO DO FLAMENGO, 22 SALA 501',
-    banco: 'NU PAGAMENTOS',
-    agencia: '0001',
-    conta: '70586169-7',
-    favorecido: '2L ASSESSORIA ADM E FINANCEIRA L',
-    chave_pix: '39914151000190',
-    comissao: '5.00',
-    produto: 'individual',
-    categoria: 'PRODUTOR (PF)'
-  },
-  {
-    codigo: '0000000002',
-    nome: 'AMBIENTE ADMINISTRACAO DE BENS LTDA.',
-    tipo: 'juridica',
-    cpf_cnpj: '68613678000183',
-    endereco: 'RUA DA ASSEMBLEIA, 58 / 13 ANDAR',
-    banco: '341 - Itaú',
-    agencia: '1234',
-    conta: '56789-0',
-    favorecido: 'AMBIENTE ADMINISTRACAO',
-    chave_pix: '68613678000183',
-    comissao: '3.50',
-    produto: 'coletivo',
-    categoria: 'ADMINISTRADORA'
-  },
-  {
-    codigo: '0000000003',
-    nome: 'CCY CONSULTORIA DE ENGENHARIA LTDA',
-    tipo: 'juridica',
-    cpf_cnpj: '40314403000120',
-    endereco: 'AV. FRANKLIN ROOSEVELT, 39/SL. 1505',
-    banco: '237 - Bradesco',
-    agencia: '5678',
-    conta: '12345-6',
-    favorecido: 'CCY CONSULTORIA',
-    chave_pix: '40314403000120',
-    comissao: '4.00',
-    produto: 'individual',
-    categoria: 'TERCEIRIZADA'
-  },
-  {
-    codigo: '0000000004',
-    nome: 'SECAL SOC. EMP. DE CONST. ALGARVIA LTDA',
-    tipo: 'juridica',
-    cpf_cnpj: '33519497000108',
-    endereco: 'AV. DAS AMERICAS, 500/BL.16-SL.223/2',
-    banco: '104 - Caixa Econômica Federal',
-    agencia: '9012',
-    conta: '34567-8',
-    favorecido: 'SECAL ALGARVIA',
-    chave_pix: '33519497000108',
-    comissao: '2.75',
-    produto: 'coletivo',
-    categoria: 'CONDOMINIO'
-  },
-  {
-    codigo: '0000000005',
-    nome: 'CONCORDE ASSESS. CONTABIL E EMPR. LTDA',
-    tipo: 'juridica',
-    cpf_cnpj: '30314330000112',
-    endereco: 'R. CAMBAUBA, 803/GR. 201',
-    banco: '001 - Banco do Brasil',
-    agencia: '3456',
-    conta: '78901-2',
-    favorecido: 'CONCORDE ASSESSORIA',
-    chave_pix: '30314330000112',
-    comissao: '6.00',
-    produto: 'individual',
-    categoria: 'FORNECEDOR'
-  }
-].map(p => ({ ...INITIAL_STATE, ...p }));
+const normalizePessoa = (pessoa) => {
+  if (!pessoa || typeof pessoa !== 'object') return pessoa;
 
+  const fieldMap = {
+    'PESSOA': 'codigo',
+    'NOME': 'nome',
+    'TIPO': 'tipo',
+    'CPF_CNPJ': 'cpf_cnpj',
+    'SEXO': 'sexo',
+    'DATA_CADASTRO': 'data_cadastro',
+    'CEP': 'cep',
+    'UF': 'uf',
+    'CIDADE': 'cidade',
+    'BAIRRO': 'bairro',
+    'ENDERECO': 'endereco',
+    'LOGRADOURO': 'logradouro',
+    'COMPLEMENTO': 'complemento',
+    'BANCO': 'banco',
+    'AGENCIA': 'agencia',
+    'CONTA': 'conta',
+    'FAVORECIDO': 'favorecido',
+    'CHAVE_PIX': 'chave_pix',
+    'TELEFONE1_DDD': 'telefone1_ddd',
+    'TELEFONE1_NUMERO': 'telefone1_numero',
+    'TELEFONE2_DDD': 'telefone2_ddd',
+    'TELEFONE2_NUMERO': 'telefone2_numero',
+    'EMAIL': 'email',
+    'OBSERVACOES': 'observacoes',
+    'CONTATO': 'contato',
+    'EMITE_NOTA_FISCAL': 'emite_nota_fiscal',
+    'MELHOR_DIA_PAGAMENTO': 'melhor_dia_pagamento',
+    'CEDENTE': 'cedente',
+    'COMERCIAL': 'comercial',
+    'POSSUI_PORTAL': 'possui_portal',
+    'PORTAL': 'portal',
+    'AGENCIADOR': 'agenciador',
+    'PERCENTUAL_AGENCIAMENTO': 'percentual_agenciamento',
+    'IMPOSTOS': 'impostos',
+    'OPTANTE_SIMPLES': 'optante_simples',
+    'PRESTADOR_SERVICOS': 'prestador_servicos',
+    'CREDENCIADO': 'credenciado',
+    'CODIGO_CREDENCIADO': 'codigo_credenciado',
+    'COMISSAO': 'comissao',
+    'PRODUTO': 'produto',
+    'CATEGORIA': 'categoria'
+  };
+
+  const normalized = {};
+  Object.keys(pessoa).forEach(key => {
+    const newKey = fieldMap[key] || key.toLowerCase();
+    let value = pessoa[key];
+    if (value === 'true') value = true;
+    if (value === 'false') value = false;
+    normalized[newKey] = value;
+  });
+
+  return { ...INITIAL_STATE, ...normalized };
+};
 
 const generateCodigo = pessoas => {
+  if (!pessoas || pessoas.length === 0) {
+    return '0000000001';
+  }
   const maxCodigo = pessoas.reduce((max, p) => {
     const num = parseInt(p.codigo, 10) || 0;
     return num > max ? num : max;
@@ -148,20 +138,138 @@ const generateCodigo = pessoas => {
 };
 
 export const usePessoaForm = (isNewMode = false) => {
-  const [pessoas, setPessoas] = useState(MOCK_PESSOAS);
+  const [pessoas, setPessoas] = useState([]);
   const [formData, setFormData] = useState(INITIAL_STATE);
   const [errors, setErrors] = useState({});
   const [mode, setMode] = useState(isNewMode ? 'new' : 'view');
   const [selectedCodigo, setSelectedCodigo] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  // ✅ Estado de paginação
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    pageSize: 20,
+    total: 0,
+    hasMore: false,
+  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [allLoaded, setAllLoaded] = useState(false);
+  const isLoadingRef = useRef(false);
 
   const isReadOnly = mode === 'view';
   const isEditing = mode !== 'view';
 
   const canAlterar = mode === 'view' && !!selectedCodigo;
-  const canNovo = mode === 'view';
   const canCancelar = mode !== 'view';
   const canLimpar = mode !== 'view';
+
+  // 🔥 Função para carregar a primeira página ou buscar com termo
+  const fetchPessoas = useCallback(async (reset = true, search = '') => {
+    if (isLoadingRef.current) return;
+    isLoadingRef.current = true;
+    
+    if (reset) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+
+    try {
+      const page = reset ? 1 : pagination.currentPage + 1;
+      const offset = (page - 1) * pagination.pageSize;
+      
+      const response = await buscarPessoas({
+        limit: pagination.pageSize,
+        offset: offset,
+        search: search || searchTerm
+      });
+      
+      console.log("📦 Pessoas buscadas (paginado):", response);
+      
+      let pessoasList = [];
+      let total = 0;
+      
+      if (response?.data && Array.isArray(response.data)) {
+        pessoasList = response.data;
+        total = response.total || response.total_registros || 0;
+      } else if (Array.isArray(response)) {
+        pessoasList = response;
+        total = pessoasList.length;
+      }
+      
+      // Normaliza os dados
+      const normalizedPessoas = pessoasList.map(normalizePessoa);
+      
+      if (reset) {
+        setPessoas(normalizedPessoas);
+        setPagination(prev => ({
+          ...prev,
+          currentPage: page,
+          total: total,
+          hasMore: pessoasList.length === pagination.pageSize,
+        }));
+        setAllLoaded(pessoasList.length < pagination.pageSize);
+      } else {
+        setPessoas(prev => [...prev, ...normalizedPessoas]);
+        setPagination(prev => ({
+          ...prev,
+          currentPage: page,
+          total: total,
+          hasMore: pessoasList.length === pagination.pageSize,
+        }));
+        setAllLoaded(pessoasList.length < pagination.pageSize);
+      }
+      
+      console.log(`✅ ${normalizedPessoas.length} pessoas carregadas (total: ${total})`);
+      
+    } catch (error) {
+      console.error("❌ Erro ao buscar pessoas:", error);
+      if (reset) {
+        setPessoas([]);
+        setPagination(prev => ({ ...prev, total: 0, hasMore: false }));
+      }
+    } finally {
+      isLoadingRef.current = false;
+      if (reset) {
+        setLoading(false);
+      } else {
+        setLoadingMore(false);
+      }
+    }
+  }, [pagination.currentPage, pagination.pageSize, searchTerm]);
+
+  // 🔥 Carrega mais (próxima página)
+  const loadMore = useCallback(() => {
+    if (!pagination.hasMore || loadingMore || allLoaded || isLoadingRef.current) {
+      return;
+    }
+    fetchPessoas(false);
+  }, [pagination.hasMore, loadingMore, allLoaded, fetchPessoas]);
+
+  // 🔥 Busca por termo
+  const searchPessoas = useCallback(async (term) => {
+    setSearchTerm(term);
+    if (term.length >= 2 || term.length === 0) {
+      await fetchPessoas(true, term);
+    }
+  }, [fetchPessoas]);
+
+  // 🔥 Carrega inicial
+  useEffect(() => {
+    fetchPessoas(true);
+  }, []);
+
+  // Atualiza o formData quando uma pessoa é selecionada
+  useEffect(() => {
+    if (selectedCodigo && mode === 'edit') {
+      const pessoa = pessoas.find(p => p.codigo === selectedCodigo);
+      if (pessoa) {
+        setFormData({ ...INITIAL_STATE, ...pessoa });
+      }
+    }
+  }, [selectedCodigo, pessoas, mode]);
 
   const updateField = useCallback(
     e => {
@@ -178,8 +286,6 @@ export const usePessoaForm = (isNewMode = false) => {
     },
     [errors]
   );
-
-  // ✅ REMOVIDO: toggleCategoria e applyCategorias (não são mais necessários com select)
 
   const preencherEndereco = useCallback(dadosCep => {
     setFormData(prev => ({
@@ -203,12 +309,10 @@ export const usePessoaForm = (isNewMode = false) => {
       newErrors.cpf_cnpj = formData.tipo === 'juridica' ? 'CNPJ é obrigatório' : 'CPF é obrigatório';
     }
 
-    // ✅ Categoria obrigatória (agora é string)
     if (!formData.categoria) {
       newErrors.categoria = 'Selecione uma categoria';
     }
 
-    // Comissão obrigatória
     if (!formData.comissao && formData.comissao !== 0) {
       newErrors.comissao = 'Comissão é obrigatória';
     } else if (formData.comissao && (isNaN(formData.comissao) || parseFloat(formData.comissao) < 0)) {
@@ -264,7 +368,11 @@ export const usePessoaForm = (isNewMode = false) => {
     codigo => {
       if (mode !== 'view') return;
       const pessoa = pessoas.find(p => p.codigo === codigo);
-      if (!pessoa) return;
+      if (!pessoa) {
+        console.warn(`❌ Pessoa com código ${codigo} não encontrada`);
+        return;
+      }
+      console.log(`✅ Selecionando pessoa:`, pessoa);
       setFormData({ ...INITIAL_STATE, ...pessoa });
       setSelectedCodigo(codigo);
       setMode('edit');
@@ -278,28 +386,34 @@ export const usePessoaForm = (isNewMode = false) => {
     setIsSubmitting(true);
     try {
       const payload = { ...formData };
-
-      try {
-        await criarPessoa(payload);
-      } catch (error) {
-        console.error("Erro ao criar pessoa:", error);
-        return { success: false, error };
+      
+      const isUpdate = pessoas.some(p => p.codigo === payload.codigo);
+      
+      let response;
+      if (isUpdate) {
+        response = await atualizarPessoa(payload.codigo, payload);
+      } else {
+        response = await criarPessoa(payload);
       }
 
+      // Atualiza a lista local
       setPessoas(prev => {
         const exists = prev.some(p => p.codigo === payload.codigo);
         return exists
           ? prev.map(p => (p.codigo === payload.codigo ? payload : p))
-          : [...prev, payload];
+          : [payload, ...prev];
       });
 
       setSelectedCodigo(payload.codigo);
       setMode('view');
       return { success: true, payload };
+    } catch (error) {
+      console.error("❌ Erro ao salvar pessoa:", error);
+      return { success: false, error };
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, validate]);
+  }, [formData, validate, pessoas]);
 
   const selectedPessoa = useMemo(
     () => pessoas.find(p => p.codigo === selectedCodigo) || null,
@@ -314,12 +428,16 @@ export const usePessoaForm = (isNewMode = false) => {
     isReadOnly,
     isEditing,
     isSubmitting,
+    loading,
+    loadingMore,
     selectedCodigo,
     selectedPessoa,
     canAlterar,
-    canNovo,
     canCancelar,
     canLimpar,
+    pagination,
+    searchTerm,
+    allLoaded,
     updateField,
     preencherEndereco,
     startNew,
@@ -329,5 +447,8 @@ export const usePessoaForm = (isNewMode = false) => {
     selectPessoa,
     save,
     setFormData,
+    fetchPessoas,
+    loadMore,
+    searchPessoas,
   };
 };

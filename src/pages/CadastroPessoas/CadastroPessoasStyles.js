@@ -451,3 +451,82 @@ export const LogoPreview = styled.div`
     color: #94a3b8;
   }
 `;
+
+// CadastroPessoasStyles.js - adicione:
+
+export const SearchContainer = styled.div`
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+`;
+
+export const SearchForm = styled.form`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+export const SearchInput = styled.input`
+  flex: 1;
+  min-width: 200px;
+  padding: 0.6rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #0f3d5d;
+    box-shadow: 0 0 0 3px rgba(15, 61, 93, 0.1);
+  }
+`;
+
+export const SearchButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: #0f3d5d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #1a5a7a;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+export const ClearButton = styled.button`
+  padding: 0.6rem 1rem;
+  background: transparent;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+  }
+`;
+
+export const ResultInfo = styled.div`
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-style: italic;
+`;

@@ -1,3 +1,5 @@
+// src/pages/CadastroPessoas/CadastroPessoasHome.jsx
+
 import React from 'react';
 import { FaUserPlus, FaUserEdit, FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +12,7 @@ const opcoesCadastro = [
     key: 'pessoas-cadastrar',
     icon: <FaUserPlus />,
     title: 'Novo Cadastro',
-    desc: 'Cadastre uma nova pessoa física ou jurídica no sistema. Preencha todos os dados necessários.',
+    desc: 'Cadastre uma nova pessoa física ou jurídica no sistema.',
     to: '/cadastro-pessoas/cadastrar',
     niveis: ['admin', 'usuario', 'comercial', 'faturamento', 'ti'],
     color: '#0f3d5d',
@@ -19,7 +21,7 @@ const opcoesCadastro = [
     key: 'pessoas-atualizar',
     icon: <FaUserEdit />,
     title: 'Atualizar Cadastro',
-    desc: 'Consulte e atualize os dados de pessoas já cadastradas no sistema.',
+    desc: 'Consulte e atualize os dados de pessoas já cadastradas.',
     to: '/cadastro-pessoas/atualizar',
     niveis: ['admin', 'usuario', 'comercial', 'faturamento', 'ti'],
     color: '#1a5a7a',

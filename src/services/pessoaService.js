@@ -1,27 +1,46 @@
 // src/services/pessoaService.js
+// src/services/pessoaService.js
 
 import api from "./api";
 
+/**
+ * Busca pessoas com paginação
+ * @param {Object} params - Parâmetros de paginação
+ * @param {number} params.limit - Quantidade de registros por página (default: 50)
+ * @param {number} params.offset - Offset para paginação (default: 0)
+ * @param {string} params.search - Termo de busca (opcional)
+ */
+export const buscarPessoas = async (params = {}) => {
+  try {
+    const { limit = 50, offset = 0, search = '' } = params;
+    
+    const queryParams = new URLSearchParams();
+    queryParams.append('limit', limit);
+    queryParams.append('offset', offset);
+    if (search) queryParams.append('search', search);
+    
+    const response = await api.get(`pessoas/?${queryParams.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error("❌ Erro ao buscar pessoas:", error);
+    throw error;
+  }
+};
+
+export const buscarPessoaPorCodigo = async (codigo) => {
+  try {
+    const response = await api.get(`pessoas/${codigo}/`);
+    return response.data;
+  } catch (error) {
+    console.error(`❌ Erro ao buscar pessoa ${codigo}:`, error);
+    throw error;
+  }
+};
+
 export const criarPessoa = async (payload) => {
   try {
-    let response;
-
-    try {
-      response = await api.post('pessoas/criar/', payload);
-    } catch (primaryError) {
-      // Compatibilidade com backends legados que ainda usam /pessoas/criar/
-      if (primaryError.response?.status === 404) {
-        response = await api.post('pessoas/criar/', payload);
-      } else {
-        throw primaryError;
-      }
-    }
+    const response = await api.post('pessoas/criar/', payload);
     
-    // Log para debug
-    // console.log("📦 Payload enviado:", payload);
-    // console.log("✅ Resposta da API:", response.data);
-    
-    // Verifica se a resposta tem a estrutura esperada
     if (response.data && response.data.sucesso) {
       return response.data;
     } else {
@@ -30,11 +49,31 @@ export const criarPessoa = async (payload) => {
   } catch (error) {
     console.error("❌ Erro ao criar pessoa:", error);
     
-    // Tratamento específico para erro 405
     if (error.response?.status === 405) {
-      throw new Error("Método não permitido na rota de criação. Verifique se o backend aceita POST em /pessoas/.");
+      throw new Error("Método não permitido na rota de criação.");
     }
     
     throw error;
   }
 };
+
+export const atualizarPessoa = async (codigo, payload) => {
+  try {
+    const response = await api.put(`pessoas/${codigo}/`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("❌ Erro ao atualizar pessoa:", error);
+    throw error;
+  }
+};
+
+export const excluirPessoa = async (codigo) => {
+  try {
+    const response = await api.delete(`pessoas/${codigo}/`);
+    return response.data;
+  } catch (error) {
+    console.error(`❌ Erro ao excluir pessoa ${codigo}:`, error);
+    throw error;
+  }
+};
+

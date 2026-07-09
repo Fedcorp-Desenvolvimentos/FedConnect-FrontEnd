@@ -107,8 +107,9 @@ import ConverterBoletoCSV from '../components/FormatosArquivos/ConverterBoletoCS
 import MapaRedes from '../pages/MapaRedes/MapaRedes.jsx';
 
 
-import CadastroPessoasHome from '../pages/CadastroPessoas/CadastroPessoasHome.jsx';
-import CadastroPessoas from '../pages/CadastroPessoas/CadastroPessoas.jsx';
+import CadastroPessoasHome from '../pages/CadastroPessoas/CadastroPessoasHome';
+import CadastroPessoas from '../pages/CadastroPessoas/CadastroPessoas';
+import AtualizarPessoas from '../pages/CadastroPessoas/AtualizarPessoas';
 
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
@@ -216,7 +217,8 @@ const AppRouter = () => {
           <Route path="/mapa-redes" element={<MapaRedes />} />
           
           <Route path="/cadastro-pessoas" element={<CadastroPessoasHome />} />
-          <Route path="/cadastro-pessoas/:mode" element={<CadastroPessoas />} />
+          <Route path="/cadastro-pessoas/cadastrar" element={<CadastroPessoas />} />
+          <Route path="/cadastro-pessoas/atualizar" element={<AtualizarPessoas />} />
 
         </Route>
       </Route>

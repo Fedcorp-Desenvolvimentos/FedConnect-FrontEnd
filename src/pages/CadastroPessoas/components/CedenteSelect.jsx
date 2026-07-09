@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { FaSearch, FaTimes } from 'react-icons/fa';
+// src/pages/CadastroPessoas/components/CedenteSelect.js
+
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { FaSearch, FaTimes, FaSpinner } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
 import { useCedentes } from '../hooks/useCedentes';
 
 const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  const wrapperRef = useRef(null);
   const { cedentes, loading, buscarCedentesPorNome, carregarCedentes } = useCedentes();
 
   const selectedCedente = useMemo(() => {
@@ -13,18 +16,27 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
     return cedentes.find((item) => String(item.codigo) === String(value)) || null;
   }, [cedentes, value]);
 
-  const displayValue = searchInput || selectedCedente?.cedente || value || '';
+  const displayValue = searchInput || selectedCedente?.nome || selectedCedente?.cedente || value || '';
+
+  // Fecha o dropdown ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleOpen = useCallback(async () => {
-    setIsOpen(true);
-    if (cedentes.length === 0) {
-      await carregarCedentes();
+    if (!disabled) {
+      setIsOpen(true);
+      if (cedentes.length === 0) {
+        await carregarCedentes();
+      }
     }
-  }, [cedentes.length, carregarCedentes]);
-
-  const handleClose = () => {
-    setIsOpen(false);
-  };
+  }, [cedentes.length, carregarCedentes, disabled]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -40,7 +52,6 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
 
   const handleSelectCedente = (cedente) => {
     const codigoCedente = cedente.codigo ? String(cedente.codigo) : '';
-    const nomeCedente = cedente.cedente || '';
     onChange({
       target: {
         name: 'cedente',
@@ -50,7 +61,7 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
     if (onCedenteSelecionado) {
       onCedenteSelecionado(cedente);
     }
-    setSearchInput(nomeCedente);
+    setSearchInput(cedente.nome || cedente.cedente || '');
     setIsOpen(false);
   };
 
@@ -65,10 +76,14 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
     setIsOpen(false);
   };
 
+  const getDisplayName = (cedente) => {
+    return cedente.nome || cedente.cedente || cedente.razao_social || 'Sem nome';
+  };
+
   return (
     <S.FormGroup $flex="1 1 100%">
       <S.FormLabel>Cedente</S.FormLabel>
-      <div style={{ position: 'relative' }}>
+      <div ref={wrapperRef} style={{ position: 'relative' }}>
         <S.InputWithButton>
           <S.FormInput
             type="text"
@@ -92,10 +107,10 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
           <S.IconSquareButton
             type="button"
             onClick={handleOpen}
-            disabled={disabled}
+            disabled={disabled || loading}
             title="Buscar cedentes"
           >
-            <FaSearch />
+            {loading ? <FaSpinner className="spin" /> : <FaSearch />}
           </S.IconSquareButton>
         </S.InputWithButton>
 
@@ -118,7 +133,7 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
           >
             {loading ? (
               <div style={{ padding: '1rem', textAlign: 'center', color: '#94a3b8' }}>
-                Carregando...
+                <FaSpinner className="spin" /> Carregando...
               </div>
             ) : cedentes.length === 0 ? (
               <div style={{ padding: '1rem', textAlign: 'center', color: '#94a3b8' }}>
@@ -127,7 +142,7 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
             ) : (
               cedentes.map((cedente) => (
                 <div
-                  key={cedente.codigo || cedente.id || cedente.cedente}
+                  key={cedente.codigo || cedente.id || Math.random()}
                   onClick={() => handleSelectCedente(cedente)}
                   style={{
                     padding: '0.6rem 1rem',
@@ -140,7 +155,7 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
                   onMouseLeave={(e) => e.target.style.background = 'white'}
                 >
                   <div style={{ fontWeight: 600, color: '#0f3d5d' }}>
-                    {cedente.cedente || cedente.nome || 'Sem nome'}
+                    {getDisplayName(cedente)}
                   </div>
                   {cedente.cnpj && (
                     <div style={{ fontSize: '0.75rem', color: '#64748b' }}>

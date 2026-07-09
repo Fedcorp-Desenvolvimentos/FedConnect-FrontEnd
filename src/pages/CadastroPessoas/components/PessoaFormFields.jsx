@@ -1,7 +1,10 @@
+// src/pages/CadastroPessoas/components/PessoaFormFields.js
+
 import React from 'react';
 import { FaSearch, FaGlobe } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
 import CedenteSelect from './CedenteSelect';
+import { CATEGORIAS_DISPONIVEIS } from '../hooks/usePessoaForm';
 
 const ESTADOS = [
   'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
@@ -20,19 +23,6 @@ const BANCOS = [
   'NU PAGAMENTOS',
   'SICOOB',
   'SICREDI',
-];
-
-// ✅ CATEGORIAS para o Select
-const CATEGORIAS_OPCOES = [
-  'ADMINISTRADORA',
-  'IMOBILIARIA',
-  'CONDOMINIO',
-  'CORRETOR(A)',
-  'PRODUTOR (PF)',
-  'TERCEIRIZADA',
-  'PF FATURADO',
-  'FORNECEDOR',
-  'FUNCIONARIO'
 ];
 
 const SECTION_VISIBILITY = {
@@ -54,8 +44,6 @@ const PessoaFormFields = ({
   errors,
   disabled,
   onChange,
-  onToggleCategoria,
-  onAplicarCategorias,
   onBuscarCep,
   activeTab = 'identificacao'
 }) => {
@@ -156,7 +144,7 @@ const PessoaFormFields = ({
                 $error={errors.categoria}
               >
                 <option value="">Selecione uma categoria</option>
-                {CATEGORIAS_OPCOES.map(cat => (
+                {CATEGORIAS_DISPONIVEIS.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </S.FormSelect>
