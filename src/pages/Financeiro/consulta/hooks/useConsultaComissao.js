@@ -159,31 +159,39 @@ export const useConsultaComissao = () => {
     if (!confirm) return;
 
     startLoading('Cancelando comissões...');
+    
     try {
-      if (SIMULAR_CANCELAMENTO) {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-      } else {
-        const selected = comissoes.filter((c) => selectedKeys.has(getComissaoKey(c)));
-        const payload = {
-          comissoes: selected.map((c) => ({
-            fatura: Number(c.FATURA || c.fatura),
-            parcela: Number(c.PARCELA || c.parcela || 1),
-            documento: c.DOCUMENTO || c.documento || '',
-            favorecido: c.FAVOR || c.favor || '',
-            tipo: c.TIPO || c.tipo || 'BENEFICIO',
-          })),
-        };
 
-        const response = await cancelarComissaoApi(payload);
+      const selected = comissoes.filter((c) => selectedKeys.has(getComissaoKey(c)));
 
-        if (!response?.sucesso) {
-          throw new Error(response?.erro || 'Erro ao cancelar');
-        }
+      console.log('Comissões selecionadas para cancelamento:', selected);
+
+      const payload = {
+        comissoes: selected.map((c) => ({
+          fatura: Number(c.FATURA || c.fatura),
+          parcela: Number(c.PARCELA || c.parcela || 1),
+          documento: c.DOCUMENTO || c.documento || '',
+          favorecido: c.FAVOR || c.favor || '',
+          voucher: c.VOUCHER || c.voucher || '',
+          tipo: c.TIPO || c.tipo || 'BENEFICIO',
+        })),
+      };
+      
+
+      const response = await cancelarComissaoApi(payload);
+
+
+      if (!response?.sucesso) {
+        throw new Error(response?.erro || 'Erro ao cancelar');
       }
+      
 
       enqueueSnackbar(`${selectedKeys.size} comissão(ões) cancelada(s) com sucesso!`, { variant: 'success' });
-      setSelectedKeys(new Set());
-      buscar();
+
+      console.log('Resposta do cancelamento:', response);
+
+      // setSelectedKeys(new Set());
+      // buscar();
     } catch (error) {
       enqueueSnackbar(error.message || 'Erro ao cancelar comissões', { variant: 'error' });
     } finally {
