@@ -1031,3 +1031,27 @@ export const RawDataToggle = styled.div`
     max-height: 260px;
   }
 `;
+
+export const RetentionStatus = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #FFF8E1;
+  border-radius: 4px;
+  border: 1px solid #FFE082;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #7A5B1E;
+
+  svg {
+    color: #F9A825;
+    flex-shrink: 0;
+  }
+`;
+
+export const RetentionInfo = styled.span`
+  font-size: 10px;
+  color: var(--ink-soft);
+  margin-left: 4px;
+`;

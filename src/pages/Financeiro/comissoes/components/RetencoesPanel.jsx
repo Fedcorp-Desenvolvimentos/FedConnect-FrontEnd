@@ -1,11 +1,13 @@
-import React from 'react';
-import { FaPercentage } from 'react-icons/fa';
+import React, { useEffect } from 'react';
+import { FaPercentage, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
 import {
   RetentionCard,
   CardHeader,
   RetentionStats,
   RetentionOptionList,
   RetentionOption,
+  RetentionStatus,
+  RetentionInfo
 } from '../ComissoesStyles';
 
 const RETENTION_OPTIONS = [
@@ -24,7 +26,33 @@ const formatMoney = (value) => {
 
 const formatRate = (rate) => `${(rate * 100).toFixed(rate * 100 % 1 ? 2 : 0)}%`;
 
-export function RetencoesPanel({ selectedRetentions, totals, onToggleRetention, hasResults, comissoes }) {  
+export function RetencoesPanel({ 
+  selectedRetentions, 
+  totals, 
+  onToggleRetention, 
+  hasResults, 
+  comissoes,
+  onVerificarRetencoes,
+  retencoesVerificadas,
+  loading 
+}) {
+  const hasAutomaticRetentions = retencoesVerificadas?.comissoes?.some(
+    c => c.retencoes_calculadas?.aplicaveis?.length > 0
+  );
+
+  const getIsencaoMotivo = () => {
+    if (!retencoesVerificadas?.comissoes) return null;
+    
+    const motivos = new Set();
+    retencoesVerificadas.comissoes.forEach(c => {
+      if (c.retencoes_calculadas?.motivo) {
+        motivos.add(c.retencoes_calculadas.motivo);
+      }
+    });
+    
+    return Array.from(motivos).join('; ');
+  };
+
   return (
     <RetentionCard>
       <CardHeader>
@@ -33,7 +61,40 @@ export function RetencoesPanel({ selectedRetentions, totals, onToggleRetention, 
           <h2>Retenções</h2>
           <span>Aplicadas sobre o total selecionado</span>
         </div>
+        
+        {hasResults && comissoes.length > 0 && (
+          <button 
+            onClick={onVerificarRetencoes}
+            disabled={loading}
+            style={{
+              background: 'var(--navy-800)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '6px 12px',
+              fontSize: '11px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <FaCheckCircle />
+            Verificar Retenções
+          </button>
+        )}
       </CardHeader>
+
+      {retencoesVerificadas && !hasAutomaticRetentions && (
+        <RetentionStatus>
+          <FaInfoCircle />
+          <span>
+            {retencoesVerificadas.comissoes.length > 0 
+              ? `Isento de retenções: ${getIsencaoMotivo() || 'Aplicam-se regras de isenção'}`
+              : 'Nenhuma retenção aplicável'}
+          </span>
+        </RetentionStatus>
+      )}
 
       <RetentionStats>
         <div>
@@ -54,17 +115,23 @@ export function RetencoesPanel({ selectedRetentions, totals, onToggleRetention, 
         {RETENTION_OPTIONS.map((item) => {
           const checked = selectedRetentions.includes(item.id);
           const value = hasResults ? totals.grossTotal * item.rate : 0;
+          
+          const isAutomatic = retencoesVerificadas?.comissoes?.some(
+            c => c.retencoes_calculadas?.aplicaveis?.some(r => r.tipo === item.id)
+          );
 
           return (
-            <RetentionOption key={item.id} checked={checked}>
+            <RetentionOption key={item.id} checked={checked} isAutomatic={isAutomatic}>
               <span className="left">
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => onToggleRetention(item.id)}
+                  disabled={isAutomatic}
                 />
                 <span className="name">{item.label}</span>
                 <span className="rate">{formatRate(item.rate)}</span>
+                {isAutomatic && <span className="auto-badge">Auto</span>}
               </span>
               <span className="amount">{checked ? `- ${formatMoney(value)}` : formatMoney(0)}</span>
             </RetentionOption>

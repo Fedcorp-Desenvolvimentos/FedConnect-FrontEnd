@@ -1,4 +1,3 @@
-// Comissoes.jsx
 import React from 'react';
 import { FaArrowLeft, FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -58,10 +57,12 @@ export default function Comissoes() {
     closePreview,
     isUsingFilteredData,
     hasActiveFilters,
+    verificarRetencoesComissoes,
+    retencoesVerificadas,
   } = useEmissaoRecibos();
 
-  const canIssue = selectedComissoes.size > 0;
-  const hasResults = comissoes.length > 0;
+  const canIssue = selectedComissoes?.size > 0;
+  const hasResults = comissoes?.length > 0;
   const isEmpty = !loading && !loadingInitial && !hasResults && hasSearched;
 
   return (
@@ -82,12 +83,6 @@ export default function Comissoes() {
         </Title>
       </Header>
 
-      {/*
-        Layout principal: a coluna da esquerda concentra o fluxo de consulta
-        (filtros -> lista de comissões). A barra lateral fixa mantém retenções
-        e as ações de emissão sempre visíveis, sem precisar rolar a página
-        depois de selecionar as comissões.
-      */}
       <PageLayout>
         <MainColumn>
           <FilterForm
@@ -147,7 +142,6 @@ export default function Comissoes() {
         </MainColumn>
 
         <Sidebar>
-
           {documentType !== 'recibo' && (
             <RetencoesPanel
               selectedRetentions={selectedRetentions}
@@ -155,6 +149,9 @@ export default function Comissoes() {
               onToggleRetention={toggleRetention}
               hasResults={hasResults}
               comissoes={comissoes}
+              onVerificarRetencoes={verificarRetencoesComissoes}
+              retencoesVerificadas={retencoesVerificadas}
+              loading={loading}
             />
           )}
 

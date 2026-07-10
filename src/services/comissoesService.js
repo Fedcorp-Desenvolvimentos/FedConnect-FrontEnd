@@ -250,3 +250,14 @@ export const cancelarComissaoApi = async (payload) => {
     throw error;
   }
 };
+
+
+export const verificarRetencoes = async (payload) => {
+  try {
+    const response = await api.post('/vouchers/verificar-retencoes', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao verificar retenções:', error);
+    throw error;
+  }
+};

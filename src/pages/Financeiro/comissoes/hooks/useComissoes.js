@@ -1,5 +1,3 @@
-// hooks/useComissoes.js
-
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useSnackbar } from 'notistack';
 import { useLoading } from '../../../../hooks/useLoading';
@@ -33,6 +31,12 @@ const RETENTION_OPTIONS = [
   { id: 'pis', label: 'PIS', rate: 0.0065 },
   { id: 'inss', label: 'INSS', rate: 0.11 },
 ];
+
+// ⭐ REGRAS DE RETENÇÃO NO FRONTEND
+const RETENTION_RULES = {
+  MIN_VALUE_FOR_RETENTION: 215.00,
+  MIN_VALUE_FOR_IR: 666.00,
+};
 
 const getComissaoKey = (c) => {
   const documento = c.DOCUMENTO ?? '';
@@ -107,6 +111,85 @@ const hasMeaningfulFilters = (filters) => {
   );
 };
 
+// ⭐ FUNÇÃO QUE CALCULA RETENÇÕES NO FRONTEND
+const calcularRetencoesFrontend = (comissao) => {
+  const valorComissao = Number(comissao.VALOR || comissao.valor || 0);
+  const optanteSimples = comissao.OPTOU_SIMPLES === 'S';
+  const codAgenc = comissao.COD_AGENC;
+
+  const retencoes = {
+    iss: { aplicavel: false, valor: 0, aliquota: 0.02 },
+    ir: { aplicavel: false, valor: 0, aliquota: 0.015 },
+    cofins: { aplicavel: false, valor: 0, aliquota: 0.03 },
+    csll: { aplicavel: false, valor: 0, aliquota: 0.01 },
+    pis: { aplicavel: false, valor: 0, aliquota: 0.0065 },
+    inss: { aplicavel: false, valor: 0, aliquota: 0.11 },
+  };
+
+  let motivo = '';
+
+  // REGRA 1: Valor mínimo para retenção
+  if (valorComissao < RETENTION_RULES.MIN_VALUE_FOR_RETENTION) {
+    motivo = 'Valor abaixo do mínimo para retenção (R$ 215,00)';
+    return { retencoes, total_retencoes: 0, valor_liquido: valorComissao, motivo };
+  }
+
+  // REGRA 2: Optante pelo Simples Nacional
+  if (optanteSimples) {
+    motivo = 'Optante pelo Simples Nacional - isento de retenções';
+    return { retencoes, total_retencoes: 0, valor_liquido: valorComissao, motivo };
+  }
+
+  // REGRA 3: Não optante com código de serviço de agenciamento (tem COD_AGENC)
+  if (codAgenc) {
+    // Só retém IR (se valor >= 666,00)
+    if (valorComissao >= RETENTION_RULES.MIN_VALUE_FOR_IR) {
+      retencoes.ir.aplicavel = true;
+      retencoes.ir.valor = valorComissao * 0.015;
+    }
+    
+    const totalRetencoes = Object.values(retencoes).reduce((sum, r) => sum + (r.aplicavel ? r.valor : 0), 0);
+    motivo = 'Agenciador - apenas IR retido';
+    
+    return {
+      retencoes,
+      total_retencoes: totalRetencoes,
+      valor_liquido: valorComissao - totalRetencoes,
+      motivo
+    };
+  }
+
+  // REGRA 4: Não optante - retém todos os impostos
+  // IR só se valor >= 666,00
+  if (valorComissao >= RETENTION_RULES.MIN_VALUE_FOR_IR) {
+    retencoes.ir.aplicavel = true;
+    retencoes.ir.valor = valorComissao * 0.015;
+  }
+
+  // Demais impostos sempre aplicáveis para não optantes
+  retencoes.iss.aplicavel = true;
+  retencoes.iss.valor = valorComissao * 0.02;
+
+  retencoes.cofins.aplicavel = true;
+  retencoes.cofins.valor = valorComissao * 0.03;
+
+  retencoes.csll.aplicavel = true;
+  retencoes.csll.valor = valorComissao * 0.01;
+
+  retencoes.pis.aplicavel = true;
+  retencoes.pis.valor = valorComissao * 0.0065;
+
+  const totalRetencoes = Object.values(retencoes).reduce((sum, r) => sum + (r.aplicavel ? r.valor : 0), 0);
+  motivo = 'Não optante - retenções completas aplicadas';
+
+  return {
+    retencoes,
+    total_retencoes: totalRetencoes,
+    valor_liquido: valorComissao - totalRetencoes,
+    motivo
+  };
+};
+
 export const useEmissaoRecibos = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { withLoading, loading, startLoading, stopLoading } = useLoading();
@@ -129,6 +212,7 @@ export const useEmissaoRecibos = () => {
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewData, setPreviewData] = useState(null);
+  const [retencoesVerificadas, setRetencoesVerificadas] = useState(null);
 
   const { user } = useAuth();
 
@@ -170,6 +254,7 @@ export const useEmissaoRecibos = () => {
   const resetSelections = useCallback(() => {
     setSelectedComissoes(new Set());
     setSelectedRetentions([]);
+    setRetencoesVerificadas(null);
   }, []);
 
   const buscarComissoes = useCallback(
@@ -226,15 +311,6 @@ export const useEmissaoRecibos = () => {
     },
     [filters, withLoading, enqueueSnackbar, resetSelections]
   );
-
-  const cancelarComissao = useCallback(async () => {
-    if (selectedComissoes.size === 0) {
-      enqueueSnackbar('Selecione pelo menos uma comissão para cancelar', { variant: 'warning' });
-      return;
-    }
-
-    // Lógica para cancelar comissões selecionadas
-  }, [selectedComissoes, enqueueSnackbar]);
 
   const buscarTudo = useCallback(async () => {
     await buscarComissoes();
@@ -337,6 +413,77 @@ export const useEmissaoRecibos = () => {
     };
   }, [retentionSummary]);
 
+  // ⭐ FUNÇÃO QUE VERIFICA RETENÇÕES NO FRONTEND (SEM CHAMADA AO BACKEND)
+  const verificarRetencoesComissoes = useCallback(async () => {
+    if (selectedComissoes.size === 0) {
+      enqueueSnackbar('Selecione pelo menos uma comissão', { variant: 'warning' });
+      return;
+    }
+
+    startLoading('Verificando retenções...');
+
+    try {
+      const comissoesSelecionadas = comissoes.filter((c) => 
+        selectedComissoes.has(getComissaoKey(c))
+      );
+
+      // ⭐ CALCULA RETENÇÕES DIRETAMENTE NO FRONTEND
+      const comissoesComRetencoes = comissoesSelecionadas.map(c => {
+        const resultado = calcularRetencoesFrontend(c);
+        return {
+          ...c,
+          retencoes_calculadas: {
+            aplicaveis: Object.entries(resultado.retencoes)
+              .filter(([_, v]) => v.aplicavel)
+              .map(([key, v]) => ({
+                tipo: key,
+                valor: v.valor,
+                aliquota: v.aliquota
+              })),
+            total_retencoes: resultado.total_retencoes,
+            valor_liquido: resultado.valor_liquido,
+            motivo: resultado.motivo
+          }
+        };
+      });
+
+      const totalBruto = comissoesComRetencoes.reduce((sum, c) => sum + Number(c.VALOR || 0), 0);
+      const totalRetencoes = comissoesComRetencoes.reduce((sum, c) => sum + c.retencoes_calculadas.total_retencoes, 0);
+
+      const response = {
+        status: 'success',
+        total_bruto: totalBruto,
+        total_retencoes: totalRetencoes,
+        total_liquido: totalBruto - totalRetencoes,
+        quantidade: comissoesComRetencoes.length,
+        comissoes: comissoesComRetencoes,
+        timestamp: new Date().toISOString()
+      };
+
+      setRetencoesVerificadas(response);
+      
+      // Auto-seleciona retenções aplicáveis
+      const retencoesAplicaveis = new Set();
+      response.comissoes.forEach(c => {
+        c.retencoes_calculadas?.aplicaveis?.forEach(r => {
+          retencoesAplicaveis.add(r.tipo);
+        });
+      });
+      
+      setSelectedRetentions(Array.from(retencoesAplicaveis));
+      
+      enqueueSnackbar(`Retenções verificadas: ${response.comissoes.length} comissão(ões)`, {
+        variant: 'success'
+      });
+      
+    } catch (error) {
+      console.error('Erro ao verificar retenções:', error);
+      enqueueSnackbar('Erro ao verificar retenções', { variant: 'error' });
+    } finally {
+      stopLoading();
+    }
+  }, [selectedComissoes, comissoes, enqueueSnackbar, startLoading, stopLoading]);
+
   const buildDocumentPayload = useCallback(() => {
     const comissoesSelecionadas = comissoes.filter((c) => 
       selectedComissoes.has(getComissaoKey(c))
@@ -356,51 +503,37 @@ export const useEmissaoRecibos = () => {
       })),
       
       comissoes: comissoesSelecionadas.map((c) => ({
-        // ---- DADOS BÁSICOS DA COMISSÃO ----
         fatura: c.FATURA || c.fatura || '',
         parcela: c.PARCELA || c.parcela || '1',
         tipo_fat: c.TIPO_FAT || c.tipo_fat || 'A',
         documento: c.DOCUMENTO || c.documento || '',
         vencimento: c.VENCIMENTO || c.vencimento || null,
         data_fat: c.DATA_FAT || c.data_fat || null,
-
         nome_segurado: c.NOME_SEGURADO || c.nome_segurado || 'NÃO INFORMADO',
         doc_segurado: c.DOC_SEGURADO || c.doc_segurado || '',
         tp_segurado: c.TP_SEGURADO || c.tp_segurado || '',
         cod_segurado: c.COD_SEGURADO || c.cod_segurado || '',
-        
-        // ---- DADOS DO FAVORECIDO  ----
         favorecido: c.FAVOR || c.favor || '',
         favorecido_nome: c.NOME || c.nome || '',
         favorecido_documento: c.DOC_FAVORECIDO || c.doc_favorecido || '',
         banco_agencia_conta: c.BC_AG_CC || c.bc_ag_cc || '',
         chave_pix: c.CHAVE_PIX || c.chave_pix || null,
-        
-        // ---- VALORES ----
         valor_comissao: Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0),
         percentual: Number(c.COMISSAO || c.comissao || 0),
         imposto: Number(c.IMPOSTO || c.imposto || 0),
         valor_liq: Number(c.VALOR_LIQ || c.valor_liq || 0),
-        
-        // ---- PRODUTO ----
         produto: c.PRODUTO || c.produto || '',
         produto_original: c.PRODUTO_ORI || c.produto_ori || '',
         co_estipulante: c.CO_ESTIP || c.co_estip || '',
-        
-        // ---- STATUS ----
         voucher: c.VOUCHER || c.voucher || null,
         data_repasse: c.DT_REPASSE || c.dt_repasse || null,
         status: c.STATUS || c.status || '',
         quitado: Number(c.QUITADO || c.quitado || 0),
         prc_quitado: Number(c.PRC_QUITADO || c.prc_quitado || 0),
-        
-        // ---- PARCELAS ----
         parcelas_fat: Number(c.PARCELAS || c.parcelas || 1),
         inclui_manual: c.INCLUI_MANUAL || c.inclui_manual || 'N',
         parc_manual: Number(c.PARC_MANUAL || c.parc_manual || 0),
         tipo: c.TIPO || c.tipo || 'BENEFICIO',
-        
-        // ---- IMPOSTOS DA APÓLICE ----
         iof: c.IOF || c.iof || 'N',
         perc_iof: Number(c.PERC_IOF || c.perc_iof || 0),
         cofins: c.COFINS || c.cofins || 'N',
@@ -409,8 +542,6 @@ export const useEmissaoRecibos = () => {
         perc_csll: Number(c.PERC_CSLL || c.perc_csll || 0),
         pis: c.PIS || c.pis || 'N',
         perc_pis: Number(c.PERC_PIS || c.perc_pis || 0),
-        
-        // ---- APÓLICE ----
         apolice: c.APOLICE || c.apolice || '',
         premio_bruto: Number(c.PREMIO_BRUTO || c.premio_bruto || 0),
         premio_liquido: Number(c.PREMIO_LIQ || c.premio_liq || 0),
@@ -450,7 +581,6 @@ export const useEmissaoRecibos = () => {
     filters
   ]);
 
-
   const emitirDocumento = useCallback(async () => {
     if (selectedComissoes.size === 0) {
       enqueueSnackbar('Selecione pelo menos uma comissão', { variant: 'warning' });
@@ -464,58 +594,42 @@ export const useEmissaoRecibos = () => {
         selectedComissoes.has(getComissaoKey(c))
       );
 
-      // Monta o payload para o backend
       const payload = {
         tipo_documento: documentType,
         data_emissao: new Date().toISOString().split('T')[0],
         usuario: user?.nome_completo || user?.email,
         comissoes: comissoesSelecionadas.map((c) => ({
-          // ---- DADOS BÁSICOS ----
           fatura: Number(c.FATURA || c.fatura),
           parcela: Number(c.PARCELA || c.parcela || 1),
           tipo_fat: c.TIPO_FAT || c.tipo_fat || 'A',
           documento: c.DOCUMENTO || c.documento || '',
           vencimento: c.VENCIMENTO || c.vencimento || null,
           data_fat: c.DATA_FAT || c.data_fat || null,
-          
-          // ---- ⭐ DADOS DO SEGURADO (Cliente Final) - ESSENCIAL PARA O RECIBO ----
           nome_segurado: c.NOME_SEGURADO || c.nome_segurado || 'NÃO INFORMADO',
           doc_segurado: c.DOC_SEGURADO || c.doc_segurado || '',
           tp_segurado: c.TP_SEGURADO || c.tp_segurado || '',
           cod_segurado: c.COD_SEGURADO || c.cod_segurado || '',
-          
-          // ---- DADOS DO FAVORECIDO ----
           favorecido: c.FAVOR || c.favor || '',
           favorecido_nome: c.NOME || c.nome || '',
           favorecido_documento: c.DOC_FAVORECIDO || c.doc_favorecido || '',
           banco_agencia_conta: c.BC_AG_CC || c.bc_ag_cc || '',
           chave_pix: c.CHAVE_PIX || c.chave_pix || null,
-          
-          // ---- VALORES ----
           valor_comissao: Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0),
           percentual: Number(c.COMISSAO || c.comissao || 0),
           imposto: Number(c.IMPOSTO || c.imposto || 0),
           valor_liq: Number(c.VALOR_LIQ || c.valor_liq || 0),
-          
-          // ---- PRODUTO ----
           produto: c.PRODUTO || c.produto || '',
           produto_original: c.PRODUTO_ORI || c.produto_ori || '',
           co_estipulante: c.CO_ESTIP || c.co_estip || '',
-          
-          // ---- STATUS ----
           voucher: c.VOUCHER || c.voucher || null,
           data_repasse: c.DT_REPASSE || c.dt_repasse || null,
           status: c.STATUS || c.status || '',
           quitado: Number(c.QUITADO || c.quitado || 0),
           prc_quitado: Number(c.PRC_QUITADO || c.prc_quitado || 0),
-          
-          // ---- PARCELAS ----
           parcelas_fat: Number(c.PARCELAS || c.parcelas || 1),
           inclui_manual: c.INCLUI_MANUAL || c.inclui_manual || 'N',
           parc_manual: Number(c.PARC_MANUAL || c.parc_manual || 0),
           tipo: c.TIPO || c.tipo || 'BENEFICIO',
-          
-          // ---- IMPOSTOS DA APÓLICE ----
           iof: c.IOF || c.iof || 'N',
           perc_iof: Number(c.PERC_IOF || c.perc_iof || 0),
           cofins: c.COFINS || c.cofins || 'N',
@@ -524,8 +638,6 @@ export const useEmissaoRecibos = () => {
           perc_csll: Number(c.PERC_CSLL || c.perc_csll || 0),
           pis: c.PIS || c.pis || 'N',
           perc_pis: Number(c.PERC_PIS || c.perc_pis || 0),
-          
-          // ---- APÓLICE ----
           apolice: c.APOLICE || c.apolice || '',
           premio_bruto: Number(c.PREMIO_BRUTO || c.premio_bruto || 0),
           premio_liquido: Number(c.PREMIO_LIQ || c.premio_liq || 0),
@@ -553,8 +665,6 @@ export const useEmissaoRecibos = () => {
         },
       };
 
-      // console.log('📄 Payload para emissão:', payload);
-
       let response;
 
       if (documentType === 'voucher') {
@@ -562,8 +672,6 @@ export const useEmissaoRecibos = () => {
       } else {
         response = await emitirRecibo(payload);
       }
-
-      // console.log('📄 Resposta da emissão:', response);
 
       if (response?.sucesso) {
         if (response.pdf_base64) {
@@ -643,6 +751,7 @@ export const useEmissaoRecibos = () => {
     hasSearched,
     previewOpen,
     previewData,
+    retencoesVerificadas,
 
     buscarTudo,
     updateFilter,
@@ -655,5 +764,6 @@ export const useEmissaoRecibos = () => {
     emitirDocumento,
     previewDocument,
     closePreview,
+    verificarRetencoesComissoes,
   };
 };
