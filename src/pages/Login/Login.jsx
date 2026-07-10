@@ -26,7 +26,7 @@ const Login = () => {
             if (result.success) {
                 updateProgress(100);
                 await new Promise(resolve => setTimeout(resolve, 300));
-                navigate('/home');
+                navigate('/home', { replace: true });
             } else {
                 setError(result.error || 'Falha no login. Verifique suas credenciais.');
                 stopLoading();
@@ -48,7 +48,7 @@ const Login = () => {
             const result = await loginGoogle(credentialResponse.credential);
 
             if (result.success) {
-                navigate('/home');
+                navigate('/home', { replace: true });
             } else {
                 setError(result.error || 'Falha no login com Google');
             }

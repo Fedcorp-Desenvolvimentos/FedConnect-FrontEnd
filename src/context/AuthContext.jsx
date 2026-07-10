@@ -16,13 +16,10 @@ export const AuthProvider = ({ children }) => {
     const { loading, setLoading, setLoadingMessage } = useGlobal();
     const navigate = useNavigate();
 
-    // console.log("user", user)
-
     const login = useCallback(async (credentials) => {
         setLoadingMessage("Fazendo login...");
         setLoading(true);
         try {
-            // 1. Faz a requisição de login
             const response = await api.post('/login/', credentials);
             localStorage.setItem('accessToken', response.data.access);
             const userResponse = await api.get('/users/me/');
@@ -84,7 +81,6 @@ export const AuthProvider = ({ children }) => {
     const logout = useCallback(() => {
         setLoadingMessage("Fazendo logout...");
         setLoading(true);
-        // Remove o token do localStorage
         localStorage.removeItem('accessToken');
         setUser(null);
         setIsAuthenticated(false);
@@ -94,38 +90,47 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const checkAuthStatus = async () => {
-            // Tenta obter o token do localStorage
             const token = localStorage.getItem('accessToken');
+            
+            // CORREÇÃO: Verificação correta de rotas públicas
             const publicRoutes = ["/", "/login", "/recuperar-senha", "/resetar-senha", "/404"];
+            
+            const isPublicRoute = publicRoutes.some((route) => {
+                const pathname = window.location.pathname;
+                
+                // Caso especial para /resetar-senha/:token
+                if (route === "/resetar-senha") {
+                    return pathname.startsWith("/resetar-senha/") || pathname === "/resetar-senha";
+                }
+                
+                // Para as outras rotas, verificação exata
+                return pathname === route;
+            });
 
-            // Se não houver token, o usuário não está autenticado
-           if (!token) {
+            if (!token) {
                 setLoading(false);
                 setIsAuthenticated(false);
-
-                const isPublicRoute = publicRoutes.some((route) =>
-                    window.location.pathname.startsWith(route)
-                );
 
                 if (!isPublicRoute) {
                     navigate("/login");
                 }
-
                 return;
             }
+
             try {
                 const response = await api.get('/users/me/');
                 setUser(response.data);
                 setIsAuthenticated(true);
+                
+                // Se estiver em rota pública e logado, redireciona para home
+                if (isPublicRoute && window.location.pathname !== '/') {
+                    navigate('/home');
+                }
             } catch (error) {
-                // Se a requisição falhar, o token é inválido/expirado
-               
-                // Remove o token inválido para evitar futuras requisições
+                console.error("Erro ao validar token:", error);
                 localStorage.removeItem('accessToken');
                 setUser(null);
                 setIsAuthenticated(false);
-
-                const isPublicRoute = publicRoutes.includes(window.location.pathname);
 
                 if (!isPublicRoute) {
                     navigate("/login");
@@ -134,6 +139,7 @@ export const AuthProvider = ({ children }) => {
                 setLoading(false);
             }
         };
+        
         checkAuthStatus();
     }, [navigate]);
 

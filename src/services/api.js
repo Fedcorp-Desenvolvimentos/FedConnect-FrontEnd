@@ -8,12 +8,11 @@ const api = axios.create({
   // baseURL: "http://localhost:8000/", 
 });
 
-// Intercepta todas as requisições Axios teste
+// Intercepta todas as requisições Axios
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
 
-    // Se o token existir, adicione-o ao cabeçalho Authorization
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,11 +24,20 @@ api.interceptors.request.use(
   }
 );
 
-const publicRoutes = ["/", "/login", "/esqueci-senha", "/resetar-senha", "/404"];
+// CORREÇÃO: Verificação correta de rotas públicas
+const publicRoutes = ["/", "/login", "/recuperar-senha", "/resetar-senha", "/404"];
 
-const isPublic = publicRoutes.some((route) =>
-  window.location.pathname.startsWith(route)
-);
+const isPublic = publicRoutes.some((route) => {
+  const pathname = window.location.pathname;
+  
+  // Caso especial para /resetar-senha/:token
+  if (route === "/resetar-senha") {
+    return pathname.startsWith("/resetar-senha/") || pathname === "/resetar-senha";
+  }
+  
+  // Para as outras rotas, verificação exata
+  return pathname === route;
+});
 
 api.interceptors.response.use(
   (response) => response,
