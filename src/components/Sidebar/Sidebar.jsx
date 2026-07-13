@@ -12,7 +12,7 @@ import {
   FaCog,
   FaProjectDiagram,
   FaUsers,
-  FaFileInvoiceDollar, 
+  FaFileInvoiceDollar,
   FaUserPlus
 
 } from "react-icons/fa";
@@ -79,14 +79,14 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
     { path: "/consultas", label: "Consultas", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"] },
     { path: "/consulta-comercial", label: "Comercial", icon: <FaBriefcase />, allowed: ["admin", "comercial", "financeiro"] },
     { path: "/ferramentas", label: "Ferramentas", icon: <FaTools />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"] },
-    { path: "/faturamento", label: "Faturamento", icon: <FaWallet />, allowed: ["admin", "faturamento", "ti", "financeiro"] },
+    { path: "/faturamento", label: "Faturamento", icon: <FaWallet />, allowed: ["admin", "faturamento", "ti"] },
     { path: "/metricas", label: "Métricas", icon: <FaChartBar />, allowed: ["admin"] },
     { path: "/agenda", label: "Agenda", icon: <FaCalendarAlt />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"] },
     { path: "/automacao", label: "Automação", icon: <FaCog />, allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin", "faturamento", "ti", "usuario", "comercial", "financeiro"] : ["admin"] },
-    { path: "/analytics", label: "Estatísticas", icon: <FaChartLine />, allowed: ["admin", "ti", "financeiro"] },
+    { path: "/analytics", label: "Estatísticas", icon: <FaChartLine />, allowed: ["admin", "ti"] },
     { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"] },
-    { path: "/financeiro", label: "Financeiro", icon: <FaFileInvoiceDollar  />, allowed: ["admin", "ti", "financeiro"] },
-    { path: "/cadastro-pessoas", label: "Cadastro", icon: <FaUserPlus />, allowed: ["admin", "ti", "financeiro"] },
+    { path: "/financeiro", label: "Financeiro", icon: <FaFileInvoiceDollar />, allowed: ["admin", "ti", "financeiro"] },
+    { path: "/cadastro-pessoas", label: "Cadastro", icon: <FaUserPlus />, allowed: ["admin", "ti"] },
     // { path: "/workflow", label: "Workflow", icon: <FaProjectDiagram />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     // { path: "/rh", label: "Recursos Humanos", icon: <FaUsers />, allowed: ["admin"] },
   ];
