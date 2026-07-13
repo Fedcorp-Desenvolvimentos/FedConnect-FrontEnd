@@ -72,7 +72,7 @@ const PessoaFormFields = ({
                 name="data_cadastro"
                 value={data.data_cadastro}
                 onChange={onChange}
-                disabled={disabled}
+                disabled={true}
               />
             </S.FormGroup>
           </S.FormRow>
