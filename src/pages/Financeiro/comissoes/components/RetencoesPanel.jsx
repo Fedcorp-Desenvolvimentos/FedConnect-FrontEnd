@@ -1,143 +1,271 @@
-import React, { useEffect } from 'react';
+// src/pages/Financeiro/comissoes/components/RetencoesPanel.jsx
+
+import React, { useMemo } from 'react';
 import { FaPercentage, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
 import {
-  RetentionCard,
-  CardHeader,
-  RetentionStats,
-  RetentionOptionList,
-  RetentionOption,
-  RetentionStatus,
-  RetentionInfo
+    RetentionCard,
+    CardHeader,
+    RetentionStats,
+    RetentionOptionList,
+    RetentionOption,
+    RetentionStatus
 } from '../ComissoesStyles';
 
 const RETENTION_OPTIONS = [
-  { id: 'iss', label: 'ISS', rate: 0.02 },
-  { id: 'ir', label: 'IR', rate: 0.015 },
-  { id: 'cofins', label: 'COFINS', rate: 0.03 },
-  { id: 'csll', label: 'CSLL', rate: 0.01 },
-  { id: 'pis', label: 'PIS', rate: 0.0065 },
-  { id: 'inss', label: 'INSS', rate: 0.11 },
+    { id: 'iss', label: 'ISS', rate: 0.02 },
+    { id: 'ir', label: 'IR', rate: 0.015 },
+    { id: 'cofins', label: 'COFINS', rate: 0.03 },
+    { id: 'csll', label: 'CSLL', rate: 0.01 },
+    { id: 'pis', label: 'PIS', rate: 0.0065 },
+    { id: 'inss', label: 'INSS', rate: 0.11 },
 ];
 
 const formatMoney = (value) => {
-  if (value === null || value === undefined) return 'R$ 0,00';
-  return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
+    if (value === null || value === undefined) return 'R$ 0,00';
+    return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
 };
 
 const formatRate = (rate) => `${(rate * 100).toFixed(rate * 100 % 1 ? 2 : 0)}%`;
 
+const getComissaoKey = (c) => {
+    const documento = c.DOCUMENTO ?? '';
+    const favor = c.FAVOR ?? '';
+    const tipo = c.TIPO ?? '';
+    const parcela = c.PARCELA ?? '1';
+    const valor = Number(c.VALOR ?? 0).toFixed(2);
+    return [documento, favor, tipo, parcela, valor].join('|');
+};
+
 export function RetencoesPanel({ 
-  selectedRetentions, 
-  totals, 
-  onToggleRetention, 
-  hasResults, 
-  comissoes,
-  onVerificarRetencoes,
-  retencoesVerificadas,
-  loading 
+    selectedRetentions, 
+    totals, 
+    onToggleRetention, 
+    hasResults, 
+    comissoes,
+    onVerificarRetencoes,
+    retencoesVerificadas,
+    loading,
+    selectedComissoes 
 }) {
-  const hasAutomaticRetentions = retencoesVerificadas?.comissoes?.some(
-    c => c.retencoes_calculadas?.aplicaveis?.length > 0
-  );
+    const isIsento = retencoesVerificadas?.isIsento || false;
+    const motivo = retencoesVerificadas?.motivo || '';
+    const detalhesRetencoes = retencoesVerificadas?.detalhesRetencoes || {};
+    const regimeInfo = retencoesVerificadas?.regimeInfo;
 
-  const getIsencaoMotivo = () => {
-    if (!retencoesVerificadas?.comissoes) return null;
-    
-    const motivos = new Set();
-    retencoesVerificadas.comissoes.forEach(c => {
-      if (c.retencoes_calculadas?.motivo) {
-        motivos.add(c.retencoes_calculadas.motivo);
-      }
-    });
-    
-    return Array.from(motivos).join('; ');
-  };
-
-  return (
-    <RetentionCard>
-      <CardHeader>
-        <div>
-          <FaPercentage />
-          <h2>Retenções</h2>
-          <span>Aplicadas sobre o total selecionado</span>
-        </div>
+    // CALCULA O TOTAL BRUTO DAS COMISSÕES SELECIONADAS
+    const totalBrutoSelecionado = useMemo(() => {
+        if (!comissoes || !selectedComissoes || selectedComissoes.size === 0) return 0;
         
-        {hasResults && comissoes.length > 0 && (
-          <button 
-            onClick={onVerificarRetencoes}
-            disabled={loading}
-            style={{
-              background: 'var(--navy-800)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '6px 12px',
-              fontSize: '11px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            <FaCheckCircle />
-            Verificar Retenções
-          </button>
-        )}
-      </CardHeader>
+        return comissoes
+            .filter(c => selectedComissoes.has(getComissaoKey(c)))
+            .reduce((sum, c) => sum + Number(c.VALOR || c.valor || 0), 0);
+    }, [comissoes, selectedComissoes]);
 
-      {retencoesVerificadas && !hasAutomaticRetentions && (
-        <RetentionStatus>
-          <FaInfoCircle />
-          <span>
-            {retencoesVerificadas.comissoes.length > 0 
-              ? `Isento de retenções: ${getIsencaoMotivo() || 'Aplicam-se regras de isenção'}`
-              : 'Nenhuma retenção aplicável'}
-          </span>
-        </RetentionStatus>
-      )}
+    // CALCULA AS RETENÇÕES COM BASE NO TOTAL BRUTO REAL
+    const retencoesCalculadas = useMemo(() => {
+        const result = {};
+        const grossTotal = totalBrutoSelecionado;
+        
+        RETENTION_OPTIONS.forEach(item => {
+            const isAplicavel = detalhesRetencoes[item.id]?.aplicavel || false;
+            
+            // ⭐ SE FOR ISENTO, NUNCA MARCA
+            // ⭐ SE NÃO FOR ISENTO, MARCA APENAS SE FOR APLICÁVEL
+            const checked = !isIsento && (selectedRetentions.includes(item.id) || isAplicavel);
+            
+            result[item.id] = {
+                ...item,
+                checked: checked,
+                valor: checked ? grossTotal * item.rate : 0,
+                isAutomatic: isAplicavel && !isIsento,
+                isIsento: isIsento,
+                aplicavel: isAplicavel,
+            };
+        });
+        
+        return result;
+    }, [totalBrutoSelecionado, selectedRetentions, detalhesRetencoes, isIsento]);
 
-      <RetentionStats>
-        <div>
-          <span>Bruto</span>
-          <strong>{formatMoney(totals.grossTotal)}</strong>
-        </div>
-        <div className="retained">
-          <span>Retido</span>
-          <strong>{formatMoney(totals.retentionTotal)}</strong>
-        </div>
-        <div className="net" style={{ gridColumn: '1 / -1' }}>
-          <span>Líquido a repassar</span>
-          <strong>{formatMoney(totals.netTotal)}</strong>
-        </div>
-      </RetentionStats>
+    // CALCULA OS TOTAIS REAIS
+    const totaisReais = useMemo(() => {
+        const grossTotal = totalBrutoSelecionado;
+        const retentionTotal = Object.values(retencoesCalculadas)
+            .filter(r => r.checked)
+            .reduce((sum, r) => sum + r.valor, 0);
+        
+        return {
+            grossTotal,
+            retentionTotal,
+            netTotal: grossTotal - retentionTotal
+        };
+    }, [totalBrutoSelecionado, retencoesCalculadas]);
 
-      <RetentionOptionList>
-        {RETENTION_OPTIONS.map((item) => {
-          const checked = selectedRetentions.includes(item.id);
-          const value = hasResults ? totals.grossTotal * item.rate : 0;
-          
-          const isAutomatic = retencoesVerificadas?.comissoes?.some(
-            c => c.retencoes_calculadas?.aplicaveis?.some(r => r.tipo === item.id)
-          );
+    // DEFINE O STATUS
+    let statusText = '';
+    let statusColor = '';
+    let statusBg = '';
+    
+    if (retencoesVerificadas) {
+        if (isIsento) {
+            statusText = `✅ ${motivo || 'Isento de retenções'}`;
+            statusColor = '#2E7D32';
+            statusBg = '#E8F5E9';
+        } else if (regimeInfo?.temCodAgenc && regimeInfo?.todosNaoOptantes) {
+            statusText = '📋 Agenciador - Apenas IR retido';
+            statusColor = '#E65100';
+            statusBg = '#FFF3E0';
+        } else if (regimeInfo?.todosNaoOptantes) {
+            statusText = '⚠️ Não optante - Retenções completas aplicadas';
+            statusColor = '#C62828';
+            statusBg = '#FFEBEE';
+        } else if (regimeInfo?.isMisto) {
+            statusText = '🔄 Regime misto - Retenções combinadas';
+            statusColor = '#616161';
+            statusBg = '#F5F5F5';
+        } else {
+            statusText = `ℹ️ ${motivo || 'Verificação concluída'}`;
+            statusColor = '#1565C0';
+            statusBg = '#E3F2FD';
+        }
+    }
 
-          return (
-            <RetentionOption key={item.id} checked={checked} isAutomatic={isAutomatic}>
-              <span className="left">
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => onToggleRetention(item.id)}
-                  disabled={isAutomatic}
-                />
-                <span className="name">{item.label}</span>
-                <span className="rate">{formatRate(item.rate)}</span>
-                {isAutomatic && <span className="auto-badge">Auto</span>}
-              </span>
-              <span className="amount">{checked ? `- ${formatMoney(value)}` : formatMoney(0)}</span>
-            </RetentionOption>
-          );
-        })}
-      </RetentionOptionList>
-    </RetentionCard>
-  );
+    const mostrarValores = totalBrutoSelecionado > 0 && !isIsento;
+
+    return (
+        <RetentionCard>
+            <CardHeader>
+                <div>
+                    <FaPercentage />
+                    <h2>Retenções</h2>
+                    <span>Aplicadas sobre o total selecionado</span>
+                </div>
+                
+                {hasResults && comissoes.length > 0 && selectedComissoes?.size > 0 && (
+                    <button 
+                        onClick={onVerificarRetencoes}
+                        disabled={loading}
+                        style={{
+                            background: '#2b6cb0',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '6px 12px',
+                            fontSize: '11px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                        }}
+                    >
+                        <FaCheckCircle />
+                        Verificar
+                    </button>
+                )}
+            </CardHeader>
+
+            {retencoesVerificadas && statusText && (
+                <RetentionStatus style={{ 
+                    backgroundColor: statusBg,
+                    borderColor: statusColor,
+                    color: statusColor
+                }}>
+                    <FaInfoCircle />
+                    <span>{statusText}</span>
+                </RetentionStatus>
+            )}
+
+            <RetentionStats>
+                <div>
+                    <span>Bruto</span>
+                    <strong>{formatMoney(totaisReais.grossTotal)}</strong>
+                </div>
+                <div className="retained">
+                    <span>Retido</span>
+                    <strong>{isIsento ? formatMoney(0) : formatMoney(totaisReais.retentionTotal)}</strong>
+                </div>
+                <div className="net" style={{ gridColumn: '1 / -1' }}>
+                    <span>Líquido a repassar</span>
+                    <strong>{formatMoney(totaisReais.netTotal)}</strong>
+                </div>
+            </RetentionStats>
+
+            <RetentionOptionList>
+                {RETENTION_OPTIONS.map((item) => {
+                    const retention = retencoesCalculadas[item.id];
+                    const checked = retention?.checked || false;
+                    const value = retention?.valor || 0;
+                    const isAutomatic = retention?.isAutomatic || false;
+                    const aplicavel = retention?.aplicavel || false;
+
+                    return (
+                        <RetentionOption 
+                            key={item.id} 
+                            checked={checked}
+                            isAutomatic={isAutomatic}
+                            isIsento={isIsento}
+                            style={{
+                                opacity: isIsento ? 0.7 : 1,
+                                backgroundColor: isAutomatic && !isIsento ? '#E3F2FD' : 
+                                                (isIsento ? '#F5F5F5' : undefined),
+                                borderColor: isAutomatic && !isIsento ? '#90CAF9' :
+                                            (isIsento ? '#E0E0E0' : undefined),
+                                cursor: isIsento ? 'default' : 'pointer',
+                            }}
+                        >
+                            <span className="left">
+                                <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => onToggleRetention(item.id)}
+                                    disabled={isIsento}
+                                    style={{ 
+                                        accentColor: '#2b6cb0',
+                                        cursor: isIsento ? 'default' : 'pointer'
+                                    }}
+                                />
+                                <span className="name">{item.label}</span>
+                                <span className="rate">{formatRate(item.rate)}</span>
+                                {isAutomatic && !isIsento && (
+                                    <span style={{ 
+                                        fontSize: '9px', 
+                                        background: '#2b6cb0', 
+                                        color: '#fff',
+                                        padding: '1px 6px',
+                                        borderRadius: '3px',
+                                        marginLeft: '4px'
+                                    }}>
+                                        Auto
+                                    </span>
+                                )}
+                                {isIsento && (
+                                    <span style={{ 
+                                        fontSize: '9px', 
+                                        background: '#4CAF50', 
+                                        color: '#fff',
+                                        padding: '1px 6px',
+                                        borderRadius: '3px',
+                                        marginLeft: '4px'
+                                    }}>
+                                        Isento
+                                    </span>
+                                )}
+                                {!isIsento && !aplicavel && !checked && (
+                                    <span style={{ 
+                                        fontSize: '9px', 
+                                        color: '#999',
+                                        marginLeft: '4px'
+                                    }}>
+                                        (opcional)
+                                    </span>
+                                )}
+                            </span>
+                            <span className="amount">
+                                {checked && mostrarValores ? `- ${formatMoney(value)}` : formatMoney(0)}
+                            </span>
+                        </RetentionOption>
+                    );
+                })}
+            </RetentionOptionList>
+        </RetentionCard>
+    );
 }

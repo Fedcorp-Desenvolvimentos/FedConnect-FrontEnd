@@ -1,3 +1,5 @@
+// src/pages/Financeiro/comissoes/ComissoesStyles.js
+
 import styled, { keyframes } from 'styled-components';
 
 const pulse = keyframes`
@@ -21,7 +23,7 @@ const slideUp = keyframes`
 `;
 
 /* ---------------------------------------------------
-   Design tokens (kept local to avoid a global refactor)
+   Design tokens
 --------------------------------------------------- */
 export const tokens = {
   ink: '#1a202c',
@@ -149,8 +151,7 @@ export const InfoBanner = styled.div`
 `;
 
 /* ---------------------------------------------------
-   Page layout: main workflow column + sticky sidebar
-   for taxes/retentions + issuance actions
+   Page layout
 --------------------------------------------------- */
 export const PageLayout = styled.div`
   display: grid;
@@ -679,7 +680,7 @@ export const EmptyStateText = styled.p`
 `;
 
 /* ---------------------------------------------------
-   Retenções (sidebar tax card)
+   Retenções
 --------------------------------------------------- */
 export const RetentionCard = styled(Card)`
   padding: 18px;
@@ -733,14 +734,23 @@ export const RetentionOption = styled.label`
   gap: 10px;
   padding: 9px 11px;
   border-radius: 9px;
-  border: 1px solid ${(props) => (props.checked ? '#bfdcf3' : tokens.line)};
-  background: ${(props) => (props.checked ? tokens.primarySoft : tokens.surface)};
-  cursor: pointer;
+  border: 1px solid ${(props) => {
+    if (props.isIsento) return '#A5D6A7';
+    if (props.checked) return '#90CAF9';
+    return tokens.line;
+  }};
+  background: ${(props) => {
+    if (props.isIsento) return '#E8F5E9';
+    if (props.checked) return tokens.primarySoft;
+    if (props.isAutomatic) return '#E3F2FD';
+    return tokens.surface;
+  }};
+  cursor: ${(props) => (props.isIsento ? 'default' : 'pointer')};
   transition: all 0.12s;
   font-size: 13px;
 
   &:hover {
-    border-color: ${tokens.primary};
+    border-color: ${(props) => (props.isIsento ? '#A5D6A7' : tokens.primary)};
   }
 
   .left {
@@ -749,7 +759,7 @@ export const RetentionOption = styled.label`
     gap: 9px;
 
     input[type='checkbox'] {
-      cursor: pointer;
+      cursor: ${(props) => (props.isIsento ? 'default' : 'pointer')};
       accent-color: ${tokens.primary};
       width: 15px;
       height: 15px;
@@ -769,13 +779,17 @@ export const RetentionOption = styled.label`
   .amount {
     font-size: 12.5px;
     font-weight: 600;
-    color: ${(props) => (props.checked ? tokens.negative : tokens.faint)};
+    color: ${(props) => {
+      if (props.isIsento) return '#4CAF50';
+      if (props.checked) return tokens.negative;
+      return tokens.faint;
+    }};
     white-space: nowrap;
   }
 `;
 
 /* ---------------------------------------------------
-   Preview modal (document-style receipt/voucher preview)
+   Preview modal
 --------------------------------------------------- */
 export const ModalOverlay = styled.div`
   position: fixed;

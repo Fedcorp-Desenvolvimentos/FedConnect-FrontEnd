@@ -1,3 +1,5 @@
+// src/pages/Financeiro/comissoes/Comissoes.jsx
+
 import React from 'react';
 import { FaArrowLeft, FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -152,6 +154,7 @@ export default function Comissoes() {
               onVerificarRetencoes={verificarRetencoesComissoes}
               retencoesVerificadas={retencoesVerificadas}
               loading={loading}
+              selectedComissoes={selectedComissoes}
             />
           )}
 
