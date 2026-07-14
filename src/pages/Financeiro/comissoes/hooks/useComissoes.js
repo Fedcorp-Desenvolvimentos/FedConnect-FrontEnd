@@ -1,3 +1,5 @@
+// src/pages/Financeiro/comissoes/hooks/useComissoes.js
+
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useSnackbar } from 'notistack';
 import { useLoading } from '../../../../hooks/useLoading';
@@ -9,6 +11,10 @@ import {
   emitirRecibo
 } from '../../../../services/comissoesService';
 import { useAuth } from '../../../../context/AuthContext';
+import { 
+  calcularRetencoesFrontend, 
+  calcularRetencoesConsolidadas,
+} from '../../../../utils/regras_retencao';
 
 const INITIAL_FILTERS = {
   favorecido: '',
@@ -263,6 +269,12 @@ export const useEmissaoRecibos = () => {
     setRetencoesVerificadas(null);
   }, []);
 
+  // RESETA AS RETENÇÕES QUANDO A LISTA DE COMISSÕES MUDA
+  useEffect(() => {
+    setSelectedRetentions([]);
+    setRetencoesVerificadas(null);
+  }, [comissoes]);
+
   const buscarComissoes = useCallback(
     async (novosFiltros = {}) => {
       const filtrosAtualizados = { ...filters, ...novosFiltros };
@@ -293,9 +305,10 @@ export const useEmissaoRecibos = () => {
         setIsUsingFilteredData(usingFilteredMode);
         setHasSearched(true);
 
-        if (!usingFilteredMode) {
-          resetSelections();
-        }
+        // RESETA SELEÇÕES E RETENÇÕES
+        setSelectedComissoes(new Set());
+        setSelectedRetentions([]);
+        setRetencoesVerificadas(null);
 
         if (lista.length === 0) {
           enqueueSnackbar(`Nenhuma comissão encontrada para ${formatDataCorte(getCurrentMonthDate())}`, {
@@ -315,7 +328,7 @@ export const useEmissaoRecibos = () => {
         setLoadingInitial(false);
       }
     },
-    [filters, withLoading, enqueueSnackbar, resetSelections]
+    [filters, withLoading, enqueueSnackbar]
   );
 
   const buscarTudo = useCallback(async () => {
@@ -336,12 +349,14 @@ export const useEmissaoRecibos = () => {
     setTotalRegistros(0);
     setIsUsingFilteredData(false);
     setHasSearched(false);
-    resetSelections();
+    setSelectedComissoes(new Set());
+    setSelectedRetentions([]);
+    setRetencoesVerificadas(null);
 
     enqueueSnackbar('Filtros limpos. Faça uma nova consulta.', {
       variant: 'info',
     });
-  }, [enqueueSnackbar, resetSelections]);
+  }, [enqueueSnackbar]);
 
   // Auto-calcula retenções quando comissões são selecionadas/desmarcadas
   useEffect(() => {
@@ -415,6 +430,9 @@ export const useEmissaoRecibos = () => {
       }
       return next;
     });
+
+    // RESETA RETENÇÕES VERIFICADAS QUANDO MUDA SELEÇÃO
+    setRetencoesVerificadas(null);
   }, []);
 
   const toggleAllComissoes = useCallback(() => {
@@ -434,6 +452,9 @@ export const useEmissaoRecibos = () => {
 
       return next;
     });
+
+    // RESETA RETENÇÕES VERIFICADAS
+    setRetencoesVerificadas(null);
   }, [comissoes, selectedComissoes]);
 
   const toggleRetention = useCallback((retentionId) => {
@@ -445,15 +466,33 @@ export const useEmissaoRecibos = () => {
     });
   }, []);
 
-  const retentionSummary = useMemo(() => {
-    const selecionadas = comissoes.filter((c) => selectedComissoes.has(getComissaoKey(c)));
-
-    const grossTotal = selecionadas.reduce((sum, c) => {
+  const totalBrutoSelecionado = useMemo(() => {
+    const selecionadas = comissoes.filter((c) => 
+      selectedComissoes.has(getComissaoKey(c))
+    );
+    
+    return selecionadas.reduce((sum, c) => {
       return sum + Number(c.VALOR || c.valor || c.VALOR_COMISSAO || c.valor_comissao || 0);
     }, 0);
+  }, [comissoes, selectedComissoes]);
+
+  const retentionSummary = useMemo(() => {
+    const selecionadas = comissoes.filter((c) => 
+      selectedComissoes.has(getComissaoKey(c))
+    );
+
+    const grossTotal = totalBrutoSelecionado;
+
+    // USA AS RETENÇÕES VERIFICADAS OU CALCULA DO ZERO
+    let retencoesAtivas = [];
+    if (retencoesVerificadas?.retencoesAplicaveis) {
+      retencoesAtivas = retencoesVerificadas.retencoesAplicaveis;
+    } else if (selectedRetentions.length > 0) {
+      retencoesAtivas = selectedRetentions;
+    }
 
     const retentionRows = RETENTION_OPTIONS.filter((opt) =>
-      selectedRetentions.includes(opt.id)
+      retencoesAtivas.includes(opt.id)
     ).map((opt) => ({
       ...opt,
       value: grossTotal * opt.rate,
@@ -468,7 +507,7 @@ export const useEmissaoRecibos = () => {
       netTotal: grossTotal - retentionTotal,
       count: selecionadas.length,
     };
-  }, [comissoes, selectedComissoes, selectedRetentions]);
+  }, [comissoes, selectedComissoes, selectedRetentions, totalBrutoSelecionado, retencoesVerificadas]);
 
   const totals = useMemo(() => {
     return {
@@ -479,7 +518,6 @@ export const useEmissaoRecibos = () => {
     };
   }, [retentionSummary]);
 
-  // ⭐ FUNÇÃO QUE VERIFICA RETENÇÕES NO FRONTEND (SEM CHAMADA AO BACKEND)
   const verificarRetencoesComissoes = useCallback(async () => {
     if (selectedComissoes.size === 0) {
       enqueueSnackbar('Selecione pelo menos uma comissão', { variant: 'warning' });
@@ -493,53 +531,43 @@ export const useEmissaoRecibos = () => {
         selectedComissoes.has(getComissaoKey(c))
       );
 
-      // ⭐ CALCULA RETENÇÕES DIRETAMENTE NO FRONTEND
-      const comissoesComRetencoes = comissoesSelecionadas.map(c => {
-        const resultado = calcularRetencoesFrontend(c);
-        return {
-          ...c,
-          retencoes_calculadas: {
-            aplicaveis: Object.entries(resultado.retencoes)
-              .filter(([_, v]) => v.aplicavel)
-              .map(([key, v]) => ({
-                tipo: key,
-                valor: v.valor,
-                aliquota: v.aliquota
-              })),
-            total_retencoes: resultado.total_retencoes,
-            valor_liquido: resultado.valor_liquido,
-            motivo: resultado.motivo
-          }
-        };
-      });
+      // USA A FUNÇÃO CONSOLIDADA
+      const resultado = calcularRetencoesConsolidadas(
+        comissoesSelecionadas,
+        totalBrutoSelecionado
+      );
 
-      const totalBruto = comissoesComRetencoes.reduce((sum, c) => sum + Number(c.VALOR || 0), 0);
-      const totalRetencoes = comissoesComRetencoes.reduce((sum, c) => sum + c.retencoes_calculadas.total_retencoes, 0);
-
-      const response = {
+      setRetencoesVerificadas({
         status: 'success',
-        total_bruto: totalBruto,
-        total_retencoes: totalRetencoes,
-        total_liquido: totalBruto - totalRetencoes,
-        quantidade: comissoesComRetencoes.length,
-        comissoes: comissoesComRetencoes,
-        timestamp: new Date().toISOString()
-      };
-
-      setRetencoesVerificadas(response);
-      
-      // Auto-seleciona retenções aplicáveis
-      const retencoesAplicaveis = new Set();
-      response.comissoes.forEach(c => {
-        c.retencoes_calculadas?.aplicaveis?.forEach(r => {
-          retencoesAplicaveis.add(r.tipo);
-        });
+        total_bruto: resultado.totalBruto,
+        total_retencoes: resultado.totalRetencoes,
+        total_liquido: resultado.valorLiquido,
+        quantidade: comissoesSelecionadas.length,
+        comissoes: resultado.comissoesComDetalhes,
+        timestamp: new Date().toISOString(),
+        retencoesAplicaveis: resultado.retencoesAplicaveis,
+        isIsento: resultado.isIsento,
+        motivo: resultado.motivo,
+        regimeInfo: resultado.regimeInfo,
+        detalhesRetencoes: resultado.retencoes,
       });
+
+      // ATUALIZA AS RETENÇÕES SELECIONADAS COM AS APLICÁVEIS
+      setSelectedRetentions(resultado.retencoesAplicaveis);
       
-      setSelectedRetentions(Array.from(retencoesAplicaveis));
+      let mensagem;
+      if (resultado.isIsento) {
+        mensagem = `✅ ${resultado.motivo}`;
+      } else if (resultado.regimeInfo.todosNaoOptantes && resultado.regimeInfo.temAgenc) {
+        mensagem = '📋 Agenciador - Apenas IR retido';
+      } else if (resultado.regimeInfo.todosNaoOptantes) {
+        mensagem = '⚠️ Não optante - Retenções completas aplicadas';
+      } else {
+        mensagem = `🔄 Regime misto - ${resultado.retencoesAplicaveis.length} retenção(ões) aplicada(s)`;
+      }
       
-      enqueueSnackbar(`Retenções verificadas: ${response.comissoes.length} comissão(ões)`, {
-        variant: 'success'
+      enqueueSnackbar(`${mensagem} (${comissoesSelecionadas.length} comissão(ões))`, {
+        variant: resultado.isIsento ? 'info' : 'success'
       });
       
     } catch (error) {
@@ -548,25 +576,57 @@ export const useEmissaoRecibos = () => {
     } finally {
       stopLoading();
     }
-  }, [selectedComissoes, comissoes, enqueueSnackbar, startLoading, stopLoading]);
+  }, [selectedComissoes, comissoes, enqueueSnackbar, startLoading, stopLoading, totalBrutoSelecionado]);
 
   const buildDocumentPayload = useCallback(() => {
     const comissoesSelecionadas = comissoes.filter((c) => 
       selectedComissoes.has(getComissaoKey(c))
     );
 
+    // USA OS DADOS JÁ VERIFICADOS OU CALCULA NOVAMENTE
+    let resultado;
+    if (retencoesVerificadas?.comissoes?.length > 0) {
+      resultado = {
+        totalBruto: retencoesVerificadas.total_bruto,
+        totalRetencoes: retencoesVerificadas.total_retencoes,
+        valorLiquido: retencoesVerificadas.total_liquido,
+        retencoesAplicaveis: retencoesVerificadas.retencoesAplicaveis,
+        detalhesRetencoes: retencoesVerificadas.detalhesRetencoes || {},
+      };
+    } else {
+      const calculado = calcularRetencoesConsolidadas(
+        comissoesSelecionadas,
+        totalBrutoSelecionado
+      );
+      resultado = {
+        totalBruto: calculado.totalBruto,
+        totalRetencoes: calculado.totalRetencoes,
+        valorLiquido: calculado.valorLiquido,
+        retencoesAplicaveis: calculado.retencoesAplicaveis,
+        detalhesRetencoes: calculado.retencoes,
+      };
+    }
+
+    // CONSTRÓI AS RETENÇÕES PARA O PAYLOAD
+    const retencoesAplicadas = [];
+    Object.values(resultado.detalhesRetencoes || {}).forEach(r => {
+      if (r.aplicavel) {
+        retencoesAplicadas.push({
+          tipo: r.label || r.id?.toUpperCase() || 'RETENÇÃO',
+          aliquota: `${((r.rate || 0) * 100).toFixed(2)}%`,
+          valor: r.valor || 0,
+        });
+      }
+    });
+
     return {
       tipoDocumento: documentType,
       dataEmissao: new Date().toISOString(),
       dataCorteFormatada: formatDataCorte(getCurrentMonthDate()),
       totalComissoes: comissoesSelecionadas.length,
-      valorTotalBruto: retentionSummary.grossTotal,
-      valorLiquido: retentionSummary.netTotal,
-      retencoesAplicadas: retentionSummary.retentionRows.map((r) => ({
-        tipo: r.label,
-        aliquota: `${(r.rate * 100).toFixed(2)}%`,
-        valor: r.value,
-      })),
+      valorTotalBruto: resultado.totalBruto,
+      valorLiquido: resultado.valorLiquido,
+      retencoesAplicadas: retencoesAplicadas,
       
       comissoes: comissoesSelecionadas.map((c) => ({
         fatura: c.FATURA || c.fatura || '',
@@ -632,9 +692,9 @@ export const useEmissaoRecibos = () => {
       
       resumoGeral: {
         totalComissoesSelecionadas: comissoesSelecionadas.length,
-        valorTotalBruto: retentionSummary.grossTotal,
-        totalRetencoes: retentionSummary.retentionTotal,
-        valorLiquidoFinal: retentionSummary.netTotal,
+        valorTotalBruto: resultado.totalBruto,
+        totalRetencoes: resultado.totalRetencoes,
+        valorLiquidoFinal: resultado.valorLiquido,
       },
       
       registrosBrutos: comissoesSelecionadas,
@@ -643,8 +703,9 @@ export const useEmissaoRecibos = () => {
     comissoes, 
     selectedComissoes, 
     documentType, 
-    retentionSummary, 
-    filters
+    filters,
+    retencoesVerificadas,
+    totalBrutoSelecionado
   ]);
 
   const emitirDocumento = useCallback(async () => {
@@ -659,6 +720,40 @@ export const useEmissaoRecibos = () => {
       const comissoesSelecionadas = comissoes.filter((c) => 
         selectedComissoes.has(getComissaoKey(c))
       );
+
+      // USA OS DADOS VERIFICADOS OU CALCULA
+      let resultado;
+      if (retencoesVerificadas?.comissoes?.length > 0) {
+        resultado = {
+          totalBruto: retencoesVerificadas.total_bruto,
+          totalRetencoes: retencoesVerificadas.total_retencoes,
+          valorLiquido: retencoesVerificadas.total_liquido,
+          detalhesRetencoes: retencoesVerificadas.detalhesRetencoes || {},
+        };
+      } else {
+        const calculado = calcularRetencoesConsolidadas(
+          comissoesSelecionadas,
+          totalBrutoSelecionado
+        );
+        resultado = {
+          totalBruto: calculado.totalBruto,
+          totalRetencoes: calculado.totalRetencoes,
+          valorLiquido: calculado.valorLiquido,
+          detalhesRetencoes: calculado.retencoes,
+        };
+      }
+
+      // CONSTRÓI RETENÇÕES PARA O PAYLOAD
+      const retencoesPayload = [];
+      Object.values(resultado.detalhesRetencoes || {}).forEach(r => {
+        if (r.aplicavel) {
+          retencoesPayload.push({
+            tipo: r.label || r.id?.toUpperCase() || 'RETENÇÃO',
+            aliquota: r.rate || 0,
+            valor: r.valor || 0,
+          });
+        }
+      });
 
       const payload = {
         tipo_documento: documentType,
@@ -715,19 +810,12 @@ export const useEmissaoRecibos = () => {
           assist: c.ASSIST || c.assist || 'N',
           qtd_vidas: Number(c.QTD_VIDAS || c.qtd_vidas || 0),
         })),
-        retencoes: selectedRetentions.map((id) => {
-          const opt = RETENTION_OPTIONS.find((o) => o.id === id);
-          return {
-            tipo: opt?.label || id,
-            aliquota: opt?.rate || 0,
-            valor: retentionSummary.grossTotal * (opt?.rate || 0),
-          };
-        }),
+        retencoes: retencoesPayload,
         resumo: {
           total_comissoes: comissoesSelecionadas.length,
-          valor_total_bruto: retentionSummary.grossTotal,
-          total_retencoes: retentionSummary.retentionTotal,
-          valor_liquido_final: retentionSummary.netTotal,
+          valor_total_bruto: resultado.totalBruto,
+          total_retencoes: resultado.totalRetencoes,
+          valor_liquido_final: resultado.valorLiquido,
         },
       };
 
@@ -751,7 +839,7 @@ export const useEmissaoRecibos = () => {
           numero: response.numero_documento || `RC-${String(Date.now()).slice(-6)}`,
           emitidoEm: new Date().toISOString(),
           tipo: documentType,
-          total: retentionSummary.netTotal,
+          total: resultado.valorLiquido,
           quantidade: payload.resumo.total_comissoes,
         });
 
@@ -774,13 +862,13 @@ export const useEmissaoRecibos = () => {
     selectedComissoes,
     comissoes,
     documentType,
-    retentionSummary,
-    selectedRetentions,
     enqueueSnackbar,
     startLoading,
     stopLoading,
     resetSelections,
+    retencoesVerificadas,
     user,
+    totalBrutoSelecionado,
   ]);
 
   const previewDocument = useCallback(() => {
@@ -831,5 +919,6 @@ export const useEmissaoRecibos = () => {
     previewDocument,
     closePreview,
     verificarRetencoesComissoes,
+    totalBrutoSelecionado
   };
 };
