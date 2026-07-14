@@ -34,7 +34,6 @@ const RETENTION_OPTIONS = [
 
 // ⭐ REGRAS DE RETENÇÃO NO FRONTEND
 const RETENTION_RULES = {
-  MIN_VALUE_FOR_RETENTION: 215.00,
   MIN_VALUE_FOR_IR: 666.00,
 };
 
@@ -114,6 +113,7 @@ const hasMeaningfulFilters = (filters) => {
 // ⭐ FUNÇÃO QUE CALCULA RETENÇÕES NO FRONTEND
 const calcularRetencoesFrontend = (comissao) => {
   const valorComissao = Number(comissao.VALOR || comissao.valor || 0);
+  const valorParcela = Number(comissao.VALOR_PARCELA || comissao.valor_parcela || valorComissao);
   const optanteSimples = comissao.OPTOU_SIMPLES === 'S';
   const codAgenc = comissao.COD_AGENC;
 
@@ -128,27 +128,27 @@ const calcularRetencoesFrontend = (comissao) => {
 
   let motivo = '';
 
-  // REGRA 1: Valor mínimo para retenção
-  if (valorComissao < RETENTION_RULES.MIN_VALUE_FOR_RETENTION) {
-    motivo = 'Valor abaixo do mínimo para retenção (R$ 215,00)';
-    return { retencoes, total_retencoes: 0, valor_liquido: valorComissao, motivo };
-  }
-
-  // REGRA 2: Optante pelo Simples Nacional
+  // REGRA 1: Optante pelo Simples Nacional - isento de retenções
   if (optanteSimples) {
     motivo = 'Optante pelo Simples Nacional - isento de retenções';
     return { retencoes, total_retencoes: 0, valor_liquido: valorComissao, motivo };
   }
 
-  // REGRA 3: Não optante com código de serviço de agenciamento (tem COD_AGENC)
+  // REGRA 2: Não optante com código de serviço de agenciamento (tem COD_AGENC)
   if (codAgenc) {
-    // Só retém IR (se valor >= 666,00)
-    if (valorComissao >= RETENTION_RULES.MIN_VALUE_FOR_IR) {
+    // Só retém IR (se valor da parcela >= 666,00)
+    if (valorParcela >= RETENTION_RULES.MIN_VALUE_FOR_IR) {
       retencoes.ir.aplicavel = true;
       retencoes.ir.valor = valorComissao * 0.015;
     }
     
     const totalRetencoes = Object.values(retencoes).reduce((sum, r) => sum + (r.aplicavel ? r.valor : 0), 0);
+    
+    if (totalRetencoes < 10) {
+      motivo = 'Soma dos impostos abaixo de R$ 10,00 - isento de retenção';
+      return { retencoes, total_retencoes: 0, valor_liquido: valorComissao, motivo };
+    }
+    
     motivo = 'Agenciador - apenas IR retido';
     
     return {
@@ -159,9 +159,9 @@ const calcularRetencoesFrontend = (comissao) => {
     };
   }
 
-  // REGRA 4: Não optante - retém todos os impostos
-  // IR só se valor >= 666,00
-  if (valorComissao >= RETENTION_RULES.MIN_VALUE_FOR_IR) {
+  // REGRA 3: Não optante - retém todos os impostos
+  // IR só se valor da parcela >= 666,00
+  if (valorParcela >= RETENTION_RULES.MIN_VALUE_FOR_IR) {
     retencoes.ir.aplicavel = true;
     retencoes.ir.valor = valorComissao * 0.015;
   }
@@ -180,6 +180,12 @@ const calcularRetencoesFrontend = (comissao) => {
   retencoes.pis.valor = valorComissao * 0.0065;
 
   const totalRetencoes = Object.values(retencoes).reduce((sum, r) => sum + (r.aplicavel ? r.valor : 0), 0);
+
+  if (totalRetencoes < 10) {
+    motivo = 'Soma dos impostos abaixo de R$ 10,00 - isento de retenção';
+    return { retencoes, total_retencoes: 0, valor_liquido: valorComissao, motivo };
+  }
+
   motivo = 'Não optante - retenções completas aplicadas';
 
   return {
@@ -388,7 +394,9 @@ export const useEmissaoRecibos = () => {
     const retencoesAplicaveis = new Set();
     response.comissoes.forEach(c => {
       c.retencoes_calculadas?.aplicaveis?.forEach(r => {
-        retencoesAplicaveis.add(r.tipo);
+        if (r.tipo !== 'iss') {
+          retencoesAplicaveis.add(r.tipo);
+        }
       });
     });
 
