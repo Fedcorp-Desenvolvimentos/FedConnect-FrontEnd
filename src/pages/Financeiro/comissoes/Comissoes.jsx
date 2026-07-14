@@ -1,3 +1,5 @@
+// src/pages/Financeiro/comissoes/Comissoes.jsx
+
 import React from 'react';
 import { FaArrowLeft, FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -58,6 +60,7 @@ export default function Comissoes() {
     isUsingFilteredData,
     hasActiveFilters,
     retencoesVerificadas,
+    verificarRetencoesComissoes,
   } = useEmissaoRecibos();
 
   const canIssue = selectedComissoes?.size > 0;
@@ -141,15 +144,19 @@ export default function Comissoes() {
         </MainColumn>
 
         <Sidebar>
-          <RetencoesPanel
-            selectedRetentions={selectedRetentions}
-            totals={retentionSummary}
-            onToggleRetention={toggleRetention}
-            hasResults={hasResults}
-            comissoes={comissoes}
-            retencoesVerificadas={retencoesVerificadas}
-            loading={loading}
-          />
+          {documentType !== 'recibo' && (
+            <RetencoesPanel
+              selectedRetentions={selectedRetentions}
+              totals={retentionSummary}
+              onToggleRetention={toggleRetention}
+              hasResults={hasResults}
+              comissoes={comissoes}
+              onVerificarRetencoes={verificarRetencoesComissoes}
+              retencoesVerificadas={retencoesVerificadas}
+              loading={loading}
+              selectedComissoes={selectedComissoes}
+            />
+          )}
 
           <EmissaoPanel
             canIssue={canIssue && hasResults}

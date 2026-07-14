@@ -86,6 +86,15 @@ export const FilterForm = ({
             ))}
           </select>
         </FormGroup>
+
+        {/* <FormGroup>
+          <label>Competencia</label>
+          <input
+            type="month"
+            value={filters.competencia || ''}
+            onChange={(e) => onFilterChange('competencia', e.target.value)}
+          />
+        </FormGroup> */}
       </FormGrid>
 
       <Actions style={{ marginTop: 14, marginBottom: showAdvanced ? 0 : undefined }}>
