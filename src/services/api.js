@@ -5,7 +5,7 @@ const ambiente = "dev";
 
 const api = axios.create({
   baseURL: "https://fedconnect-backend-d6kgr.ondigitalocean.app/",
-  // baseURL: "http://localhost:8000/", 
+  // baseURL: "http://localhost:8000/",
 });
 
 // Intercepta todas as requisições Axios
@@ -29,12 +29,12 @@ const publicRoutes = ["/", "/login", "/recuperar-senha", "/resetar-senha", "/404
 
 const isPublic = publicRoutes.some((route) => {
   const pathname = window.location.pathname;
-  
+
   // Caso especial para /resetar-senha/:token
   if (route === "/resetar-senha") {
     return pathname.startsWith("/resetar-senha/") || pathname === "/resetar-senha";
   }
-  
+
   // Para as outras rotas, verificação exata
   return pathname === route;
 });
