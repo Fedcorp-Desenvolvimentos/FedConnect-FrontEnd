@@ -218,7 +218,7 @@ export const buscarFaturamento = async (filtros = {}) => {
  */
 export const emitirRecibo = async (payload) => {
   try {
-    const response = await api.post('/comissoes/emitir-recibo/', payload);
+    const response = await api.post('/comissoes/emitir-recibo/', payload, { timeout: 120000 });
     return response.data;
   } catch (error) {
     console.error('Erro ao emitir recibo:', error);
@@ -228,7 +228,7 @@ export const emitirRecibo = async (payload) => {
 
 export const emitirVoucher = async (payload) => {
   try {
-    const response = await api.post('/comissoes/emitir-voucher/', payload);
+    const response = await api.post('/comissoes/emitir-voucher/', payload, { timeout: 120000 });
     return response.data;
   } catch (error) {
     console.error('Erro ao emitir voucher:', error);
