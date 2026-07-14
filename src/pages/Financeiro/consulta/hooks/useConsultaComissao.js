@@ -153,11 +153,6 @@ export const useConsultaComissao = () => {
       return;
     }
 
-    const confirm = window.confirm(
-      `Tem certeza que deseja cancelar ${selectedKeys.size} comissão(ões)?`
-    );
-    if (!confirm) return;
-
     startLoading('Cancelando comissões...');
     
     try {
@@ -168,8 +163,8 @@ export const useConsultaComissao = () => {
 
       const payload = {
         comissoes: selected.map((c) => ({
-          fatura: Number(c.FATURA || c.fatura),
-          parcela: Number(c.PARCELA || c.parcela || 1),
+          fatura: String(c.FATURA || c.fatura || ''),
+          parcela: String(c.PARCELA || c.parcela || '1'),
           documento: c.DOCUMENTO || c.documento || '',
           favorecido: c.FAVOR || c.favor || '',
           voucher: c.VOUCHER || c.voucher || '',
@@ -188,16 +183,16 @@ export const useConsultaComissao = () => {
 
       enqueueSnackbar(`${selectedKeys.size} comissão(ões) cancelada(s) com sucesso!`, { variant: 'success' });
 
-      // console.log('Resposta do cancelamento:', response);
-
       setSelectedKeys(new Set());
-      buscar();
+      setComissoes([]);
+      setTotalRegistros(0);
+      setHasSearched(false);
     } catch (error) {
       enqueueSnackbar(error.message || 'Erro ao cancelar comissões', { variant: 'error' });
     } finally {
       stopLoading();
     }
-  }, [selectedKeys, comissoes, enqueueSnackbar, startLoading, stopLoading, buscar]);
+  }, [selectedKeys, comissoes, enqueueSnackbar, startLoading, stopLoading]);
 
   return {
     loading,

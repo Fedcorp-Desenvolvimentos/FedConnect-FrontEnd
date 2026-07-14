@@ -261,6 +261,10 @@ export const useEmissaoRecibos = () => {
     setSelectedComissoes(new Set());
     setSelectedRetentions([]);
     setRetencoesVerificadas(null);
+    setComissoes([]);
+    setTotalRegistros(0);
+    setHasSearched(false);
+    setPreviewOpen(false);
   }, []);
 
   const buscarComissoes = useCallback(
@@ -665,8 +669,8 @@ export const useEmissaoRecibos = () => {
         data_emissao: new Date().toISOString().split('T')[0],
         usuario: user?.nome_completo || user?.email,
         comissoes: comissoesSelecionadas.map((c) => ({
-          fatura: Number(c.FATURA || c.fatura),
-          parcela: Number(c.PARCELA || c.parcela || 1),
+          fatura: String(c.FATURA || c.fatura || ''),
+          parcela: String(c.PARCELA || c.parcela || '1'),
           tipo_fat: c.TIPO_FAT || c.tipo_fat || 'A',
           documento: c.DOCUMENTO || c.documento || '',
           vencimento: c.VENCIMENTO || c.vencimento || null,
