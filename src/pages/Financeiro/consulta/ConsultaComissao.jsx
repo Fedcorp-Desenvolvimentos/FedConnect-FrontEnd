@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FaArrowLeft, FaSearch, FaEraser, FaSpinner, FaTrashAlt, FaFileInvoiceDollar, FaCalendarAlt, FaExclamationTriangle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { PessoaSelect } from '../comissoes/components/PessoaSelect';
