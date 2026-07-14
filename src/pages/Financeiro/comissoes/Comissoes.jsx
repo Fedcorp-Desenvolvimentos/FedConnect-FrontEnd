@@ -60,7 +60,6 @@ export default function Comissoes() {
     isUsingFilteredData,
     hasActiveFilters,
     retencoesVerificadas,
-    verificarRetencoesComissoes,
   } = useEmissaoRecibos();
 
   const canIssue = selectedComissoes?.size > 0;
@@ -151,7 +150,6 @@ export default function Comissoes() {
               onToggleRetention={toggleRetention}
               hasResults={hasResults}
               comissoes={comissoes}
-              onVerificarRetencoes={verificarRetencoesComissoes}
               retencoesVerificadas={retencoesVerificadas}
               loading={loading}
               selectedComissoes={selectedComissoes}
