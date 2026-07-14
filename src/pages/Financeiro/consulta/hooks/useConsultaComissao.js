@@ -164,7 +164,7 @@ export const useConsultaComissao = () => {
 
       const selected = comissoes.filter((c) => selectedKeys.has(getComissaoKey(c)));
 
-      // console.log('Comissões selecionadas para cancelamento:', selected);
+      console.log('Comissões selecionadas para cancelamento:', selected);
 
       const payload = {
         comissoes: selected.map((c) => ({
@@ -176,10 +176,11 @@ export const useConsultaComissao = () => {
           tipo: c.TIPO || c.tipo || 'BENEFICIO',
         })),
       };
+
+      console.log('Payload para cancelamento:', payload);
       
 
       const response = await cancelarComissaoApi(payload);
-
 
       if (!response?.sucesso) {
         throw new Error(response?.erro || 'Erro ao cancelar');
