@@ -75,6 +75,12 @@ export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) 
               <span>Tipo de documento</span>
               <strong>{tituloDocumento}</strong>
             </div>
+            {data.comissoes.length > 0 && data.comissoes[0].co_estipulante && (
+              <div>
+                <span>Condomínio</span>
+                <strong>{data.comissoes[0].co_estipulante}</strong>
+              </div>
+            )}
           </DocMetaGrid>
 
           <DocTable>

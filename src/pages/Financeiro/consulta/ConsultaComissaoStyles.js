@@ -547,18 +547,66 @@ export const BottomBar = styled.div`
   border-radius: 10px;
   flex-wrap: wrap;
   gap: 12px;
+  padding: 13px 18px;
+  margin-bottom: 18px;
+  background: ${(props) => (props.$warning ? '#fffbeb' : '#ebf8ff')};
+  border: 1px solid ${(props) => (props.$warning ? '#fde68a' : '#bee3f8')};
+  border-radius: 12px;
+  color: ${(props) => (props.$warning ? '#92400e' : '#2b6cb0')};
+  font-size: 13px;
+`;
 
-  span {
-    font-size: 14px;
-    color: #475569;
+export const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+`;
+
+export const ModalCard = styled.div`
+  background: #fff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+`;
+
+export const ModalHeader = styled.div`
+  padding: 20px 24px;
+  border-bottom: 1px solid #e6ebf1;
+
+  h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    color: #1a202c;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  @media (max-width: 640px) {
-    flex-direction: column;
-    
-    button {
-      width: 100%;
-      justify-content: center;
-    }
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: #718096;
   }
+`;
+
+export const ModalBody = styled.div`
+  padding: 20px 24px;
+  font-size: 14px;
+  color: #4a5568;
+  line-height: 1.6;
+`;
+
+export const ModalFooter = styled.div`
+  padding: 16px 24px;
+  border-top: 1px solid #e6ebf1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 `;

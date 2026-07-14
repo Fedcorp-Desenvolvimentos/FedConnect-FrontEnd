@@ -1,9 +1,5 @@
-import React, { useMemo } from 'react';
-import { 
-  FaArrowLeft, FaSearch, FaEraser, FaSpinner, 
-  FaTrashAlt, FaFileInvoiceDollar, FaCalendarAlt,
-  FaInfoCircle 
-} from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaArrowLeft, FaSearch, FaEraser, FaSpinner, FaTrashAlt, FaFileInvoiceDollar, FaCalendarAlt, FaExclamationTriangle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { PessoaSelect } from '../comissoes/components/PessoaSelect';
 import { useConsultaComissao } from './hooks/useConsultaComissao';
@@ -64,6 +60,7 @@ const VoucherBadge = ({ voucher }) => {
 
 const ConsultaComissao = () => {
   const navigate = useNavigate();
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const {
     loading,
     filters,
@@ -367,13 +364,44 @@ const ConsultaComissao = () => {
             <S.Button
               className="danger"
               disabled={selectedKeys.size === 0 || loading}
-              onClick={handleCancel}
+              onClick={() => setShowCancelModal(true)}
             >
               <FaTrashAlt />
               Cancelar Selecionadas
             </S.Button>
           </S.BottomBar>
         </S.Card>
+      )}
+
+      {showCancelModal && (
+        <S.ModalOverlay onClick={() => setShowCancelModal(false)}>
+          <S.ModalCard onClick={(e) => e.stopPropagation()}>
+            <S.ModalHeader>
+              <h3>
+                <FaExclamationTriangle style={{ color: '#e53e3e' }} />
+                Confirmar cancelamento
+              </h3>
+              <p>Esta ação irá cancelar as comissões selecionadas e limpar o voucher.</p>
+            </S.ModalHeader>
+            <S.ModalBody>
+              <p>
+                Tem certeza que deseja cancelar <strong>{selectedKeys.size} comissão(ões)</strong> selecionada(s)?
+              </p>
+              <p style={{ fontSize: 12, color: '#a0aec0', marginTop: 8 }}>
+                O voucher será removido e as comissões voltarão ao status pendente.
+              </p>
+            </S.ModalBody>
+            <S.ModalFooter>
+              <S.Button className="ghost" onClick={() => setShowCancelModal(false)}>
+                Voltar
+              </S.Button>
+              <S.Button className="danger" onClick={() => { setShowCancelModal(false); handleCancel(); }} disabled={loading}>
+                {loading ? <FaSpinner className="spin" /> : <FaTrashAlt />}
+                {loading ? 'Cancelando...' : 'Confirmar cancelamento'}
+              </S.Button>
+            </S.ModalFooter>
+          </S.ModalCard>
+        </S.ModalOverlay>
       )}
     </S.Container>
   );
