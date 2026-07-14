@@ -191,8 +191,8 @@ export const useConsultaComissao = () => {
 
       // console.log('Resposta do cancelamento:', response);
 
-      // setSelectedKeys(new Set());
-      // buscar();
+      setSelectedKeys(new Set());
+      buscar();
     } catch (error) {
       enqueueSnackbar(error.message || 'Erro ao cancelar comissões', { variant: 'error' });
     } finally {

@@ -59,7 +59,6 @@ export default function Comissoes() {
     closePreview,
     isUsingFilteredData,
     hasActiveFilters,
-    verificarRetencoesComissoes,
     retencoesVerificadas,
   } = useEmissaoRecibos();
 

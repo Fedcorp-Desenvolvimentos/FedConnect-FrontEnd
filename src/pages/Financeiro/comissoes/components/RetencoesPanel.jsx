@@ -1,7 +1,6 @@
-// src/pages/Financeiro/comissoes/components/RetencoesPanel.jsx
-
 import React, { useMemo } from 'react';
 import { FaPercentage, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
+
 import {
     RetentionCard,
     CardHeader,
