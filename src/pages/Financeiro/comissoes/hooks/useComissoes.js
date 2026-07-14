@@ -483,77 +483,6 @@ export const useEmissaoRecibos = () => {
     };
   }, [retentionSummary]);
 
-  // ⭐ FUNÇÃO QUE VERIFICA RETENÇÕES NO FRONTEND (SEM CHAMADA AO BACKEND)
-  const verificarRetencoesComissoes = useCallback(async () => {
-    if (selectedComissoes.size === 0) {
-      enqueueSnackbar('Selecione pelo menos uma comissão', { variant: 'warning' });
-      return;
-    }
-
-    startLoading('Verificando retenções...');
-
-    try {
-      const comissoesSelecionadas = comissoes.filter((c) => 
-        selectedComissoes.has(getComissaoKey(c))
-      );
-
-      // ⭐ CALCULA RETENÇÕES DIRETAMENTE NO FRONTEND
-      const comissoesComRetencoes = comissoesSelecionadas.map(c => {
-        const resultado = calcularRetencoesFrontend(c);
-        return {
-          ...c,
-          retencoes_calculadas: {
-            aplicaveis: Object.entries(resultado.retencoes)
-              .filter(([_, v]) => v.aplicavel)
-              .map(([key, v]) => ({
-                tipo: key,
-                valor: v.valor,
-                aliquota: v.aliquota
-              })),
-            total_retencoes: resultado.total_retencoes,
-            valor_liquido: resultado.valor_liquido,
-            motivo: resultado.motivo
-          }
-        };
-      });
-
-      const totalBruto = comissoesComRetencoes.reduce((sum, c) => sum + Number(c.VALOR || 0), 0);
-      const totalRetencoes = comissoesComRetencoes.reduce((sum, c) => sum + c.retencoes_calculadas.total_retencoes, 0);
-
-      const response = {
-        status: 'success',
-        total_bruto: totalBruto,
-        total_retencoes: totalRetencoes,
-        total_liquido: totalBruto - totalRetencoes,
-        quantidade: comissoesComRetencoes.length,
-        comissoes: comissoesComRetencoes,
-        timestamp: new Date().toISOString()
-      };
-
-      setRetencoesVerificadas(response);
-      
-      // Auto-seleciona retenções aplicáveis
-      const retencoesAplicaveis = new Set();
-      response.comissoes.forEach(c => {
-        c.retencoes_calculadas?.aplicaveis?.forEach(r => {
-          retencoesAplicaveis.add(r.tipo);
-        });
-      });
-      
-      setSelectedRetentions(Array.from(retencoesAplicaveis));
-      
-      enqueueSnackbar(`Retenções verificadas: ${response.comissoes.length} comissão(ões)`, {
-        variant: 'success'
-      });
-      
-    } catch (error) {
-      console.error('Erro ao verificar retenções:', error);
-      enqueueSnackbar('Erro ao verificar retenções', { variant: 'error' });
-    } finally {
-      stopLoading();
-    }
-  }, [selectedComissoes, comissoes, enqueueSnackbar, startLoading, stopLoading]);
-
   const buildDocumentPayload = useCallback(() => {
     const comissoesSelecionadas = comissoes.filter((c) => 
       selectedComissoes.has(getComissaoKey(c))
@@ -834,6 +763,5 @@ export const useEmissaoRecibos = () => {
     emitirDocumento,
     previewDocument,
     closePreview,
-    verificarRetencoesComissoes,
   };
 };
