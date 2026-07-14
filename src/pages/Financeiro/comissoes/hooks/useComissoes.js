@@ -438,66 +438,6 @@ export const useEmissaoRecibos = () => {
     };
   }, [retentionSummary]);
 
-  const verificarRetencoesComissoes = useCallback(async () => {
-    if (selectedComissoes.size === 0) {
-      enqueueSnackbar('Selecione pelo menos uma comissão', { variant: 'warning' });
-      return;
-    }
-
-    startLoading('Verificando retenções...');
-
-    try {
-      const comissoesSelecionadas = comissoes.filter((c) => 
-        selectedComissoes.has(getComissaoKey(c))
-      );
-
-      // USA A FUNÇÃO CONSOLIDADA
-      const resultado = calcularRetencoesConsolidadas(
-        comissoesSelecionadas,
-        totalBrutoSelecionado
-      );
-
-      setRetencoesVerificadas({
-        status: 'success',
-        total_bruto: resultado.totalBruto,
-        total_retencoes: resultado.totalRetencoes,
-        total_liquido: resultado.valorLiquido,
-        quantidade: comissoesSelecionadas.length,
-        comissoes: resultado.comissoesComDetalhes,
-        timestamp: new Date().toISOString(),
-        retencoesAplicaveis: resultado.retencoesAplicaveis,
-        isIsento: resultado.isIsento,
-        motivo: resultado.motivo,
-        regimeInfo: resultado.regimeInfo,
-        detalhesRetencoes: resultado.retencoes,
-      });
-
-      // ATUALIZA AS RETENÇÕES SELECIONADAS COM AS APLICÁVEIS
-      setSelectedRetentions(resultado.retencoesAplicaveis);
-      
-      let mensagem;
-      if (resultado.isIsento) {
-        mensagem = `✅ ${resultado.motivo}`;
-      } else if (resultado.regimeInfo.todosNaoOptantes && resultado.regimeInfo.temAgenc) {
-        mensagem = '📋 Agenciador - Apenas IR retido';
-      } else if (resultado.regimeInfo.todosNaoOptantes) {
-        mensagem = '⚠️ Não optante - Retenções completas aplicadas';
-      } else {
-        mensagem = `🔄 Regime misto - ${resultado.retencoesAplicaveis.length} retenção(ões) aplicada(s)`;
-      }
-      
-      enqueueSnackbar(`${mensagem} (${comissoesSelecionadas.length} comissão(ões))`, {
-        variant: resultado.isIsento ? 'info' : 'success'
-      });
-      
-    } catch (error) {
-      console.error('Erro ao verificar retenções:', error);
-      enqueueSnackbar('Erro ao verificar retenções', { variant: 'error' });
-    } finally {
-      stopLoading();
-    }
-  }, [selectedComissoes, comissoes, enqueueSnackbar, startLoading, stopLoading, totalBrutoSelecionado]);
-
   const buildDocumentPayload = useCallback(() => {
     const comissoesSelecionadas = comissoes.filter((c) => 
       selectedComissoes.has(getComissaoKey(c))
@@ -838,7 +778,5 @@ export const useEmissaoRecibos = () => {
     emitirDocumento,
     previewDocument,
     closePreview,
-    verificarRetencoesComissoes,
-    totalBrutoSelecionado
   };
 };
