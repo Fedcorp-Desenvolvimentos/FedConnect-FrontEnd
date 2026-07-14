@@ -60,6 +60,7 @@ export default function Comissoes() {
     isUsingFilteredData,
     hasActiveFilters,
     retencoesVerificadas,
+    verificarRetencoesComissoes,
   } = useEmissaoRecibos();
 
   const canIssue = selectedComissoes?.size > 0;
