@@ -57,7 +57,6 @@ export default function Comissoes() {
     closePreview,
     isUsingFilteredData,
     hasActiveFilters,
-    verificarRetencoesComissoes,
     retencoesVerificadas,
   } = useEmissaoRecibos();
 
@@ -142,18 +141,15 @@ export default function Comissoes() {
         </MainColumn>
 
         <Sidebar>
-          {documentType !== 'recibo' && (
-            <RetencoesPanel
-              selectedRetentions={selectedRetentions}
-              totals={retentionSummary}
-              onToggleRetention={toggleRetention}
-              hasResults={hasResults}
-              comissoes={comissoes}
-              onVerificarRetencoes={verificarRetencoesComissoes}
-              retencoesVerificadas={retencoesVerificadas}
-              loading={loading}
-            />
-          )}
+          <RetencoesPanel
+            selectedRetentions={selectedRetentions}
+            totals={retentionSummary}
+            onToggleRetention={toggleRetention}
+            hasResults={hasResults}
+            comissoes={comissoes}
+            retencoesVerificadas={retencoesVerificadas}
+            loading={loading}
+          />
 
           <EmissaoPanel
             canIssue={canIssue && hasResults}

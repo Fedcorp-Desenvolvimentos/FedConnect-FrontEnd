@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { FaPercentage, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
+import React from 'react';
+import { FaPercentage, FaInfoCircle } from 'react-icons/fa';
 import {
   RetentionCard,
   CardHeader,
@@ -32,7 +32,6 @@ export function RetencoesPanel({
   onToggleRetention, 
   hasResults, 
   comissoes,
-  onVerificarRetencoes,
   retencoesVerificadas,
   loading 
 }) {
@@ -61,28 +60,6 @@ export function RetencoesPanel({
           <h2>Retenções</h2>
           <span>Aplicadas sobre o total selecionado</span>
         </div>
-        
-        {hasResults && comissoes.length > 0 && (
-          <button 
-            onClick={onVerificarRetencoes}
-            disabled={loading}
-            style={{
-              background: 'var(--navy-800)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '6px 12px',
-              fontSize: '11px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            <FaCheckCircle />
-            Verificar Retenções
-          </button>
-        )}
       </CardHeader>
 
       {retencoesVerificadas && !hasAutomaticRetentions && (
@@ -127,7 +104,6 @@ export function RetencoesPanel({
                   type="checkbox"
                   checked={checked}
                   onChange={() => onToggleRetention(item.id)}
-                  disabled={isAutomatic}
                 />
                 <span className="name">{item.label}</span>
                 <span className="rate">{formatRate(item.rate)}</span>
