@@ -15,7 +15,8 @@ import { useAuth } from '../../../../context/AuthContext';
 // ⭐ IMPORTA AS FUNÇÕES DO ARQUIVO DE REGRAS
 import { 
   calcularRetencoesConsolidadas,
-  calcularRetencoesFrontend, // ✅ Importado do regras_retencao.js
+  calcularRetencoesFrontend,
+  DEFAULT_SELECTED,
 } from '../../../../utils/regras_retencao';
 
 const INITIAL_FILTERS = {
@@ -55,35 +56,12 @@ const getComissaoKey = (c) => {
   return [documento, favor, tipo, parcela, valor].join('|');
 };
 
-const getCurrentMonthDate = () => {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
-};
+// Data fixa para busca sem período - o backend não usa data_corte na query
+const DATA_BUSCA_DEFAULT = '2000-01-01';
 
 const formatDataCorte = (data) => {
-  if (!data) return 'Mês atual';
-
-  try {
-    const partes = data.split('-');
-    const meses = [
-      'Janeiro',
-      'Fevereiro',
-      'Março',
-      'Abril',
-      'Maio',
-      'Junho',
-      'Julho',
-      'Agosto',
-      'Setembro',
-      'Outubro',
-      'Novembro',
-      'Dezembro',
-    ];
-
-    return `${meses[parseInt(partes[1], 10) - 1]} de ${partes[0]}`;
-  } catch {
-    return data;
-  }
+  if (!data) return 'Todas';
+  return data;
 };
 
 const normalizeFilters = (filters) => {
@@ -205,7 +183,7 @@ export const useEmissaoRecibos = () => {
 
       try {
         const result = await withLoading(
-          async () => buscarComissoesPorDataCorte(getCurrentMonthDate(), filtrosLimpos),
+          async () => buscarComissoesPorDataCorte(DATA_BUSCA_DEFAULT, filtrosLimpos),
           'Buscando comissões...'
         );
 
@@ -231,7 +209,7 @@ export const useEmissaoRecibos = () => {
         setRetencoesVerificadas(null);
 
         if (lista.length === 0) {
-          enqueueSnackbar(`Nenhuma comissão encontrada para ${formatDataCorte(getCurrentMonthDate())}`, {
+          enqueueSnackbar('Nenhuma comissão encontrada', {
             variant: 'info',
           });
         } else {
@@ -326,16 +304,15 @@ export const useEmissaoRecibos = () => {
 
     setRetencoesVerificadas(response);
 
-    const retencoesAplicaveis = new Set();
-    response.comissoes.forEach(c => {
-      c.retencoes_calculadas?.aplicaveis?.forEach(r => {
-        if (r.tipo !== 'iss') {
-          retencoesAplicaveis.add(r.tipo);
-        }
-      });
-    });
+    // PRÉ-SELEÇÃO: apenas PIS, COFINS, CSLL vêm marcados por padrão
+    // Se o valor da comissão > 666, IR também vem marcado
+    const temIR = response.comissoes.some(c => c.retencoes_calculadas?.motivo?.includes('IR'));
+    const preSelected = [...DEFAULT_SELECTED];
+    if (temIR) {
+      preSelected.push('ir');
+    }
 
-    setSelectedRetentions(Array.from(retencoesAplicaveis));
+    setSelectedRetentions(preSelected);
   }, [selectedComissoes, comissoes]);
 
   const toggleComissao = useCallback((comissao) => {
