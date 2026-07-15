@@ -19,6 +19,9 @@ const RETENTION_OPTIONS = [
     { id: 'inss', label: 'INSS', rate: 0.11 },
 ];
 
+// Impostos que vêm PRÉ-SELECIONADOS por padrão
+const DEFAULT_SELECTED = ['pis', 'cofins', 'csll'];
+
 const formatMoney = (value) => {
     if (value === null || value === undefined) return 'R$ 0,00';
     return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
@@ -68,17 +71,20 @@ export function RetencoesPanel({
         RETENTION_OPTIONS.forEach(item => {
             const isAplicavel = detalhesRetencoes[item.id]?.aplicavel || false;
             
-            // ⭐ SE FOR ISENTO, NUNCA MARCA
-            // ⭐ SE NÃO FOR ISENTO, MARCA APENAS SE FOR APLICÁVEL
-            const checked = !isIsento && (selectedRetentions.includes(item.id) || isAplicavel);
+            // SE FOR ISENTO, NUNCA MARCA
+            // SE NÃO FOR ISENTO, MARCA APENAS SE ESTIVER NO selectedRetentions
+            // PIS, COFINS, CSLL vêm marcados por padrão (DEFAULT_SELECTED)
+            // ISS, IR, INSS NÃO vêm marcados (usuário seleciona se necessário)
+            const checked = !isIsento && selectedRetentions.includes(item.id);
             
             result[item.id] = {
                 ...item,
                 checked: checked,
                 valor: checked ? grossTotal * item.rate : 0,
-                isAutomatic: isAplicavel && !isIsento,
+                isAutomatic: DEFAULT_SELECTED.includes(item.id) && !isIsento,
                 isIsento: isIsento,
                 aplicavel: isAplicavel,
+                isDefault: DEFAULT_SELECTED.includes(item.id),
             };
         });
         
@@ -109,20 +115,12 @@ export function RetencoesPanel({
             statusText = `✅ ${motivo || 'Isento de retenções'}`;
             statusColor = '#2E7D32';
             statusBg = '#E8F5E9';
-        } else if (regimeInfo?.temCodAgenc && regimeInfo?.todosNaoOptantes) {
-            statusText = '📋 Agenciador - Apenas IR retido';
-            statusColor = '#E65100';
-            statusBg = '#FFF3E0';
-        } else if (regimeInfo?.todosNaoOptantes) {
-            statusText = '⚠️ Não optante - Retenções completas aplicadas';
+        } else if (regimeInfo?.temIR) {
+            statusText = '⚠️ Retenções completas (PIS, COFINS, CSLL, IR)';
             statusColor = '#C62828';
             statusBg = '#FFEBEE';
-        } else if (regimeInfo?.isMisto) {
-            statusText = '🔄 Regime misto - Retenções combinadas';
-            statusColor = '#616161';
-            statusBg = '#F5F5F5';
         } else {
-            statusText = `ℹ️ ${motivo || 'Verificação concluída'}`;
+            statusText = '📋 Retenções aplicadas (PIS, COFINS, CSLL)';
             statusColor = '#1565C0';
             statusBg = '#E3F2FD';
         }
@@ -194,6 +192,7 @@ export function RetencoesPanel({
                     const checked = retention?.checked || false;
                     const value = retention?.valor || 0;
                     const isAutomatic = retention?.isAutomatic || false;
+                    const isDefault = retention?.isDefault || false;
                     const aplicavel = retention?.aplicavel || false;
 
                     return (
@@ -224,7 +223,7 @@ export function RetencoesPanel({
                                 />
                                 <span className="name">{item.label}</span>
                                 <span className="rate">{formatRate(item.rate)}</span>
-                                {isAutomatic && !isIsento && (
+                                {isDefault && !isIsento && (
                                     <span style={{ 
                                         fontSize: '9px', 
                                         background: '#2b6cb0', 
@@ -248,7 +247,7 @@ export function RetencoesPanel({
                                         Isento
                                     </span>
                                 )}
-                                {!isIsento && !aplicavel && !checked && (
+                                {!isIsento && !isDefault && !checked && (
                                     <span style={{ 
                                         fontSize: '9px', 
                                         color: '#999',

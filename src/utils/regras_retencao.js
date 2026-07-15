@@ -9,6 +9,9 @@ const ALIQUOTAS = {
   inss: 0.11,
 };
 
+// Limite mínimo para gerar impostos (somatório dos impostos > 10 reais)
+const VALOR_MINIMO_IMPOSTOS = 10.00;
+
 const RETENTION_OPTIONS = [
   { id: 'iss', label: 'ISS', rate: 0.02 },
   { id: 'ir', label: 'IR', rate: 0.015 },
@@ -18,23 +21,25 @@ const RETENTION_OPTIONS = [
   { id: 'inss', label: 'INSS', rate: 0.11 },
 ];
 
+// Impostos que vêm PRÉ-SELECIONADOS por padrão
+const DEFAULT_SELECTED = ['pis', 'cofins', 'csll'];
+
 /**
  * Calcula as retenções para UMA comissão individual
  * REGRAS:
- * 1. Optante Simples (OPTOU_SIMPLES = "S") → ISENTO
- * 2. Não optante (OPTOU_SIMPLES = "N") → RETÉM TUDO
- * 3. Não optante + COD_AGENC preenchido → SÓ IR
+ * 1. Optante Simples (OPTOU_SIMPLES = "S") → ISENTO (nenhum imposto)
+ * 2. Somatório de TODOS os impostos > R$ 10,00 → gera impostos normalmente
+ * 3. Somatório de TODOS os impostos < R$ 10,00 → NÃO gera impostos
+ * 4. Valor da comissão > R$ 666,00 → adiciona IR
+ * 5. Pré-seleção: PIS, COFINS, CSLL vêm marcados; ISS, IR, INSS não vêm marcados
  */
 export const calcularRetencoesFrontend = (comissao) => {
   const valorComissao = Number(comissao.VALOR || comissao.valor || 0);
   
   // CAMPOS DECISIVOS
   const optouSimples = comissao.OPTOU_SIMPLES === 'S';
-  const temCodAgenc = comissao.COD_AGENC !== null && 
-                       comissao.COD_AGENC !== undefined && 
-                       comissao.COD_AGENC !== '';
 
-  // REGRA 1: Optante pelo Simples Nacional → ISENTO
+  // REGRA 1: Optante pelo Simples Nacional → ISENTO (nenhum imposto)
   if (optouSimples) {
     return {
       retencoes: {
@@ -54,42 +59,54 @@ export const calcularRetencoesFrontend = (comissao) => {
     };
   }
 
-  // REGRA 2: Não optante com código de agenciamento → SÓ IR
-  if (temCodAgenc) {
-    const retencoes = {
-      iss: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.iss },
-      ir: { 
-        aplicavel: true, 
-        valor: valorComissao * ALIQUOTAS.ir,
-        aliquota: ALIQUOTAS.ir 
-      },
-      cofins: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.cofins },
-      csll: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.csll },
-      pis: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.pis },
-      inss: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.inss }
-    };
-    
-    const totalRetencoes = Object.values(retencoes).reduce((sum, r) => sum + (r.aplicavel ? r.valor : 0), 0);
-    
+  // Calcula todos os impostos potenciais
+  const impostosPotenciais = {
+    pis: valorComissao * ALIQUOTAS.pis,
+    cofins: valorComissao * ALIQUOTAS.cofins,
+    csll: valorComissao * ALIQUOTAS.csll,
+    iss: valorComissao * ALIQUOTAS.iss,
+    ir: valorComissao * ALIQUOTAS.ir,
+    inss: valorComissao * ALIQUOTAS.inss,
+  };
+
+  // Soma de TODOS os impostos potenciais (PIS, COFINS, CSLL, IR, ISS, INSS)
+  const somaImpostosBase = impostosPotenciais.pis + impostosPotenciais.cofins + impostosPotenciais.csll + impostosPotenciais.iss + impostosPotenciais.ir + impostosPotenciais.inss;
+  
+  // REGRA 3: Somatório de TODOS os impostos < R$ 10,00 → NÃO gera impostos
+  if (somaImpostosBase < VALOR_MINIMO_IMPOSTOS) {
     return {
-      retencoes,
-      total_retencoes: totalRetencoes,
-      valor_liquido: valorComissao - totalRetencoes,
-      motivo: 'Agenciador - apenas IR retido',
-      isIsento: false,
+      retencoes: {
+        iss: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.iss },
+        ir: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.ir },
+        cofins: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.cofins },
+        csll: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.csll },
+        pis: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.pis },
+        inss: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.inss }
+      },
+      total_retencoes: 0,
+      valor_liquido: valorComissao,
+      motivo: `Somatório dos impostos (R$ ${somaImpostosBase.toFixed(2)}) abaixo de R$ ${VALOR_MINIMO_IMPOSTOS.toFixed(2)} - Isento`,
+      isIsento: true,
       optouSimples: false,
-      temCodAgenc: true,
+      temCodAgenc: false,
     };
   }
 
-  // REGRA 3: Não optante → RETÉM TODOS OS IMPOSTOS
+  // REGRA 2: Valor da comissão > R$ 666,00 → adiciona IR
+  const temIR = valorComissao > 666.00;
+
+  // Monta retenções com base nas regras
   const retencoes = {
-    iss: { aplicavel: true, valor: valorComissao * ALIQUOTAS.iss, aliquota: ALIQUOTAS.iss },
-    ir: { aplicavel: true, valor: valorComissao * ALIQUOTAS.ir, aliquota: ALIQUOTAS.ir },
-    cofins: { aplicavel: true, valor: valorComissao * ALIQUOTAS.cofins, aliquota: ALIQUOTAS.cofins },
-    csll: { aplicavel: true, valor: valorComissao * ALIQUOTAS.csll, aliquota: ALIQUOTAS.csll },
-    pis: { aplicavel: true, valor: valorComissao * ALIQUOTAS.pis, aliquota: ALIQUOTAS.pis },
-    inss: { aplicavel: true, valor: valorComissao * ALIQUOTAS.inss, aliquota: ALIQUOTAS.inss }
+    iss: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.iss },
+    ir: { 
+      aplicavel: temIR, 
+      valor: temIR ? impostosPotenciais.ir : 0, 
+      aliquota: ALIQUOTAS.ir 
+    },
+    cofins: { aplicavel: true, valor: impostosPotenciais.cofins, aliquota: ALIQUOTAS.cofins },
+    csll: { aplicavel: true, valor: impostosPotenciais.csll, aliquota: ALIQUOTAS.csll },
+    pis: { aplicavel: true, valor: impostosPotenciais.pis, aliquota: ALIQUOTAS.pis },
+    inss: { aplicavel: false, valor: 0, aliquota: ALIQUOTAS.inss }
   };
   
   const totalRetencoes = Object.values(retencoes).reduce((sum, r) => sum + (r.aplicavel ? r.valor : 0), 0);
@@ -98,15 +115,27 @@ export const calcularRetencoesFrontend = (comissao) => {
     retencoes,
     total_retencoes: totalRetencoes,
     valor_liquido: valorComissao - totalRetencoes,
-    motivo: 'Não optante - retenções completas aplicadas',
+    motivo: temIR 
+      ? 'Retenções aplicadas (PIS, COFINS, CSLL, IR)' 
+      : 'Retenções aplicadas (PIS, COFINS, CSLL)',
     isIsento: false,
     optouSimples: false,
     temCodAgenc: false,
+    temIR,
   };
 };
 
 /**
  * Calcula retenções para um conjunto de comissões (CONSOLIDADO)
+ * 
+ * REGRAS DE PRÉ-SELEÇÃO:
+ * - PIS, COFINS, CSLL vêm PRÉ-SELECIONADOS por padrão
+ * - ISS, IR, INSS NÃO vêm pré-selecionados (usuário seleciona se necessário)
+ * 
+ * REGRAS DE BLOQUEIO:
+ * - Simples Nacional → nenhum imposto (bloqueado)
+ * - Somatório impostos < R$ 10 → nenhum imposto (bloqueado)
+ * - Valor comissão > R$ 666 → IR é desbloqueado para seleção
  */
 export const calcularRetencoesConsolidadas = (comissoes, totalBruto = null) => {
   if (!comissoes || comissoes.length === 0) {
@@ -143,9 +172,8 @@ export const calcularRetencoesConsolidadas = (comissoes, totalBruto = null) => {
 
   // VERIFICA O REGIME DOMINANTE
   const todosOptantes = comissoesComDetalhes.every(c => c.optouSimples);
-  const todosNaoOptantes = comissoesComDetalhes.every(c => !c.optouSimples && !c.isIsento);
-  const temCodAgenc = comissoesComDetalhes.some(c => c.temCodAgenc);
   const todosIsentos = comissoesComDetalhes.every(c => c.isIsento);
+  const temIR = comissoesComDetalhes.some(c => c.temIR);
 
   // DETERMINA QUAIS RETENÇÕES SÃO APLICÁVEIS PARA O GRUPO
   let retencoesAplicaveis = [];
@@ -155,27 +183,21 @@ export const calcularRetencoesConsolidadas = (comissoes, totalBruto = null) => {
   if (todosOptantes || todosIsentos) {
     // Todos isentos/optantes → sem retenções
     retencoesAplicaveis = [];
-    motivo = todosOptantes ? 'Todos são optantes pelo Simples Nacional' : 'Todos são isentos';
+    motivo = todosOptantes ? 'Todos são optantes pelo Simples Nacional' : 'Todos são isentos (abaixo do mínimo)';
     isIsento = true;
-  } else if (todosNaoOptantes && temCodAgenc) {
-    // Todos não optantes com agenciamento → apenas IR
-    retencoesAplicaveis = ['ir'];
-    motivo = 'Agenciador - apenas IR retido';
-    isIsento = false;
-  } else if (todosNaoOptantes) {
-    // Todos não optantes → todas as retenções
-    retencoesAplicaveis = ['iss', 'ir', 'cofins', 'csll', 'pis', 'inss'];
-    motivo = 'Não optante - retenções completas aplicadas';
-    isIsento = false;
   } else {
-    // Regime misto → união de todas as retenções aplicáveis
-    const todasRetencoes = new Set();
-    comissoesComDetalhes.forEach(c => {
-      c.retencoes_aplicaveis.forEach(r => todasRetencoes.add(r.tipo));
-    });
-    retencoesAplicaveis = Array.from(todasRetencoes);
-    motivo = 'Regime misto - retenções combinadas';
-    isIsento = retencoesAplicaveis.length === 0;
+    // Regra padrão: PIS, COFINS, CSLL são sempre aplicáveis quando não isento
+    retencoesAplicaveis = ['pis', 'cofins', 'csll'];
+    
+    // IR só é aplicável se valor comissão > R$ 666
+    if (temIR) {
+      retencoesAplicaveis.push('ir');
+    }
+    
+    motivo = temIR 
+      ? 'Retenções aplicadas (PIS, COFINS, CSLL, IR)' 
+      : 'Retenções aplicadas (PIS, COFINS, CSLL)';
+    isIsento = false;
   }
 
   // CALCULA OS VALORES COM BASE NO TOTAL BRUTO
@@ -204,10 +226,9 @@ export const calcularRetencoesConsolidadas = (comissoes, totalBruto = null) => {
     comissoesComDetalhes,
     regimeInfo: {
       todosOptantes,
-      todosNaoOptantes,
-      temCodAgenc,
       todosIsentos,
-      isMisto: !todosOptantes && !todosNaoOptantes && !todosIsentos
+      temIR,
+      isMisto: !todosOptantes && !todosIsentos
     }
   };
 };
@@ -232,3 +253,6 @@ export const getRetencoesAplicaveis = (comissao) => {
       aliquota: v.aliquota
     }));
 };
+
+// Exporta as constantes para uso em outros arquivos
+export { ALIQUOTAS, RETENTION_OPTIONS, DEFAULT_SELECTED, VALOR_MINIMO_IMPOSTOS };
