@@ -459,7 +459,7 @@ export const useEmissaoRecibos = () => {
     return {
       tipoDocumento: documentType,
       dataEmissao: new Date().toISOString(),
-      dataCorteFormatada: formatDataCorte(getCurrentMonthDate()),
+      dataCorteFormatada: 'Todas',
       totalComissoes: comissoesSelecionadas.length,
       valorTotalBruto: resultado.totalBruto,
       valorLiquido: resultado.valorLiquido,
