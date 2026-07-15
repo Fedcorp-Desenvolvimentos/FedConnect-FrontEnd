@@ -1,6 +1,7 @@
 // src/pages/CadastroPessoas/components/PessoaTable.jsx
 
-import React, { useRef, useCallback, useEffect } from 'react';
+import React from 'react';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
 
 const formatDocumento = doc => {
@@ -20,81 +21,61 @@ const PessoaTable = ({
   selectedCodigo, 
   onSelect, 
   disabled,
-  loadingMore = false,
-  allLoaded = false,
-  onLoadMore = null,
-  total = 0
+  currentPage = 1,
+  totalPages = 1,
+  total = 0,
+  onPageChange,
+  loading = false,
 }) => {
-  const tableRef = useRef(null);
-  const observerRef = useRef(null);
-  const lastRowRef = useRef(null);
-
-  // Observer para scroll infinito
-  const handleObserver = useCallback((entries) => {
-    const target = entries[0];
-    if (target.isIntersecting && onLoadMore && !loadingMore && !allLoaded) {
-      onLoadMore();
-    }
-  }, [onLoadMore, loadingMore, allLoaded]);
-
-  useEffect(() => {
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
-
-    observerRef.current = new IntersectionObserver(handleObserver, {
-      root: tableRef.current,
-      rootMargin: '0px 0px 50px 0px',
-      threshold: 0.1,
-    });
-
-    if (lastRowRef.current) {
-      observerRef.current.observe(lastRowRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, [handleObserver, pessoas.length]);
-
   const pessoasList = Array.isArray(pessoas) ? pessoas : [];
 
-  if (pessoasList.length === 0) {
-    return (
-      <S.TableWrapper>
-        <S.TableScroll ref={tableRef}>
-          <S.Table>
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Nome</th>
-                <th>CPF/CNPJ</th>
-                <th>Endereço</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <S.EmptyRow colSpan={4}>
-                  <div style={{ textAlign: 'center', padding: '20px' }}>
-                    <p>Nenhuma pessoa cadastrada encontrada.</p>
-                    <p style={{ fontSize: '0.9rem', marginTop: '8px', color: '#94a3b8' }}>
-                      Clique em "Novo Cadastro" para adicionar uma pessoa.
-                    </p>
-                  </div>
-                </S.EmptyRow>
-              </tr>
-            </tbody>
-          </S.Table>
-        </S.TableScroll>
-      </S.TableWrapper>
-    );
-  }
+  const renderPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(totalPages, start + maxVisible - 1);
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    if (start > 1) {
+      pages.push(
+        <S.PaginationPage key={1} onClick={() => onPageChange(1)}>1</S.PaginationPage>
+      );
+      if (start > 2) {
+        pages.push(<S.PaginationEllipsis key="start-ellipsis">...</S.PaginationEllipsis>);
+      }
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(
+        <S.PaginationPage
+          key={i}
+          $active={i === currentPage}
+          onClick={() => onPageChange(i)}
+        >
+          {i}
+        </S.PaginationPage>
+      );
+    }
+
+    if (end < totalPages) {
+      if (end < totalPages - 1) {
+        pages.push(<S.PaginationEllipsis key="end-ellipsis">...</S.PaginationEllipsis>);
+      }
+      pages.push(
+        <S.PaginationPage key={totalPages} onClick={() => onPageChange(totalPages)}>
+          {totalPages}
+        </S.PaginationPage>
+      );
+    }
+
+    return pages;
+  };
 
   return (
     <S.TableWrapper>
-      <S.TableScroll ref={tableRef}>
+      <S.TableScroll>
         <S.Table>
           <thead>
             <tr>
@@ -105,15 +86,34 @@ const PessoaTable = ({
             </tr>
           </thead>
           <tbody>
-            {pessoasList.map((pessoa, index) => {
+            {loading && (
+              <tr>
+                <td colSpan="4" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+                  <span>Carregando...</span>
+                </td>
+              </tr>
+            )}
+
+            {!loading && pessoasList.length === 0 && (
+              <tr>
+                <S.EmptyRow colSpan={4}>
+                  <div style={{ textAlign: 'center', padding: '20px' }}>
+                    <p>Nenhuma pessoa cadastrada encontrada.</p>
+                    <p style={{ fontSize: '0.9rem', marginTop: '8px', color: '#94a3b8' }}>
+                      Clique em "Novo Cadastro" para adicionar uma pessoa.
+                    </p>
+                  </div>
+                </S.EmptyRow>
+              </tr>
+            )}
+
+            {!loading && pessoasList.map((pessoa, index) => {
               const codigo = pessoa.codigo || pessoa.PESSOA || `temp-${index}`;
               const isSelected = codigo === selectedCodigo;
-              const isLast = index === pessoasList.length - 1;
 
               return (
                 <tr
                   key={codigo}
-                  ref={isLast ? lastRowRef : null}
                   className={isSelected ? 'selected' : ''}
                   onClick={() => {
                     if (!disabled && onSelect) {
@@ -132,27 +132,37 @@ const PessoaTable = ({
                 </tr>
               );
             })}
-            
-            {/* Loading row */}
-            {loadingMore && (
-              <tr>
-                <td colSpan="4" style={{ textAlign: 'center', padding: '15px', color: '#94a3b8' }}>
-                  <span>⏳ Carregando mais registros...</span>
-                </td>
-              </tr>
-            )}
-            
-            {/* All loaded row */}
-            {allLoaded && pessoasList.length > 0 && (
-              <tr>
-                <td colSpan="4" style={{ textAlign: 'center', padding: '15px', color: '#94a3b8', fontSize: '0.85rem' }}>
-                  {total > 0 ? `✅ Todos os ${total} registros carregados` : '✅ Todos os registros carregados'}
-                </td>
-              </tr>
-            )}
           </tbody>
         </S.Table>
       </S.TableScroll>
+
+      {totalPages > 1 && (
+        <S.Pagination>
+          <S.PaginationButton
+            disabled={currentPage <= 1}
+            onClick={() => onPageChange(currentPage - 1)}
+          >
+            <FaChevronLeft /> Anterior
+          </S.PaginationButton>
+
+          <S.PaginationPages>
+            {renderPageNumbers()}
+          </S.PaginationPages>
+
+          <S.PaginationButton
+            disabled={currentPage >= totalPages}
+            onClick={() => onPageChange(currentPage + 1)}
+          >
+            Próximo <FaChevronRight />
+          </S.PaginationButton>
+        </S.Pagination>
+      )}
+
+      {total > 0 && (
+        <S.ResultInfo>
+          Página {currentPage} de {totalPages} — {total} registro{total !== 1 ? 's' : ''}
+        </S.ResultInfo>
+      )}
     </S.TableWrapper>
   );
 };

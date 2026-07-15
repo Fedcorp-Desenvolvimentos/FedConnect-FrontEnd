@@ -1,6 +1,6 @@
 // src/pages/CadastroPessoas/AtualizarPessoas.jsx
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { FaUsers, FaSignOutAlt, FaSave, FaEraser, FaPen, FaTimes, FaFileAlt, FaSearch } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +25,7 @@ const AtualizarPessoas = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('identificacao');
   const [searchInput, setSearchInput] = useState('');
+  const debounceRef = useRef(null);
 
   const {
     pessoas,
@@ -34,13 +35,11 @@ const AtualizarPessoas = () => {
     isReadOnly,
     isSubmitting,
     loading,
-    loadingMore,
     selectedCodigo,
     canAlterar,
     canCancelar,
     canLimpar,
     pagination,
-    allLoaded,
     updateField,
     preencherEndereco,
     startEdit,
@@ -48,9 +47,25 @@ const AtualizarPessoas = () => {
     clearForm,
     selectPessoa,
     save,
-    loadMore,
+    goToPage,
     searchPessoas,
   } = usePessoaForm(false);
+
+  const handleSearchInput = useCallback((value) => {
+    setSearchInput(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      if (value.trim().length >= 2 || value.trim().length === 0) {
+        searchPessoas(value.trim());
+      }
+    }, 400);
+  }, [searchPessoas]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   // ===== HANDLERS =====
   const handleVoltar = () => {
@@ -136,6 +151,7 @@ const AtualizarPessoas = () => {
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     const term = searchInput.trim();
     if (term.length >= 2 || term.length === 0) {
       await searchPessoas(term);
@@ -148,9 +164,10 @@ const AtualizarPessoas = () => {
     }
   };
 
-  const handleClearSearch = async () => {
+  const handleClearSearch = () => {
     setSearchInput('');
-    await searchPessoas('');
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    searchPessoas('');
     enqueueSnackbar('Busca limpa', { variant: 'info' });
   };
 
@@ -201,7 +218,7 @@ const AtualizarPessoas = () => {
                   type="text"
                   placeholder="Buscar por nome, CPF/CNPJ ou código..."
                   value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
+                  onChange={(e) => handleSearchInput(e.target.value)}
                 />
                 <S.SearchButton type="submit">
                   <FaSearch /> Buscar
@@ -231,10 +248,11 @@ const AtualizarPessoas = () => {
               selectedCodigo={selectedCodigo}
               onSelect={handleSelectPessoa}
               disabled={mode !== 'view'}
-              loadingMore={loadingMore}
-              allLoaded={allLoaded}
-              onLoadMore={loadMore}
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
               total={pagination.total}
+              onPageChange={goToPage}
+              loading={loading}
             />
           </S.Card>
         </S.Container>

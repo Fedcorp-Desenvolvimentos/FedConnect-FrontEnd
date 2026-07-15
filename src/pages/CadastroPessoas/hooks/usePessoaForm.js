@@ -146,16 +146,13 @@ export const usePessoaForm = (isNewMode = false) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  // ✅ Estado de paginação
   const [pagination, setPagination] = useState({
     currentPage: 1,
     pageSize: 20,
     total: 0,
-    hasMore: false,
+    totalPages: 0,
   });
   const [searchTerm, setSearchTerm] = useState('');
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [allLoaded, setAllLoaded] = useState(false);
   const isLoadingRef = useRef(false);
 
   const isReadOnly = mode === 'view';
@@ -165,19 +162,12 @@ export const usePessoaForm = (isNewMode = false) => {
   const canCancelar = mode !== 'view';
   const canLimpar = mode !== 'view';
 
-  // 🔥 Função para carregar a primeira página ou buscar com termo
-  const fetchPessoas = useCallback(async (reset = true, search = '') => {
+  const fetchPessoas = useCallback(async (page = 1, search = '') => {
     if (isLoadingRef.current) return;
     isLoadingRef.current = true;
-    
-    if (reset) {
-      setLoading(true);
-    } else {
-      setLoadingMore(true);
-    }
+    setLoading(true);
 
     try {
-      const page = reset ? 1 : pagination.currentPage + 1;
       const offset = (page - 1) * pagination.pageSize;
       
       const response = await buscarPessoas({
@@ -185,8 +175,6 @@ export const usePessoaForm = (isNewMode = false) => {
         offset: offset,
         search: search || searchTerm
       });
-      
-      // console.log("📦 Pessoas buscadas (paginado):", response);
       
       let pessoasList = [];
       let total = 0;
@@ -199,66 +187,40 @@ export const usePessoaForm = (isNewMode = false) => {
         total = pessoasList.length;
       }
       
-      // Normaliza os dados
       const normalizedPessoas = pessoasList.map(normalizePessoa);
+      const totalPages = Math.ceil(total / pagination.pageSize);
       
-      if (reset) {
-        setPessoas(normalizedPessoas);
-        setPagination(prev => ({
-          ...prev,
-          currentPage: page,
-          total: total,
-          hasMore: pessoasList.length === pagination.pageSize,
-        }));
-        setAllLoaded(pessoasList.length < pagination.pageSize);
-      } else {
-        setPessoas(prev => [...prev, ...normalizedPessoas]);
-        setPagination(prev => ({
-          ...prev,
-          currentPage: page,
-          total: total,
-          hasMore: pessoasList.length === pagination.pageSize,
-        }));
-        setAllLoaded(pessoasList.length < pagination.pageSize);
-      }
-      
-      // console.log(`✅ ${normalizedPessoas.length} pessoas carregadas (total: ${total})`);
-      
+      setPessoas(normalizedPessoas);
+      setPagination(prev => ({
+        ...prev,
+        currentPage: page,
+        total: total,
+        totalPages: totalPages,
+      }));
     } catch (error) {
-      console.error("❌ Erro ao buscar pessoas:", error);
-      if (reset) {
-        setPessoas([]);
-        setPagination(prev => ({ ...prev, total: 0, hasMore: false }));
-      }
+      console.error("Erro ao buscar pessoas:", error);
+      setPessoas([]);
+      setPagination(prev => ({ ...prev, total: 0, totalPages: 0 }));
     } finally {
       isLoadingRef.current = false;
-      if (reset) {
-        setLoading(false);
-      } else {
-        setLoadingMore(false);
-      }
+      setLoading(false);
     }
-  }, [pagination.currentPage, pagination.pageSize, searchTerm]);
+  }, [pagination.pageSize, searchTerm]);
 
-  // 🔥 Carrega mais (próxima página)
-  const loadMore = useCallback(() => {
-    if (!pagination.hasMore || loadingMore || allLoaded || isLoadingRef.current) {
-      return;
-    }
-    fetchPessoas(false);
-  }, [pagination.hasMore, loadingMore, allLoaded, fetchPessoas]);
+  const goToPage = useCallback((page) => {
+    if (page < 1 || page > pagination.totalPages) return;
+    fetchPessoas(page, searchTerm);
+  }, [fetchPessoas, pagination.totalPages, searchTerm]);
 
-  // 🔥 Busca por termo
   const searchPessoas = useCallback(async (term) => {
     setSearchTerm(term);
     if (term.length >= 2 || term.length === 0) {
-      await fetchPessoas(true, term);
+      await fetchPessoas(1, term);
     }
   }, [fetchPessoas]);
 
-  // 🔥 Carrega inicial
   useEffect(() => {
-    fetchPessoas(true);
+    fetchPessoas(1);
   }, []);
 
   // Atualiza o formData quando uma pessoa é selecionada
@@ -429,7 +391,6 @@ export const usePessoaForm = (isNewMode = false) => {
     isEditing,
     isSubmitting,
     loading,
-    loadingMore,
     selectedCodigo,
     selectedPessoa,
     canAlterar,
@@ -437,7 +398,6 @@ export const usePessoaForm = (isNewMode = false) => {
     canLimpar,
     pagination,
     searchTerm,
-    allLoaded,
     updateField,
     preencherEndereco,
     startNew,
@@ -448,7 +408,7 @@ export const usePessoaForm = (isNewMode = false) => {
     save,
     setFormData,
     fetchPessoas,
-    loadMore,
+    goToPage,
     searchPessoas,
   };
 };

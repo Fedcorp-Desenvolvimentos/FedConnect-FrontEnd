@@ -530,3 +530,78 @@ export const ResultInfo = styled.div`
   color: #64748b;
   font-style: italic;
 `;
+
+// ==================== PAGINAÇÃO ====================
+export const Pagination = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.75rem 0;
+  flex-wrap: wrap;
+`;
+
+export const PaginationButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #0f3d5d;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
+
+export const PaginationPages = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+`;
+
+export const PaginationPage = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.4rem;
+  border: 1px solid ${props => props.$active ? '#0f3d5d' : '#e2e8f0'};
+  border-radius: 6px;
+  background: ${props => props.$active ? '#0f3d5d' : 'white'};
+  color: ${props => props.$active ? 'white' : '#475569'};
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: ${props => props.$active ? '#0f3d5d' : '#f1f5f9'};
+    border-color: ${props => props.$active ? '#0f3d5d' : '#94a3b8'};
+  }
+`;
+
+export const PaginationEllipsis = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  color: #94a3b8;
+  font-size: 0.8rem;
+`;
