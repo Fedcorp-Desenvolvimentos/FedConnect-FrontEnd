@@ -17,6 +17,7 @@ import {
   calcularRetencoesConsolidadas,
   calcularRetencoesFrontend,
   DEFAULT_SELECTED,
+  RETENTION_OPTIONS,
 } from '../../../../utils/regras_retencao';
 
 const INITIAL_FILTERS = {
@@ -30,20 +31,6 @@ const INITIAL_FILTERS = {
   apolice: '',
   recibo: '',
   produto: '',
-};
-
-const RETENTION_OPTIONS = [
-  { id: 'iss', label: 'ISS', rate: 0.02 },
-  { id: 'ir', label: 'IR', rate: 0.015 },
-  { id: 'cofins', label: 'COFINS', rate: 0.03 },
-  { id: 'csll', label: 'CSLL', rate: 0.01 },
-  { id: 'pis', label: 'PIS', rate: 0.0065 },
-  { id: 'inss', label: 'INSS', rate: 0.11 },
-];
-
-// ⭐ REGRAS DE RETENÇÃO NO FRONTEND
-const RETENTION_RULES = {
-  MIN_VALUE_FOR_IR: 666.00,
 };
 
 const getComissaoKey = (c) => {
@@ -304,9 +291,12 @@ export const useEmissaoRecibos = () => {
 
     setRetencoesVerificadas(response);
 
-    // PRÉ-SELEÇÃO: apenas PIS, COFINS, CSLL vêm marcados por padrão
-    // Se o valor da comissão > 666, IR também vem marcado
-    const temIR = response.comissoes.some(c => c.retencoes_calculadas?.motivo?.includes('IR'));
+    // PRÉ-SELEÇÃO: PIS, COFINS, CSLL vêm marcados por padrão
+    // Se ALGUMA comissão tem valor > 666, IR também vem marcado
+    const temIR = comissoesComRetencoes.some(c => {
+      const valor = Number(c.VALOR || c.valor || 0);
+      return valor > 666.00;
+    });
     const preSelected = [...DEFAULT_SELECTED];
     if (temIR) {
       preSelected.push('ir');
@@ -445,13 +435,14 @@ export const useEmissaoRecibos = () => {
     }
 
     // CONSTRÓI AS RETENÇÕES PARA O PAYLOAD
+    // Usa selectedRetentions (estado dos checkboxes) para determinar o que aplicar
     const retencoesAplicadas = [];
-    Object.values(resultado.detalhesRetencoes || {}).forEach(r => {
-      if (r.aplicavel) {
+    RETENTION_OPTIONS.forEach(opt => {
+      if (selectedRetentions.includes(opt.id)) {
         retencoesAplicadas.push({
-          tipo: r.label || r.id?.toUpperCase() || 'RETENÇÃO',
-          aliquota: `${((r.rate || 0) * 100).toFixed(2)}%`,
-          valor: r.valor || 0,
+          tipo: opt.label,
+          aliquota: `${(opt.rate * 100).toFixed(2)}%`,
+          valor: resultado.totalBruto * opt.rate,
         });
       }
     });
@@ -581,16 +572,20 @@ export const useEmissaoRecibos = () => {
       }
 
       // CONSTRÓI RETENÇÕES PARA O PAYLOAD
+      // Usa selectedRetentions (estado dos checkboxes) para determinar o que enviar
       const retencoesPayload = [];
-      Object.values(resultado.detalhesRetencoes || {}).forEach(r => {
-        if (r.aplicavel) {
+      RETENTION_OPTIONS.forEach(opt => {
+        if (selectedRetentions.includes(opt.id)) {
           retencoesPayload.push({
-            tipo: r.label || r.id?.toUpperCase() || 'RETENÇÃO',
-            aliquota: r.rate || 0,
-            valor: r.valor || 0,
+            tipo: opt.label,
+            aliquota: opt.rate,
+            valor: resultado.totalBruto * opt.rate,
           });
         }
       });
+
+      // CALCULA TOTAIS DAS RETENÇÕES SELECIONADAS
+      const totalRetencoesCalculado = retencoesPayload.reduce((sum, r) => sum + r.valor, 0);
 
       const payload = {
         tipo_documento: documentType,
@@ -651,8 +646,8 @@ export const useEmissaoRecibos = () => {
         resumo: {
           total_comissoes: comissoesSelecionadas.length,
           valor_total_bruto: resultado.totalBruto,
-          total_retencoes: resultado.totalRetencoes,
-          valor_liquido_final: resultado.valorLiquido,
+          total_retencoes: totalRetencoesCalculado,
+          valor_liquido_final: resultado.totalBruto - totalRetencoesCalculado,
         },
       };
 
