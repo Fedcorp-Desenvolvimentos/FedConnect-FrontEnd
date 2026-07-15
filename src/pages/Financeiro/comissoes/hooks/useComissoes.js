@@ -160,6 +160,31 @@ export const useEmissaoRecibos = () => {
     setRetencoesVerificadas(null);
   }, [comissoes]);
 
+  // RESETA RETENÇÕES QUANDO MUDA O TIPO DE DOCUMENTO
+  useEffect(() => {
+    if (documentType === 'recibo') {
+      // Recibo: nenhum imposto pré-selecionado
+      setSelectedRetentions([]);
+      setRetencoesVerificadas(null);
+    } else {
+      // Voucher: pré-seleciona PIS, COFINS, CSLL
+      const comissoesSelecionadas = comissoes.filter((c) =>
+        selectedComissoes.has(getComissaoKey(c))
+      );
+      if (comissoesSelecionadas.length > 0) {
+        const temIR = comissoesSelecionadas.some(c => {
+          const valor = Number(c.VALOR || c.valor || 0);
+          return valor > 666.00;
+        });
+        const preSelected = [...DEFAULT_SELECTED];
+        if (temIR) {
+          preSelected.push('ir');
+        }
+        setSelectedRetentions(preSelected);
+      }
+    }
+  }, [documentType]);
+
   const buscarComissoes = useCallback(
     async (novosFiltros = {}) => {
       const filtrosAtualizados = { ...filters, ...novosFiltros };
@@ -291,19 +316,23 @@ export const useEmissaoRecibos = () => {
 
     setRetencoesVerificadas(response);
 
-    // PRÉ-SELEÇÃO: PIS, COFINS, CSLL vêm marcados por padrão
-    // Se ALGUMA comissão tem valor > 666, IR também vem marcado
-    const temIR = comissoesComRetencoes.some(c => {
-      const valor = Number(c.VALOR || c.valor || 0);
-      return valor > 666.00;
-    });
-    const preSelected = [...DEFAULT_SELECTED];
-    if (temIR) {
-      preSelected.push('ir');
+    // PRÉ-SELEÇÃO:
+    // VOUCHER: PIS, COFINS, CSLL vêm marcados (+ IR se valor > 666)
+    // RECIBO: nenhum imposto pré-selecionado (usuário marca manualmente se quiser)
+    if (documentType === 'recibo') {
+      setSelectedRetentions([]);
+    } else {
+      const temIR = comissoesComRetencoes.some(c => {
+        const valor = Number(c.VALOR || c.valor || 0);
+        return valor > 666.00;
+      });
+      const preSelected = [...DEFAULT_SELECTED];
+      if (temIR) {
+        preSelected.push('ir');
+      }
+      setSelectedRetentions(preSelected);
     }
-
-    setSelectedRetentions(preSelected);
-  }, [selectedComissoes, comissoes]);
+  }, [selectedComissoes, comissoes, documentType]);
 
   const toggleComissao = useCallback((comissao) => {
     const key = getComissaoKey(comissao);
@@ -435,17 +464,23 @@ export const useEmissaoRecibos = () => {
     }
 
     // CONSTRÓI AS RETENÇÕES PARA O PAYLOAD
-    // Usa selectedRetentions (estado dos checkboxes) para determinar o que aplicar
+    // RECIBO: NENHUM imposto no PDF | VOUCHER: usa selectedRetentions
     const retencoesAplicadas = [];
-    RETENTION_OPTIONS.forEach(opt => {
-      if (selectedRetentions.includes(opt.id)) {
-        retencoesAplicadas.push({
-          tipo: opt.label,
-          aliquota: `${(opt.rate * 100).toFixed(2)}%`,
-          valor: resultado.totalBruto * opt.rate,
-        });
-      }
-    });
+    if (documentType !== 'recibo') {
+      RETENTION_OPTIONS.forEach(opt => {
+        if (selectedRetentions.includes(opt.id)) {
+          retencoesAplicadas.push({
+            tipo: opt.label,
+            aliquota: `${(opt.rate * 100).toFixed(2)}%`,
+            valor: resultado.totalBruto * opt.rate,
+          });
+        }
+      });
+    }
+
+    // Calcula valor líquido: recibo = bruto (sem impostos), voucher = bruto - retenções
+    const totalRetencoesCalc = documentType === 'recibo' ? 0 : retencoesAplicadas.reduce((sum, r) => sum + r.valor, 0);
+    const valorLiquidoFinal = resultado.totalBruto - totalRetencoesCalc;
 
     return {
       tipoDocumento: documentType,
@@ -453,7 +488,7 @@ export const useEmissaoRecibos = () => {
       dataCorteFormatada: 'Todas',
       totalComissoes: comissoesSelecionadas.length,
       valorTotalBruto: resultado.totalBruto,
-      valorLiquido: resultado.valorLiquido,
+      valorLiquido: valorLiquidoFinal,
       retencoesAplicadas: retencoesAplicadas,
       
       comissoes: comissoesSelecionadas.map((c) => ({
@@ -572,17 +607,21 @@ export const useEmissaoRecibos = () => {
       }
 
       // CONSTRÓI RETENÇÕES PARA O PAYLOAD
-      // Usa selectedRetentions (estado dos checkboxes) para determinar o que enviar
+      // RECIBO: SEMPRE envia array vazio (nenhum imposto no PDF)
+      // VOUCHER: usa selectedRetentions (estado dos checkboxes)
       const retencoesPayload = [];
-      RETENTION_OPTIONS.forEach(opt => {
-        if (selectedRetentions.includes(opt.id)) {
-          retencoesPayload.push({
-            tipo: opt.label,
-            aliquota: opt.rate,
-            valor: resultado.totalBruto * opt.rate,
-          });
-        }
-      });
+      if (documentType !== 'recibo') {
+        RETENTION_OPTIONS.forEach(opt => {
+          if (selectedRetentions.includes(opt.id)) {
+            retencoesPayload.push({
+              tipo: opt.label,
+              aliquota: opt.rate,
+              valor: resultado.totalBruto * opt.rate,
+            });
+          }
+        });
+      }
+      // Para recibo, retencoesPayload fica vazio = []
 
       // CALCULA TOTAIS DAS RETENÇÕES SELECIONADAS
       const totalRetencoesCalculado = retencoesPayload.reduce((sum, r) => sum + r.valor, 0);
@@ -646,8 +685,8 @@ export const useEmissaoRecibos = () => {
         resumo: {
           total_comissoes: comissoesSelecionadas.length,
           valor_total_bruto: resultado.totalBruto,
-          total_retencoes: totalRetencoesCalculado,
-          valor_liquido_final: resultado.totalBruto - totalRetencoesCalculado,
+          total_retencoes: documentType === 'recibo' ? 0 : totalRetencoesCalculado,
+          valor_liquido_final: documentType === 'recibo' ? resultado.totalBruto : resultado.totalBruto - totalRetencoesCalculado,
         },
       };
 

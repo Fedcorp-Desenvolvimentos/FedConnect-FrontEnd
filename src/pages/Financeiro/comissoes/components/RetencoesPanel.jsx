@@ -47,8 +47,10 @@ export function RetencoesPanel({
     onVerificarRetencoes,
     retencoesVerificadas,
     loading,
-    selectedComissoes 
+    selectedComissoes,
+    documentType
 }) {
+    const isRecibo = documentType === 'recibo';
     const isIsento = retencoesVerificadas?.isIsento || false;
     const motivo = retencoesVerificadas?.motivo || '';
     const detalhesRetencoes = retencoesVerificadas?.detalhesRetencoes || {};
@@ -71,18 +73,18 @@ export function RetencoesPanel({
         RETENTION_OPTIONS.forEach(item => {
             const isAplicavel = detalhesRetencoes[item.id]?.aplicavel || false;
             
-            // SE FOR ISENTO, NUNCA MARCA
-            // SE NÃO FOR ISENTO, MARCA APENAS SE ESTIVER NO selectedRetentions
-            // PIS, COFINS, CSLL vêm marcados por padrão (DEFAULT_SELECTED)
-            // ISS, IR, INSS NÃO vêm marcados (usuário seleciona se necessário)
-            const checked = !isIsento && selectedRetentions.includes(item.id);
+            // RECIBO: nenhum imposto (desabilitado)
+            // ISENTO: nenhum imposto (desabilitado)
+            // VOUCHER: marca se estiver no selectedRetentions
+            const checked = !isRecibo && !isIsento && selectedRetentions.includes(item.id);
             
             result[item.id] = {
                 ...item,
                 checked: checked,
                 valor: checked ? grossTotal * item.rate : 0,
-                isAutomatic: DEFAULT_SELECTED.includes(item.id) && !isIsento,
+                isAutomatic: DEFAULT_SELECTED.includes(item.id) && !isIsento && !isRecibo,
                 isIsento: isIsento,
+                isRecibo: isRecibo,
                 aplicavel: isAplicavel,
                 isDefault: DEFAULT_SELECTED.includes(item.id),
             };
@@ -110,7 +112,11 @@ export function RetencoesPanel({
     let statusColor = '';
     let statusBg = '';
     
-    if (retencoesVerificadas) {
+    if (isRecibo) {
+        statusText = '📄 Recibo - Nenhum imposto será gerado no PDF';
+        statusColor = '#6A1B9A';
+        statusBg = '#F3E5F5';
+    } else if (retencoesVerificadas) {
         if (isIsento) {
             statusText = `✅ ${motivo || 'Isento de retenções'}`;
             statusColor = '#2E7D32';
@@ -126,7 +132,7 @@ export function RetencoesPanel({
         }
     }
 
-    const mostrarValores = totalBrutoSelecionado > 0 && !isIsento;
+    const mostrarValores = totalBrutoSelecionado > 0 && !isIsento && !isRecibo;
 
     return (
         <RetentionCard>
@@ -137,7 +143,7 @@ export function RetencoesPanel({
                     <span>Aplicadas sobre o total selecionado</span>
                 </div>
                 
-                {hasResults && comissoes.length > 0 && selectedComissoes?.size > 0 && (
+                {!isRecibo && hasResults && comissoes.length > 0 && selectedComissoes?.size > 0 && (
                     <button 
                         onClick={onVerificarRetencoes}
                         disabled={loading}
@@ -202,12 +208,12 @@ export function RetencoesPanel({
                             isAutomatic={isAutomatic}
                             isIsento={isIsento}
                             style={{
-                                opacity: isIsento ? 0.7 : 1,
-                                backgroundColor: isAutomatic && !isIsento ? '#E3F2FD' : 
-                                                (isIsento ? '#F5F5F5' : undefined),
-                                borderColor: isAutomatic && !isIsento ? '#90CAF9' :
-                                            (isIsento ? '#E0E0E0' : undefined),
-                                cursor: isIsento ? 'default' : 'pointer',
+                                opacity: (isIsento || isRecibo) ? 0.7 : 1,
+                                backgroundColor: isAutomatic && !isIsento && !isRecibo ? '#E3F2FD' : 
+                                                ((isIsento || isRecibo) ? '#F5F5F5' : undefined),
+                                borderColor: isAutomatic && !isIsento && !isRecibo ? '#90CAF9' :
+                                            ((isIsento || isRecibo) ? '#E0E0E0' : undefined),
+                                cursor: (isIsento || isRecibo) ? 'default' : 'pointer',
                             }}
                         >
                             <span className="left">
@@ -215,15 +221,27 @@ export function RetencoesPanel({
                                     type="checkbox"
                                     checked={checked}
                                     onChange={() => onToggleRetention(item.id)}
-                                    disabled={isIsento}
+                                    disabled={isIsento || isRecibo}
                                     style={{ 
                                         accentColor: '#2b6cb0',
-                                        cursor: isIsento ? 'default' : 'pointer'
+                                        cursor: (isIsento || isRecibo) ? 'default' : 'pointer'
                                     }}
                                 />
                                 <span className="name">{item.label}</span>
                                 <span className="rate">{formatRate(item.rate)}</span>
-                                {isDefault && !isIsento && (
+                                {isRecibo && (
+                                    <span style={{ 
+                                        fontSize: '9px', 
+                                        background: '#6A1B9A', 
+                                        color: '#fff',
+                                        padding: '1px 6px',
+                                        borderRadius: '3px',
+                                        marginLeft: '4px'
+                                    }}>
+                                        Recibo
+                                    </span>
+                                )}
+                                {!isRecibo && isDefault && !isIsento && (
                                     <span style={{ 
                                         fontSize: '9px', 
                                         background: '#2b6cb0', 
@@ -235,7 +253,7 @@ export function RetencoesPanel({
                                         Auto
                                     </span>
                                 )}
-                                {isIsento && (
+                                {!isRecibo && isIsento && (
                                     <span style={{ 
                                         fontSize: '9px', 
                                         background: '#4CAF50', 
@@ -247,7 +265,7 @@ export function RetencoesPanel({
                                         Isento
                                     </span>
                                 )}
-                                {!isIsento && !isDefault && !checked && (
+                                {!isIsento && !isRecibo && !isDefault && !checked && (
                                     <span style={{ 
                                         fontSize: '9px', 
                                         color: '#999',

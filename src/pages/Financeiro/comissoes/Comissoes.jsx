@@ -143,18 +143,17 @@ export default function Comissoes() {
         </MainColumn>
 
         <Sidebar>
-          {documentType !== 'recibo' && (
-            <RetencoesPanel
-              selectedRetentions={selectedRetentions}
-              totals={retentionSummary}
-              onToggleRetention={toggleRetention}
-              hasResults={hasResults}
-              comissoes={comissoes}
-              retencoesVerificadas={retencoesVerificadas}
-              loading={loading}
-              selectedComissoes={selectedComissoes}
-            />
-          )}
+          <RetencoesPanel
+            selectedRetentions={selectedRetentions}
+            totals={retentionSummary}
+            onToggleRetention={toggleRetention}
+            hasResults={hasResults}
+            comissoes={comissoes}
+            retencoesVerificadas={retencoesVerificadas}
+            loading={loading}
+            selectedComissoes={selectedComissoes}
+            documentType={documentType}
+          />
 
           <EmissaoPanel
             canIssue={canIssue && hasResults}
