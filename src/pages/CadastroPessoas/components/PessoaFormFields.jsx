@@ -31,7 +31,7 @@ const SECTION_VISIBILITY = {
   bancario: ['bancario'],
   contato: ['contato'],
   configuracoes: ['configuracoes'],
-  agenciamento: ['agenciamento', 'prestador', 'comissao'],
+  agenciamento: ['agenciamento', 'prestador'],
 };
 
 const isSectionVisible = (activeTab, sectionName) => {
