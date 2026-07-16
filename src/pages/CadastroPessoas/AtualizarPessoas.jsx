@@ -130,11 +130,6 @@ const AtualizarPessoas = () => {
       return;
     }
 
-    if (!formData.comissao && formData.comissao !== 0) {
-      enqueueSnackbar('⚠️ Comissão é obrigatória', { variant: 'warning' });
-      return;
-    }
-
     const result = await save();
 
     if (!result.success) {
