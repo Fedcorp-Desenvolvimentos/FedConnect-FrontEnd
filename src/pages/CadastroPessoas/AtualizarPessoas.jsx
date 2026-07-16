@@ -49,6 +49,8 @@ const AtualizarPessoas = () => {
     save,
     goToPage,
     searchPessoas,
+    produtos,
+    gerentes,
   } = usePessoaForm(false);
 
   const handleSearchInput = useCallback((value) => {
@@ -306,6 +308,8 @@ const AtualizarPessoas = () => {
               onChange={updateField}
               onBuscarCep={handleBuscarCep}
               activeTab={activeTab}
+              produtos={produtos}
+              gerentes={gerentes}
             />
 
             {!isReadOnly && (

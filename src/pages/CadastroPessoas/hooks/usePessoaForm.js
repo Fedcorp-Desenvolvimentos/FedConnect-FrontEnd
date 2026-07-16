@@ -1,7 +1,7 @@
 // src/pages/CadastroPessoas/hooks/usePessoaForm.js
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { buscarPessoas, criarPessoa, atualizarPessoa } from '../../../services/pessoaService';
+import { buscarPessoas, criarPessoa, atualizarPessoa, buscarProdutos, buscarGerentesComerciais } from '../../../services/pessoaService';
 
 export const CATEGORIAS_DISPONIVEIS = [
   'ADMINISTRADORA',
@@ -62,9 +62,13 @@ export const INITIAL_STATE = {
   credenciado: '',
   codigo_credenciado: '',
 
-  comissao: '',
-  produto: 'individual',
-  categoria: ''
+  comissao1: '',
+  comissao2: '',
+  produto: '',
+  categoria: '',
+  gerente_comercial: '',
+  favorecido1: '',
+  favorecido2: ''
 };
 
 const normalizePessoa = (pessoa) => {
@@ -109,9 +113,13 @@ const normalizePessoa = (pessoa) => {
     'PRESTADOR_SERVICOS': 'prestador_servicos',
     'CREDENCIADO': 'credenciado',
     'CODIGO_CREDENCIADO': 'codigo_credenciado',
-    'COMISSAO': 'comissao',
     'PRODUTO': 'produto',
-    'CATEGORIA': 'categoria'
+    'CATEGORIA': 'categoria',
+    'COD_GERENTE_EXTRA': 'gerente_comercial',
+    'FAVOR1': 'favorecido1',
+    'FAVOR2': 'favorecido2',
+    'COMISSAO1': 'comissao1',
+    'COMISSAO2': 'comissao2'
   };
 
   const normalized = {};
@@ -153,6 +161,8 @@ export const usePessoaForm = (isNewMode = false) => {
     totalPages: 0,
   });
   const [searchTerm, setSearchTerm] = useState('');
+  const [produtos, setProdutos] = useState([]);
+  const [gerentes, setGerentes] = useState([]);
   const isLoadingRef = useRef(false);
 
   const isReadOnly = mode === 'view';
@@ -223,6 +233,38 @@ export const usePessoaForm = (isNewMode = false) => {
     fetchPessoas(1);
   }, []);
 
+  const fetchProdutos = useCallback(async () => {
+    try {
+      const response = await buscarProdutos();
+      if (response?.produtos) {
+        setProdutos(response.produtos);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+      setProdutos([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProdutos();
+  }, [fetchProdutos]);
+
+  const fetchGerentes = useCallback(async () => {
+    try {
+      const response = await buscarGerentesComerciais();
+      if (response?.gerentes) {
+        setGerentes(response.gerentes);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar gerentes comerciais:", error);
+      setGerentes([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchGerentes();
+  }, [fetchGerentes]);
+
   // Atualiza o formData quando uma pessoa é selecionada
   useEffect(() => {
     if (selectedCodigo && mode === 'edit') {
@@ -273,12 +315,6 @@ export const usePessoaForm = (isNewMode = false) => {
 
     if (!formData.categoria) {
       newErrors.categoria = 'Selecione uma categoria';
-    }
-
-    if (!formData.comissao && formData.comissao !== 0) {
-      newErrors.comissao = 'Comissão é obrigatória';
-    } else if (formData.comissao && (isNaN(formData.comissao) || parseFloat(formData.comissao) < 0)) {
-      newErrors.comissao = 'Comissão deve ser um número válido';
     }
 
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
@@ -410,5 +446,7 @@ export const usePessoaForm = (isNewMode = false) => {
     fetchPessoas,
     goToPage,
     searchPessoas,
+    produtos,
+    gerentes,
   };
 };

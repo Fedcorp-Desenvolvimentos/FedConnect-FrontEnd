@@ -77,3 +77,23 @@ export const excluirPessoa = async (codigo) => {
   }
 };
 
+export const buscarProdutos = async () => {
+  try {
+    const response = await api.get('pessoas/produtos/');
+    return response.data;
+  } catch (error) {
+    console.error("❌ Erro ao buscar produtos:", error);
+    throw error;
+  }
+};
+
+export const buscarGerentesComerciais = async () => {
+  try {
+    const response = await api.get('pessoas/gerentes-comerciais/');
+    return response.data;
+  } catch (error) {
+    console.error("❌ Erro ao buscar gerentes comerciais:", error);
+    throw error;
+  }
+};
+
