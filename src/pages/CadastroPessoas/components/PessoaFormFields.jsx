@@ -45,7 +45,9 @@ const PessoaFormFields = ({
   disabled,
   onChange,
   onBuscarCep,
-  activeTab = 'identificacao'
+  activeTab = 'identificacao',
+  produtos = [],
+  gerentes = []
 }) => {
   const renderSection = (section, children) => {
     if (!isSectionVisible(activeTab, section)) return null;
@@ -149,6 +151,93 @@ const PessoaFormFields = ({
                 ))}
               </S.FormSelect>
               {errors.categoria && <S.ErrorMessage>{errors.categoria}</S.ErrorMessage>}
+            </S.FormGroup>
+          </S.FormRow>
+
+          <S.FormRow>
+            <S.FormGroup $flex="1 1 320px">
+              <S.FormLabel>Gerente Comercial</S.FormLabel>
+              <S.FormSelect
+                name="gerente_comercial"
+                value={data.gerente_comercial || ''}
+                onChange={onChange}
+                disabled={disabled}
+              >
+                <option value="">Selecione o gerente</option>
+                {gerentes.map(gerente => (
+                  <option key={gerente.codigo} value={gerente.codigo}>{gerente.nome}</option>
+                ))}
+              </S.FormSelect>
+            </S.FormGroup>
+          </S.FormRow>
+
+          <S.FormRow>
+            <S.FormGroup $flex="1 1 320px">
+              <S.FormLabel>Favorecido 1</S.FormLabel>
+              <S.FormInput
+                type="text"
+                name="favorecido1"
+                value={data.favorecido1 || ''}
+                onChange={onChange}
+                disabled={disabled}
+                placeholder="Nome do favorecido 1"
+              />
+            </S.FormGroup>
+
+            <S.FormGroup $flex="1 1 320px">
+              <S.FormLabel>Favorecido 2</S.FormLabel>
+              <S.FormInput
+                type="text"
+                name="favorecido2"
+                value={data.favorecido2 || ''}
+                onChange={onChange}
+                disabled={disabled}
+                placeholder="Nome do favorecido 2"
+              />
+            </S.FormGroup>
+          </S.FormRow>
+
+          <S.FormRow>
+            <S.FormGroup $flex="0 1 250px">
+              <S.FormLabel>Comissão 1 (%)</S.FormLabel>
+              <S.FormInput
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                name="comissao1"
+                value={data.comissao1 || ''}
+                onChange={onChange}
+                disabled={disabled}
+                placeholder="0,00"
+              />
+            </S.FormGroup>
+
+            <S.FormGroup $flex="0 1 250px">
+              <S.FormLabel>Comissão 2 (%)</S.FormLabel>
+              <S.FormInput
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                name="comissao2"
+                value={data.comissao2 || ''}
+                onChange={onChange}
+                disabled={disabled}
+                placeholder="0,00"
+              />
+            </S.FormGroup>
+          </S.FormRow>
+
+          <S.FormRow>
+            <S.FormGroup $flex="0 1 250px">
+              <S.FormLabel>Produto</S.FormLabel>
+              <S.FormSelect name="produto" value={data.produto} onChange={onChange} disabled={disabled}>
+                <option value="">Selecione o produto</option>
+                {produtos.map(produto => (
+                  <option key={produto.codigo} value={produto.codigo}>{produto.nome}</option>
+                ))}
+              </S.FormSelect>
             </S.FormGroup>
           </S.FormRow>
         </S.Section>
@@ -598,39 +687,6 @@ const PessoaFormFields = ({
                   onChange={onChange}
                   disabled={disabled || !data.prestador_servicos}
                 />
-              </S.FormGroup>
-            </S.FormRow>
-          </S.Section>
-
-          {/* Comissão + Produto */}
-          <S.Section disabled={disabled}>
-            <S.SectionTitle>Comissão e Produto</S.SectionTitle>
-            <S.FormRow>
-              <S.FormGroup $flex="0 1 250px">
-                <S.FormLabel>
-                  Comissão (%) <span className="required">*</span>
-                </S.FormLabel>
-                <S.FormInput
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max="100"
-                  name="comissao"
-                  value={data.comissao}
-                  onChange={onChange}
-                  disabled={disabled}
-                  $error={errors.comissao}
-                  placeholder="0,00"
-                />
-                {errors.comissao && <S.ErrorMessage>{errors.comissao}</S.ErrorMessage>}
-              </S.FormGroup>
-
-              <S.FormGroup $flex="0 1 250px">
-                <S.FormLabel>Produto</S.FormLabel>
-                <S.FormSelect name="produto" value={data.produto} onChange={onChange} disabled={disabled}>
-                  <option value="individual">Individual</option>
-                  <option value="coletivo">Coletivo</option>
-                </S.FormSelect>
               </S.FormGroup>
             </S.FormRow>
           </S.Section>

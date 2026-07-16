@@ -33,6 +33,8 @@ const CadastroPessoas = () => {
     preencherEndereco,
     clearForm,
     save,
+    produtos,
+    gerentes,
   } = usePessoaForm(true); // true = modo new
 
   const handleVoltar = () => {
@@ -131,6 +133,8 @@ const CadastroPessoas = () => {
               onChange={updateField}
               onBuscarCep={handleBuscarCep}
               activeTab={activeTab}
+              produtos={produtos}
+              gerentes={gerentes}
             />
 
             <S.FormActions>
