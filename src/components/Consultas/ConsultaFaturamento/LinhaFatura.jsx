@@ -20,7 +20,7 @@ const getStatusClass = (status) => {
     return statusMap[status] || 'desconhecido';
 };
 
-export const LinhaFatura = ({ fatura, index, isExpanded, toggleExpandRow, obterNomeCedente, obterNomeCorretor }) => {
+export const LinhaFatura = ({ fatura, index, isExpanded, toggleExpandRow, obterNomeCedente, obterNomeCorretor, onSyncComplete }) => {
     const venc = verificarVencimento(fatura.VENCIMENTO);
     const statusClass = getStatusClass(venc.status);
 
@@ -55,6 +55,7 @@ export const LinhaFatura = ({ fatura, index, isExpanded, toggleExpandRow, obterN
                                 fatura={fatura}
                                 obterNomeCedente={obterNomeCedente}
                                 obterNomeCorretor={obterNomeCorretor}
+                                onSyncComplete={onSyncComplete}
                             />
                         </S.ExpandedContent>
                     </td>

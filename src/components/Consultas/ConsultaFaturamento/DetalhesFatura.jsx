@@ -1,11 +1,35 @@
 // components/Faturamento/DetalhesFatura.jsx
-import React from 'react';
-import { FaReceipt, FaFileInvoiceDollar } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaReceipt, FaFileInvoiceDollar, FaSync } from 'react-icons/fa';
 import * as S from "./styles/ConsultaFaturamentoStyles";
 import { formatarData, formatarValor, formatarVigencia } from "./utils/formatacao";
 import { TabelaBoletos } from "./TabelaBoletos";
+import { sincronizarBoletos } from "../../../services/boletofedbnk";
 
-export const DetalhesFatura = ({ fatura, obterNomeCedente, obterNomeCorretor }) => {
+export const DetalhesFatura = ({ fatura, obterNomeCedente, obterNomeCorretor, onSyncComplete }) => {
+    const [syncLoading, setSyncLoading] = useState(false);
+    const [syncResult, setSyncResult] = useState(null);
+
+    const handleSincronizar = async () => {
+        if (!fatura.FATURA) return;
+
+        setSyncLoading(true);
+        setSyncResult(null);
+
+        try {
+            const resultado = await sincronizarBoletos(fatura.FATURA);
+            setSyncResult(resultado);
+
+            if (resultado.total_atualizados > 0 && onSyncComplete) {
+                onSyncComplete();
+            }
+        } catch (error) {
+            setSyncResult({ erro: error.response?.data?.erro || "Erro ao sincronizar boletos" });
+        } finally {
+            setSyncLoading(false);
+        }
+    };
+
     // Dados para os cards
     const infoItems = [
         { label: "Prêmio Bruto", value: formatarValor(fatura.PREMIO_BRUTO), highlight: true },
@@ -72,17 +96,60 @@ export const DetalhesFatura = ({ fatura, obterNomeCedente, obterNomeCorretor }) 
             {/* BOLETOS */}
             {fatura.BOLETOS && fatura.BOLETOS.length > 0 && (
                 <div style={{ marginTop: "1.5rem" }}>
-                    <S.SectionTitle>
-                        <FaReceipt /> BOLETOS ({fatura.QTD_BOLETOS})
-                        {fatura.VALOR_TOTAL_BOLETOS > 0 && (
-                            <span style={{ marginLeft: 8, fontSize: "0.75rem" }}>
-                                Total: {formatarValor(fatura.VALOR_TOTAL_BOLETOS)}
-                            </span>
-                        )}
-                    </S.SectionTitle>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
+                        <S.SectionTitle>
+                            <FaReceipt /> BOLETOS ({fatura.QTD_BOLETOS})
+                            {fatura.VALOR_TOTAL_BOLETOS > 0 && (
+                                <span style={{ marginLeft: 8, fontSize: "0.75rem" }}>
+                                    Total: {formatarValor(fatura.VALOR_TOTAL_BOLETOS)}
+                                </span>
+                            )}
+                        </S.SectionTitle>
+
+                        <S.Button 
+                            $secondary 
+                            onClick={handleSincronizar} 
+                            disabled={syncLoading}
+                            style={{ padding: "0.5rem 1rem", fontSize: "0.75rem" }}
+                        >
+                            <FaSync className={syncLoading ? "rb-spin" : ""} style={{ animation: syncLoading ? "spin 1s linear infinite" : "none" }} />
+                            {syncLoading ? "Sincronizando..." : "Sincronizar Boletos"}
+                        </S.Button>
+                    </div>
+
+                    {/* Resultado da sincronização */}
+                    {syncResult && (
+                        <div style={{ 
+                            marginTop: "0.75rem", 
+                            padding: "0.75rem", 
+                            borderRadius: "8px", 
+                            fontSize: "0.75rem",
+                            background: syncResult.erro ? "#fef2f2" : "#f0fdf4",
+                            border: syncResult.erro ? "1px solid #fecaca" : "1px solid #bbf7d0",
+                            color: syncResult.erro ? "#dc2626" : "#16a34a"
+                        }}>
+                            {syncResult.erro ? (
+                                <span>Erro: {syncResult.erro}</span>
+                            ) : (
+                                <span>
+                                    {syncResult.total_atualizados > 0 && `${syncResult.total_atualizados} boleto(s) atualizado(s)`}
+                                    {syncResult.total_erros > 0 && ` | ${syncResult.total_erros} erro(s)`}
+                                    {syncResult.total_atualizados === 0 && syncResult.total_erros === 0 && "Nenhum boleto precisou ser atualizado"}
+                                </span>
+                            )}
+                        </div>
+                    )}
+
                     <TabelaBoletos boletos={fatura.BOLETOS} parcelas={fatura.PARCELAS} />
                 </div>
             )}
+
+            <style>{`
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     );
 };

@@ -87,6 +87,37 @@ export const consultarSegundaVia = async (fatura) => {
 };
 
 /**
+ * Sincroniza status dos boletos com a FedBNK.
+ * POST /boletofedbnk/sincronizar/
+ * @param {string} numeroFatura - Número da fatura
+ */
+export const sincronizarBoletos = async (numeroFatura) => {
+  try {
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      throw new Error("Usuário não autenticado");
+    }
+
+    const response = await api.post(
+      'boletofedbnk/sincronizar/',
+      { numero_fatura: numeroFatura },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao sincronizar boletos:', error);
+    throw error;
+  }
+};
+
+/**
  * Emite segunda via de boletos para uma fatura.
  * POST /api/faturamento/emissao-segunda-via-boleto/{fatura}/
  * @param {string} fatura - Número da fatura

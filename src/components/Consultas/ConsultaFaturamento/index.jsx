@@ -104,6 +104,12 @@ const ConsultaFaturamento = () => {
         setExpandedRow(prev => prev === index ? null : index);
     }, []);
 
+    const handleSyncComplete = useCallback(async () => {
+        const { dados, pagination: novaPagination } = await carregarPagina(formData, pagination.current_page || 1, PAGE_SIZE);
+        setResultados(dados);
+        if (novaPagination) atualizarPagination(novaPagination);
+    }, [formData, carregarPagina, PAGE_SIZE, setResultados, atualizarPagination, pagination.current_page]);
+
     const handleIrParaPagina = useCallback(async (page) => {
         const pageToGo = irParaPagina(page);
         if (pageToGo) {
@@ -227,6 +233,7 @@ const ConsultaFaturamento = () => {
                                             toggleExpandRow={toggleExpandRow}
                                             obterNomeCedente={obterNomeCedente}
                                             obterNomeCorretor={obterNomeCorretor}
+                                            onSyncComplete={handleSyncComplete}
                                         />
                                     ))}
                                 </tbody>
