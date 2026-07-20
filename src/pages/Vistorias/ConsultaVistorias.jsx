@@ -391,6 +391,7 @@ const ConsultaVistorias = () => {
             <S.FormGroup>
               <S.Label>Estado</S.Label>
               <Autocomplete
+                name="estado"
                 value={formData.estado}
                 onChange={handleChange}
                 onSelect={handleEstadoSelect}
@@ -406,6 +407,7 @@ const ConsultaVistorias = () => {
             <S.FormGroup>
               <S.Label>Administradora</S.Label>
               <Autocomplete
+                name="administradora"
                 value={formData.administradora}
                 onChange={handleChange}
                 onSelect={handleAdministradoraSelect}
@@ -421,6 +423,7 @@ const ConsultaVistorias = () => {
             <S.FormGroup>
               <S.Label>Vistoriador</S.Label>
               <Autocomplete
+                name="cod_vistoriador"
                 value={formData.cod_vistoriador}
                 onChange={handleChange}
                 onSelect={handleVistoriadorSelect}
