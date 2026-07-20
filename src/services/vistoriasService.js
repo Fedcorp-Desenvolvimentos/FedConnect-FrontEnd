@@ -146,7 +146,9 @@ export const exportarHTML = async (filtros = {}) => {
 
     const url = `/vistorias/exportar/pdf/?${params.toString()}`;
 
-    const response = await api.get(url);
+    const response = await api.get(url, {
+      responseType: 'blob'
+    });
 
     // Cria link para download
     const blob = new Blob([response.data], {
