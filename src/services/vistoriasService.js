@@ -150,19 +150,19 @@ export const exportarHTML = async (filtros = {}) => {
 
     // Cria link para download
     const blob = new Blob([response.data], {
-      type: 'text/html'
+      type: 'application/pdf'
     });
     const downloadUrl = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
 
     link.href = downloadUrl;
-    link.download = 'relatorio-vistoria.html';
+    link.download = 'relatorio-vistoria.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(downloadUrl);
 
-    return { sucesso: true, filename: 'relatorio-vistoria.html' };
+    return { sucesso: true, filename: 'relatorio-vistoria.pdf' };
   } catch (error) {
     console.error('Erro ao exportar HTML:', error);
     throw error;
