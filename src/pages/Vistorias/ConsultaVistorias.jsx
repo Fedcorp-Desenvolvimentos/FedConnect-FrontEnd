@@ -11,7 +11,7 @@ import {
   listarAdministradoras,
   consultarVistorias,
   exportarExcel,
-  exportarHTML
+  exportarPDF
 } from '../../services/vistoriasService';
 import * as S from './ConsultaVistoriasStyles';
 
@@ -310,13 +310,13 @@ const ConsultaVistorias = () => {
     }
   };
 
-  // Exporta para HTML (PDF)
-  const handleExportarHTML = async () => {
+  // Exporta para PDF
+  const handleExportarPDF = async () => {
     try {
-      await exportarHTML(formData);
+      await exportarPDF(formData);
     } catch (error) {
-      console.error('Erro ao exportar HTML:', error);
-      setErro(error.message || 'Erro ao exportar HTML');
+      console.error('Erro ao exportar PDF:', error);
+      setErro(error.message || 'Erro ao exportar PDF');
     }
   };
 
@@ -456,7 +456,7 @@ const ConsultaVistorias = () => {
             <S.Button type="button" $secondary onClick={handleExportarExcel} disabled={loading || vistorias.length === 0}>
               <FaFileExcel /> Excel
             </S.Button>
-            <S.Button type="button" $secondary onClick={handleExportarHTML} disabled={loading || vistorias.length === 0}>
+            <S.Button type="button" $secondary onClick={handleExportarPDF} disabled={loading || vistorias.length === 0}>
               <FaFilePdf /> PDF
             </S.Button>
           </S.ButtonGroup>

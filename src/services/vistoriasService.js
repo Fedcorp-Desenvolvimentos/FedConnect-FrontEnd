@@ -131,9 +131,9 @@ export const exportarExcel = async (filtros = {}) => {
 };
 
 /**
- * Exporta vistorias para HTML (para PDF)
+ * Exporta vistorias para PDF
  */
-export const exportarHTML = async (filtros = {}) => {
+export const exportarPDF = async (filtros = {}) => {
   try {
     const params = new URLSearchParams();
 
