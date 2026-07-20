@@ -169,21 +169,42 @@ const ConsultaEnd = () => {
         setMassConsultaMessage(`Consultando ${cepsValidos.length} CEPs...`);
         
         const allResults = [];
-        const batchSize = 5;
+        const BATCH_SIZE = 5;
+        const DELAY_BETWEEN_BATCHES_MS = 1500;
+        const MAX_RETRIES = 2;
+
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        const consultarCep = async (cep, retries = 0) => {
+          try {
+            const response = await ConsultaService.realizarConsulta({ tipo_consulta: "endereco", parametro_consulta: cep, origem: "planilha" });
+            const data = response?.resultado_api ?? response?.data ?? {};
+            if (!data.street && !data.logradouro && !data.cep) {
+              throw new Error("Resposta vazia da API");
+            }
+            return data;
+          } catch (err) {
+            if (retries < MAX_RETRIES) {
+              await wait(2000 * (retries + 1));
+              return consultarCep(cep, retries + 1);
+            }
+            throw err;
+          }
+        };
         
-        for (let i = 0; i < cepsValidos.length; i += batchSize) {
-          const batch = cepsValidos.slice(i, i + batchSize);
-          const batchPromises = batch.map(cep => 
-            ConsultaService.realizarConsulta({ tipo_consulta: "endereco", parametro_consulta: cep, origem: "planilha" })
-          );
+        for (let i = 0; i < cepsValidos.length; i += BATCH_SIZE) {
+          const batch = cepsValidos.slice(i, i + BATCH_SIZE);
+          const batchPromises = batch.map(cep => consultarCep(cep));
           
           const batchResults = await Promise.allSettled(batchPromises);
           
           batchResults.forEach((result, idx) => {
-            const data = result.value?.resultado_api ?? result.value?.data ?? {};
+            const data = result.status === "fulfilled" ? (result.value || {}) : {};
+            const erro = result.status === "rejected" ? result.reason?.message || "Erro na consulta" : null;
+
             allResults.push({
               "CEP Original": batch[idx],
-              "Logradouro": data.street || data.logradouro || "N/A",
+              "Logradouro": data.street || data.logradouro || (erro ? `[ERRO] ${erro}` : "N/A"),
               "Bairro": data.neighborhood || data.bairro || "N/A",
               "Cidade": data.city || data.localidade || "N/A",
               "UF": data.state || data.uf || "N/A",
@@ -191,7 +212,11 @@ const ConsultaEnd = () => {
             });
           });
           
-          setMassConsultaMessage(`Processando ${Math.min(i + batchSize, cepsValidos.length)} de ${cepsValidos.length}...`);
+          setMassConsultaMessage(`Processando ${Math.min(i + BATCH_SIZE, cepsValidos.length)} de ${cepsValidos.length}...`);
+
+          if (i + BATCH_SIZE < cepsValidos.length) {
+            await wait(DELAY_BETWEEN_BATCHES_MS);
+          }
         }
 
         const newWorksheet = XLSX.utils.json_to_sheet(allResults);
