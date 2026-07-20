@@ -24,6 +24,19 @@ const opcoesFinanceiro = [
     niveis: ['admin', 'ti', 'financeiro'],
     color: '#1a5a7a',
   },
+  // {
+  //   key: 'santander',
+  //   icon: <img
+  //     src="/imagens/santander-logo.png"
+  //     alt="Santander"
+  //     style={{ width: 24, height: 24 }}
+  //   />,
+  //   title: 'Santander',
+  //   desc: 'Acesse informações e serviços relacionados ao Santander.',
+  //   to: '/financeiro/santander',
+  //   niveis: ['admin', 'ti', 'financeiro'],
+  //   color: '#1a5a7a',
+  // },
 ];
 
 const FinanceiroHome = () => {

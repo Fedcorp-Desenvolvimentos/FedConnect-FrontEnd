@@ -149,45 +149,61 @@ const ConsultaPF = () => {
         }
 
         const total = cpfsValidos.length;
-        // Inicia loading com total conhecido
         startLoading(`Iniciando consulta de ${total} CPFs...`);
         
         const allResults = [];
-        const batchSize = 5;
+        const BATCH_SIZE = 5;
+        const DELAY_BETWEEN_BATCHES_MS = 1500;
+        const MAX_RETRIES = 2;
+
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        const consultarCpf = async (cpf, retries = 0) => {
+          try {
+            const response = await ConsultaService.realizarConsulta({ tipo_consulta: "cpf", parametro_consulta: cpf });
+            const data = response?.resultado_api ?? response?.data ?? {};
+            const basicData = data?.Result?.[0]?.BasicData;
+            if (!basicData?.Name && !basicData?.TaxIdNumber) {
+              throw new Error("Resposta vazia da API");
+            }
+            return basicData;
+          } catch (err) {
+            if (retries < MAX_RETRIES) {
+              await wait(2000 * (retries + 1));
+              return consultarCpf(cpf, retries + 1);
+            }
+            throw err;
+          }
+        };
         
-        for (let i = 0; i < cpfsValidos.length; i += batchSize) {
-          const batch = cpfsValidos.slice(i, i + batchSize);
-          const batchNumber = Math.floor(i / batchSize) + 1;
-          const totalBatches = Math.ceil(total / batchSize);
-          
-          // Atualiza progresso e mensagem
-          const processed = Math.min(i + batchSize, total);
+        for (let i = 0; i < cpfsValidos.length; i += BATCH_SIZE) {
+          const batch = cpfsValidos.slice(i, i + BATCH_SIZE);
+          const processed = Math.min(i + BATCH_SIZE, total);
           const percent = Math.round((processed / total) * 100);
           
-          updateProgress(
-            percent,
-            // `Consultando CPFs - Lote ${batchNumber}/${totalBatches} (${processed}/${total})`
-            `Consultando CPFs - ${processed}/${total} -`
-          );
+          updateProgress(percent, `Consultando CPFs - ${processed}/${total} -`);
           
-          const batchPromises = batch.map(item => 
-            ConsultaService.realizarConsulta({ tipo_consulta: "cpf", parametro_consulta: item.CPF })
-          );
-          
+          const batchPromises = batch.map(item => consultarCpf(item.CPF));
           const batchResults = await Promise.allSettled(batchPromises);
           
           batchResults.forEach((result, idx) => {
-            const consultaResult = result.value?.resultado_api?.Result?.[0]?.BasicData;
+            const consultaResult = result.status === "fulfilled" ? (result.value || {}) : {};
+            const erro = result.status === "rejected" ? result.reason?.message || "Erro na consulta" : null;
+
             allResults.push({
               "CPF Original": batch[idx].CPF,
-              "Nome Completo": consultaResult?.Name || "N/A",
-              CPF: consultaResult?.TaxIdNumber || "N/A",
-              "Situação Cadastral": consultaResult?.TaxIdStatus || "N/A",
-              "Data de Nascimento": formatarData(consultaResult?.BirthDate),
-              Idade: consultaResult?.Age || "N/A",
-              "Nome da Mãe": consultaResult?.MotherName || "N/A",
+              "Nome Completo": consultaResult.Name || (erro ? `[ERRO] ${erro}` : "N/A"),
+              CPF: consultaResult.TaxIdNumber || "N/A",
+              "Situação Cadastral": consultaResult.TaxIdStatus || "N/A",
+              "Data de Nascimento": formatarData(consultaResult.BirthDate),
+              Idade: consultaResult.Age || "N/A",
+              "Nome da Mãe": consultaResult.MotherName || "N/A",
             });
           });
+
+          if (i + BATCH_SIZE < cpfsValidos.length) {
+            await wait(DELAY_BETWEEN_BATCHES_MS);
+          }
         }
         
         // 100% completo

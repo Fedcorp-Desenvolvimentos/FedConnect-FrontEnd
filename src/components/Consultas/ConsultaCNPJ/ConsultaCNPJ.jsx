@@ -269,34 +269,46 @@ const ConsultaCNPJ = () => {
         startLoading(`Iniciando consulta de ${total} CNPJs...`);
 
         const allResults = [];
-        const batchSize = 5;
+        const BATCH_SIZE = 5;
+        const DELAY_BETWEEN_BATCHES_MS = 1500;
+        const MAX_RETRIES = 2;
 
-        for (let i = 0; i < cnpjsValidos.length; i += batchSize) {
-          const batch = cnpjsValidos.slice(i, i + batchSize);
-          const batchNumber = Math.floor(i / batchSize) + 1;
-          const totalBatches = Math.ceil(total / batchSize);
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-          // Atualiza progresso real
-          const processed = Math.min(i + batchSize, total);
+        const consultarCnpj = async (cnpj, retries = 0) => {
+          try {
+            const response = await ConsultaService.realizarConsulta({ tipo_consulta: "cnpj", parametro_consulta: cnpj });
+            const data = response?.resultado_api ?? response?.data ?? {};
+            if (!data.razao_social && !data.cnpj) {
+              throw new Error("Resposta vazia da API");
+            }
+            return data;
+          } catch (err) {
+            if (retries < MAX_RETRIES) {
+              await wait(2000 * (retries + 1));
+              return consultarCnpj(cnpj, retries + 1);
+            }
+            throw err;
+          }
+        };
+
+        for (let i = 0; i < cnpjsValidos.length; i += BATCH_SIZE) {
+          const batch = cnpjsValidos.slice(i, i + BATCH_SIZE);
+          const processed = Math.min(i + BATCH_SIZE, total);
           const percent = Math.round((processed / total) * 100);
 
-          updateProgress(
-            percent,
-            // `Consultando CNPJs - Lote ${batchNumber}/${totalBatches} (${processed}/${total})`
-            `Consultando CNPJs - ${processed}/${total} -`
-          );
+          updateProgress(percent, `Consultando CNPJs - ${processed}/${total} -`);
 
-          const batchPromises = batch.map(item =>
-            ConsultaService.realizarConsulta({ tipo_consulta: "cnpj", parametro_consulta: item })
-          );
-
+          const batchPromises = batch.map(item => consultarCnpj(item));
           const batchResults = await Promise.allSettled(batchPromises);
 
           batchResults.forEach((result, idx) => {
-            const data = result.value?.resultado_api ?? result.value?.data ?? {};
+            const data = result.status === "fulfilled" ? (result.value || {}) : {};
+            const erro = result.status === "rejected" ? result.reason?.message || "Erro na consulta" : null;
+
             allResults.push({
               "CNPJ Original": batch[idx],
-              "Razão Social": data.razao_social || "N/A",
+              "Razão Social": data.razao_social || (erro ? `[ERRO] ${erro}` : "N/A"),
               "Nome Fantasia": data.nome_fantasia || "N/A",
               "Situação Cadastral": data.descricao_situacao_cadastral || "N/A",
               "Atividade Principal": data.cnae_fiscal_descricao || "N/A",
@@ -304,7 +316,6 @@ const ConsultaCNPJ = () => {
                 ? data.cnaes_secundarios.map(c => c.descricao).filter(d => d).join(", ")
                 : "N/A",
 
-              // ENDEREÇO COMPLETO
               "Logradouro": `${data.descricao_tipo_de_logradouro || ""} ${data.logradouro || ""}`.trim() || "N/A",
               "Número": data.numero || "N/A",
               "Complemento": data.complemento || "N/A",
@@ -324,6 +335,10 @@ const ConsultaCNPJ = () => {
               "Motivo Situação": data.descricao_motivo_situacao_cadastral || "N/A",
             });
           });
+
+          if (i + BATCH_SIZE < cnpjsValidos.length) {
+            await wait(DELAY_BETWEEN_BATCHES_MS);
+          }
         }
 
         // 100% completo
