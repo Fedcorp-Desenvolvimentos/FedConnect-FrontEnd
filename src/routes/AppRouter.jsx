@@ -111,6 +111,9 @@ import CadastroPessoasHome from '../pages/CadastroPessoas/CadastroPessoasHome';
 import CadastroPessoas from '../pages/CadastroPessoas/CadastroPessoas';
 import AtualizarPessoas from '../pages/CadastroPessoas/AtualizarPessoas';
 
+// Vistorias
+import ConsultaVistorias from '../pages/Vistorias/ConsultaVistorias';
+
 const AppRouter = () => {
   const { isAuthenticated } = useAuth();
 
@@ -219,6 +222,9 @@ const AppRouter = () => {
           <Route path="/cadastro-pessoas" element={<CadastroPessoasHome />} />
           <Route path="/cadastro-pessoas/cadastrar" element={<CadastroPessoas />} />
           <Route path="/cadastro-pessoas/atualizar" element={<AtualizarPessoas />} />
+
+          {/* Vistorias */}
+          <Route path="/vistorias" element={<ConsultaVistorias />} />
 
         </Route>
       </Route>

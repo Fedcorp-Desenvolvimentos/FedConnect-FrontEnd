@@ -5,7 +5,8 @@ import {
   FaMapMarkerAlt, 
   FaShieldAlt, 
   FaFileInvoiceDollar,
-  FaSearch
+  FaSearch,
+  FaClipboardCheck
 } from "react-icons/fa";
 import CardGridLayout from "../../Layouts/CardGridLayout/CardGridLayout";
 import { Card, CardBody, IconWrapper, Title, Description, Button } from "../../Layouts/CardGridLayout/CardGridLayoutStyles";
@@ -54,6 +55,15 @@ const consultas = [
         title: "Consultar Faturamento",
         desc: "Consulte faturamento de maneira detalhada com parâmetros de pesquisa.",
         to: "/consultas/consulta-faturamento",
+        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"],
+        color: "#2463eb",
+    },
+    {
+        key: "vistorias",
+        icon: <FaClipboardCheck />,
+        title: "Consulta de Vistorias",
+        desc: "Consulte e exporte relatórios de vistorias realizadas com filtros por período, estado e vistoriador.",
+        to: "/vistorias",
         niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"],
         color: "#2463eb",
     },
