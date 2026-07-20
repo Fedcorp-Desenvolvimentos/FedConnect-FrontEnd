@@ -483,6 +483,7 @@ const ConsultaVistorias = () => {
                     <th>Estado</th>
                     <th>Administradora</th>
                     <th>Vistoriador</th>
+                    <th>Metragem</th>
                     <th>Fatura</th>
                     <th>Valor</th>
                   </tr>
@@ -502,6 +503,7 @@ const ConsultaVistorias = () => {
                       <td>{vistoria.ESTADO_MOV || '-'}</td>
                       <td>{vistoria.NOME_ADMINISTRADORA || '-'}</td>
                       <td>{vistoria.VISTORIADOR || '-'}</td>
+                      <td>{vistoria.METRAGEM ? `${vistoria.METRAGEM} m²` : '-'}</td>
                       <td>{vistoria.FATURA || '-'}</td>
                       <td><span className="valor">{formatarValor(vistoria.VALOR_COBRAR)}</span></td>
                     </S.TableRow>
@@ -583,6 +585,14 @@ const ConsultaVistorias = () => {
                     <S.ModalInfoItem>
                       <label>Tipo Vistoria</label>
                       <span>{vistorias[expandedRow].TIPO_VISTORIA || '-'}</span>
+                    </S.ModalInfoItem>
+                    <S.ModalInfoItem>
+                      <label>Metragem</label>
+                      <span>{vistorias[expandedRow].METRAGEM ? `${vistorias[expandedRow].METRAGEM} m²` : '-'}</span>
+                    </S.ModalInfoItem>
+                    <S.ModalInfoItem>
+                      <label>Mobiliado</label>
+                      <span>{vistorias[expandedRow].MOBILIADO === 'S' ? 'Sim' : 'Não'}</span>
                     </S.ModalInfoItem>
                   </S.ModalInfoGrid>
                 </S.ModalSection>
