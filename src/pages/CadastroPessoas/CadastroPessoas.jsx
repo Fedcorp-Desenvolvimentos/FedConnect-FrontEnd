@@ -1,6 +1,6 @@
 // src/pages/CadastroPessoas/CadastroPessoas.jsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaUsers, FaSignOutAlt, FaSave, FaEraser, FaFileAlt } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,8 @@ import PageLayout from '../../Layouts/PageLayout/PageLayout';
 import * as S from './CadastroPessoasStyles';
 import PessoaFormFields from './components/PessoaFormFields';
 import PessoaFormTabs from './components/PessoaFormTabs';
-import { usePessoaForm } from './hooks/usePessoaForm';
+import { usePessoas } from './hooks/usePessoas';
+import { useProdutos } from './hooks/useProdutos';
 
 const TAB_SECTIONS = [
   { key: 'identificacao', label: 'Identificação', icon: <FaFileAlt /> },
@@ -33,9 +34,11 @@ const CadastroPessoas = () => {
     preencherEndereco,
     clearForm,
     save,
-    produtos,
+    simulateSave,
     gerentes,
-  } = usePessoaForm(true); // true = modo new
+  } = usePessoas(true);
+
+  const { produtos } = useProdutos();
 
   const handleVoltar = () => {
     if (!window.confirm('Deseja realmente sair? Os dados não salvos serão perdidos.')) {
@@ -82,7 +85,7 @@ const CadastroPessoas = () => {
       return;
     }
 
-    const result = await save();
+    const result = await simulateSave();
 
     if (!result.success) {
       enqueueSnackbar('Erro ao salvar. Verifique os campos obrigatórios.', { variant: 'error' });

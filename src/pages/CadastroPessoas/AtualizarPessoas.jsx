@@ -9,7 +9,7 @@ import * as S from './CadastroPessoasStyles';
 import PessoaFormFields from './components/PessoaFormFields';
 import PessoaFormTabs from './components/PessoaFormTabs';
 import PessoaTable from './components/PessoaTable';
-import { usePessoaForm } from './hooks/usePessoaForm';
+import { usePessoas } from './hooks/usePessoas';
 
 const TAB_SECTIONS = [
   { key: 'identificacao', label: 'Identificação', icon: <FaFileAlt /> },
@@ -51,7 +51,7 @@ const AtualizarPessoas = () => {
     searchPessoas,
     produtos,
     gerentes,
-  } = usePessoaForm(false);
+  } = usePessoas(false);
 
   const handleSearchInput = useCallback((value) => {
     setSearchInput(value);

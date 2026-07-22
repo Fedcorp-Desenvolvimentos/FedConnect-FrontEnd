@@ -79,7 +79,7 @@ export const excluirPessoa = async (codigo) => {
 
 export const buscarProdutos = async () => {
   try {
-    const response = await api.get('pessoas/produtos/');
+    const response = await api.get('produtos/');
     return response.data;
   } catch (error) {
     console.error("❌ Erro ao buscar produtos:", error);

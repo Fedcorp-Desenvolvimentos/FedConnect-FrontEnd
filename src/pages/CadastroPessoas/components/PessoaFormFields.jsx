@@ -4,7 +4,7 @@ import React from 'react';
 import { FaSearch, FaGlobe } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
 import CedenteSelect from './CedenteSelect';
-import { CATEGORIAS_DISPONIVEIS } from '../hooks/usePessoaForm';
+import { CATEGORIAS_DISPONIVEIS } from '../hooks/usePessoas';
 
 const ESTADOS = [
   'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',

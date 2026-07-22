@@ -1,7 +1,8 @@
-// src/pages/CadastroPessoas/hooks/usePessoaForm.js
+// src/pages/CadastroPessoas/hooks/usePessoas.js
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { buscarPessoas, criarPessoa, atualizarPessoa, buscarProdutos, buscarGerentesComerciais } from '../../../services/pessoaService';
+import { buscarPessoas, criarPessoa, atualizarPessoa, buscarGerentesComerciais } from '../../../services/pessoaService';
+import { buscarTodosProdutos } from '../../../services/produtosService';
 
 export const CATEGORIAS_DISPONIVEIS = [
   'ADMINISTRADORA',
@@ -145,7 +146,7 @@ const generateCodigo = pessoas => {
   return String(maxCodigo + 1).padStart(10, '0');
 };
 
-export const usePessoaForm = (isNewMode = false) => {
+export const usePessoas = (isNewMode = false) => {
   const [pessoas, setPessoas] = useState([]);
   const [formData, setFormData] = useState(INITIAL_STATE);
   const [errors, setErrors] = useState({});
@@ -235,7 +236,8 @@ export const usePessoaForm = (isNewMode = false) => {
 
   const fetchProdutos = useCallback(async () => {
     try {
-      const response = await buscarProdutos();
+      const response = await buscarTodosProdutos();
+      console.log("📦 Produtos carregados:", response);
       if (response?.produtos) {
         setProdutos(response.produtos);
       }
@@ -265,7 +267,6 @@ export const usePessoaForm = (isNewMode = false) => {
     fetchGerentes();
   }, [fetchGerentes]);
 
-  // Atualiza o formData quando uma pessoa é selecionada
   useEffect(() => {
     if (selectedCodigo && mode === 'edit') {
       const pessoa = pessoas.find(p => p.codigo === selectedCodigo);
@@ -388,6 +389,7 @@ export const usePessoaForm = (isNewMode = false) => {
       const isUpdate = pessoas.some(p => p.codigo === payload.codigo);
       
       let response;
+      
       if (isUpdate) {
         response = await atualizarPessoa(payload.codigo, payload);
       } else {
@@ -413,6 +415,30 @@ export const usePessoaForm = (isNewMode = false) => {
     }
   }, [formData, validate, pessoas]);
 
+  
+  const simulateSave = useCallback(async () => {
+    if (!validate()) return { success: false };
+
+    setIsSubmitting(true);
+
+    try {
+      const payload = { ...formData };
+      const isUpdate = pessoas.some(p => p.codigo === payload.codigo);
+      
+      // Simula um atraso de 1 segundo
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      console.log(`Simulação de ${isUpdate ? 'atualização' : 'criação'} da pessoa:`, payload);
+
+      return { success: true, payload };
+    } catch (error) {
+      console.error("❌ Erro ao simular o salvamento da pessoa:", error);
+      return { success: false, error };
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [formData, validate, pessoas]);
+  
   const selectedPessoa = useMemo(
     () => pessoas.find(p => p.codigo === selectedCodigo) || null,
     [pessoas, selectedCodigo]
@@ -442,6 +468,7 @@ export const usePessoaForm = (isNewMode = false) => {
     clearForm,
     selectPessoa,
     save,
+    simulateSave,
     setFormData,
     fetchPessoas,
     goToPage,
