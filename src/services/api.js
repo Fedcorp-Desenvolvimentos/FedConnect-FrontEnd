@@ -4,7 +4,7 @@ import axios from "axios";
 const ambiente = "dev";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_REACT_APP_URL_BACKEND ? import.meta.env.VITE_REACT_APP_URL_BACKEND : "http://localhost:8000/",
+  baseURL: "https://fedconnect-backend-d6kgr.ondigitalocean.app/",
 });
 
 // Intercepta todas as requisições Axios
