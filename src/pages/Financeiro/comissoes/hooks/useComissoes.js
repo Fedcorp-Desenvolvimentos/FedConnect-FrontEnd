@@ -21,6 +21,7 @@ import {
 } from '../../../../utils/regras_retencao';
 
 const INITIAL_FILTERS = {
+  empresa: '',
   favorecido: '',
   fatura: '',
   vencimento_inicial: '',
