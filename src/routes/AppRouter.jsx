@@ -61,6 +61,11 @@ import FinanceiroHome from '../pages/Financeiro/Home/FinanceiroHome.jsx';
 import ConsultaComissao from '../pages/Financeiro/consulta/ConsultaComissao.jsx';
 import Comissoes from '../pages/Financeiro/comissoes/Comissoes.jsx';
 
+// import Santander from '../pages/Financeiro/santander/Santander.jsx';
+// import SantanderWorkspaces from '../pages/Financeiro/santander/SantanderWorkspaces.jsx';
+// import SantanderEmpresas from '../pages/Financeiro/santander/SantanderEmpresas.JSX';
+// import SantanderBoletos from '../pages/Financeiro/santander/SantanderBoletos.jsx';
+
 // Faturamento
 // import OperacionalHome from '../components/Faturamento/OperacionalHome';
 import FaturamentoHome from '../pages/Faturamento/FaturamentoHome';
@@ -186,6 +191,13 @@ const AppRouter = () => {
           {/* Financeiro */}
           <Route path="/financeiro/comissoes" element={<Comissoes />} />
           <Route path="/financeiro/consulta-comissao" element={<ConsultaComissao />} />
+          
+          {/* Santander */}
+          {/* <Route path="/financeiro/santander" element={<Santander />} />
+          <Route path="/financeiro/santander/workspaces" element={<SantanderWorkspaces />} />
+          <Route path="/financeiro/santander/empresas" element={<SantanderEmpresas />} />
+          <Route path="/financeiro/santander/boletos" element={<SantanderBoletos />} /> */}
+
 
           {/* Automação */}
           <Route path="/automacao" element={<AutomacaoHome />} />
