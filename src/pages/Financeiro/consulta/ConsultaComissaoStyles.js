@@ -274,6 +274,17 @@ export const Button = styled.button`
     }
   }
 
+  &.success {
+    background: #16a34a;
+    color: #ffffff;
+
+    &:hover:not(:disabled) {
+      background: #15803d;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    }
+  }
+
   &.ghost {
     background: transparent;
     color: #64748b;
