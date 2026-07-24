@@ -1,6 +1,8 @@
-import React, { useState, useMemo } from 'react';
-import { FaArrowLeft, FaSearch, FaEraser, FaSpinner, FaTrashAlt, FaFileInvoiceDollar, FaCalendarAlt, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
+import React, { useState, useMemo, useCallback } from 'react';
+import { FaArrowLeft, FaSearch, FaEraser, FaSpinner, FaTrashAlt, FaFileInvoiceDollar, FaCalendarAlt, FaExclamationTriangle, FaInfoCircle, FaDownload } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import { PessoaSelect } from '../comissoes/components/PessoaSelect';
 import { useConsultaComissao } from './hooks/useConsultaComissao';
 import * as S from './ConsultaComissaoStyles';
@@ -113,6 +115,35 @@ const ConsultaComissao = () => {
     e.preventDefault();
     buscar();
   };
+
+  const handleExportExcel = useCallback(() => {
+    const selected = comissoes.filter((c) => selectedKeys.has(getComissaoKey(c)));
+    if (selected.length === 0) return;
+
+    const data = selected.map((c) => ({
+      'Favorecido': c.NOME || c.nome || '',
+      'Documento': c.DOCUMENTO || c.doc_favorecido || '',
+      'Produto': c.PRODUTO || c.produto || '',
+      'Fatura': c.FATURA || c.fatura || '',
+      'Parcela': c.PARCELA || c.parcela || '',
+      'Valor': Number(c.VALOR || c.valor || 0),
+      'Vencimento': formatDate(c.VENCIMENTO || c.vencimento),
+      'Vigência': formatDate(c.DT_INI_VIG || c.dt_ini_vig),
+      'Voucher': c.VOUCHER || c.voucher || '',
+      'Status': c.STATUS || c.status || '',
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    ws['!cols'] = [
+      { wch: 40 }, { wch: 18 }, { wch: 25 }, { wch: 12 },
+      { wch: 8 }, { wch: 14 }, { wch: 14 }, { wch: 14 },
+      { wch: 12 }, { wch: 10 },
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Comissões');
+    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    saveAs(new Blob([buf], { type: 'application/octet-stream' }), 'comissoes.xlsx');
+  }, [comissoes, selectedKeys, getComissaoKey]);
 
   // ================================================================
   // RENDER
@@ -243,6 +274,15 @@ const ConsultaComissao = () => {
               <h2>Comissões encontradas</h2>
               <S.Badge>{totalRegistros} registro(s)</S.Badge>
             </div>
+
+            <S.Button
+              className="success"
+              disabled={selectedKeys.size === 0 || loading}
+              onClick={handleExportExcel}
+            >
+              <FaDownload />
+              Baixar Excel
+            </S.Button>
           </S.CardHeader>
 
           <S.ResultsBar>
