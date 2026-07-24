@@ -118,9 +118,14 @@ import AtualizarPessoas from '../pages/CadastroPessoas/AtualizarPessoas';
 
 // Vistorias
 import ConsultaVistorias from '../pages/Vistorias/ConsultaVistorias';
+import Loading from '../components/Loading/Loading.jsx';
 
 const AppRouter = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <Loading fullScreen message="Carregando aplicação..." />;
+  }
 
   return (
     <Routes>
@@ -241,7 +246,7 @@ const AppRouter = () => {
         </Route>
       </Route>
 
-      {/* Rota 404 - SEMPRE no final */}
+      {/* Rota 404  */}
       <Route path="/404" element={<NotFound />} />
       <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>

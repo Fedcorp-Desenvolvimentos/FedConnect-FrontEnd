@@ -11,27 +11,54 @@ import { SnackbarProvider } from 'notistack';
 import { GlobalStyles } from './styles/GlobalStyles';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <GlobalStyles />
-    <Router 
-      future={{
-        v7_startTransition: true,
-        v7_relativeSplatPath: true,
-      }}>
-      <GlobalProvider>
-        <AuthProvider>
-          <GoogleOAuthProvider clientId="765602112412-336nt6annegl11j5s3ffm5lie68a975q.apps.googleusercontent.com">
-            <ScrollToTop />
-            <SnackbarProvider
-              maxSnack={3}
-              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-              <App />
-            </SnackbarProvider>
-          </GoogleOAuthProvider>
-        </AuthProvider>
-      </GlobalProvider>
-    </Router>
-  </React.StrictMode>
+  isDevelopment ? (
+    <React.StrictMode>
+      <GlobalStyles />
+      <Router 
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}>
+        <GlobalProvider>
+          <AuthProvider>
+            <GoogleOAuthProvider clientId="765602112412-336nt6annegl11j5s3ffm5lie68a975q.apps.googleusercontent.com">
+              <ScrollToTop />
+              <SnackbarProvider
+                maxSnack={3}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                <App />
+              </SnackbarProvider>
+            </GoogleOAuthProvider>
+          </AuthProvider>
+        </GlobalProvider>
+      </Router>
+    </React.StrictMode>
+  ) : (
+    <>
+      <GlobalStyles />
+      <Router 
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}>
+        <GlobalProvider>
+          <AuthProvider>
+            <GoogleOAuthProvider clientId="765602112412-336nt6annegl11j5s3ffm5lie68a975q.apps.googleusercontent.com">
+              <ScrollToTop />
+              <SnackbarProvider
+                maxSnack={3}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              >
+                <App />
+              </SnackbarProvider>
+            </GoogleOAuthProvider>
+          </AuthProvider>
+        </GlobalProvider>
+      </Router>
+    </>
+  )
 );
