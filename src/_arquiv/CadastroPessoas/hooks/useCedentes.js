@@ -13,7 +13,6 @@ export const useCedentes = () => {
     setError(null);
     try {
       const response = await buscarCedentes();
-      console.log("📦 Cedentes carregados:", response);
       
       // Extrai o array da resposta
       let cedentesList = [];

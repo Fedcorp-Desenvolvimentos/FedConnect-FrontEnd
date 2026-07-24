@@ -1,12 +1,8 @@
 // src/pages/CadastroPessoas/hooks/usePessoas.js
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { buscarPessoas, criarPessoa, atualizarPessoa, buscarGerentesComerciais } from '../../../services/pessoaService';
-import { INITIAL_STATE, MAPEAMENTO_CAMPOS, todayISO } from '../constants/pessoaConstants';
-
-// src/pages/CadastroPessoas/hooks/usePessoas.js
-
-// src/pages/CadastroPessoas/hooks/usePessoas.js
+import { buscarPessoas, criarPessoa, atualizarPessoa, buscarGerentesComerciais } from '../services/pessoaService';
+import { INITIAL_STATE, MAPEAMENTO_CAMPOS, todayISO } from '../pages/CadastroPessoas/constants/pessoaConstants';
 
 const normalizePessoa = (pessoa) => {
   if (!pessoa || typeof pessoa !== 'object') return pessoa;
@@ -17,11 +13,9 @@ const normalizePessoa = (pessoa) => {
     const lowerKey = key.toLowerCase();
     let value = pessoa[key];
     
-    // Converte strings 'true'/'false' para booleanos
     if (value === 'true') value = true;
     if (value === 'false') value = false;
     
-    // Mapeia as chaves mais comuns
     switch (lowerKey) {
       case 'pessoa':
         normalized.codigo = value;
@@ -120,7 +114,6 @@ const normalizePessoa = (pessoa) => {
         normalized.abrev = value;
         break;
       default:
-        // Mantém outras chaves se existirem
         if (!normalized.hasOwnProperty(lowerKey)) {
           normalized[lowerKey] = value;
         }
@@ -233,10 +226,22 @@ export const usePessoas = (isNewMode = false) => {
   const updateField = useCallback(
     (e) => {
       const { name, value, type, checked } = e.target;
-      setFormData((prev) => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value,
-      }));
+      
+      setFormData((prev) => {
+        const newData = {
+          ...prev,
+          [name]: type === 'checkbox' ? checked : value,
+        };
+        
+        // ✅ AUTOPREENCHER FAVORECIDO QUANDO O NOME FOR PREENCHIDO
+        // Se o campo alterado for 'nome' e o 'favorecido' estiver vazio, copiar o nome
+        if (name === 'nome' && value && !prev.favorecido) {
+          newData.favorecido = value;
+        }
+        
+        return newData;
+      });
+      
       if (errors[name]) {
         setErrors((prev) => ({ ...prev, [name]: '' }));
       }
@@ -316,25 +321,44 @@ export const usePessoas = (isNewMode = false) => {
     try {
       const payload = { ...formData };
 
-      // Converte booleanos para 'S'/'N'
       const convertBoolean = (value) => {
         if (typeof value === 'boolean') return value ? 'S' : 'N';
         return value;
       };
 
+      // ✅ Mapeia os valores do frontend para o formato do banco
+      const mapearValorBanco = (campo, valor) => {
+        switch (campo) {
+          case 'tipo':
+            return valor === 'juridica' ? 'J' : 'F';
+          case 'sexo':
+            if (valor === 'masculino') return 'M';
+            if (valor === 'feminino') return 'F';
+            if (valor === 'nao_informado') return 'N';
+            return 'J'; // padrão para jurídica
+          default:
+            return valor;
+        }
+      };
+
       const finalPayload = {
         ...payload,
+        tipo: mapearValorBanco('tipo', payload.tipo),
+        sexo: mapearValorBanco('sexo', payload.sexo),
         emite_nota_fiscal: convertBoolean(payload.emite_nota_fiscal),
         optante_simples: convertBoolean(payload.optante_simples),
         possui_portal: convertBoolean(payload.possui_portal),
       };
 
-      const isUpdate = pessoas.some((p) => p.codigo === payload.codigo);
-      const response = isUpdate
-        ? await atualizarPessoa(payload.codigo, finalPayload)
-        : await criarPessoa(finalPayload);
+      const isUpdate = mode === 'edit' || (mode === 'view' && selectedCodigo);
+      
+      let response;
+      if (isUpdate) {
+        response = await atualizarPessoa(payload.codigo, finalPayload);
+      } else {
+        response = await criarPessoa(finalPayload);
+      }
 
-      // Atualiza a lista local
       setPessoas((prev) => {
         const exists = prev.some((p) => p.codigo === payload.codigo);
         return exists
@@ -351,7 +375,7 @@ export const usePessoas = (isNewMode = false) => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, validate, pessoas]);
+  }, [formData, validate, pessoas, mode, selectedCodigo]);
 
   // ===== INIT =====
   useEffect(() => {

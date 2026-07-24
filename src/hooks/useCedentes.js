@@ -1,7 +1,7 @@
-// src/pages/CadastroPessoas/hooks/useCedentes.js
+// src/hooks/useCedentes.js
 
 import { useState, useEffect, useCallback } from 'react';
-import { buscarCedentes, buscarCedentePorNome } from '../../../services/cedenteService';
+import { buscarCedentes, buscarCedentePorNome } from '../services/cedenteService';
 
 export const useCedentes = () => {
   const [cedentes, setCedentes] = useState([]);
@@ -13,7 +13,6 @@ export const useCedentes = () => {
     setError(null);
     try {
       const response = await buscarCedentes();
-      console.log("📦 Cedentes carregados:", response);
       
       // Extrai o array da resposta
       let cedentesList = [];

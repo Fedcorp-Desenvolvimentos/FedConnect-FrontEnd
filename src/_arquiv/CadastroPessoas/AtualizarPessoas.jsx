@@ -1,6 +1,7 @@
 // src/pages/CadastroPessoas/AtualizarPessoas.jsx
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { usePessoas } from '../../../hooks/usePessoas';
 import { FaUsers, FaSignOutAlt, FaSave, FaEraser, FaPen, FaTimes, FaFileAlt, FaSearch } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +10,6 @@ import * as S from './CadastroPessoasStyles';
 import PessoaFormFields from './components/PessoaFormFields';
 import PessoaFormTabs from './components/PessoaFormTabs';
 import PessoaTable from './components/PessoaTable';
-import { usePessoas } from './hooks/usePessoas';
 
 const TAB_SECTIONS = [
   { key: 'identificacao', label: 'Identificação', icon: <FaFileAlt /> },

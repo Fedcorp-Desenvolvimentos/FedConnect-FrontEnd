@@ -8,8 +8,8 @@ import PageLayout from '../../Layouts/PageLayout/PageLayout';
 import * as S from './CadastroPessoasStyles';
 import PessoaFormFields from './components/PessoaFormFields';
 import PessoaFormTabs from './components/PessoaFormTabs';
-import { usePessoas } from './hooks/usePessoas';
 import { TAB_SECTIONS } from './constants/pessoaConstants';
+import { usePessoas } from '../../hooks/usePessoas';
 
 const CadastroPessoas = () => {
   const { enqueueSnackbar } = useSnackbar();

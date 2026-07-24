@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { buscarTodosProdutos, buscarProdutosDinamicamente } from '../../../services/produtosService';
+import { buscarTodosProdutos, buscarProdutosDinamicamente } from '../services/produtosService';
 import { useCallback, useState } from 'react';
 
 export const useProdutos = () => {

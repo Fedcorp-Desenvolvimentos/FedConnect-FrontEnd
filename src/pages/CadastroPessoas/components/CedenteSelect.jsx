@@ -1,9 +1,9 @@
-// src/pages/CadastroPessoas/components/CedenteSelect.js
+// src/pages/CadastroPessoas/components/CedenteSelect.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { FaSearch, FaTimes, FaSpinner } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
-import { useCedentes } from '../hooks/useCedentes';
+import { useCedentes } from '../../../hooks/useCedentes';
 
 const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,7 +18,6 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
 
   const displayValue = searchInput || selectedCedente?.nome || selectedCedente?.cedente || value || '';
 
-  // Fecha o dropdown ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -28,6 +27,13 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // ✅ Carrega cedentes ao focar se tiver valor
+  useEffect(() => {
+    if (isOpen && value && cedentes.length === 0 && !loading) {
+      carregarCedentes();
+    }
+  }, [isOpen, value, cedentes.length, loading, carregarCedentes]);
 
   const handleOpen = useCallback(async () => {
     if (!disabled) {
@@ -46,7 +52,6 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
         carregarCedentes();
       }
     }, 300);
-
     return () => clearTimeout(timer);
   }, [searchInput, buscarCedentesPorNome, carregarCedentes]);
 
@@ -92,7 +97,7 @@ const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado 
             onFocus={handleOpen}
             disabled={disabled}
             $error={error}
-            placeholder="Buscar cedente..."
+            placeholder={loading ? 'Carregando cedentes...' : 'Buscar cedente...'}
           />
           {value && (
             <S.IconSquareButton

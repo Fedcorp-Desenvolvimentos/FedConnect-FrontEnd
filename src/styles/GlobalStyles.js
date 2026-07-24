@@ -302,4 +302,14 @@ export const GlobalStyles = createGlobalStyle`
   @media (min-width: 769px) {
     .hidden-desktop { display: none; }
   }
+
+  .spin {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
 `;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { FaSearch, FaTimes, FaSpinner } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
-import { useCedentes } from '../hooks/useCedentes';
+import { useCedentes } from '../../../hooks/useCedentes';
 
 const CedenteSelect = ({ value, onChange, disabled, error, onCedenteSelecionado }) => {
   const [isOpen, setIsOpen] = useState(false);

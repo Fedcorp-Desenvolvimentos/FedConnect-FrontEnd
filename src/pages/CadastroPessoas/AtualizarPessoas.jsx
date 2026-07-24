@@ -9,8 +9,8 @@ import * as S from './CadastroPessoasStyles';
 import PessoaFormFields from './components/PessoaFormFields';
 import PessoaFormTabs from './components/PessoaFormTabs';
 import PessoaTable from './components/PessoaTable';
-import { usePessoas } from './hooks/usePessoas';
 import { TAB_SECTIONS } from './constants/pessoaConstants';
+import { usePessoas } from '../../hooks/usePessoas';
 
 const AtualizarPessoas = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -124,6 +124,8 @@ const AtualizarPessoas = () => {
       enqueueSnackbar('⚠️ CPF/CNPJ é obrigatório', { variant: 'warning' });
       return;
     }
+
+    console.log("Dados a serem salvos:", formData); // Log para depuração
 
     const result = await save();
 
