@@ -1,10 +1,28 @@
-// src/pages/CadastroPessoas/components/PessoaFormFields.jsx
+// src/pages/CadastroPessoas/components/PessoaFormFields.js
 
 import React from 'react';
 import { FaSearch, FaGlobe } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
 import CedenteSelect from './CedenteSelect';
-import { ESTADOS, BANCOS } from '../constants/pessoaConstants';
+
+const ESTADOS = [
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
+  'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC',
+  'SP', 'SE', 'TO'
+];
+
+const BANCOS = [
+  '001 - Banco do Brasil',
+  '033 - Santander',
+  '104 - Caixa Econômica Federal',
+  '237 - Bradesco',
+  '341 - Itaú',
+  '077 - Inter',
+  '260 - Nubank',
+  'NU PAGAMENTOS',
+  'SICOOB',
+  'SICREDI',
+];
 
 const PessoaFormFields = ({
   data,
@@ -13,8 +31,9 @@ const PessoaFormFields = ({
   onChange,
   onBuscarCep,
   activeTab = 'identificacao',
-  gerentes = [],
+  gerentes = []
 }) => {
+  // Mostra apenas a seção ativa
   const isVisible = (section) => activeTab === section;
 
   return (
@@ -104,10 +123,8 @@ const PessoaFormFields = ({
                 disabled={disabled}
               >
                 <option value="">Selecione o gerente</option>
-                {gerentes.map((gerente) => (
-                  <option key={gerente.codigo} value={gerente.codigo}>
-                    {gerente.nome}
-                  </option>
+                {gerentes.map(gerente => (
+                  <option key={gerente.codigo} value={gerente.codigo}>{gerente.nome}</option>
                 ))}
               </S.FormSelect>
             </S.FormGroup>
@@ -147,10 +164,8 @@ const PessoaFormFields = ({
               <S.FormLabel>UF</S.FormLabel>
               <S.FormSelect name="uf" value={data.uf} onChange={onChange} disabled={disabled}>
                 <option value="">-</option>
-                {ESTADOS.map((uf) => (
-                  <option key={uf} value={uf}>
-                    {uf}
-                  </option>
+                {ESTADOS.map(uf => (
+                  <option key={uf} value={uf}>{uf}</option>
                 ))}
               </S.FormSelect>
             </S.FormGroup>
@@ -250,10 +265,8 @@ const PessoaFormFields = ({
               <S.FormLabel>Banco</S.FormLabel>
               <S.FormSelect name="banco" value={data.banco} onChange={onChange} disabled={disabled}>
                 <option value="">Selecione o banco</option>
-                {BANCOS.map((banco) => (
-                  <option key={banco} value={banco}>
-                    {banco}
-                  </option>
+                {BANCOS.map(banco => (
+                  <option key={banco} value={banco}>{banco}</option>
                 ))}
               </S.FormSelect>
             </S.FormGroup>

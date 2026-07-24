@@ -73,9 +73,6 @@ const PessoaTable = ({
     return pages;
   };
 
-    console.log("pessoasList", pessoasList);
-
-
   return (
     <S.TableWrapper>
       <S.TableScroll>
