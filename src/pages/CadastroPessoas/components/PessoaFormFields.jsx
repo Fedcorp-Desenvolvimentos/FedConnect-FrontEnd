@@ -253,6 +253,7 @@ const PessoaFormFields = ({
             <S.FormGroup $flex="0 1 180px">
               <S.FormLabel>Sexo</S.FormLabel>
               <S.FormSelect name="sexo" value={data.sexo} onChange={onChange} disabled={disabled}>
+                <option value="juridica">Jurídica</option>
                 <option value="masculino">Masculino</option>
                 <option value="feminino">Feminino</option>
                 <option value="nao_informado">Não informado</option>
@@ -601,7 +602,7 @@ const PessoaFormFields = ({
               <S.FormLabel>URL do Portal</S.FormLabel>
               <S.InputWithButton>
                 <S.FormInput
-                  type="url"
+                  type="text"
                   name="portal"
                   value={data.portal}
                   onChange={onChange}

@@ -1,6 +1,6 @@
 // src/pages/CadastroPessoas/CadastroPessoas.jsx
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FaUsers, FaSignOutAlt, FaSave, FaEraser, FaFileAlt } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +27,13 @@ const CadastroPessoas = () => {
     save,
     gerentes,
   } = usePessoas(true);
+
+  const isFormValid = useMemo(() => {
+    if (!formData.nome?.trim()) return false;
+    if (!formData.cpf_cnpj?.trim()) return false;
+    
+    return true;
+  }, [formData.nome, formData.cpf_cnpj]);
 
   const handleVoltar = () => {
     if (!window.confirm('Deseja realmente sair? Os dados não salvos serão perdidos.')) {
@@ -68,7 +75,6 @@ const CadastroPessoas = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validação básica antes de enviar
     if (!formData.nome?.trim()) {
       enqueueSnackbar('⚠️ Nome é obrigatório', { variant: 'warning' });
       return;
@@ -79,10 +85,13 @@ const CadastroPessoas = () => {
       return;
     }
 
+    console.log('Dados do formulário:', formData);
     const result = await save();
+    console.log('Resultado do save():', result);
 
     if (!result.success) {
-      enqueueSnackbar('Erro ao salvar. Verifique os campos obrigatórios.', { variant: 'error' });
+      const errorMessages = Object.values(errors).join(', ');
+      enqueueSnackbar(`❌ ${errorMessages}`, { variant: 'error' });
       return;
     }
 
@@ -122,7 +131,7 @@ const CadastroPessoas = () => {
             />
 
             <S.FormActions>
-              <S.SuccessButton type="submit" disabled={isSubmitting}>
+              <S.SuccessButton type="submit" disabled={isSubmitting || !isFormValid}>
                 {isSubmitting ? '⏳ Salvando...' : (
                   <>
                     <FaSave /> Salvar

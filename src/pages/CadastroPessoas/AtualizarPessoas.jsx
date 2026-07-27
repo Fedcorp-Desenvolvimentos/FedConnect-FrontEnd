@@ -1,6 +1,6 @@
 // src/pages/CadastroPessoas/AtualizarPessoas.jsx
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { FaUsers, FaSignOutAlt, FaSave, FaEraser, FaPen, FaTimes, FaFileAlt, FaSearch } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
@@ -43,6 +43,16 @@ const AtualizarPessoas = () => {
     searchPessoas,
     gerentes,
   } = usePessoas(false);
+
+  const isFormValid = useMemo(() => {
+    if (isReadOnly) return false;
+    
+    // Verifica campos obrigatórios
+    if (!formData.nome?.trim()) return false;
+    if (!formData.cpf_cnpj?.trim()) return false;
+    
+    return true;
+  }, [formData.nome, formData.cpf_cnpj, isReadOnly]);
 
   const handleSearchInput = useCallback((value) => {
     setSearchInput(value);
@@ -125,7 +135,7 @@ const AtualizarPessoas = () => {
       return;
     }
 
-    console.log("Dados a serem salvos:", formData); // Log para depuração
+    console.log("Dados a serem salvos:", formData);
 
     const result = await save();
 
@@ -135,6 +145,7 @@ const AtualizarPessoas = () => {
     }
 
     enqueueSnackbar('✅ Pessoa atualizada com sucesso!', { variant: 'success' });
+    navigate('/cadastro-pessoas');
   };
 
   const handleSelectPessoa = (codigo) => {
@@ -250,7 +261,6 @@ const AtualizarPessoas = () => {
     );
   }
 
-  // RENDER: EDIÇÃO
   return (
     <PageLayout title="Atualizar Cadastro" subtitle={`Editando: ${formData.nome || 'Selecionado'}`}>
       <S.Container>
@@ -290,7 +300,7 @@ const AtualizarPessoas = () => {
 
             {!isReadOnly && (
               <S.FormActions>
-                <S.SuccessButton type="submit" disabled={isSubmitting}>
+                <S.SuccessButton type="submit" disabled={isSubmitting || !isFormValid}>
                   {isSubmitting ? '⏳ Salvando...' : (
                     <>
                       <FaSave /> Salvar

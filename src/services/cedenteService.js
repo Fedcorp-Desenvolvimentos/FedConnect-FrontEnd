@@ -14,7 +14,7 @@ export const buscarCedentes = async (params = {}) => {
 
 export const buscarCedentePorNome = async (nome) => {
   try {
-    const response = await api.get('cedentes/buscar/', { 
+    const response = await api.get('cedentes/por-nome', { 
       params: { nome: nome } 
     });
     return response.data;

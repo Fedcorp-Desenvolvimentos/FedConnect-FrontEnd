@@ -30,7 +30,10 @@ const normalizePessoa = (pessoa) => {
         normalized.cpf_cnpj = value;
         break;
       case 'sexo':
-        normalized.sexo = value;
+        if (value === 'J') normalized.sexo = 'juridica';
+        else if (value === 'M') normalized.sexo = 'masculino';
+        else if (value === 'F') normalized.sexo = 'feminino';
+        else normalized.sexo = 'nao_informado';
         break;
       case 'dt_cadastro':
         normalized.data_cadastro = value;

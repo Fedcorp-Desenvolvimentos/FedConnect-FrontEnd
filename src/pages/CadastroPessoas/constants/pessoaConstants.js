@@ -8,7 +8,7 @@ export const INITIAL_STATE = {
   nome: '',
   tipo: 'juridica',        // 'fisica' ou 'juridica'
   cpf_cnpj: '',
-  sexo: 'masculino',       // 'masculino', 'feminino', 'nao_informado'
+  sexo: 'nao_informado',       // 'masculino', 'feminino', 'nao_informado'
   data_cadastro: todayISO(),
 
   // Endereço
