@@ -85,9 +85,9 @@ const CadastroPessoas = () => {
       return;
     }
 
-    console.log('Dados do formulário:', formData);
+    // console.log('Dados do formulário:', formData);
     const result = await save();
-    console.log('Resultado do save():', result);
+    // console.log('Resultado do save():', result);
 
     if (!result.success) {
       const errorMessages = Object.values(errors).join(', ');

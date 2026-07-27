@@ -14,7 +14,7 @@ export const useCedentes = () => {
     try {
       const response = await buscarCedentes();
       
-      console.log('📦 Resposta carregarCedentes:', response);
+      // console.log('📦 Resposta carregarCedentes:', response);
       
       let cedentesList = [];
       if (response?.status === 'success' && Array.isArray(response.data)) {
@@ -27,7 +27,7 @@ export const useCedentes = () => {
         cedentesList = response.data;
       }
       
-      console.log('✅ Cedentes carregados:', cedentesList.length);
+      // console.log('✅ Cedentes carregados:', cedentesList.length);
       setCedentes(cedentesList);
       return cedentesList;
     } catch (error) {
@@ -50,10 +50,10 @@ export const useCedentes = () => {
     try {
       const response = await buscarCedentePorNome(nome);
       
-      console.log(`🔍 Resposta buscarCedentesPorNome("${nome}"):`, response);
-      console.log(`🔍 Status:`, response?.status);
-      console.log(`🔍 Data:`, response?.data);
-      console.log(`🔍 Sucesso:`, response?.sucesso);
+      // console.log(`🔍 Resposta buscarCedentesPorNome("${nome}"):`, response);
+      // console.log(`🔍 Status:`, response?.status);
+      // console.log(`🔍 Data:`, response?.data);
+      // console.log(`🔍 Sucesso:`, response?.sucesso);
       
       let cedentesList = [];
       if (response?.status === 'success' && Array.isArray(response.data)) {
@@ -66,7 +66,7 @@ export const useCedentes = () => {
         cedentesList = response.data;
       }
       
-      console.log(`✅ Encontrados ${cedentesList.length} cedentes para "${nome}"`);
+      // console.log(`✅ Encontrados ${cedentesList.length} cedentes para "${nome}"`);
       setCedentes(cedentesList);
       return cedentesList;
     } catch (error) {

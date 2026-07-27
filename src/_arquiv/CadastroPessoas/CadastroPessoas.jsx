@@ -84,7 +84,7 @@ const CadastroPessoas = () => {
       return;
     }
 
-    console.log('Dados do formulário:', formData);
+    // console.log('Dados do formulário:', formData);
 
     // const result = await simulateSave();
 
