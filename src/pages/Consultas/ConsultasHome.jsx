@@ -19,7 +19,7 @@ const consultas = [
         title: "Dados Pessoais",
         desc: "Informações sobre pessoas registradas na Receita Federal, incluindo CPF, nome, filiação e data de nascimento.",
         to: "/consultas/consulta-pf",
-        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"],
+        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"],
         color: "#2463eb",
     },
     {
@@ -28,7 +28,7 @@ const consultas = [
         title: "Dados Empresariais",
         desc: "Informações sobre empresas registradas, como razão social, CNPJ, e situação cadastral.",
         to: "/consultas/consulta-cnpj",
-        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"],
+        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"],
         color: "#2463eb",
     },
     {
@@ -37,7 +37,7 @@ const consultas = [
         title: "Endereços",
         desc: "Informações detalhadas sobre endereços completos, logradouros, CEPs, cidades e estados.",
         to: "/consultas/consulta-end",
-        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"],
+        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"],
         color: "#2463eb",
     },
     {
@@ -46,7 +46,7 @@ const consultas = [
         title: "Consulta Segurados",
         desc: "Localize informações sobre segurados com base nos registros disponíveis internamente.",
         to: "/consultas/consulta-segurados",
-        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"],
+        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"],
         color: "#2463eb",
     },
     {
@@ -55,7 +55,7 @@ const consultas = [
         title: "Consultar Faturamento",
         desc: "Consulte faturamento de maneira detalhada com parâmetros de pesquisa.",
         to: "/consultas/consulta-faturamento",
-        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"],
+        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"],
         color: "#2463eb",
     },
     {
@@ -64,7 +64,7 @@ const consultas = [
         title: "Consulta de Vistorias",
         desc: "Consulte e exporte relatórios de vistorias realizadas com filtros por período, estado e vistoriador.",
         to: "/vistorias",
-        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro"],
+        niveis: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"],
         color: "#2463eb",
     },
 ];
