@@ -215,7 +215,7 @@ const ConsultaVistorias = () => {
       setLoadingFilters(true);
       try {
         const promises = [listarEstados(), listarAdministradoras()];
-        const isVistoriadorAllowed = user?.nivel_acesso === 'admin' || user?.nivel_acesso === 'moderador';
+        const isVistoriadorAllowed = user?.nivel_acesso === 'admin' || user?.nivel_acesso === 'moderador' || user?.nivel_acesso === 'vistoria';
         
         if (isVistoriadorAllowed) {
           promises.push(listarVistoriadores());
@@ -423,7 +423,7 @@ const ConsultaVistorias = () => {
               />
             </S.FormGroup>
 
-            {(user?.nivel_acesso === 'admin' || user?.nivel_acesso === 'moderador') && (
+            {(user?.nivel_acesso === 'admin' || user?.nivel_acesso === 'moderador' || user?.nivel_acesso === 'vistoria') && (
               <S.FormGroup>
                 <S.Label>Vistoriador</S.Label>
                 <Autocomplete
