@@ -1,6 +1,6 @@
 // src/pages/CadastroPessoas/CadastroPessoas.jsx
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaUsers, FaSignOutAlt, FaSave, FaEraser, FaFileAlt } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
@@ -8,8 +8,16 @@ import PageLayout from '../../Layouts/PageLayout/PageLayout';
 import * as S from './CadastroPessoasStyles';
 import PessoaFormFields from './components/PessoaFormFields';
 import PessoaFormTabs from './components/PessoaFormTabs';
-import { TAB_SECTIONS } from './constants/pessoaConstants';
-import { usePessoas } from '../../hooks/usePessoas';
+import { usePessoas } from './hooks/usePessoas';
+import { useProdutos } from './hooks/useProdutos';
+
+const TAB_SECTIONS = [
+  { key: 'identificacao', label: 'Identificação', icon: <FaFileAlt /> },
+  { key: 'endereco', label: 'Endereço', icon: <FaFileAlt /> },
+  { key: 'bancario', label: 'Dados Bancários', icon: <FaFileAlt /> },
+  { key: 'contato', label: 'Contato', icon: <FaFileAlt /> },
+  { key: 'configuracoes', label: 'Configurações', icon: <FaFileAlt /> },
+];
 
 const CadastroPessoas = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -25,15 +33,11 @@ const CadastroPessoas = () => {
     preencherEndereco,
     clearForm,
     save,
+    simulateSave,
     gerentes,
   } = usePessoas(true);
 
-  const isFormValid = useMemo(() => {
-    if (!formData.nome?.trim()) return false;
-    if (!formData.cpf_cnpj?.trim()) return false;
-    
-    return true;
-  }, [formData.nome, formData.cpf_cnpj]);
+  const { produtos } = useProdutos();
 
   const handleVoltar = () => {
     if (!window.confirm('Deseja realmente sair? Os dados não salvos serão perdidos.')) {
@@ -72,35 +76,32 @@ const CadastroPessoas = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
-    if (!formData.nome?.trim()) {
-      enqueueSnackbar('⚠️ Nome é obrigatório', { variant: 'warning' });
-      return;
-    }
-
-    if (!formData.cpf_cnpj?.trim()) {
-      enqueueSnackbar('⚠️ CPF/CNPJ é obrigatório', { variant: 'warning' });
+    if (!formData.categoria) {
+      enqueueSnackbar('⚠️ Selecione uma categoria', { variant: 'warning' });
       return;
     }
 
     // console.log('Dados do formulário:', formData);
-    const result = await save();
-    // console.log('Resultado do save():', result);
 
-    if (!result.success) {
-      const errorMessages = Object.values(errors).join(', ');
-      enqueueSnackbar(`❌ ${errorMessages}`, { variant: 'error' });
-      return;
-    }
+    // const result = await simulateSave();
 
-    enqueueSnackbar('✅ Pessoa cadastrada com sucesso!', { variant: 'success' });
-    navigate('/cadastro-pessoas');
+    // if (!result.success) {
+    //   enqueueSnackbar('Erro ao salvar. Verifique os campos obrigatórios.', { variant: 'error' });
+    //   return;
+    // }
+
+    // enqueueSnackbar('✅ Pessoa cadastrada com sucesso!', { variant: 'success' });
+    // navigate('/cadastro-pessoas');
   };
 
   return (
-    <PageLayout title="Novo Cadastro" subtitle="Preencha os dados da nova pessoa">
+    <PageLayout
+      title="Novo Cadastro"
+      subtitle="Preencha os dados da nova pessoa"
+    >
       <S.Container>
         <S.Card>
           <S.CardHeader>
@@ -118,7 +119,11 @@ const CadastroPessoas = () => {
           </S.CardHeader>
 
           <S.Form onSubmit={handleSubmit}>
-            <PessoaFormTabs activeTab={activeTab} onTabChange={setActiveTab} tabs={TAB_SECTIONS} />
+            <PessoaFormTabs
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              tabs={TAB_SECTIONS}
+            />
 
             <PessoaFormFields
               data={formData}
@@ -127,11 +132,12 @@ const CadastroPessoas = () => {
               onChange={updateField}
               onBuscarCep={handleBuscarCep}
               activeTab={activeTab}
+              produtos={produtos}
               gerentes={gerentes}
             />
 
             <S.FormActions>
-              <S.SuccessButton type="submit" disabled={isSubmitting || !isFormValid}>
+              <S.SuccessButton type="submit" disabled={isSubmitting}>
                 {isSubmitting ? '⏳ Salvando...' : (
                   <>
                     <FaSave /> Salvar

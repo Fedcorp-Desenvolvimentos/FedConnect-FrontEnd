@@ -81,7 +81,7 @@ const EmailAutomacao = () => {
     corpo: ""
   });
 
-  console.log("Dados a sero enviado:", emailData);
+  // console.log("Dados a sero enviado:", emailData);
 
   // Input de destinatário temporário
   const [destinatarioInput, setDestinatarioInput] = useState("");

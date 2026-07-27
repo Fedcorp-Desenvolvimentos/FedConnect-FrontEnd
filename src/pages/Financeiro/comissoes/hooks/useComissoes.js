@@ -21,6 +21,7 @@ import {
 } from '../../../../utils/regras_retencao';
 
 const INITIAL_FILTERS = {
+  empresa: '',
   favorecido: '',
   fatura: '',
   vencimento_inicial: '',
@@ -399,13 +400,8 @@ export const useEmissaoRecibos = () => {
 
     const grossTotal = totalBrutoSelecionado;
 
-    // USA AS RETENÇÕES VERIFICADAS OU CALCULA DO ZERO
-    let retencoesAtivas = [];
-    if (retencoesVerificadas?.retencoesAplicaveis) {
-      retencoesAtivas = retencoesVerificadas.retencoesAplicaveis;
-    } else if (selectedRetentions.length > 0) {
-      retencoesAtivas = selectedRetentions;
-    }
+    // USA selectedRetentions (estado real dos checkboxes) como fonte primária
+    const retencoesAtivas = selectedRetentions;
 
     const retentionRows = RETENTION_OPTIONS.filter((opt) =>
       retencoesAtivas.includes(opt.id)
@@ -423,7 +419,7 @@ export const useEmissaoRecibos = () => {
       netTotal: grossTotal - retentionTotal,
       count: selecionadas.length,
     };
-  }, [comissoes, selectedComissoes, selectedRetentions, totalBrutoSelecionado, retencoesVerificadas]);
+  }, [comissoes, selectedComissoes, selectedRetentions, totalBrutoSelecionado]);
 
   const totals = useMemo(() => {
     return {
@@ -565,6 +561,7 @@ export const useEmissaoRecibos = () => {
   }, [
     comissoes, 
     selectedComissoes, 
+    selectedRetentions,
     documentType, 
     filters,
     retencoesVerificadas,
@@ -731,6 +728,7 @@ export const useEmissaoRecibos = () => {
     }
   }, [
     selectedComissoes,
+    selectedRetentions,
     comissoes,
     documentType,
     enqueueSnackbar,

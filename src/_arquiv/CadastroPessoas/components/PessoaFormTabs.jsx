@@ -1,8 +1,5 @@
-// src/pages/CadastroPessoas/components/PessoaFormTabs.jsx
-
 import React from 'react';
 import styled from 'styled-components';
-import { FaFileAlt } from 'react-icons/fa';
 
 const TabsContainer = styled.div`
   display: flex;
@@ -19,17 +16,17 @@ const TabButton = styled.button`
   gap: 0.5rem;
   padding: 0.6rem 1.25rem;
   border: none;
-  background: ${(props) => (props.$active ? '#0f3d5d' : 'transparent')};
-  color: ${(props) => (props.$active ? 'white' : '#64748b')};
+  background: ${props => props.$active ? '#0f3d5d' : 'transparent'};
+  color: ${props => props.$active ? 'white' : '#64748b'};
   border-radius: 10px 10px 0 0;
-  font-weight: ${(props) => (props.$active ? '600' : '500')};
+  font-weight: ${props => props.$active ? '600' : '500'};
   font-size: 0.82rem;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${(props) => (props.$active ? '#0f3d5d' : '#f1f5f9')};
-    color: ${(props) => (props.$active ? 'white' : '#0f3d5d')};
+    background: ${props => props.$active ? '#0f3d5d' : '#f1f5f9'};
+    color: ${props => props.$active ? 'white' : '#0f3d5d'};
   }
 
   svg {
@@ -47,23 +44,19 @@ const TabButton = styled.button`
   }
 `;
 
-const TAB_LABELS = {
-  identificacao: 'Identificação',
-  endereco: 'Endereço',
-  bancario: 'Dados Bancários',
-  contato: 'Contato',
-  configuracoes: 'Configurações',
-};
-
-const TAB_ICONS = {
-  identificacao: <FaFileAlt />,
-  endereco: <FaFileAlt />,
-  bancario: <FaFileAlt />,
-  contato: <FaFileAlt />,
-  configuracoes: <FaFileAlt />,
-};
-
 const PessoaFormTabs = ({ activeTab, onTabChange, tabs }) => {
+  const getTabLabel = (tab) => {
+    const labels = {
+      identificacao: 'Identificação',
+      endereco: 'Endereço',
+      bancario: 'Dados Bancários',
+      contato: 'Contato',
+      configuracoes: 'Configurações',
+      agenciamento: 'Agenciamento',
+    };
+    return labels[tab.key] || tab.label;
+  };
+
   return (
     <TabsContainer>
       {tabs.map((tab) => (
@@ -73,8 +66,8 @@ const PessoaFormTabs = ({ activeTab, onTabChange, tabs }) => {
           onClick={() => onTabChange(tab.key)}
           type="button"
         >
-          {TAB_ICONS[tab.key] || tab.icon}
-          <span>{TAB_LABELS[tab.key] || tab.label}</span>
+          {tab.icon}
+          <span>{getTabLabel(tab)}</span>
         </TabButton>
       ))}
     </TabsContainer>

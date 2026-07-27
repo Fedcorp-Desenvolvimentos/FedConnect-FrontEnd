@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { FaSearch, FaEraser, FaSlidersH } from 'react-icons/fa';
 import { Card, CardHeader, FormGrid, FormGroup, Divider, Actions, Button } from '../ComissoesStyles';
 import { PessoaSelect } from './PessoaSelect';
+import { buscarCedentes } from '../../../../services/cedenteService';
 
 export const FilterForm = ({
   filters,
@@ -14,6 +15,16 @@ export const FilterForm = ({
   onClear,
   onToggleAdvanced,
 }) => {
+  const [empresas, setEmpresas] = useState([]);
+
+  useEffect(() => {
+    buscarCedentes()
+      .then((res) => {
+        const data = res?.dados || res?.data || [];
+        setEmpresas(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setEmpresas([]));
+  }, []);
   const handleSubmit = (e) => {
     e.preventDefault();
     onSearch();
@@ -40,7 +51,7 @@ export const FilterForm = ({
         A data de corte é o filtro que mais impacta o resultado, por isso
         abre a grade em destaque, seguida dos filtros de uso mais comum.
       */}
-        <FormGrid style={{ gridTemplateColumns: '2fr 1fr 1fr' }}>
+        <FormGrid style={{ gridTemplateColumns: '1fr' }}>
           <FormGroup>
             <label>Favorecido</label>
             <PessoaSelect
@@ -50,7 +61,9 @@ export const FilterForm = ({
               placeholder="Nome, código ou documento"
             />
           </FormGroup>
+        </FormGrid>
 
+        <FormGrid style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
         <FormGroup>
           <label>Fatura</label>
           <input
@@ -86,16 +99,24 @@ export const FilterForm = ({
             ))}
           </select>
         </FormGroup>
+        </FormGrid>
 
-        {/* <FormGroup>
-          <label>Competencia</label>
-          <input
-            type="month"
-            value={filters.competencia || ''}
-            onChange={(e) => onFilterChange('competencia', e.target.value)}
-          />
-        </FormGroup> */}
-      </FormGrid>
+        <FormGrid style={{ gridTemplateColumns: '1fr' }}>
+          <FormGroup>
+            <label>Empresa</label>
+            <select
+              value={filters.empresa || ''}
+              onChange={(e) => onFilterChange('empresa', e.target.value)}
+            >
+              <option value="">Todas as empresas</option>
+              {empresas.map((emp) => (
+                <option key={emp.CEDENTE || emp.cedente || emp.id} value={emp.CEDENTE || emp.cedente || emp.nome}>
+                  {emp.CEDENTE || emp.cedente || emp.nome}
+                </option>
+              ))}
+            </select>
+          </FormGroup>
+        </FormGrid>
 
       <Actions style={{ marginTop: 14, marginBottom: showAdvanced ? 0 : undefined }}>
         <Button type="submit" className="primary" disabled={loading}>

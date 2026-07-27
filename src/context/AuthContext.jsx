@@ -1,5 +1,5 @@
-// src/contexts/AuthContext.js
-import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+// src/context/AuthContext.js
+import { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api.js';
 import { useGlobal } from './GlobalContext.jsx';
@@ -13,8 +13,10 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const { loading, setLoading, setLoadingMessage } = useGlobal();
+    const [isLoading, setIsLoading] = useState(true);
+    const { setLoading, setLoadingMessage } = useGlobal();
     const navigate = useNavigate();
+    const authCheckedRef = useRef(false); 
 
     const login = useCallback(async (credentials) => {
         setLoadingMessage("Fazendo login...");
@@ -90,29 +92,32 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const checkAuthStatus = async () => {
+            if (authCheckedRef.current) {
+                setIsLoading(false);
+                return;
+            }
+
             const token = localStorage.getItem('accessToken');
+            const currentPath = window.location.pathname;
             
-            // CORREÇÃO: Verificação correta de rotas públicas
-            const publicRoutes = ["/", "/login", "/recuperar-senha", "/resetar-senha", "/404"];
+            const publicRoutes = [
+                "/login",
+                "/recuperar-senha",
+                "/404"
+            ];
             
-            const isPublicRoute = publicRoutes.some((route) => {
-                const pathname = window.location.pathname;
-                
-                // Caso especial para /resetar-senha/:token
-                if (route === "/resetar-senha") {
-                    return pathname.startsWith("/resetar-senha/") || pathname === "/resetar-senha";
-                }
-                
-                // Para as outras rotas, verificação exata
-                return pathname === route;
-            });
+            const isPublicRoute = publicRoutes.some(route => currentPath === route) || 
+                                 currentPath.startsWith("/resetar-senha/") ||
+                                 currentPath === "/";
 
             if (!token) {
-                setLoading(false);
                 setIsAuthenticated(false);
+                setUser(null);
+                setIsLoading(false);
+                authCheckedRef.current = true;
 
                 if (!isPublicRoute) {
-                    navigate("/login");
+                    navigate("/login", { replace: true });
                 }
                 return;
             }
@@ -122,9 +127,8 @@ export const AuthProvider = ({ children }) => {
                 setUser(response.data);
                 setIsAuthenticated(true);
                 
-                // Se estiver em rota pública e logado, redireciona para home
-                if (isPublicRoute && window.location.pathname !== '/') {
-                    navigate('/home');
+                if (isPublicRoute) {
+                    navigate('/home', { replace: true });
                 }
             } catch (error) {
                 console.error("Erro ao validar token:", error);
@@ -133,27 +137,28 @@ export const AuthProvider = ({ children }) => {
                 setIsAuthenticated(false);
 
                 if (!isPublicRoute) {
-                    navigate("/login");
+                    navigate("/login", { replace: true });
                 }
             } finally {
-                setLoading(false);
+                setIsLoading(false);
+                authCheckedRef.current = true;
             }
         };
         
         checkAuthStatus();
     }, [navigate]);
 
-    const isAuthenticatedCheck = () => isAuthenticated;
+    const isAuthenticatedCheck = useCallback(() => isAuthenticated, [isAuthenticated]);
 
     const authContextValue = useMemo(() => ({
         user,
         isAuthenticated,
-        loading,
+        isLoading,
         login,
         loginGoogle,
         logout,
         isAuthenticatedCheck
-    }), [user, isAuthenticated, loading, login, loginGoogle, logout]);
+    }), [user, isAuthenticated, isLoading, login, loginGoogle, logout]);
 
     return (
         <AuthContext.Provider value={authContextValue}>

@@ -1,176 +1,28 @@
-// src/pages/CadastroPessoas/components/PessoaFormFields.jsx
+// src/pages/CadastroPessoas/components/PessoaFormFields.js
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useBancos } from '../../../hooks/useBancos';
-import { FaSearch, FaGlobe, FaTimes, FaSpinner } from 'react-icons/fa';
+import React from 'react';
+import { FaSearch, FaGlobe } from 'react-icons/fa';
 import * as S from '../CadastroPessoasStyles';
 import CedenteSelect from './CedenteSelect';
-import { ESTADOS } from '../constants/pessoaConstants';
-import PessoaAutocomplete from './PessoaAutocomplete';
 
-// ==================== COMPONENTE BANCO SELECT ====================
-const BancoSelect = ({ value, onChange, disabled, error }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState('');
-  const wrapperRef = useRef(null);
-  const { bancos, loading, carregarBancos, buscarBancosPorNome } = useBancos();
+const ESTADOS = [
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
+  'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC',
+  'SP', 'SE', 'TO'
+];
 
-  // ✅ Encontra o banco selecionado (incluindo busca local se não estiver na lista)
-  const selectedBanco = bancos.find((b) => String(b.codigo) === String(value));
-  
-  // ✅ Mostra nome do banco se encontrado, senão mostra o código
-  const displayValue = searchInput || (selectedBanco ? `${selectedBanco.codigo} - ${selectedBanco.nome}` : value || '');
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchInput.length >= 2) {
-        buscarBancosPorNome(searchInput);
-      } else if (searchInput === '') {
-        carregarBancos();
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchInput, buscarBancosPorNome, carregarBancos]);
-
-  // ✅ Carrega bancos automaticamente ao focar
-  useEffect(() => {
-    if (isOpen && bancos.length === 0 && !loading) {
-      carregarBancos();
-    }
-  }, [isOpen, bancos.length, loading, carregarBancos]);
-
-  const handleSelectBanco = (banco) => {
-    onChange({
-      target: {
-        name: 'banco',
-        value: banco.codigo
-      }
-    });
-    setSearchInput('');
-    setIsOpen(false);
-  };
-
-  const handleClear = () => {
-    onChange({
-      target: {
-        name: 'banco',
-        value: ''
-      }
-    });
-    setSearchInput('');
-    setIsOpen(false);
-  };
-
-  const handleFocus = () => {
-    if (!disabled) {
-      setIsOpen(true);
-    }
-  };
-
-  return (
-    <S.FormGroup $flex="2 1 260px">
-      <S.FormLabel>Banco</S.FormLabel>
-      <div ref={wrapperRef} style={{ position: 'relative' }}>
-        <S.InputWithButton>
-          <S.FormInput
-            type="text"
-            value={displayValue}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onFocus={handleFocus}
-            disabled={disabled}
-            $error={error}
-            placeholder={loading ? 'Carregando bancos...' : 'Buscar banco por nome ou código...'}
-          />
-          {value && (
-            <S.IconSquareButton
-              type="button"
-              onClick={handleClear}
-              disabled={disabled}
-              title="Limpar"
-            >
-              <FaTimes />
-            </S.IconSquareButton>
-          )}
-          <S.IconSquareButton
-            type="button"
-            onClick={() => !disabled && setIsOpen(!isOpen)}
-            disabled={disabled || loading}
-            title="Buscar bancos"
-          >
-            {loading ? <FaSpinner className="spin" /> : <FaSearch />}
-          </S.IconSquareButton>
-        </S.InputWithButton>
-
-        {isOpen && !disabled && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              marginTop: '4px',
-              background: 'white',
-              border: '1px solid #e2e8f0',
-              borderRadius: '10px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-              maxHeight: '250px',
-              overflowY: 'auto',
-              zIndex: 1000,
-            }}
-          >
-            {loading ? (
-              <div style={{ padding: '1rem', textAlign: 'center', color: '#94a3b8' }}>
-                <FaSpinner className="spin" /> Carregando bancos...
-              </div>
-            ) : bancos.length === 0 ? (
-              <div style={{ padding: '1rem', textAlign: 'center', color: '#94a3b8' }}>
-                Nenhum banco encontrado
-              </div>
-            ) : (
-              bancos.map((banco) => (
-                <div
-                  key={banco.codigo}
-                  onClick={() => handleSelectBanco(banco)}
-                  style={{
-                    padding: '0.6rem 1rem',
-                    cursor: 'pointer',
-                    borderBottom: '1px solid #f1f5f9',
-                    transition: 'background 0.15s ease',
-                    fontSize: '0.875rem',
-                  }}
-                  onMouseEnter={(e) => e.target.style.background = '#f8fafc'}
-                  onMouseLeave={(e) => e.target.style.background = 'white'}
-                >
-                  <div style={{ fontWeight: 600, color: '#0f3d5d' }}>
-                    {banco.codigo} - {banco.nome}
-                  </div>
-                  {banco.digito && (
-                    <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-                      Dígito: {banco.digito}
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        )}
-      </div>
-      {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
-    </S.FormGroup>
-  );
-};
-
-// ==================== FORMULÁRIO PRINCIPAL ====================
+const BANCOS = [
+  '001 - Banco do Brasil',
+  '033 - Santander',
+  '104 - Caixa Econômica Federal',
+  '237 - Bradesco',
+  '341 - Itaú',
+  '077 - Inter',
+  '260 - Nubank',
+  'NU PAGAMENTOS',
+  'SICOOB',
+  'SICREDI',
+];
 
 const PessoaFormFields = ({
   data,
@@ -179,8 +31,9 @@ const PessoaFormFields = ({
   onChange,
   onBuscarCep,
   activeTab = 'identificacao',
-  gerentes = [],
+  gerentes = []
 }) => {
+  // Mostra apenas a seção ativa
   const isVisible = (section) => activeTab === section;
 
   return (
@@ -253,7 +106,6 @@ const PessoaFormFields = ({
             <S.FormGroup $flex="0 1 180px">
               <S.FormLabel>Sexo</S.FormLabel>
               <S.FormSelect name="sexo" value={data.sexo} onChange={onChange} disabled={disabled}>
-                <option value="juridica">Jurídica</option>
                 <option value="masculino">Masculino</option>
                 <option value="feminino">Feminino</option>
                 <option value="nao_informado">Não informado</option>
@@ -271,10 +123,8 @@ const PessoaFormFields = ({
                 disabled={disabled}
               >
                 <option value="">Selecione o gerente</option>
-                {gerentes.map((gerente) => (
-                  <option key={gerente.codigo} value={gerente.codigo}>
-                    {gerente.nome}
-                  </option>
+                {gerentes.map(gerente => (
+                  <option key={gerente.codigo} value={gerente.codigo}>{gerente.nome}</option>
                 ))}
               </S.FormSelect>
             </S.FormGroup>
@@ -314,10 +164,8 @@ const PessoaFormFields = ({
               <S.FormLabel>UF</S.FormLabel>
               <S.FormSelect name="uf" value={data.uf} onChange={onChange} disabled={disabled}>
                 <option value="">-</option>
-                {ESTADOS.map((uf) => (
-                  <option key={uf} value={uf}>
-                    {uf}
-                  </option>
+                {ESTADOS.map(uf => (
+                  <option key={uf} value={uf}>{uf}</option>
                 ))}
               </S.FormSelect>
             </S.FormGroup>
@@ -413,13 +261,15 @@ const PessoaFormFields = ({
           <S.SectionTitle>Dados Bancários</S.SectionTitle>
 
           <S.FormRow>
-            {/* Substituir o select estático pelo componente com busca */}
-            <BancoSelect
-              value={data.banco}
-              onChange={onChange}
-              disabled={disabled}
-              error={errors.banco}
-            />
+            <S.FormGroup $flex="2 1 260px">
+              <S.FormLabel>Banco</S.FormLabel>
+              <S.FormSelect name="banco" value={data.banco} onChange={onChange} disabled={disabled}>
+                <option value="">Selecione o banco</option>
+                {BANCOS.map(banco => (
+                  <option key={banco} value={banco}>{banco}</option>
+                ))}
+              </S.FormSelect>
+            </S.FormGroup>
 
             <S.FormGroup $flex="0 1 150px">
               <S.FormLabel>Agência</S.FormLabel>
@@ -445,16 +295,16 @@ const PessoaFormFields = ({
           </S.FormRow>
 
           <S.FormRow>
-            <PessoaAutocomplete
-              value={data.favorecido}
-              onChange={onChange}
-              disabled={disabled}
-              error={errors.favorecido}
-              placeholder="Buscar pessoa por nome ou CPF/CNPJ..."
-              onSelect={(pessoa) => {
-                console.log('Pessoa selecionada:', pessoa);
-              }}
-            />
+            <S.FormGroup $flex="1 1 100%">
+              <S.FormLabel>Favorecido</S.FormLabel>
+              <S.FormInput
+                type="text"
+                name="favorecido"
+                value={data.favorecido}
+                onChange={onChange}
+                disabled={disabled}
+              />
+            </S.FormGroup>
           </S.FormRow>
 
           <S.FormRow>
@@ -602,7 +452,7 @@ const PessoaFormFields = ({
               <S.FormLabel>URL do Portal</S.FormLabel>
               <S.InputWithButton>
                 <S.FormInput
-                  type="text"
+                  type="url"
                   name="portal"
                   value={data.portal}
                   onChange={onChange}

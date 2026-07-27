@@ -1,6 +1,7 @@
 // src/pages/CadastroPessoas/AtualizarPessoas.jsx
 
-import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { usePessoas } from '../../../hooks/usePessoas';
 import { FaUsers, FaSignOutAlt, FaSave, FaEraser, FaPen, FaTimes, FaFileAlt, FaSearch } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
@@ -9,8 +10,15 @@ import * as S from './CadastroPessoasStyles';
 import PessoaFormFields from './components/PessoaFormFields';
 import PessoaFormTabs from './components/PessoaFormTabs';
 import PessoaTable from './components/PessoaTable';
-import { TAB_SECTIONS } from './constants/pessoaConstants';
-import { usePessoas } from '../../hooks/usePessoas';
+
+const TAB_SECTIONS = [
+  { key: 'identificacao', label: 'Identificação', icon: <FaFileAlt /> },
+  { key: 'endereco', label: 'Endereço', icon: <FaFileAlt /> },
+  { key: 'bancario', label: 'Dados Bancários', icon: <FaFileAlt /> },
+  { key: 'contato', label: 'Contato', icon: <FaFileAlt /> },
+  { key: 'configuracoes', label: 'Configurações', icon: <FaFileAlt /> },
+  { key: 'agenciamento', label: 'Agenciamento', icon: <FaFileAlt /> },
+];
 
 const AtualizarPessoas = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -41,18 +49,9 @@ const AtualizarPessoas = () => {
     save,
     goToPage,
     searchPessoas,
+    produtos,
     gerentes,
   } = usePessoas(false);
-
-  const isFormValid = useMemo(() => {
-    if (isReadOnly) return false;
-    
-    // Verifica campos obrigatórios
-    if (!formData.nome?.trim()) return false;
-    if (!formData.cpf_cnpj?.trim()) return false;
-    
-    return true;
-  }, [formData.nome, formData.cpf_cnpj, isReadOnly]);
 
   const handleSearchInput = useCallback((value) => {
     setSearchInput(value);
@@ -70,6 +69,7 @@ const AtualizarPessoas = () => {
     };
   }, []);
 
+  // ===== HANDLERS =====
   const handleVoltar = () => {
     if (mode !== 'view' && !window.confirm('Existem alterações não salvas. Deseja realmente sair?')) {
       return;
@@ -122,20 +122,13 @@ const AtualizarPessoas = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
-    if (!formData.nome?.trim()) {
-      enqueueSnackbar('⚠️ Nome é obrigatório', { variant: 'warning' });
+    if (!formData.categoria) {
+      enqueueSnackbar('⚠️ Selecione uma categoria', { variant: 'warning' });
       return;
     }
-
-    if (!formData.cpf_cnpj?.trim()) {
-      enqueueSnackbar('⚠️ CPF/CNPJ é obrigatório', { variant: 'warning' });
-      return;
-    }
-
-    console.log("Dados a serem salvos:", formData);
 
     const result = await save();
 
@@ -145,7 +138,6 @@ const AtualizarPessoas = () => {
     }
 
     enqueueSnackbar('✅ Pessoa atualizada com sucesso!', { variant: 'success' });
-    navigate('/cadastro-pessoas');
   };
 
   const handleSelectPessoa = (codigo) => {
@@ -176,7 +168,7 @@ const AtualizarPessoas = () => {
     enqueueSnackbar('Busca limpa', { variant: 'info' });
   };
 
-  // RENDER: CARREGANDO
+  // ===== RENDER: CARREGANDO =====
   if (loading && pessoas.length === 0) {
     return (
       <PageLayout title="Carregando...">
@@ -196,10 +188,13 @@ const AtualizarPessoas = () => {
     );
   }
 
-  // RENDER: SELEÇÃO DE PESSOA
+  // ===== RENDER: SELEÇÃO DE PESSOA =====
   if (!selectedCodigo || mode === 'view') {
     return (
-      <PageLayout title="Atualizar Cadastro" subtitle="Selecione uma pessoa para editar">
+      <PageLayout
+        title="Atualizar Cadastro"
+        subtitle="Selecione uma pessoa para editar"
+      >
         <S.Container>
           <S.Card>
             <S.CardHeader>
@@ -213,6 +208,7 @@ const AtualizarPessoas = () => {
               </S.HeaderActions>
             </S.CardHeader>
 
+            {/* 🔍 Barra de busca */}
             <S.SearchContainer>
               <S.SearchForm onSubmit={handleSearch}>
                 <S.SearchInput
@@ -243,7 +239,7 @@ const AtualizarPessoas = () => {
             <S.SectionTitle as="h3" style={{ margin: '0 0 0.75rem 0', padding: 0 }}>
               Selecione uma pessoa para editar
             </S.SectionTitle>
-
+            
             <PessoaTable
               pessoas={pessoas}
               selectedCodigo={selectedCodigo}
@@ -261,8 +257,12 @@ const AtualizarPessoas = () => {
     );
   }
 
+  // ===== RENDER: EDIÇÃO =====
   return (
-    <PageLayout title="Atualizar Cadastro" subtitle={`Editando: ${formData.nome || 'Selecionado'}`}>
+    <PageLayout
+      title="Atualizar Cadastro"
+      subtitle={`Editando: ${formData.nome || 'Selecionado'}`}
+    >
       <S.Container>
         <S.Card>
           <S.CardHeader>
@@ -270,7 +270,11 @@ const AtualizarPessoas = () => {
               <FaUsers /> Atualizar Cadastro
             </S.Title>
             <S.HeaderActions>
-              <S.SecondaryButton type="button" onClick={handleAlterar} disabled={!canAlterar}>
+              <S.SecondaryButton 
+                type="button" 
+                onClick={handleAlterar} 
+                disabled={!canAlterar}
+              >
                 <FaPen /> Alterar
               </S.SecondaryButton>
               <S.SecondaryButton type="button" onClick={handleCancelar} disabled={!canCancelar}>
@@ -286,7 +290,11 @@ const AtualizarPessoas = () => {
           </S.CardHeader>
 
           <S.Form onSubmit={handleSubmit}>
-            <PessoaFormTabs activeTab={activeTab} onTabChange={setActiveTab} tabs={TAB_SECTIONS} />
+            <PessoaFormTabs
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              tabs={TAB_SECTIONS}
+            />
 
             <PessoaFormFields
               data={formData}
@@ -295,12 +303,13 @@ const AtualizarPessoas = () => {
               onChange={updateField}
               onBuscarCep={handleBuscarCep}
               activeTab={activeTab}
+              produtos={produtos}
               gerentes={gerentes}
             />
 
             {!isReadOnly && (
               <S.FormActions>
-                <S.SuccessButton type="submit" disabled={isSubmitting || !isFormValid}>
+                <S.SuccessButton type="submit" disabled={isSubmitting}>
                   {isSubmitting ? '⏳ Salvando...' : (
                     <>
                       <FaSave /> Salvar
