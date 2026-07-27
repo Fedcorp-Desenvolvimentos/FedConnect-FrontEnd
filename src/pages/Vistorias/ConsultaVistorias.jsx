@@ -214,15 +214,18 @@ const ConsultaVistorias = () => {
     const carregarDados = async () => {
       setLoadingFilters(true);
       try {
-        const [estadosRes, vistoriadoresRes, administradorasRes] = await Promise.all([
-          listarEstados(),
-          listarVistoriadores(),
-          listarAdministradoras()
-        ]);
+        const promises = [listarEstados(), listarAdministradoras()];
+        const isVistoriadorAllowed = user?.nivel_acesso === 'admin' || user?.nivel_acesso === 'moderador';
+        
+        if (isVistoriadorAllowed) {
+          promises.push(listarVistoriadores());
+        }
 
-        if (estadosRes?.sucesso) setEstados(estadosRes.data || []);
-        if (vistoriadoresRes?.sucesso) setVistoriadores(vistoriadoresRes.data || []);
-        if (administradorasRes?.sucesso) setAdministradoras(administradorasRes.data || []);
+        const results = await Promise.all(promises);
+
+        if (results[0]?.sucesso) setEstados(results[0].data || []);
+        if (results[1]?.sucesso) setAdministradoras(results[1].data || []);
+        if (isVistoriadorAllowed && results[2]?.sucesso) setVistoriadores(results[2].data || []);
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
       } finally {
@@ -231,7 +234,7 @@ const ConsultaVistorias = () => {
     };
 
     carregarDados();
-  }, []);
+  }, [user]);
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -420,21 +423,23 @@ const ConsultaVistorias = () => {
               />
             </S.FormGroup>
 
-            <S.FormGroup>
-              <S.Label>Vistoriador</S.Label>
-              <Autocomplete
-                name="cod_vistoriador"
-                value={formData.cod_vistoriador}
-                onChange={handleChange}
-                onSelect={handleVistoriadorSelect}
-                options={opcoesVistoriadores}
-                labelKey="label"
-                valueKey="value"
-                placeholder="Digite o nome do vistoriador..."
-                disabled={loading}
-                shimmerLoading={loadingFilters}
-              />
-            </S.FormGroup>
+            {(user?.nivel_acesso === 'admin' || user?.nivel_acesso === 'moderador') && (
+              <S.FormGroup>
+                <S.Label>Vistoriador</S.Label>
+                <Autocomplete
+                  name="cod_vistoriador"
+                  value={formData.cod_vistoriador}
+                  onChange={handleChange}
+                  onSelect={handleVistoriadorSelect}
+                  options={opcoesVistoriadores}
+                  labelKey="label"
+                  valueKey="value"
+                  placeholder="Digite o nome do vistoriador..."
+                  disabled={loading}
+                  shimmerLoading={loadingFilters}
+                />
+              </S.FormGroup>
+            )}
 
             <S.FormGroup>
               <S.Label>Fatura</S.Label>
