@@ -31,20 +31,52 @@ export const buscarPessoaPorCodigo = async (codigo) => {
 
 export const criarPessoa = async (payload) => {
   try {
-    const response = await api.post('pessoas/criar/', payload);
-
-    if (response.data && response.data.sucesso) {
-      return response.data;
-    } else {
-      throw new Error(response.data?.erro || 'Erro ao criar pessoa');
-    }
+    const response = await api.post('pessoas/criar/', payload); // Verifique a rota
+    return response.data;
   } catch (error) {
     console.error('❌ Erro ao criar pessoa:', error);
-
-    if (error.response?.status === 405) {
-      throw new Error('Método não permitido na rota de criação.');
+    
+    // 🔥 TRATAMENTO MELHORADO PARA A ESTRUTURA DO SEU ERRO
+    if (error.response) {
+      const status = error.response.status;
+      const errorData = error.response.data;
+      
+      console.log('📦 Dados do erro:', errorData);
+      
+      // Cria um objeto de erro enriquecido
+      const enhancedError = new Error();
+      enhancedError.status = status;
+      enhancedError.data = errorData;
+      
+      // 🔥 CAPTURA A MENSAGEM DE ERRO ESPECÍFICA
+      if (errorData && typeof errorData === 'object') {
+        // Para o formato: {'mensagem': 'Já existe uma pessoa com este CPF/CNPJ: 0000006909', 'pessoa_existente': '0000006909'}
+        if (errorData.mensagem) {
+          enhancedError.message = errorData.mensagem;
+        } else if (errorData.detail) {
+          enhancedError.message = errorData.detail;
+        } else if (errorData.erro) {
+          enhancedError.message = errorData.erro;
+        } else if (errorData.message) {
+          enhancedError.message = errorData.message;
+        } else {
+          enhancedError.message = 'Erro ao criar pessoa';
+        }
+        
+        // Captura campos extras do erro
+        if (errorData.pessoa_existente) {
+          enhancedError.existingData = errorData.pessoa_existente;
+        }
+        
+        // Captura erros de validação por campo se existirem
+        if (errorData.errors || errorData.fields) {
+          enhancedError.fieldErrors = errorData.errors || errorData.fields;
+        }
+      }
+      
+      throw enhancedError;
     }
-
+    
     throw error;
   }
 };
@@ -55,6 +87,32 @@ export const atualizarPessoa = async (codigo, payload) => {
     return response.data;
   } catch (error) {
     console.error('❌ Erro ao atualizar pessoa:', error);
+    
+    if (error.response) {
+      const errorData = error.response.data;
+      const enhancedError = new Error();
+      enhancedError.status = error.response.status;
+      enhancedError.data = errorData;
+      
+      if (errorData && typeof errorData === 'object') {
+        if (errorData.mensagem) {
+          enhancedError.message = errorData.mensagem;
+        } else if (errorData.detail) {
+          enhancedError.message = errorData.detail;
+        } else if (errorData.erro) {
+          enhancedError.message = errorData.erro;
+        } else {
+          enhancedError.message = 'Erro ao atualizar pessoa';
+        }
+        
+        if (errorData.errors || errorData.fields) {
+          enhancedError.fieldErrors = errorData.errors || errorData.fields;
+        }
+      }
+      
+      throw enhancedError;
+    }
+    
     throw error;
   }
 };

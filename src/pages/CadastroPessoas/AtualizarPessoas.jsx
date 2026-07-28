@@ -135,8 +135,6 @@ const AtualizarPessoas = () => {
       return;
     }
 
-    console.log("Dados a serem salvos:", formData);
-
     const result = await save();
 
     if (!result.success) {

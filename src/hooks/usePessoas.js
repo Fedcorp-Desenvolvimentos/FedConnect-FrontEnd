@@ -321,6 +321,8 @@ export const usePessoas = (isNewMode = false) => {
     if (!validate()) return { success: false };
 
     setIsSubmitting(true);
+    setErrors({});
+    
     try {
       const payload = { ...formData };
 
@@ -329,7 +331,6 @@ export const usePessoas = (isNewMode = false) => {
         return value;
       };
 
-      // ✅ Mapeia os valores do frontend para o formato do banco
       const mapearValorBanco = (campo, valor) => {
         switch (campo) {
           case 'tipo':
@@ -338,7 +339,7 @@ export const usePessoas = (isNewMode = false) => {
             if (valor === 'masculino') return 'M';
             if (valor === 'feminino') return 'F';
             if (valor === 'nao_informado') return 'N';
-            return 'J'; // padrão para jurídica
+            return 'J';
           default:
             return valor;
         }
@@ -372,9 +373,68 @@ export const usePessoas = (isNewMode = false) => {
       setSelectedCodigo(payload.codigo);
       setMode('view');
       return { success: true, payload };
+      
     } catch (error) {
       console.error('❌ Erro ao salvar pessoa:', error);
-      return { success: false, error };
+      
+      // 🔥 TRATAMENTO DE ERRO MELHORADO
+      let errorMessage = 'Erro ao salvar pessoa';
+      let fieldErrors = {};
+      let status = 500;
+      let existingData = null;
+      
+      if (error.status) {
+        status = error.status;
+      }
+      
+      // 🔥 CAPTURA A MENSAGEM DO ERRO
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // 🔥 CAPTURA DADOS EXISTENTES (como CPF/CNPJ duplicado)
+      if (error.existingData) {
+        existingData = error.existingData;
+      }
+      
+      // 🔥 CAPTURA ERROS POR CAMPO
+      if (error.fieldErrors) {
+        fieldErrors = error.fieldErrors;
+      }
+      
+      // Se tem dados de erro no data
+      if (error.data) {
+        const data = error.data;
+        if (data.mensagem) {
+          errorMessage = data.mensagem;
+        }
+        if (data.pessoa_existente) {
+          existingData = data.pessoa_existente;
+        }
+        if (data.errors || data.fields) {
+          fieldErrors = data.errors || data.fields;
+        }
+      }
+      
+      // Atualiza os erros no estado
+      setErrors(fieldErrors);
+      
+      // Log detalhado
+      console.log('📋 Detalhes do erro:', {
+        message: errorMessage,
+        status: status,
+        existingData: existingData,
+        fieldErrors: fieldErrors
+      });
+      
+      return { 
+        success: false, 
+        error: errorMessage,
+        fieldErrors: fieldErrors,
+        status: status,
+        existingData: existingData
+      };
+      
     } finally {
       setIsSubmitting(false);
     }

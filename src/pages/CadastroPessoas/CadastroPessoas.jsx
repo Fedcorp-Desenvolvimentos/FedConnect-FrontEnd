@@ -71,7 +71,7 @@ const CadastroPessoas = () => {
       enqueueSnackbar('Não foi possível consultar o CEP agora', { variant: 'error' });
     }
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -85,17 +85,74 @@ const CadastroPessoas = () => {
       return;
     }
 
-    // console.log('Dados do formulário:', formData);
     const result = await save();
-    // console.log('Resultado do save():', result);
 
     if (!result.success) {
-      const errorMessages = Object.values(errors).join(', ');
-      enqueueSnackbar(`❌ ${errorMessages}`, { variant: 'error' });
+      // 🔥 EXIBE O ERRO CORRETAMENTE
+      console.log('🔴 Resultado do erro:', result);
+      
+      // Caso especial: CPF/CNPJ já existe
+      if (result.existingData) {
+        enqueueSnackbar(
+          `❌ ${result.error}`,
+          { 
+            variant: 'error',
+            autoHideDuration: 8000,
+            anchorOrigin: { vertical: 'top', horizontal: 'center' }
+          }
+        );
+        
+        // Opcional: Destacar o campo CPF/CNPJ
+        setErrors(prev => ({
+          ...prev,
+          cpf_cnpj: 'Este CPF/CNPJ já está cadastrado'
+        }));
+        
+        return;
+      }
+      
+      // Erros por campo
+      if (result.fieldErrors && Object.keys(result.fieldErrors).length > 0) {
+        const errorMessages = [];
+        Object.entries(result.fieldErrors).forEach(([field, messages]) => {
+          const fieldName = MAPEAMENTO_CAMPOS[field] || field;
+          const msg = Array.isArray(messages) ? messages.join(', ') : messages;
+          errorMessages.push(`${fieldName}: ${msg}`);
+        });
+        
+        const maxErrors = 3;
+        const displayErrors = errorMessages.slice(0, maxErrors);
+        const moreErrors = errorMessages.length > maxErrors ? ` (+${errorMessages.length - maxErrors} mais)` : '';
+        
+        enqueueSnackbar(
+          `❌ ${displayErrors.join('; ')}${moreErrors}`,
+          { variant: 'error', autoHideDuration: 8000 }
+        );
+        
+        console.error('Detalhes dos erros por campo:', result.fieldErrors);
+        return;
+      }
+      
+      // Erro genérico
+      if (result.error) {
+        enqueueSnackbar(`❌ ${result.error}`, { 
+          variant: 'error',
+          autoHideDuration: 6000 
+        });
+        return;
+      }
+      
+      // Fallback
+      enqueueSnackbar('❌ Erro ao salvar. Tente novamente.', { 
+        variant: 'error' 
+      });
+      
       return;
     }
 
-    enqueueSnackbar('✅ Pessoa cadastrada com sucesso!', { variant: 'success' });
+    enqueueSnackbar('✅ Pessoa cadastrada com sucesso!', { 
+      variant: 'success' 
+    });
     navigate('/cadastro-pessoas');
   };
 
