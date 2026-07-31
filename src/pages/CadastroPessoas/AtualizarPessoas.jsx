@@ -1,7 +1,7 @@
 // src/pages/CadastroPessoas/AtualizarPessoas.jsx
 
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { FaUsers, FaSignOutAlt, FaSave, FaEraser, FaPen, FaTimes, FaFileAlt, FaSearch } from 'react-icons/fa';
+import { FaUsers, FaSignOutAlt, FaSave, FaEraser, FaPen, FaTimes, FaSearch } from 'react-icons/fa';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '../../Layouts/PageLayout/PageLayout';
@@ -9,6 +9,7 @@ import * as S from './CadastroPessoasStyles';
 import PessoaFormFields from './components/PessoaFormFields';
 import PessoaFormTabs from './components/PessoaFormTabs';
 import PessoaTable from './components/PessoaTable';
+import ConfirmModal from './components/ConfirmModal';
 import { TAB_SECTIONS } from './constants/pessoaConstants';
 import { usePessoas } from '../../hooks/usePessoas';
 
@@ -18,6 +19,12 @@ const AtualizarPessoas = () => {
   const [activeTab, setActiveTab] = useState('identificacao');
   const [searchInput, setSearchInput] = useState('');
   const debounceRef = useRef(null);
+
+  const [showVoltarModal, setShowVoltarModal] = useState(false);
+  const [showLimparModal, setShowLimparModal] = useState(false);
+  const [showCancelarModal, setShowCancelarModal] = useState(false);
+  const [showSalvarModal, setShowSalvarModal] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const {
     pessoas,
@@ -46,14 +53,12 @@ const AtualizarPessoas = () => {
 
   const isFormValid = useMemo(() => {
     if (isReadOnly) return false;
-    
-    // Verifica campos obrigatórios
     if (!formData.nome?.trim()) return false;
     if (!formData.cpf_cnpj?.trim()) return false;
-    
     return true;
   }, [formData.nome, formData.cpf_cnpj, isReadOnly]);
 
+  // ==================== BUSCA ====================
   const handleSearchInput = useCallback((value) => {
     setSearchInput(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -70,11 +75,67 @@ const AtualizarPessoas = () => {
     };
   }, []);
 
-  const handleVoltar = () => {
-    if (mode !== 'view' && !window.confirm('Existem alterações não salvas. Deseja realmente sair?')) {
-      return;
+  // ==================== MODAIS ====================
+  const handleVoltarClick = () => {
+    if (mode !== 'view') {
+      setShowVoltarModal(true);
+    } else {
+      navigate('/cadastro-pessoas');
     }
-    navigate('/cadastro-pessoas');
+  };
+
+  const handleVoltarConfirm = () => {
+    setIsConfirming(true);
+    setTimeout(() => {
+      setIsConfirming(false);
+      setShowVoltarModal(false);
+      navigate('/cadastro-pessoas');
+    }, 300);
+  };
+
+  const handleVoltarCancel = () => {
+    setShowVoltarModal(false);
+  };
+
+  const handleLimparClick = () => {
+    if (canLimpar) {
+      setShowLimparModal(true);
+    }
+  };
+
+  const handleLimparConfirm = () => {
+    setIsConfirming(true);
+    setTimeout(() => {
+      clearForm();
+      setIsConfirming(false);
+      setShowLimparModal(false);
+      enqueueSnackbar('Campos limpos com sucesso', { variant: 'info' });
+    }, 300);
+  };
+
+  const handleLimparCancel = () => {
+    setShowLimparModal(false);
+  };
+
+  const handleCancelarClick = () => {
+    if (canCancelar) {
+      setShowCancelarModal(true);
+    }
+  };
+
+  const handleCancelarConfirm = () => {
+    setIsConfirming(true);
+    setTimeout(() => {
+      cancelAction();
+      setIsConfirming(false);
+      setShowCancelarModal(false);
+      enqueueSnackbar('Alterações descartadas', { variant: 'info' });
+      setActiveTab('identificacao');
+    }, 300);
+  };
+
+  const handleCancelarCancel = () => {
+    setShowCancelarModal(false);
   };
 
   const handleAlterar = () => {
@@ -87,18 +148,60 @@ const AtualizarPessoas = () => {
     setActiveTab('identificacao');
   };
 
-  const handleCancelar = () => {
-    cancelAction();
-    enqueueSnackbar('Alterações descartadas', { variant: 'info' });
+  const handleSelectPessoa = (codigo) => {
+    selectPessoa(codigo);
+    enqueueSnackbar('Pessoa selecionada para edição', { variant: 'info' });
+    setActiveTab('identificacao');
   };
 
-  const handleLimpar = () => {
-    if (window.confirm('Tem certeza que deseja limpar os campos?')) {
-      clearForm();
-      enqueueSnackbar('Campos limpos', { variant: 'info' });
+  // ==================== SALVAR ====================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.nome?.trim()) {
+      enqueueSnackbar('⚠️ Nome é obrigatório', { variant: 'warning' });
+      return;
+    }
+
+    if (!formData.cpf_cnpj?.trim()) {
+      enqueueSnackbar('⚠️ CPF/CNPJ é obrigatório', { variant: 'warning' });
+      return;
+    }
+
+    setShowSalvarModal(true);
+  };
+
+  const handleSalvarConfirm = async () => {
+    setIsConfirming(true);
+    
+    try {
+      const result = await save();
+
+      if (!result.success) {
+        enqueueSnackbar(result.error || 'Erro ao salvar. Verifique os campos obrigatórios.', { variant: 'error' });
+        setIsConfirming(false);
+        setShowSalvarModal(false);
+        return;
+      }
+
+      enqueueSnackbar('✅ Pessoa atualizada com sucesso!', { variant: 'success' });
+      setIsConfirming(false);
+      setShowSalvarModal(false);
+      navigate('/cadastro-pessoas');
+      
+    } catch (error) {
+      console.error('Erro inesperado:', error);
+      enqueueSnackbar('❌ Erro inesperado ao salvar.', { variant: 'error' });
+      setIsConfirming(false);
+      setShowSalvarModal(false);
     }
   };
 
+  const handleSalvarCancel = () => {
+    setShowSalvarModal(false);
+  };
+
+  // ==================== CEP ====================
   const handleBuscarCep = async () => {
     const cep = formData.cep?.replace(/\D/g, '');
     if (!cep || cep.length !== 8) {
@@ -122,36 +225,7 @@ const AtualizarPessoas = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.nome?.trim()) {
-      enqueueSnackbar('⚠️ Nome é obrigatório', { variant: 'warning' });
-      return;
-    }
-
-    if (!formData.cpf_cnpj?.trim()) {
-      enqueueSnackbar('⚠️ CPF/CNPJ é obrigatório', { variant: 'warning' });
-      return;
-    }
-
-    const result = await save();
-
-    if (!result.success) {
-      enqueueSnackbar('Erro ao salvar. Verifique os campos obrigatórios.', { variant: 'error' });
-      return;
-    }
-
-    enqueueSnackbar('✅ Pessoa atualizada com sucesso!', { variant: 'success' });
-    navigate('/cadastro-pessoas');
-  };
-
-  const handleSelectPessoa = (codigo) => {
-    selectPessoa(codigo);
-    enqueueSnackbar('Pessoa selecionada para edição', { variant: 'info' });
-    setActiveTab('identificacao');
-  };
-
+  // ==================== BUSCA NA TABELA ====================
   const handleSearch = async (e) => {
     e.preventDefault();
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -174,7 +248,8 @@ const AtualizarPessoas = () => {
     enqueueSnackbar('Busca limpa', { variant: 'info' });
   };
 
-  // RENDER: CARREGANDO
+  // ==================== RENDER ====================
+  
   if (loading && pessoas.length === 0) {
     return (
       <PageLayout title="Carregando...">
@@ -194,7 +269,7 @@ const AtualizarPessoas = () => {
     );
   }
 
-  // RENDER: SELEÇÃO DE PESSOA
+  // TELA DE SELEÇÃO
   if (!selectedCodigo || mode === 'view') {
     return (
       <PageLayout title="Atualizar Cadastro" subtitle="Selecione uma pessoa para editar">
@@ -205,7 +280,7 @@ const AtualizarPessoas = () => {
                 <FaUsers /> Atualizar Cadastro
               </S.Title>
               <S.HeaderActions>
-                <S.DangerButton type="button" onClick={handleVoltar}>
+                <S.DangerButton type="button" onClick={handleVoltarClick}>
                   <FaSignOutAlt /> Voltar
                 </S.DangerButton>
               </S.HeaderActions>
@@ -259,6 +334,7 @@ const AtualizarPessoas = () => {
     );
   }
 
+  // TELA DE EDIÇÃO
   return (
     <PageLayout title="Atualizar Cadastro" subtitle={`Editando: ${formData.nome || 'Selecionado'}`}>
       <S.Container>
@@ -271,13 +347,13 @@ const AtualizarPessoas = () => {
               <S.SecondaryButton type="button" onClick={handleAlterar} disabled={!canAlterar}>
                 <FaPen /> Alterar
               </S.SecondaryButton>
-              <S.SecondaryButton type="button" onClick={handleCancelar} disabled={!canCancelar}>
+              <S.SecondaryButton type="button" onClick={handleCancelarClick} disabled={!canCancelar}>
                 <FaTimes /> Cancelar
               </S.SecondaryButton>
-              <S.SecondaryButton type="button" onClick={handleLimpar} disabled={!canLimpar}>
+              <S.SecondaryButton type="button" onClick={handleLimparClick} disabled={!canLimpar}>
                 <FaEraser /> Limpar
               </S.SecondaryButton>
-              <S.DangerButton type="button" onClick={handleVoltar}>
+              <S.DangerButton type="button" onClick={handleVoltarClick}>
                 <FaSignOutAlt /> Voltar
               </S.DangerButton>
             </S.HeaderActions>
@@ -310,6 +386,83 @@ const AtualizarPessoas = () => {
           </S.Form>
         </S.Card>
       </S.Container>
+
+      {/* ==================== MODAIS ==================== */}
+      <ConfirmModal
+        isOpen={showVoltarModal}
+        onConfirm={handleVoltarConfirm}
+        onCancel={handleVoltarCancel}
+        title="Sair da edição"
+        message={
+          <>
+            <p>Existem alterações não salvas.</p>
+            <p style={{ color: '#ef4444', fontSize: '0.9rem' }}>
+              <strong>Atenção:</strong> Os dados não salvos serão perdidos.
+            </p>
+          </>
+        }
+        confirmText="Sair"
+        cancelText="Continuar editando"
+        danger={true}
+        loading={isConfirming}
+      />
+
+      <ConfirmModal
+        isOpen={showLimparModal}
+        onConfirm={handleLimparConfirm}
+        onCancel={handleLimparCancel}
+        title="Limpar formulário"
+        message={
+          <>
+            <p>Tem certeza que deseja limpar todos os campos?</p>
+            <p style={{ color: '#f59e0b', fontSize: '0.9rem' }}>
+              <strong>Atenção:</strong> Esta ação não pode ser desfeita.
+            </p>
+          </>
+        }
+        confirmText="Limpar"
+        cancelText="Cancelar"
+        danger={false}
+        loading={isConfirming}
+      />
+
+      <ConfirmModal
+        isOpen={showCancelarModal}
+        onConfirm={handleCancelarConfirm}
+        onCancel={handleCancelarCancel}
+        title="Cancelar edição"
+        message="Deseja cancelar as alterações e voltar à visualização?"
+        confirmText="Cancelar alterações"
+        cancelText="Continuar editando"
+        danger={false}
+        loading={isConfirming}
+      />
+
+      <ConfirmModal
+        isOpen={showSalvarModal}
+        onConfirm={handleSalvarConfirm}
+        onCancel={handleSalvarCancel}
+        title="Confirmar atualização"
+        message={
+          <>
+            <p>Deseja realmente atualizar os dados desta pessoa?</p>
+            <div style={{ 
+              marginTop: '0.75rem', 
+              padding: '0.75rem', 
+              background: '#f8fafc', 
+              borderRadius: '8px',
+              fontSize: '0.85rem'
+            }}>
+              <strong>Nome:</strong> {formData.nome || 'Não informado'}<br />
+              <strong>CPF/CNPJ:</strong> {formData.cpf_cnpj || 'Não informado'}
+            </div>
+          </>
+        }
+        confirmText="Salvar"
+        cancelText="Revisar dados"
+        danger={false}
+        loading={isConfirming}
+      />
     </PageLayout>
   );
 };

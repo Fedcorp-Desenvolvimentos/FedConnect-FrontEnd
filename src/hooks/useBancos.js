@@ -1,71 +1,70 @@
 // src/hooks/useBancos.js
 
-import { useState, useEffect, useCallback } from 'react';
-import { buscarBancos, buscarBancoPorNome } from '../services/bancoService';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { buscarBancos } from '../services/bancoService';
 
 export const useBancos = () => {
   const [bancos, setBancos] = useState([]);
+  const [filteredBancos, setFilteredBancos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const hasLoadedRef = useRef(false);
 
-  const carregarBancos = useCallback(async (search = '') => {
+  // Carrega TODOS os bancos uma única vez
+  const carregarBancos = useCallback(async () => {
+    if (hasLoadedRef.current) return;
+    
     setLoading(true);
     setError(null);
     try {
-      const response = await buscarBancos({ search, limit: 200 });
+      const response = await buscarBancos({ limit: 500, offset: 0 });
       
       let bancosList = [];
       if (response?.data && Array.isArray(response.data)) {
         bancosList = response.data;
-      } else if (response?.data && Array.isArray(response.data)) {
-        bancosList = response.data;
       }
       
       setBancos(bancosList);
+      setFilteredBancos(bancosList);
+      hasLoadedRef.current = true;
       return bancosList;
     } catch (error) {
       console.error('❌ Erro ao carregar bancos:', error);
       setError(error.message);
       setBancos([]);
+      setFilteredBancos([]);
       return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const buscarBancosPorNome = useCallback(async (nome) => {
-    if (!nome || nome.length < 2) {
-      return carregarBancos();
+  // Filtro local (client-side) como o Cedente
+  const buscarBancosPorNome = useCallback((termo) => {
+    if (!termo || termo.length < 2) {
+      setFilteredBancos(bancos);
+      return bancos;
     }
+
+    const termoLower = termo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const termoDigits = termo.replace(/\D/g, '');
     
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await buscarBancoPorNome(nome);
-      
-      let bancosList = [];
-      if (response?.data && Array.isArray(response.data)) {
-        bancosList = response.data;
-      }
-      
-      setBancos(bancosList);
-      return bancosList;
-    } catch (error) {
-      console.error('❌ Erro ao buscar bancos por nome:', error);
-      setError(error.message);
-      setBancos([]);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, [carregarBancos]);
+    const resultados = bancos.filter(banco => {
+      const nome = (banco.nome || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const codigo = String(banco.codigo || '');
+      return nome.includes(termoLower) || codigo.includes(termo);
+    });
+
+    setFilteredBancos(resultados);
+    return resultados;
+  }, [bancos]);
 
   useEffect(() => {
     carregarBancos();
   }, [carregarBancos]);
 
   return {
-    bancos,
+    bancos: filteredBancos,
     loading,
     error,
     carregarBancos,
