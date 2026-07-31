@@ -250,25 +250,6 @@ const AtualizarPessoas = () => {
 
   // ==================== RENDER ====================
   
-  if (loading && pessoas.length === 0) {
-    return (
-      <PageLayout title="Carregando...">
-        <S.Container>
-          <S.Card>
-            <S.CardHeader>
-              <S.Title>
-                <FaUsers /> Carregando cadastros...
-              </S.Title>
-            </S.CardHeader>
-            <div style={{ textAlign: 'center', padding: '40px' }}>
-              <p>⏳ Aguarde, carregando lista de pessoas...</p>
-            </div>
-          </S.Card>
-        </S.Container>
-      </PageLayout>
-    );
-  }
-
   // TELA DE SELEÇÃO
   if (!selectedCodigo || mode === 'view') {
     return (

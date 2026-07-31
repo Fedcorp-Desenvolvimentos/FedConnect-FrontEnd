@@ -1,8 +1,9 @@
-// src/pages/CadastroPessoas/hooks/usePessoas.js
+// src/hooks/usePessoas.js
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { buscarPessoas, criarPessoa, atualizarPessoa, buscarGerentesComerciais } from '../services/pessoaService';
 import { INITIAL_STATE, MAPEAMENTO_CAMPOS, todayISO } from '../pages/CadastroPessoas/constants/pessoaConstants';
+import { useLoading } from './useLoading';
 
 const normalizePessoa = (pessoa) => {
   if (!pessoa || typeof pessoa !== 'object') return pessoa;
@@ -128,6 +129,7 @@ const normalizePessoa = (pessoa) => {
 };
 
 export const usePessoas = (isNewMode = false) => {
+  const { withLoading } = useLoading();
   const [pessoas, setPessoas] = useState([]);
   const [formData, setFormData] = useState({ ...INITIAL_STATE, data_cadastro: todayISO() });
   const [errors, setErrors] = useState({});
@@ -151,7 +153,7 @@ export const usePessoas = (isNewMode = false) => {
   const canCancelar = mode !== 'view';
   const canLimpar = mode !== 'view';
 
-  // ===== BUSCAR PESSOAS =====
+  // ===== BUSCAR PESSOAS COM LOADING GLOBAL =====
   const fetchPessoas = useCallback(
     async (page = 1, search = '') => {
       if (isLoadingRef.current) return;
@@ -159,19 +161,32 @@ export const usePessoas = (isNewMode = false) => {
       setLoading(true);
 
       try {
-        const response = await buscarPessoas({
-          limit: pagination.pageSize,
-          offset: (page - 1) * pagination.pageSize,
-          search: search || searchTerm,
-        });
+        const response = await withLoading(
+          async () => {
+            return await buscarPessoas({
+              limit: pagination.pageSize,
+              offset: (page - 1) * pagination.pageSize,
+              search: search || searchTerm,
+            });
+          },
+          'Carregando dados...'
+        );
 
         let pessoasList = [];
         let total = 0;
 
         if (response?.data && Array.isArray(response.data)) {
           pessoasList = response.data;
-          total = response.total || 0;
+          // 🔥 CORREÇÃO AQUI: usa total_registros em vez de total
+          total = response.total_registros || response.total || 0;
         }
+
+        console.log('📊 Paginação:', {
+          total: total,
+          pageSize: pagination.pageSize,
+          totalPages: Math.ceil(total / pagination.pageSize),
+          dataLength: pessoasList.length
+        });
 
         const normalizedPessoas = pessoasList.map(normalizePessoa);
         const totalPages = Math.ceil(total / pagination.pageSize);
@@ -191,7 +206,7 @@ export const usePessoas = (isNewMode = false) => {
         setLoading(false);
       }
     },
-    [pagination.pageSize, searchTerm]
+    [pagination.pageSize, searchTerm, withLoading]
   );
 
   const searchPessoas = useCallback(
@@ -215,7 +230,12 @@ export const usePessoas = (isNewMode = false) => {
   // ===== BUSCAR GERENTES =====
   const fetchGerentes = useCallback(async () => {
     try {
-      const response = await buscarGerentesComerciais();
+      const response = await withLoading(
+        async () => {
+          return await buscarGerentesComerciais();
+        },
+        'Carregando dados...'
+      );
       if (response?.gerentes) {
         setGerentes(response.gerentes);
       }
@@ -223,7 +243,7 @@ export const usePessoas = (isNewMode = false) => {
       console.error('Erro ao buscar gerentes:', error);
       setGerentes([]);
     }
-  }, []);
+  }, [withLoading]);
 
   // ===== FORMULÁRIO =====
   const updateField = useCallback(
@@ -236,8 +256,6 @@ export const usePessoas = (isNewMode = false) => {
           [name]: type === 'checkbox' ? checked : value,
         };
         
-        // ✅ AUTOPREENCHER FAVORECIDO QUANDO O NOME FOR PREENCHIDO
-        // Se o campo alterado for 'nome' e o 'favorecido' estiver vazio, copiar o nome
         if (name === 'nome' && value && !prev.favorecido) {
           newData.favorecido = value;
         }
@@ -377,7 +395,6 @@ export const usePessoas = (isNewMode = false) => {
     } catch (error) {
       console.error('❌ Erro ao salvar pessoa:', error);
       
-      // 🔥 TRATAMENTO DE ERRO MELHORADO
       let errorMessage = 'Erro ao salvar pessoa';
       let fieldErrors = {};
       let status = 500;
@@ -387,22 +404,18 @@ export const usePessoas = (isNewMode = false) => {
         status = error.status;
       }
       
-      // 🔥 CAPTURA A MENSAGEM DO ERRO
       if (error.message) {
         errorMessage = error.message;
       }
       
-      // 🔥 CAPTURA DADOS EXISTENTES (como CPF/CNPJ duplicado)
       if (error.existingData) {
         existingData = error.existingData;
       }
       
-      // 🔥 CAPTURA ERROS POR CAMPO
       if (error.fieldErrors) {
         fieldErrors = error.fieldErrors;
       }
       
-      // Se tem dados de erro no data
       if (error.data) {
         const data = error.data;
         if (data.mensagem) {
@@ -416,10 +429,8 @@ export const usePessoas = (isNewMode = false) => {
         }
       }
       
-      // Atualiza os erros no estado
       setErrors(fieldErrors);
       
-      // Log detalhado
       console.log('📋 Detalhes do erro:', {
         message: errorMessage,
         status: status,

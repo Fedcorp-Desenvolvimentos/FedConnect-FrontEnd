@@ -34,13 +34,16 @@ const PessoaTable = ({
     const maxVisible = 5;
     let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
     let end = Math.min(totalPages, start + maxVisible - 1);
+    
     if (end - start < maxVisible - 1) {
       start = Math.max(1, end - maxVisible + 1);
     }
 
     if (start > 1) {
       pages.push(
-        <S.PaginationPage key={1} onClick={() => onPageChange(1)}>1</S.PaginationPage>
+        <S.PaginationPage key={1} onClick={() => onPageChange(1)}>
+          1
+        </S.PaginationPage>
       );
       if (start > 2) {
         pages.push(<S.PaginationEllipsis key="start-ellipsis">...</S.PaginationEllipsis>);
@@ -89,7 +92,7 @@ const PessoaTable = ({
             {loading && (
               <tr>
                 <td colSpan="4" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
-                  <span>Carregando...</span>
+                  <span>⏳ Carregando...</span>
                 </td>
               </tr>
             )}
@@ -136,6 +139,7 @@ const PessoaTable = ({
         </S.Table>
       </S.TableScroll>
 
+      {/* PAGINAÇÃO - Mostra apenas se tiver mais de 1 página */}
       {totalPages > 1 && (
         <S.Pagination>
           <S.PaginationButton
@@ -158,6 +162,7 @@ const PessoaTable = ({
         </S.Pagination>
       )}
 
+      {/* INFO DE REGISTROS */}
       {total > 0 && (
         <S.ResultInfo>
           Página {currentPage} de {totalPages} — {total} registro{total !== 1 ? 's' : ''}
