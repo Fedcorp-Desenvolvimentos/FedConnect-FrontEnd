@@ -602,6 +602,17 @@ export const Button = styled.button`
     }
   }
 
+  &.success {
+    background: ${tokens.positive};
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #17663f;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(31, 157, 85, 0.25);
+    }
+  }
+
   &.block {
     width: 100%;
   }
@@ -904,7 +915,7 @@ export const DocTable = styled.div`
 
 export const DocTableHead = styled.div`
   display: grid;
-  grid-template-columns: 2.4fr 1.1fr 1fr 1fr;
+  grid-template-columns: 2fr 1.2fr 1.4fr 0.9fr 0.9fr;
   gap: 8px;
   padding: 9px 14px;
   background: ${tokens.canvas};
@@ -921,7 +932,7 @@ export const DocTableHead = styled.div`
 
 export const DocTableRow = styled.div`
   display: grid;
-  grid-template-columns: 2.4fr 1.1fr 1fr 1fr;
+  grid-template-columns: 2fr 1.2fr 1.4fr 0.9fr 0.9fr;
   gap: 8px;
   padding: 11px 14px;
   border-top: 1px solid ${tokens.line};

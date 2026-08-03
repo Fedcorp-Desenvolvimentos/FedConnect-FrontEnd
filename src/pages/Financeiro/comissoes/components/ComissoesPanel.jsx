@@ -131,6 +131,8 @@ export const ComissoesPanel = ({
               const fatura = comissao.FATURA || comissao.fatura || comissao.DOCUMENTO || '-';
               const produto = comissao.PRODUTO || comissao.produto || '-';
               const tipo = comissao.TIPO || comissao.tipo || '-';
+              const administradora = comissao.ADMINISTRADORA || comissao.administradora || comissao.CEDENTE_NOME || comissao.cedente_nome || '';
+              const competencia = comissao.DT_INI_VIG || comissao.dt_ini_vig || '';
 
               return (
                 <ComissaoItem
@@ -154,9 +156,21 @@ export const ComissoesPanel = ({
                       Vencimento: {formatDate(comissao.VENCIMENTO || comissao.vencimento)}
                       {comissao.VOUCHER ? ` | Voucher: ${comissao.VOUCHER}` : ' | Sem voucher'}
                     </span>
-                    <span style={{ fontSize: 12, color: '#a0aec0' }}>
-                      {produto}
-                    </span>
+                    {administradora && (
+                      <span style={{ fontSize: 12, color: '#718096' }}>
+                        Admin: {administradora}
+                      </span>
+                    )}
+                    {competencia && (
+                      <span style={{ fontSize: 12, color: '#718096' }}>
+                        Competência: {formatDate(competencia)}
+                      </span>
+                    )}
+                    {produto && produto !== '-' && (
+                      <span style={{ fontSize: 12, color: '#2d3748', fontWeight: 500 }}>
+                        Produto: {produto}
+                      </span>
+                    )}
                   </div>
 
                   <span className="value">{formatMoney(valorComissao)}</span>
