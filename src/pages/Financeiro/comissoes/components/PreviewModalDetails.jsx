@@ -75,10 +75,10 @@ export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) 
               <span>Tipo de documento</span>
               <strong>{tituloDocumento}</strong>
             </div>
-            {data.comissoes.length > 0 && data.comissoes[0].co_estipulante && (
+            {data.comissoes.length > 0 && (data.comissoes[0].administradora || data.comissoes[0].cedente_nome) && (
               <div>
-                <span>Condomínio</span>
-                <strong>{data.comissoes[0].co_estipulante}</strong>
+                <span>Administradora</span>
+                <strong>{data.comissoes[0].administradora || data.comissoes[0].cedente_nome}</strong>
               </div>
             )}
           </DocMetaGrid>
@@ -87,6 +87,7 @@ export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) 
             <DocTableHead>
               <span>Favorecido / Fatura</span>
               <span>Produto</span>
+              <span>Condomínio</span>
               <span>Vencimento</span>
               <span style={{ textAlign: 'right' }}>Valor</span>
             </DocTableHead>
@@ -94,15 +95,23 @@ export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) 
             {data.comissoes.map((c, index) => (
               <DocTableRow key={`${c.documento}-${c.favorecido}-${index}`}>
                 <div className="primary-cell">
-                  <strong>{c.favorecidoNome || c.favorecido || 'Favorecido'}</strong>
+                  <strong>{c.favorecido_nome || c.favorecidoNome || c.favorecido || 'Favorecido'}</strong>
                   <span>
                     Fatura {c.fatura || '-'} · Parcela {c.parcela || '1'}
                   </span>
+                  {c.administradora && (
+                    <span>Admin: {c.administradora}</span>
+                  )}
                 </div>
 
                 <div className="value-cell">
                   <span className="cell-label">Produto&nbsp;</span>
                   {c.produto || '-'}
+                </div>
+
+                <div className="value-cell">
+                  <span className="cell-label">Condomínio&nbsp;</span>
+                  {c.co_estipulante || '-'}
                 </div>
 
                 <div className="value-cell">

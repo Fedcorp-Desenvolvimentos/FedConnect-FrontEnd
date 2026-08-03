@@ -1,6 +1,6 @@
 // components/EmissaoPanel.jsx
 import React from 'react';
-import { FaEye } from 'react-icons/fa';
+import { FaEye, FaPrint } from 'react-icons/fa';
 import {
   Card,
   CardHeader,
@@ -20,6 +20,7 @@ export const EmissaoPanel = ({
   totals,
   onDocumentTypeChange,
   onPreview,
+  onEmitir,
   onSair,
 }) => {
   return (
@@ -65,6 +66,15 @@ export const EmissaoPanel = ({
         >
           <FaEye />
           Pré-visualizar
+        </Button>
+
+        <Button
+          className="success block"
+          disabled={!canIssue}
+          onClick={onEmitir}
+        >
+          <FaPrint />
+          Emitir {documentType === 'voucher' ? 'Voucher' : 'Recibo'}
         </Button>
 
         <Button className="ghost block" onClick={onSair}>
