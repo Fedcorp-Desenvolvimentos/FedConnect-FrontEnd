@@ -261,3 +261,77 @@ export const verificarRetencoes = async (payload) => {
     throw error;
   }
 };
+
+/**
+ * Busca fatura por número para obter dados da administradora
+ * ROTAS: /consultas/faturas/{numero_fatura}/
+ */
+export const buscarFaturaPorNumero = async (numeroFatura) => {
+  try {
+    const response = await api.get(`/consultas/faturas/${numeroFatura}/`);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao buscar fatura:', error);
+    throw error;
+  }
+};
+
+/**
+ * Exporta comissões para Excel com dados do voucher/recibo
+ */
+export const exportarComissoesParaExcel = async (comissoes, totals, tipoDocumento = 'voucher') => {
+  const XLSX = await import('xlsx');
+
+  const formatMoney = (value) => {
+    if (value === null || value === undefined) return 0;
+    return Number(value);
+  };
+
+  const formatDate = (date) => {
+    if (!date) return '';
+    try {
+      return new Date(date).toLocaleDateString('pt-BR');
+    } catch {
+      return '';
+    }
+  };
+
+  const data = comissoes.map((c, index) => ({
+    'Nº': index + 1,
+    'Fatura': c.fatura || c.FATURA || '',
+    'Parcela': c.parcela || c.PARCELA || '1',
+    'Vencimento': formatDate(c.vencimento || c.VENCIMENTO),
+    'Segurado': c.nome_segurado || c.NOME_SEGURADO || 'NÃO INFORMADO',
+    'Administradora': c.cedente_nome || c.administradora || c.CEDENTE_NOME || c.cedente || '',
+    'CNPJ Administradora': c.cedente_cnpj || c.CEDENTE_CNPJ || '',
+    'Produto': c.produto || c.PRODUTO || '',
+    'Apólice': c.apolice || c.APOLICE || '',
+    '% Comissão': c.percentual || c.COMISSAO || 0,
+    'Valor Bruto': formatMoney(c.valor_comissao || c.VALOR || c.VALOR_COMISSAO),
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(data);
+
+  ws['!cols'] = [
+    { wch: 5 },
+    { wch: 12 },
+    { wch: 8 },
+    { wch: 12 },
+    { wch: 30 },
+    { wch: 35 },
+    { wch: 20 },
+    { wch: 25 },
+    { wch: 15 },
+    { wch: 10 },
+    { wch: 12 },
+    { wch: 15 },
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Comissões');
+
+  const fileName = `comissoes_${tipoDocumento}_${new Date().toISOString().split('T')[0]}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+
+  return fileName;
+};

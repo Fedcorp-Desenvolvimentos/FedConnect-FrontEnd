@@ -1,7 +1,7 @@
 // src/pages/Financeiro/comissoes/Comissoes.jsx
 
 import React from 'react';
-import { FaArrowLeft, FaSearch } from 'react-icons/fa';
+import { FaArrowLeft, FaSearch, FaFileExcel } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useEmissaoRecibos } from './hooks/useComissoes';
 import { FilterForm } from './components/FilterForm';
@@ -57,6 +57,7 @@ export default function Comissoes() {
     emitirDocumento,
     previewDocument,
     closePreview,
+    handleExportExcel,
     isUsingFilteredData,
     hasActiveFilters,
     retencoesVerificadas,
@@ -168,6 +169,30 @@ export default function Comissoes() {
             selectedComissoes={selectedComissoes}
             comissoes={comissoes}
           />
+
+          {hasResults && (
+            <button
+              onClick={handleExportExcel}
+              style={{
+                marginTop: '8px',
+                padding: '10px 16px',
+                backgroundColor: '#217A4B',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                fontSize: '14px',
+                fontWeight: 500,
+              }}
+            >
+              <FaFileExcel />
+              Exportar para Excel
+            </button>
+          )}
         </Sidebar>
       </PageLayout>
 
