@@ -12,6 +12,7 @@ import {
   emitirVoucher,
   emitirRecibo
 } from '../../../../services/comissoesService';
+import { getFaturaPorNumero } from '../../../../services/consultaFatura';
 import { useAuth } from '../../../../context/AuthContext';
 
 // ⭐ IMPORTA AS FUNÇÕES DO ARQUIVO DE REGRAS
@@ -188,6 +189,41 @@ export const useEmissaoRecibos = () => {
     }
   }, [documentType]);
 
+  const enrichComissoesWithAdministradora = async (comissoes) => {
+    if (!comissoes || comissoes.length === 0) return [];
+
+    const faturasUnicas = [...new Set(comissoes.map(c => c.FATURA || c.fatura).filter(Boolean))];
+    const cacheFaturas = {};
+
+    for (const fatura of faturasUnicas) {
+      try {
+        const result = await getFaturaPorNumero(fatura);
+        if (result?.data && result.data.length > 0) {
+          const faturaData = result.data[0];
+          cacheFaturas[fatura] = {
+            cedente_nome: faturaData.pes_nome || faturaData.NOME_ADMINISTRADORA || '',
+            cedente_cnpj: faturaData.pes_cpf_cnpj || faturaData.CNPJ_ADMINISTRADORA || '',
+          };
+        } else {
+          cacheFaturas[fatura] = { cedente_nome: '', cedente_cnpj: '' };
+        }
+      } catch (error) {
+        console.error(`Erro ao buscar fatura ${fatura}:`, error);
+        cacheFaturas[fatura] = { cedente_nome: '', cedente_cnpj: '' };
+      }
+    }
+
+    return comissoes.map(c => {
+      const fatura = c.FATURA || c.fatura;
+      const adminData = cacheFaturas[fatura] || { cedente_nome: '', cedente_cnpj: '' };
+      return {
+        ...c,
+        CEDENTE_NOME: adminData.cedente_nome || c.CEDENTE_NOME || c.cedente_nome || '',
+        CEDENTE_CNPJ: adminData.cedente_cnpj || c.CEDENTE_CNPJ || c.cedente_cnpj || '',
+      };
+    });
+  };
+
   const buscarComissoes = useCallback(
     async (novosFiltros = {}) => {
       const filtrosAtualizados = { ...filters, ...novosFiltros };
@@ -213,7 +249,9 @@ export const useEmissaoRecibos = () => {
         const lista = dados.data || [];
         const total = dados.total_registros || lista.length;
 
-        setComissoes(lista);
+        const listaEnriquecida = await enrichComissoesWithAdministradora(lista);
+
+        setComissoes(listaEnriquecida);
         setTotalRegistros(total);
         setIsUsingFilteredData(usingFilteredMode);
         setHasSearched(true);
