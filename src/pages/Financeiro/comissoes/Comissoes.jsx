@@ -61,6 +61,7 @@ export default function Comissoes() {
     isUsingFilteredData,
     hasActiveFilters,
     retencoesVerificadas,
+    loadingPreview,
   } = useEmissaoRecibos();
 
   const canIssue = selectedComissoes?.size > 0;
@@ -160,6 +161,7 @@ export default function Comissoes() {
             canIssue={canIssue && hasResults}
             documentType={documentType}
             loading={loading}
+            loadingPreview={loadingPreview}
             lastEmission={lastEmission}
             totals={retentionSummary}
             onDocumentTypeChange={setDocumentType}

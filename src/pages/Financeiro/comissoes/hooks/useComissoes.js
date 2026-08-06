@@ -1,6 +1,6 @@
 // src/pages/Financeiro/comissoes/hooks/useComissoes.js
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSnackbar } from 'notistack';
 import { useLoading } from '../../../../hooks/useLoading';
 import {
@@ -12,7 +12,7 @@ import {
   emitirVoucher,
   emitirRecibo
 } from '../../../../services/comissoesService';
-import { getFaturaPorNumero } from '../../../../services/consultaFatura';
+import { getFaturaPorNumeroViaFaturamento } from '../../../../services/consultaFatura';
 import { useAuth } from '../../../../context/AuthContext';
 
 // ⭐ IMPORTA AS FUNÇÕES DO ARQUIVO DE REGRAS
@@ -110,6 +110,7 @@ export const useEmissaoRecibos = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewData, setPreviewData] = useState(null);
   const [retencoesVerificadas, setRetencoesVerificadas] = useState(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
 
   const { user } = useAuth();
 
@@ -189,35 +190,38 @@ export const useEmissaoRecibos = () => {
     }
   }, [documentType]);
 
-  const cacheFaturasAdministradora = useMemo(() => ({}), []);
+  const cacheFaturasAdministradora = useRef({});
 
   const enrichComissoesWithAdministradora = async (comissoes) => {
     if (!comissoes || comissoes.length === 0) return [];
 
     const faturasUnicas = [...new Set(comissoes.map(c => c.FATURA || c.fatura).filter(Boolean))];
-    const faturasParaBuscar = faturasUnicas.filter(f => !cacheFaturasAdministradora[f]);
+    const faturasParaBuscar = faturasUnicas.filter(f => !cacheFaturasAdministradora.current[f]);
 
     for (const fatura of faturasParaBuscar) {
       try {
-        const result = await getFaturaPorNumero(fatura);
-        if (result?.data && result.data.length > 0) {
-          const faturaData = result.data[0];
-          cacheFaturasAdministradora[fatura] = {
-            cedente_nome: faturaData.pes_nome || faturaData.NOME_ADMINISTRADORA || '',
-            cedente_cnpj: faturaData.pes_cpf_cnpj || faturaData.CNPJ_ADMINISTRADORA || '',
+        const result = await getFaturaPorNumeroViaFaturamento(fatura);
+        console.log(`[DEBUG] Resposta para fatura ${fatura}:`, JSON.stringify(result, null, 2));
+        if (result?.resultado?.data && result.resultado.data.length > 0) {
+          const faturaData = result.resultado.data[0];
+          console.log(`[DEBUG] Dados fatura ${fatura}:`, faturaData);
+          cacheFaturasAdministradora.current[fatura] = {
+            cedente_nome: faturaData.NOME_ADMINISTRADORA || faturaData.ADMINISTRADORA || '',
+            cedente_cnpj: faturaData.CNPJ_ADMINISTRADORA || '',
           };
         } else {
-          cacheFaturasAdministradora[fatura] = { cedente_nome: '', cedente_cnpj: '' };
+          console.log(`[DEBUG] Nenhum dado encontrado para fatura ${fatura}`);
+          cacheFaturasAdministradora.current[fatura] = { cedente_nome: '', cedente_cnpj: '' };
         }
       } catch (error) {
         console.error(`Erro ao buscar fatura ${fatura}:`, error);
-        cacheFaturasAdministradora[fatura] = { cedente_nome: '', cedente_cnpj: '' };
+        cacheFaturasAdministradora.current[fatura] = { cedente_nome: '', cedente_cnpj: '' };
       }
     }
 
     return comissoes.map(c => {
       const fatura = c.FATURA || c.fatura;
-      const adminData = cacheFaturasAdministradora[fatura] || { cedente_nome: '', cedente_cnpj: '' };
+      const adminData = cacheFaturasAdministradora.current[fatura] || { cedente_nome: '', cedente_cnpj: '' };
       return {
         ...c,
         CEDENTE_NOME: adminData.cedente_nome || c.CEDENTE_NOME || c.cedente_nome || '',
@@ -617,12 +621,27 @@ export const useEmissaoRecibos = () => {
       return;
     }
 
+    if (loadingPreview) {
+      enqueueSnackbar('Aguarde o carregamento do preview', { variant: 'warning' });
+      return;
+    }
+
     startLoading('Preparando dados para emissão...');
 
     try {
       const comissoesSelecionadas = comissoes.filter((c) =>
         selectedComissoes.has(getComissaoKey(c))
       );
+
+      const comissoesEnriquecidas = await enrichComissoesWithAdministradora(comissoesSelecionadas);
+
+      console.log('[DEBUG] Dados enriquecidos:', JSON.stringify(comissoesEnriquecidas.map(c => ({
+        FATURA: c.FATURA,
+        CEDENTE_NOME: c.CEDENTE_NOME,
+        cedente_nome: c.cedente_nome,
+        administradora: c.administradora,
+        ADMINISTRADORA: c.ADMINISTRADORA
+      })), null, 2));
 
       // USA OS DADOS VERIFICADOS OU CALCULA
       let resultado;
@@ -784,6 +803,7 @@ comissoes: comissoesEnriquecidas.map((c) => ({
     retencoesVerificadas,
     user,
     totalBrutoSelecionado,
+    loadingPreview,
   ]);
 
   const previewDocument = useCallback(async () => {
@@ -792,13 +812,19 @@ comissoes: comissoesEnriquecidas.map((c) => ({
       return;
     }
 
-    const comissoesSelecionadas = comissoes.filter((c) =>
-      selectedComissoes.has(getComissaoKey(c))
-    );
+    setLoadingPreview(true);
 
-    const comissoesEnriquecidas = await enrichComissoesWithAdministradora(comissoesSelecionadas);
-    setPreviewData(buildDocumentPayload(comissoesEnriquecidas));
-    setPreviewOpen(true);
+    try {
+      const comissoesSelecionadas = comissoes.filter((c) =>
+        selectedComissoes.has(getComissaoKey(c))
+      );
+
+      const comissoesEnriquecidas = await enrichComissoesWithAdministradora(comissoesSelecionadas);
+      setPreviewData(buildDocumentPayload(comissoesEnriquecidas));
+      setPreviewOpen(true);
+    } finally {
+      setLoadingPreview(false);
+    }
   }, [selectedComissoes, comissoes, enqueueSnackbar, buildDocumentPayload]);
 
   const closePreview = useCallback(() => {
@@ -806,19 +832,28 @@ comissoes: comissoesEnriquecidas.map((c) => ({
   }, []);
 
   const handleExportExcel = useCallback(async () => {
-    if (comissoes.length === 0) {
-      enqueueSnackbar('Não há comissões para exportar', { variant: 'warning' });
+    if (selectedComissoes.size === 0) {
+      enqueueSnackbar('Selecione pelo menos uma comissão para exportar', { variant: 'warning' });
+      return;
+    }
+
+    const comissoesSelecionadas = comissoes.filter((c) =>
+      selectedComissoes.has(getComissaoKey(c))
+    );
+
+    if (comissoesSelecionadas.length === 0) {
+      enqueueSnackbar('Nenhuma comissão selecionada para exportar', { variant: 'warning' });
       return;
     }
 
     try {
-      const fileName = await exportarComissoesParaExcel(comissoes, totals, documentType);
+      const fileName = await exportarComissoesParaExcel(comissoesSelecionadas, totals, documentType);
       enqueueSnackbar(`Arquivo ${fileName} baixado com sucesso!`, { variant: 'success' });
     } catch (error) {
       console.error('Erro ao exportar para Excel:', error);
       enqueueSnackbar('Erro ao exportar para Excel', { variant: 'error' });
     }
-  }, [comissoes, totals, documentType, enqueueSnackbar]);
+  }, [comissoes, selectedComissoes, totals, documentType, enqueueSnackbar]);
 
   return {
     loading,
@@ -841,6 +876,7 @@ comissoes: comissoesEnriquecidas.map((c) => ({
     previewOpen,
     previewData,
     retencoesVerificadas,
+    loadingPreview,
 
     buscarTudo,
     updateFilter,

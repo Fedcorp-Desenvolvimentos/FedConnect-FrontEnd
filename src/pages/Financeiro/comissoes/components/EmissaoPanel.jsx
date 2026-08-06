@@ -22,6 +22,7 @@ export const EmissaoPanel = ({
   onPreview,
   onEmitir,
   onSair,
+  loadingPreview = false,
 }) => {
   return (
     <Card>
@@ -61,11 +62,11 @@ export const EmissaoPanel = ({
       <Actions style={{ flexDirection: 'column' }}>
         <Button
           className="primary block"
-          disabled={!canIssue}
+          disabled={!canIssue || loadingPreview}
           onClick={onPreview}
         >
           <FaEye />
-          Pré-visualizar
+          {loadingPreview ? 'Carregando...' : 'Pré-visualizar'}
         </Button>
 
         <Button
