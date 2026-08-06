@@ -7,6 +7,8 @@ import {
   buscarComissoesPorDataCorte,
   buscarPessoas,
   buscarProdutosPorFavorecido,
+  buscarFaturaPorNumero,
+  exportarComissoesParaExcel,
   emitirVoucher,
   emitirRecibo
 } from '../../../../services/comissoesService';
@@ -760,6 +762,21 @@ export const useEmissaoRecibos = () => {
     setPreviewOpen(false);
   }, []);
 
+  const handleExportExcel = useCallback(async () => {
+    if (comissoes.length === 0) {
+      enqueueSnackbar('Não há comissões para exportar', { variant: 'warning' });
+      return;
+    }
+
+    try {
+      const fileName = await exportarComissoesParaExcel(comissoes, totals, documentType);
+      enqueueSnackbar(`Arquivo ${fileName} baixado com sucesso!`, { variant: 'success' });
+    } catch (error) {
+      console.error('Erro ao exportar para Excel:', error);
+      enqueueSnackbar('Erro ao exportar para Excel', { variant: 'error' });
+    }
+  }, [comissoes, totals, documentType, enqueueSnackbar]);
+
   return {
     loading,
     loadingInitial,
@@ -793,5 +810,6 @@ export const useEmissaoRecibos = () => {
     emitirDocumento,
     previewDocument,
     closePreview,
+    handleExportExcel,
   };
 };
