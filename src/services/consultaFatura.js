@@ -14,6 +14,18 @@ export const getFaturaPorNumero = async (numero_fatura) => {
   }
 };
 
+export const getFaturaPorNumeroViaFaturamento = async (numero_fatura) => {
+  try {
+    const response = await api.get(`/consultas/faturamento/`, {
+      params: { fatura: numero_fatura, page_size: 1 }
+    });
+    return response.data
+  } catch(error){
+    console.error(`Erro ao consultar fatura via faturamento >>> ${error}`)
+    throw error;
+  }
+};
+
 export const getFaturamento = async (filtros = {}) => {
   try {
     const token = localStorage.getItem("accessToken", "");

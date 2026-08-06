@@ -12,7 +12,7 @@ import {
   emitirVoucher,
   emitirRecibo
 } from '../../../../services/comissoesService';
-import { getFaturaPorNumero } from '../../../../services/consultaFatura';
+import { getFaturaPorNumeroViaFaturamento } from '../../../../services/consultaFatura';
 import { useAuth } from '../../../../context/AuthContext';
 
 // ⭐ IMPORTA AS FUNÇÕES DO ARQUIVO DE REGRAS
@@ -110,6 +110,7 @@ export const useEmissaoRecibos = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewData, setPreviewData] = useState(null);
   const [retencoesVerificadas, setRetencoesVerificadas] = useState(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
 
   const { user } = useAuth();
 
@@ -199,14 +200,17 @@ export const useEmissaoRecibos = () => {
 
     for (const fatura of faturasParaBuscar) {
       try {
-        const result = await getFaturaPorNumero(fatura);
-        if (result?.data && result.data.length > 0) {
-          const faturaData = result.data[0];
+        const result = await getFaturaPorNumeroViaFaturamento(fatura);
+        console.log(`[DEBUG] Resposta para fatura ${fatura}:`, JSON.stringify(result, null, 2));
+        if (result?.resultado?.data && result.resultado.data.length > 0) {
+          const faturaData = result.resultado.data[0];
+          console.log(`[DEBUG] Dados fatura ${fatura}:`, faturaData);
           cacheFaturasAdministradora[fatura] = {
-            cedente_nome: faturaData.pes_nome || faturaData.NOME_ADMINISTRADORA || '',
-            cedente_cnpj: faturaData.pes_cpf_cnpj || faturaData.CNPJ_ADMINISTRADORA || '',
+            cedente_nome: faturaData.cedente || faturaData.NOME_ADMINISTRADORA || faturaData.administradora || '',
+            cedente_cnpj: faturaData.CNPJ_ADMINISTRADORA || '',
           };
         } else {
+          console.log(`[DEBUG] Nenhum dado encontrado para fatura ${fatura}`);
           cacheFaturasAdministradora[fatura] = { cedente_nome: '', cedente_cnpj: '' };
         }
       } catch (error) {
@@ -617,12 +621,19 @@ export const useEmissaoRecibos = () => {
       return;
     }
 
+    if (loadingPreview) {
+      enqueueSnackbar('Aguarde o carregamento do preview', { variant: 'warning' });
+      return;
+    }
+
     startLoading('Preparando dados para emissão...');
 
     try {
       const comissoesSelecionadas = comissoes.filter((c) =>
         selectedComissoes.has(getComissaoKey(c))
       );
+
+      const comissoesEnriquecidas = await enrichComissoesWithAdministradora(comissoesSelecionadas);
 
       // USA OS DADOS VERIFICADOS OU CALCULA
       let resultado;
@@ -784,6 +795,7 @@ comissoes: comissoesEnriquecidas.map((c) => ({
     retencoesVerificadas,
     user,
     totalBrutoSelecionado,
+    loadingPreview,
   ]);
 
   const previewDocument = useCallback(async () => {
@@ -792,13 +804,19 @@ comissoes: comissoesEnriquecidas.map((c) => ({
       return;
     }
 
-    const comissoesSelecionadas = comissoes.filter((c) =>
-      selectedComissoes.has(getComissaoKey(c))
-    );
+    setLoadingPreview(true);
 
-    const comissoesEnriquecidas = await enrichComissoesWithAdministradora(comissoesSelecionadas);
-    setPreviewData(buildDocumentPayload(comissoesEnriquecidas));
-    setPreviewOpen(true);
+    try {
+      const comissoesSelecionadas = comissoes.filter((c) =>
+        selectedComissoes.has(getComissaoKey(c))
+      );
+
+      const comissoesEnriquecidas = await enrichComissoesWithAdministradora(comissoesSelecionadas);
+      setPreviewData(buildDocumentPayload(comissoesEnriquecidas));
+      setPreviewOpen(true);
+    } finally {
+      setLoadingPreview(false);
+    }
   }, [selectedComissoes, comissoes, enqueueSnackbar, buildDocumentPayload]);
 
   const closePreview = useCallback(() => {
@@ -841,6 +859,7 @@ comissoes: comissoesEnriquecidas.map((c) => ({
     previewOpen,
     previewData,
     retencoesVerificadas,
+    loadingPreview,
 
     buscarTudo,
     updateFilter,
