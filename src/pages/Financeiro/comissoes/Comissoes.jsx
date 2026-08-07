@@ -140,6 +140,8 @@ export default function Comissoes() {
               totalRegistros={totalRegistros}
               isUsingFilteredData={isUsingFilteredData}
               hasSearched={hasSearched}
+              onExportExcel={handleExportExcel}
+              hasResults={hasResults}
             />
           )}
         </MainColumn>
@@ -171,30 +173,6 @@ export default function Comissoes() {
             selectedComissoes={selectedComissoes}
             comissoes={comissoes}
           />
-
-          {hasResults && (
-            <button
-              onClick={handleExportExcel}
-              style={{
-                marginTop: '8px',
-                padding: '10px 16px',
-                backgroundColor: '#217A4B',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                fontSize: '14px',
-                fontWeight: 500,
-              }}
-            >
-              <FaFileExcel />
-              Exportar para Excel
-            </button>
-          )}
         </Sidebar>
       </PageLayout>
 
