@@ -1,7 +1,7 @@
 // components/ComissoesPanel.jsx
 
 import React from 'react';
-import { FaReceipt, FaSpinner } from 'react-icons/fa';
+import { FaReceipt, FaSpinner, FaFileExcel } from 'react-icons/fa';
 import {
   Card,
   CardHeader,
@@ -49,6 +49,8 @@ export const ComissoesPanel = ({
   totalRegistros = 0,
   isUsingFilteredData,
   hasSearched,
+  onExportExcel,
+  hasResults,
 }) => {
   const allSelected =
     comissoes.length > 0 &&
@@ -99,9 +101,22 @@ export const ComissoesPanel = ({
         </div>
 
         {comissoes.length > 0 && (
-          <button type="button" className="link-button" onClick={onToggleAllComissoes}>
-            {allSelected ? 'Desmarcar todas' : 'Selecionar todas'}
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button type="button" className="link-button" onClick={onToggleAllComissoes}>
+              {allSelected ? 'Desmarcar todas' : 'Selecionar todas'}
+            </button>
+            {hasResults && selectedComissoes.size > 0 && (
+              <button
+                type="button"
+                className="link-button"
+                onClick={onExportExcel}
+                style={{ color: '#217A4B' }}
+              >
+                <FaFileExcel style={{ marginRight: 4 }} />
+                Exportar Excel
+              </button>
+            )}
+          </div>
         )}
       </CardHeader>
 
