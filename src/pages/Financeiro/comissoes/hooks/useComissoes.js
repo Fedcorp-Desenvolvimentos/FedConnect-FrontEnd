@@ -1,15 +1,18 @@
 // src/pages/Financeiro/comissoes/hooks/useComissoes.js
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSnackbar } from 'notistack';
 import { useLoading } from '../../../../hooks/useLoading';
 import {
   buscarComissoesPorDataCorte,
   buscarPessoas,
   buscarProdutosPorFavorecido,
+  buscarFaturaPorNumero,
+  exportarComissoesParaExcel,
   emitirVoucher,
   emitirRecibo
 } from '../../../../services/comissoesService';
+import { getFaturaPorNumeroViaFaturamento } from '../../../../services/consultaFatura';
 import { useAuth } from '../../../../context/AuthContext';
 
 // ⭐ IMPORTA AS FUNÇÕES DO ARQUIVO DE REGRAS
@@ -107,6 +110,7 @@ export const useEmissaoRecibos = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewData, setPreviewData] = useState(null);
   const [retencoesVerificadas, setRetencoesVerificadas] = useState(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
 
   const { user } = useAuth();
 
@@ -185,6 +189,46 @@ export const useEmissaoRecibos = () => {
       }
     }
   }, [documentType]);
+
+  const cacheFaturasAdministradora = useRef({});
+
+  const enrichComissoesWithAdministradora = async (comissoes) => {
+    if (!comissoes || comissoes.length === 0) return [];
+
+    const faturasUnicas = [...new Set(comissoes.map(c => c.FATURA || c.fatura).filter(Boolean))];
+    const faturasParaBuscar = faturasUnicas.filter(f => !cacheFaturasAdministradora.current[f]);
+
+    for (const fatura of faturasParaBuscar) {
+      try {
+        const result = await getFaturaPorNumeroViaFaturamento(fatura);
+        console.log(`[DEBUG] Resposta para fatura ${fatura}:`, JSON.stringify(result, null, 2));
+        if (result?.resultado?.data && result.resultado.data.length > 0) {
+          const faturaData = result.resultado.data[0];
+          console.log(`[DEBUG] Dados fatura ${fatura}:`, faturaData);
+          cacheFaturasAdministradora.current[fatura] = {
+            cedente_nome: faturaData.NOME_ADMINISTRADORA || faturaData.ADMINISTRADORA || '',
+            cedente_cnpj: faturaData.CNPJ_ADMINISTRADORA || '',
+          };
+        } else {
+          console.log(`[DEBUG] Nenhum dado encontrado para fatura ${fatura}`);
+          cacheFaturasAdministradora.current[fatura] = { cedente_nome: '', cedente_cnpj: '' };
+        }
+      } catch (error) {
+        console.error(`Erro ao buscar fatura ${fatura}:`, error);
+        cacheFaturasAdministradora.current[fatura] = { cedente_nome: '', cedente_cnpj: '' };
+      }
+    }
+
+    return comissoes.map(c => {
+      const fatura = c.FATURA || c.fatura;
+      const adminData = cacheFaturasAdministradora.current[fatura] || { cedente_nome: '', cedente_cnpj: '' };
+      return {
+        ...c,
+        CEDENTE_NOME: adminData.cedente_nome || c.CEDENTE_NOME || c.cedente_nome || '',
+        CEDENTE_CNPJ: adminData.cedente_cnpj || c.CEDENTE_CNPJ || c.cedente_cnpj || '',
+      };
+    });
+  };
 
   const buscarComissoes = useCallback(
     async (novosFiltros = {}) => {
@@ -430,8 +474,8 @@ export const useEmissaoRecibos = () => {
     };
   }, [retentionSummary]);
 
-  const buildDocumentPayload = useCallback(() => {
-    const comissoesSelecionadas = comissoes.filter((c) => 
+  const buildDocumentPayload = useCallback((comissoesEnriquecidas = null) => {
+    const comissoesSelecionadas = comissoesEnriquecidas || comissoes.filter((c) =>
       selectedComissoes.has(getComissaoKey(c))
     );
 
@@ -510,6 +554,9 @@ export const useEmissaoRecibos = () => {
         produto: c.PRODUTO || c.produto || '',
         produto_original: c.PRODUTO_ORI || c.produto_ori || '',
         co_estipulante: c.CO_ESTIP || c.co_estip || '',
+        administradora: c.ADMINISTRADORA || c.administradora || c.CEDENTE_NOME || c.cedente_nome || '',
+        cedente_cnpj: c.CEDENTE_CNPJ || c.cedente_cnpj || '',
+        dt_ini_vig: c.DT_INI_VIG || c.dt_ini_vig || '',
         voucher: c.VOUCHER || c.voucher || null,
         data_repasse: c.DT_REPASSE || c.dt_repasse || null,
         status: c.STATUS || c.status || '',
@@ -574,12 +621,27 @@ export const useEmissaoRecibos = () => {
       return;
     }
 
+    if (loadingPreview) {
+      enqueueSnackbar('Aguarde o carregamento do preview', { variant: 'warning' });
+      return;
+    }
+
     startLoading('Preparando dados para emissão...');
 
     try {
-      const comissoesSelecionadas = comissoes.filter((c) => 
+      const comissoesSelecionadas = comissoes.filter((c) =>
         selectedComissoes.has(getComissaoKey(c))
       );
+
+      const comissoesEnriquecidas = await enrichComissoesWithAdministradora(comissoesSelecionadas);
+
+      console.log('[DEBUG] Dados enriquecidos:', JSON.stringify(comissoesEnriquecidas.map(c => ({
+        FATURA: c.FATURA,
+        CEDENTE_NOME: c.CEDENTE_NOME,
+        cedente_nome: c.cedente_nome,
+        administradora: c.administradora,
+        ADMINISTRADORA: c.ADMINISTRADORA
+      })), null, 2));
 
       // USA OS DADOS VERIFICADOS OU CALCULA
       let resultado;
@@ -627,7 +689,7 @@ export const useEmissaoRecibos = () => {
         tipo_documento: documentType,
         data_emissao: new Date().toISOString().split('T')[0],
         usuario: user?.nome_completo || user?.email,
-        comissoes: comissoesSelecionadas.map((c) => ({
+comissoes: comissoesEnriquecidas.map((c) => ({
           fatura: String(c.FATURA || c.fatura || ''),
           parcela: String(c.PARCELA || c.parcela || '1'),
           tipo_fat: c.TIPO_FAT || c.tipo_fat || 'A',
@@ -650,6 +712,9 @@ export const useEmissaoRecibos = () => {
           produto: c.PRODUTO || c.produto || '',
           produto_original: c.PRODUTO_ORI || c.produto_ori || '',
           co_estipulante: c.CO_ESTIP || c.co_estip || '',
+          administradora: c.ADMINISTRADORA || c.administradora || c.CEDENTE_NOME || c.cedente_nome || '',
+          cedente_cnpj: c.CEDENTE_CNPJ || c.cedente_cnpj || '',
+          dt_ini_vig: c.DT_INI_VIG || c.dt_ini_vig || '',
           voucher: c.VOUCHER || c.voucher || null,
           data_repasse: c.DT_REPASSE || c.dt_repasse || null,
           status: c.STATUS || c.status || '',
@@ -680,7 +745,7 @@ export const useEmissaoRecibos = () => {
         })),
         retencoes: retencoesPayload,
         resumo: {
-          total_comissoes: comissoesSelecionadas.length,
+          total_comissoes: comissoesEnriquecidas.length,
           valor_total_bruto: resultado.totalBruto,
           total_retencoes: documentType === 'recibo' ? 0 : totalRetencoesCalculado,
           valor_liquido_final: documentType === 'recibo' ? resultado.totalBruto : resultado.totalBruto - totalRetencoesCalculado,
@@ -738,21 +803,57 @@ export const useEmissaoRecibos = () => {
     retencoesVerificadas,
     user,
     totalBrutoSelecionado,
+    loadingPreview,
   ]);
 
-  const previewDocument = useCallback(() => {
+  const previewDocument = useCallback(async () => {
     if (selectedComissoes.size === 0) {
       enqueueSnackbar('Selecione pelo menos uma comissão', { variant: 'warning' });
       return;
     }
 
-    setPreviewData(buildDocumentPayload());
-    setPreviewOpen(true);
-  }, [selectedComissoes, enqueueSnackbar, buildDocumentPayload]);
+    setLoadingPreview(true);
+
+    try {
+      const comissoesSelecionadas = comissoes.filter((c) =>
+        selectedComissoes.has(getComissaoKey(c))
+      );
+
+      const comissoesEnriquecidas = await enrichComissoesWithAdministradora(comissoesSelecionadas);
+      setPreviewData(buildDocumentPayload(comissoesEnriquecidas));
+      setPreviewOpen(true);
+    } finally {
+      setLoadingPreview(false);
+    }
+  }, [selectedComissoes, comissoes, enqueueSnackbar, buildDocumentPayload]);
 
   const closePreview = useCallback(() => {
     setPreviewOpen(false);
   }, []);
+
+  const handleExportExcel = useCallback(async () => {
+    if (selectedComissoes.size === 0) {
+      enqueueSnackbar('Selecione pelo menos uma comissão para exportar', { variant: 'warning' });
+      return;
+    }
+
+    const comissoesSelecionadas = comissoes.filter((c) =>
+      selectedComissoes.has(getComissaoKey(c))
+    );
+
+    if (comissoesSelecionadas.length === 0) {
+      enqueueSnackbar('Nenhuma comissão selecionada para exportar', { variant: 'warning' });
+      return;
+    }
+
+    try {
+      const fileName = await exportarComissoesParaExcel(comissoesSelecionadas, totals, documentType);
+      enqueueSnackbar(`Arquivo ${fileName} baixado com sucesso!`, { variant: 'success' });
+    } catch (error) {
+      console.error('Erro ao exportar para Excel:', error);
+      enqueueSnackbar('Erro ao exportar para Excel', { variant: 'error' });
+    }
+  }, [comissoes, selectedComissoes, totals, documentType, enqueueSnackbar]);
 
   return {
     loading,
@@ -775,6 +876,7 @@ export const useEmissaoRecibos = () => {
     previewOpen,
     previewData,
     retencoesVerificadas,
+    loadingPreview,
 
     buscarTudo,
     updateFilter,
@@ -787,5 +889,6 @@ export const useEmissaoRecibos = () => {
     emitirDocumento,
     previewDocument,
     closePreview,
+    handleExportExcel,
   };
 };

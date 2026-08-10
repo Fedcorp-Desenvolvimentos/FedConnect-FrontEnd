@@ -124,6 +124,7 @@ const ConsultaComissao = () => {
       'Favorecido': c.NOME || c.nome || '',
       'Documento': c.DOCUMENTO || c.doc_favorecido || '',
       'Produto': c.PRODUTO || c.produto || '',
+      'Administradora': c.ADMINISTRADORA || c.administradora || c.CEDENTE_NOME || c.cedente_nome || '',
       'Fatura': c.FATURA || c.fatura || '',
       'Parcela': c.PARCELA || c.parcela || '',
       'Valor': Number(c.VALOR || c.valor || 0),
@@ -135,7 +136,7 @@ const ConsultaComissao = () => {
 
     const ws = XLSX.utils.json_to_sheet(data);
     ws['!cols'] = [
-      { wch: 40 }, { wch: 18 }, { wch: 25 }, { wch: 12 },
+      { wch: 40 }, { wch: 18 }, { wch: 25 }, { wch: 30 }, { wch: 12 },
       { wch: 8 }, { wch: 14 }, { wch: 14 }, { wch: 14 },
       { wch: 12 }, { wch: 10 },
     ];
@@ -331,6 +332,7 @@ const ConsultaComissao = () => {
                   const status = c.STATUS || c.status || '';
                   const produto = c.PRODUTO || c.produto || '';
                   const dtIniVig = c.DT_INI_VIG || c.dt_ini_vig || '';
+                  const cedenteNome = c.ADMINISTRADORA || c.administradora || c.CEDENTE_NOME || c.cedente_nome || '';
 
                   return (
                     <S.TableRow
@@ -350,6 +352,9 @@ const ConsultaComissao = () => {
                       <S.FavorecidoCell>
                         <strong>{nome}</strong>
                         <span>{documento} · {produto}</span>
+                        {cedenteNome && (
+                          <span style={{ fontSize: 11, color: '#718096' }}>Admin: {cedenteNome}</span>
+                        )}
                       </S.FavorecidoCell>
 
                       <S.Cell>

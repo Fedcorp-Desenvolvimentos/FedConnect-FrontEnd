@@ -1,7 +1,7 @@
 // src/pages/Financeiro/comissoes/Comissoes.jsx
 
 import React from 'react';
-import { FaArrowLeft, FaSearch } from 'react-icons/fa';
+import { FaArrowLeft, FaSearch, FaFileExcel } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useEmissaoRecibos } from './hooks/useComissoes';
 import { FilterForm } from './components/FilterForm';
@@ -57,9 +57,11 @@ export default function Comissoes() {
     emitirDocumento,
     previewDocument,
     closePreview,
+    handleExportExcel,
     isUsingFilteredData,
     hasActiveFilters,
     retencoesVerificadas,
+    loadingPreview,
   } = useEmissaoRecibos();
 
   const canIssue = selectedComissoes?.size > 0;
@@ -138,6 +140,8 @@ export default function Comissoes() {
               totalRegistros={totalRegistros}
               isUsingFilteredData={isUsingFilteredData}
               hasSearched={hasSearched}
+              onExportExcel={handleExportExcel}
+              hasResults={hasResults}
             />
           )}
         </MainColumn>
@@ -159,6 +163,7 @@ export default function Comissoes() {
             canIssue={canIssue && hasResults}
             documentType={documentType}
             loading={loading}
+            loadingPreview={loadingPreview}
             lastEmission={lastEmission}
             totals={retentionSummary}
             onDocumentTypeChange={setDocumentType}

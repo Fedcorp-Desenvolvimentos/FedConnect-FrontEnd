@@ -53,9 +53,11 @@ export const AgendaHelp = () => {
         </h3>
         <ul style={{ margin: 0, paddingLeft: '1.5rem', color: '#475569' }}>
           <li>Horários disponíveis: <strong>09:00 às 18:00</strong> (em intervalos de 1 hora)</li>
-          <li>Reservas podem ter duração de <strong>15 a 240 minutos</strong></li>
+          <li>Reservas podem ter duração de <strong>1 a 4 horas</strong></li>
+          <li>A reserva <strong>ocupa todos os horários do período, inclusive o horário final</strong>. Ex: uma reunião das <strong>10:00 às 12:00</strong> marca 10:00, 11:00 e 12:00 como reservados, e o próximo horário livre é 13:00</li>
           <li>Slots em <strong>verde</strong> estão disponíveis para reserva</li>
-          <li>Slots em <strong>azul (Reservado)</strong> já possuem reunião agendada</li>
+          <li>Slots em <strong>azul (Reservado)</strong> estão ocupados e não aceitam nova reunião. Passe o mouse para ver o tema e o intervalo completo</li>
+          <li>A duração oferecida é limitada pelos horários livres seguintes e pelo fim do expediente (19:00)</li>
         </ul>
       </div>
 

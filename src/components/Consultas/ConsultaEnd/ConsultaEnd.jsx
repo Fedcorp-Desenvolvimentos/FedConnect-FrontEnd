@@ -43,6 +43,35 @@ const ConsultaEnd = () => {
     return cep.length === 8 && cep !== "00000000";
   };
 
+  /**
+   * Converte qualquer valor vindo da API em texto exibível.
+   * A BrasilAPI passou a devolver objetos em campos que antes eram string
+   * (ver `codigoIbge`), e renderizar objeto direto no JSX quebra a página.
+   */
+  const texto = (valor) => {
+    if (valor === null || valor === undefined || valor === "") return "N/A";
+    if (typeof valor === "object") {
+      const primitivos = Object.values(valor).filter(
+        (v) => v !== null && v !== undefined && typeof v !== "object"
+      );
+      return primitivos.length ? primitivos.map(String).join(" / ") : "N/A";
+    }
+    return String(valor);
+  };
+
+  /**
+   * Código IBGE do município.
+   * BrasilAPI: { city: "3304557", state: "33" } — city é o código do município.
+   * ViaCEP: "3304557" (string).
+   */
+  const codigoIbge = (ibge) => {
+    if (!ibge) return "N/A";
+    if (typeof ibge === "object") {
+      return texto(ibge.city ?? ibge.municipio ?? ibge.codigo_municipio ?? ibge);
+    }
+    return String(ibge);
+  };
+
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     let formattedValue = value;
@@ -68,13 +97,9 @@ const ConsultaEnd = () => {
   };
 
   const buildMapsUrl = ({ street, neighborhood, city, state, cep }) => {
-    const parts = [
-      street?.trim(),
-      neighborhood?.trim(),
-      city?.trim(),
-      state?.trim(),
-      cep?.trim(),
-    ].filter(Boolean);
+    const parts = [street, neighborhood, city, state, cep]
+      .map((p) => String(p ?? "").trim())
+      .filter((p) => p && p !== "N/A");
     const query = parts.join(", ");
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   };
@@ -204,11 +229,13 @@ const ConsultaEnd = () => {
 
             allResults.push({
               "CEP Original": batch[idx],
-              "Logradouro": data.street || data.logradouro || (erro ? `[ERRO] ${erro}` : "N/A"),
-              "Bairro": data.neighborhood || data.bairro || "N/A",
-              "Cidade": data.city || data.localidade || "N/A",
-              "UF": data.state || data.uf || "N/A",
-              "IBGE": data.ibge || "N/A",
+              "Logradouro": erro
+                ? `[ERRO] ${erro}`
+                : texto(data.street || data.logradouro),
+              "Bairro": texto(data.neighborhood || data.bairro),
+              "Cidade": texto(data.city || data.localidade),
+              "UF": texto(data.state || data.uf),
+              "IBGE": codigoIbge(data.ibge),
             });
           });
           
@@ -408,75 +435,50 @@ const ConsultaEnd = () => {
           <S.ResultCard ref={resultadoRef}>
             <S.ResultTitle>Resultado da Consulta</S.ResultTitle>
             
-            <S.ResultField>
-              <S.ResultLabel>CEP</S.ResultLabel>
-              <S.ResultValue>
-                <span>{cepData.cep}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cepData.cep, "cep")}>
-                  {copiado.cep ? <FiCheck /> : <FiCopy />}
-                </S.CopyButton>
-              </S.ResultValue>
-            </S.ResultField>
-
-            <S.ResultField>
-              <S.ResultLabel>Logradouro</S.ResultLabel>
-              <S.ResultValue>
-                <span>{cepData.street || cepData.logradouro || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cepData.street || cepData.logradouro || "N/A", "logradouro")}>
-                  {copiado.logradouro ? <FiCheck /> : <FiCopy />}
-                </S.CopyButton>
-              </S.ResultValue>
-            </S.ResultField>
-
-            <S.ResultField>
-              <S.ResultLabel>Bairro</S.ResultLabel>
-              <S.ResultValue>
-                <span>{cepData.neighborhood || cepData.bairro || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cepData.neighborhood || cepData.bairro || "N/A", "bairro")}>
-                  {copiado.bairro ? <FiCheck /> : <FiCopy />}
-                </S.CopyButton>
-              </S.ResultValue>
-            </S.ResultField>
-
-            <S.ResultField>
-              <S.ResultLabel>Cidade</S.ResultLabel>
-              <S.ResultValue>
-                <span>{cepData.city || cepData.localidade || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cepData.city || cepData.localidade || "N/A", "cidade")}>
-                  {copiado.cidade ? <FiCheck /> : <FiCopy />}
-                </S.CopyButton>
-              </S.ResultValue>
-            </S.ResultField>
-
-            <S.ResultField>
-              <S.ResultLabel>UF</S.ResultLabel>
-              <S.ResultValue>
-                <span>{cepData.state || cepData.uf || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cepData.state || cepData.uf || "N/A", "uf")}>
-                  {copiado.uf ? <FiCheck /> : <FiCopy />}
-                </S.CopyButton>
-              </S.ResultValue>
-            </S.ResultField>
-
-            <S.ResultField>
-              <S.ResultLabel>IBGE</S.ResultLabel>
-              <S.ResultValue>
-                <span>{cepData.ibge || "N/A"}</span>
-                <S.CopyButton onClick={() => copiarParaClipboard(cepData.ibge || "N/A", "ibge")}>
-                  {copiado.ibge ? <FiCheck /> : <FiCopy />}
-                </S.CopyButton>
-              </S.ResultValue>
-            </S.ResultField>
+            {[
+              { campo: "cep", label: "CEP", valor: texto(cepData.cep) },
+              {
+                campo: "logradouro",
+                label: "Logradouro",
+                valor: texto(cepData.street || cepData.logradouro),
+              },
+              {
+                campo: "bairro",
+                label: "Bairro",
+                valor: texto(cepData.neighborhood || cepData.bairro),
+              },
+              {
+                campo: "cidade",
+                label: "Cidade",
+                valor: texto(cepData.city || cepData.localidade),
+              },
+              {
+                campo: "uf",
+                label: "UF",
+                valor: texto(cepData.state || cepData.uf),
+              },
+              { campo: "ibge", label: "IBGE", valor: codigoIbge(cepData.ibge) },
+            ].map(({ campo, label, valor }) => (
+              <S.ResultField key={campo}>
+                <S.ResultLabel>{label}</S.ResultLabel>
+                <S.ResultValue>
+                  <span>{valor}</span>
+                  <S.CopyButton onClick={() => copiarParaClipboard(valor, campo)}>
+                    {copiado[campo] ? <FiCheck /> : <FiCopy />}
+                  </S.CopyButton>
+                </S.ResultValue>
+              </S.ResultField>
+            ))}
 
             {(cepData.cep && (cepData.street || cepData.logradouro)) && (
               <S.MapsButton
                 onClick={() => {
                   const url = buildMapsUrl({
-                    street: cepData.street || cepData.logradouro,
-                    neighborhood: cepData.neighborhood || cepData.bairro,
-                    city: cepData.city || cepData.localidade,
-                    state: cepData.state || cepData.uf,
-                    cep: cepData.cep,
+                    street: texto(cepData.street || cepData.logradouro),
+                    neighborhood: texto(cepData.neighborhood || cepData.bairro),
+                    city: texto(cepData.city || cepData.localidade),
+                    state: texto(cepData.state || cepData.uf),
+                    cep: texto(cepData.cep),
                   });
                   window.open(url, "_blank");
                 }}
@@ -497,20 +499,20 @@ const ConsultaEnd = () => {
                 <S.ResultItem key={idx} $expanded={isExpanded}>
                   <S.ResultHeader onClick={() => setSelectedResultIndex(isExpanded ? null : idx)}>
                     <div>
-                      <strong>{item.logradouro || "N/A"}</strong>
-                      <small>{item.cep || "N/A"} - {item.localidade || "N/A"}/{item.uf || "N/A"}</small>
+                      <strong>{texto(item.logradouro)}</strong>
+                      <small>{texto(item.cep)} - {texto(item.localidade)}/{texto(item.uf)}</small>
                     </div>
                     {isExpanded ? <FiChevronUp /> : <FiChevronDown />}
                   </S.ResultHeader>
                   {isExpanded && (
                     <S.ResultDetails>
-                      <S.DetailRow><strong>CEP:</strong> {item.cep || "N/A"}</S.DetailRow>
-                      <S.DetailRow><strong>Logradouro:</strong> {item.logradouro || "N/A"}</S.DetailRow>
-                      <S.DetailRow><strong>Bairro:</strong> {item.bairro || "N/A"}</S.DetailRow>
-                      <S.DetailRow><strong>Cidade:</strong> {item.localidade || "N/A"}</S.DetailRow>
-                      <S.DetailRow><strong>UF:</strong> {item.uf || "N/A"}</S.DetailRow>
-                      <S.DetailRow><strong>Complemento:</strong> {item.complemento || "N/A"}</S.DetailRow>
-                      <S.DetailRow><strong>IBGE:</strong> {item.ibge || "N/A"}</S.DetailRow>
+                      <S.DetailRow><strong>CEP:</strong> {texto(item.cep)}</S.DetailRow>
+                      <S.DetailRow><strong>Logradouro:</strong> {texto(item.logradouro)}</S.DetailRow>
+                      <S.DetailRow><strong>Bairro:</strong> {texto(item.bairro)}</S.DetailRow>
+                      <S.DetailRow><strong>Cidade:</strong> {texto(item.localidade)}</S.DetailRow>
+                      <S.DetailRow><strong>UF:</strong> {texto(item.uf)}</S.DetailRow>
+                      <S.DetailRow><strong>Complemento:</strong> {texto(item.complemento)}</S.DetailRow>
+                      <S.DetailRow><strong>IBGE:</strong> {codigoIbge(item.ibge)}</S.DetailRow>
                       {(item.cep && item.logradouro) && (
                         <S.MapsButtonSmall
                           onClick={() => {
@@ -535,10 +537,11 @@ const ConsultaEnd = () => {
           </S.ResultCard>
         )}
 
-        {/* Sem resultados */}
-        {activeTab !== "massa" && resultado && chavesResults.length === 0 && !loading && (
-          <S.NoResults>Nenhum resultado encontrado.</S.NoResults>
-        )}
+        {/* Sem resultados — por aba, para não aparecer junto com um resultado válido */}
+        {!loading && resultado && (
+          (activeTab === "cep" && !cepData?.cep) ||
+          (activeTab === "chaves" && chavesResults.length === 0)
+        ) && <S.NoResults>Nenhum resultado encontrado.</S.NoResults>}
       </S.Container>
     </PageLayout>
   );

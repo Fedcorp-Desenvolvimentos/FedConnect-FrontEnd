@@ -1,4 +1,4 @@
-import { useEffect, useState, forwardRef } from "react";
+import { useEffect, useState, useMemo, useCallback, forwardRef } from "react";
 import {
   FaPlus,
   FaChevronLeft,
@@ -26,6 +26,16 @@ import { CiCalendarDate } from "react-icons/ci";
 import { useSnackbar } from "notistack";
 import AgendaHelp from "./AgendaHelp";
 import { useAuth } from "../../context/AuthContext";
+import {
+  HORARIOS,
+  mapaDeOcupacao,
+  horariosLivres,
+  duracoesDisponiveis,
+  conflitaComReserva,
+  cabeNoExpediente,
+  horarioFinal,
+  horarioLiberacao,
+} from "../../utils/agendaSlots";
 
 function getFirstMondayOfMonth(date) {
   const firstDay = startOfMonth(date);
@@ -33,12 +43,17 @@ function getFirstMondayOfMonth(date) {
   return weekDay === 1 ? firstDay : addDays(firstDay, (8 - weekDay) % 7);
 }
 
-const HORARIOS = [
-  "09:00", "10:00", "11:00", "12:00", "13:00",
-  "14:00", "15:00", "16:00", "17:00", "18:00",
-];
-
 const diasSemana = ["Seg", "Ter", "Qua", "Qui", "Sex"];
+
+/** Extrai a mensagem de erro da API, seja em `detail` ou em erros de campo. */
+function extrairMensagemApi(data) {
+  if (!data) return "";
+  if (typeof data === "string") return data;
+  if (data.detail) return String(data.detail);
+  const primeiro = Object.values(data)[0];
+  if (Array.isArray(primeiro)) return String(primeiro[0]);
+  return primeiro ? String(primeiro) : "";
+}
 
 const MonthButton = forwardRef(function MonthButton({ value, onClick }, ref) {
   return (
@@ -102,10 +117,48 @@ export default function Agenda() {
     setSelectedSlot(null);
   };
 
-  const isSlotDisponivel = (dataDateObj, horario) => {
-    const alvo = format(dataDateObj, "yyyy-MM-dd");
-    return !reservas.some(
-      (r) => format(r.data, "yyyy-MM-dd") === alvo && r.horario === horario
+  // Agrupa as reservas por dia e expande cada uma nos slots que ela ocupa,
+  // para que uma reunião de 2h bloqueie 09:00 e 10:00, por exemplo.
+  const ocupacaoPorDia = useMemo(() => {
+    const porDia = new Map();
+    reservas.forEach((r) => {
+      const chave = format(r.data, "yyyy-MM-dd");
+      if (!porDia.has(chave)) porDia.set(chave, []);
+      porDia.get(chave).push(r);
+    });
+
+    const mapa = new Map();
+    porDia.forEach((reservasDoDia, chave) => {
+      mapa.set(chave, mapaDeOcupacao(reservasDoDia));
+    });
+    return mapa;
+  }, [reservas]);
+
+  const getReservasDoDia = useCallback(
+    (dataDateObj) => {
+      if (!dataDateObj) return [];
+      const alvo = format(dataDateObj, "yyyy-MM-dd");
+      return reservas.filter((r) => format(r.data, "yyyy-MM-dd") === alvo);
+    },
+    [reservas]
+  );
+
+  const getHorariosDisponiveis = useCallback(
+    (dataDateObj) => horariosLivres(getReservasDoDia(dataDateObj)),
+    [getReservasDoDia]
+  );
+
+  const getDuracoesDisponiveis = useCallback(
+    (dataDateObj, horario) =>
+      duracoesDisponiveis(horario, getReservasDoDia(dataDateObj)),
+    [getReservasDoDia]
+  );
+
+  /** Devolve a reserva que conflita com o intervalo informado, se houver. */
+  const encontrarConflito = (dataDateObj, horario, duracao) => {
+    const candidata = { horario, duracao };
+    return getReservasDoDia(dataDateObj).find((r) =>
+      conflitaComReserva(r, candidata)
     );
   };
 
@@ -116,11 +169,24 @@ export default function Agenda() {
           ? novaReserva.data
           : parseISO(novaReserva.data);
 
-      if (!isSlotDisponivel(dataObj, novaReserva.horario)) {
-        enqueueSnackbar("Já existe uma reunião marcada para este horário.", { 
-          variant: "error",
-          autoHideDuration: 3000
-        });
+      if (!cabeNoExpediente(novaReserva)) {
+        enqueueSnackbar(
+          `A reunião terminaria às ${horarioFinal(novaReserva)}, fora do expediente da sala (09:00 às 19:00).`,
+          { variant: "error", autoHideDuration: 4000 }
+        );
+        return;
+      }
+
+      const conflito = encontrarConflito(
+        dataObj,
+        novaReserva.horario,
+        novaReserva.duracao
+      );
+      if (conflito) {
+        enqueueSnackbar(
+          `Conflito com a reserva "${conflito.tema}" (${conflito.horario} às ${horarioFinal(conflito)}). A sala só volta a ficar livre às ${horarioLiberacao(conflito)}.`,
+          { variant: "error", autoHideDuration: 5000 }
+        );
         return;
       }
 
@@ -140,11 +206,15 @@ export default function Agenda() {
       });
     } catch (error) {
       const status = error?.response?.status;
+      const mensagemApi = extrairMensagemApi(error?.response?.data);
       if (status === 409) {
-        enqueueSnackbar("Conflito: esse horário acabou de ser reservado.", { 
+        enqueueSnackbar(mensagemApi || "Conflito: esse horário acabou de ser reservado.", {
           variant: "error",
           autoHideDuration: 4000
         });
+        await refreshWeek();
+      } else if (status === 400 && mensagemApi) {
+        enqueueSnackbar(mensagemApi, { variant: "error", autoHideDuration: 4000 });
       } else {
         enqueueSnackbar("Falha ao criar a reserva. Tente novamente.", { 
           variant: "error",
@@ -194,12 +264,10 @@ export default function Agenda() {
             <S.HorarioCell>{hora}</S.HorarioCell>
             {diasSemana.map((_, dIdx) => {
               const dia = addDays(startDate, dIdx);
-              const reservasSlot = reservas.filter(
-                (r) =>
-                  format(r.data, "yyyy-MM-dd") === format(dia, "yyyy-MM-dd") &&
-                  r.horario === hora
-              );
-              const isLivre = reservasSlot.length === 0;
+              const ocupacao = ocupacaoPorDia
+                .get(format(dia, "yyyy-MM-dd"))
+                ?.get(hora);
+              const isLivre = !ocupacao;
 
               return (
                 <S.GridCell key={dIdx} $isLivre={isLivre}>
@@ -212,8 +280,10 @@ export default function Agenda() {
                     </S.SlotButton>
                   ) : isLivre ? null : (
                     <S.ReservedPill
-                      title="Ver detalhes"
-                      onClick={() => setReservaSelecionada(reservasSlot[0])}
+                      title={`${ocupacao.reserva.tema} — ${
+                        ocupacao.reserva.horario
+                      } às ${horarioFinal(ocupacao.reserva)} — ver detalhes`}
+                      onClick={() => setReservaSelecionada(ocupacao.reserva)}
                     >
                       Reservado
                     </S.ReservedPill>
@@ -269,9 +339,11 @@ export default function Agenda() {
               <AgendaReservaForm
                 initialData={{
                   data: selectedSlot?.dia || startDate,
-                  horario: selectedSlot?.hora || "09:00",
+                  horario: selectedSlot?.hora || HORARIOS[0],
                 }}
                 userRole={String(user?.nivel_acesso || "").toLowerCase()}
+                getHorariosDisponiveis={getHorariosDisponiveis}
+                getDuracoesDisponiveis={getDuracoesDisponiveis}
                 onSave={handleSaveReserva}
                 onCancel={closeModal}
               />

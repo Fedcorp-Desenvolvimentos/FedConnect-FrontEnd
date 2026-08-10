@@ -75,10 +75,16 @@ export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) 
               <span>Tipo de documento</span>
               <strong>{tituloDocumento}</strong>
             </div>
-            {data.comissoes.length > 0 && data.comissoes[0].co_estipulante && (
+            {data.comissoes.length > 0 && (data.comissoes[0].administradora || data.comissoes[0].cedente_nome) && (
               <div>
-                <span>Condomínio</span>
-                <strong>{data.comissoes[0].co_estipulante}</strong>
+                <span>Administradora</span>
+                <strong>{data.comissoes[0].administradora || data.comissoes[0].cedente_nome}</strong>
+              </div>
+            )}
+            {data.comissoes.length > 0 && (data.comissoes[0].cedente_cnpj || data.comissoes[0].administradora_cnpj) && (
+              <div>
+                <span>CNPJ Administradora</span>
+                <strong>{data.comissoes[0].cedente_cnpj || data.comissoes[0].administradora_cnpj}</strong>
               </div>
             )}
           </DocMetaGrid>
@@ -87,16 +93,17 @@ export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) 
             <DocTableHead>
               <span>Favorecido / Fatura</span>
               <span>Produto</span>
-              <span>Vencimento</span>
+              <span>Condomínio</span>
+              <span>Administradora</span>
               <span style={{ textAlign: 'right' }}>Valor</span>
             </DocTableHead>
 
             {data.comissoes.map((c, index) => (
               <DocTableRow key={`${c.documento}-${c.favorecido}-${index}`}>
                 <div className="primary-cell">
-                  <strong>{c.favorecidoNome || c.favorecido || 'Favorecido'}</strong>
+                  <strong>{c.favorecido_nome || c.favorecidoNome || c.favorecido || 'Favorecido'}</strong>
                   <span>
-                    Fatura {c.fatura || '-'} · Parcela {c.parcela || '1'}
+                    Fatura {c.fatura || '-'} · Parc. {c.parcela || '1'}
                   </span>
                 </div>
 
@@ -106,8 +113,13 @@ export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) 
                 </div>
 
                 <div className="value-cell">
-                  <span className="cell-label">Vencimento&nbsp;</span>
-                  {formatDate(c.vencimento)}
+                  <span className="cell-label">Condomínio&nbsp;</span>
+                  {c.co_estipulante || '-'}
+                </div>
+
+                <div className="value-cell">
+                  <span className="cell-label">Admin&nbsp;</span>
+                  {c.cedente_nome || c.administradora || '-'}
                 </div>
 
                 <div className="money-cell">{formatMoney(c.valor_comissao)}</div>

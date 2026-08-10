@@ -58,6 +58,12 @@ export const Select = styled.select`
     outline: none;
     border-color: #0F3D5D;
   }
+
+  &:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+  }
 `;
 
 export const Row = styled.div`
@@ -102,9 +108,14 @@ export const SubmitButton = styled.button`
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(15, 61, 93, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   @media (max-width: 768px) {
