@@ -4,6 +4,7 @@ import ptBR from "date-fns/locale/pt-BR";
 import { FaTimes, FaTrash, FaUserFriends, FaClock, FaCalendar, FaQuestionCircle } from "react-icons/fa";
 import * as S from "./AgendaDetalheStyles";
 import { useAuth } from "../../../context/AuthContext";
+import { horarioFinal, rotuloDuracao } from "../../../utils/agendaSlots";
 
 export default function AgendaDetalhe({ reserva, onClose, onDelete }) {
   const { user } = useAuth();
@@ -78,7 +79,11 @@ export default function AgendaDetalhe({ reserva, onClose, onDelete }) {
               <FaClock size={16} />
               <S.InfoContent>
                 <S.InfoLabel>Horário</S.InfoLabel>
-                <S.InfoValue>{reserva?.horario ?? "-"}</S.InfoValue>
+                <S.InfoValue>
+                  {reserva?.horario
+                    ? `${reserva.horario} às ${horarioFinal(reserva)}`
+                    : "-"}
+                </S.InfoValue>
               </S.InfoContent>
             </S.InfoItem>
 
@@ -86,7 +91,9 @@ export default function AgendaDetalhe({ reserva, onClose, onDelete }) {
               <FaClock size={16} />
               <S.InfoContent>
                 <S.InfoLabel>Duração</S.InfoLabel>
-                <S.InfoValue>{reserva?.duracao ?? "-"} minutos</S.InfoValue>
+                <S.InfoValue>
+                  {reserva?.duracao ? rotuloDuracao(reserva.duracao) : "-"}
+                </S.InfoValue>
               </S.InfoContent>
             </S.InfoItem>
 
