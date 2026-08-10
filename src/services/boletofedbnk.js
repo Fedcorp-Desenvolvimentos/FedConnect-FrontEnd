@@ -9,12 +9,10 @@ export const cancelarBoletoFedBNK = async (payload) => {
       throw new Error("Usuário não autenticado");
     }
 
-    // Payload: sempre com metodo, fatura e documento (documento pode ser null)
     const requestPayload = {
       metodo: payload.metodo,
       fatura: payload.fatura,
       documento: payload.documento || null,
-      nossoNumero: payload.nossoNumero || null,
       motivo: payload.motivo,
       mail: payload.mail
     };
@@ -37,7 +35,7 @@ export const cancelarBoletoFedBNK = async (payload) => {
   }
 };
 
-const CANCEL_PATH = 'https://fedhub-api-local.ngrok.app/api/fedbnk/cancelamento/';
+const CANCEL_PATH = 'https://fedhub-api-local.ngrok.app/api/fedpay/cancelamento';
 const IMPRESS_PATH = 'https://fedhub-api-local.ngrok.app/api/webhook/boletofedbnk/impressao/';
 
 /**

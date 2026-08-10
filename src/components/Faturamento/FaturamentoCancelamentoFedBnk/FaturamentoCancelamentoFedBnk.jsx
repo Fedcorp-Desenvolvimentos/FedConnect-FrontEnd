@@ -133,7 +133,6 @@ const FaturamentoCancelamentoFedBnk = () => {
     setConfirmData({
       tipo: "BOLETO",
       documento: boleto.documento,
-      nossoNumero: boleto.nossoNumero,
       motivo: `Cancelamento solicitado pelo usuário ${user?.nome_completo || user?.email}`,
       boletoInfo: boleto
     });
@@ -163,7 +162,6 @@ const FaturamentoCancelamentoFedBnk = () => {
       metodo: confirmData.tipo === "BOLETO" ? "INDIVIDUAL" : "TODOS",
       fatura: dadosFatura?.FATURA || fatura.trim(),
       documento: confirmData.tipo === "BOLETO" ? confirmData.documento : null,
-      nossoNumero: confirmData.tipo === "BOLETO" ? confirmData.nossoNumero : null,
       motivo: confirmData.motivo,
       mail: user?.email || "danielmello@condomed.com.br",
     };
