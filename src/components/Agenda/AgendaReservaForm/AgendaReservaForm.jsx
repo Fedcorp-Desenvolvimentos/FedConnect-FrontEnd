@@ -1,15 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import * as S from "./AgendaReservaFormStyles";
-
-const HORARIOS = [
-  "09:00", "10:00", "11:00", "12:00", "13:00",
-  "14:00", "15:00", "16:00", "17:00", "18:00",
-];
+import {
+  HORARIOS,
+  DURACOES,
+  rotuloDuracao,
+  horarioFinal,
+  slotsDaReserva,
+} from "../../../utils/agendaSlots";
 
 export default function AgendaReservaForm({
   initialData = {},
+  getHorariosDisponiveis,
+  getDuracoesDisponiveis,
   onSave,
   onCancel,
 }) {
@@ -18,9 +22,43 @@ export default function AgendaReservaForm({
     initialData.participantes?.join(", ") || ""
   );
   const [data, setData] = useState(initialData.data || new Date());
-  const [horario, setHorario] = useState(initialData.horario || "09:00");
-  const [duracao, setDuracao] = useState(initialData.duracao || 60);
+  const [horario, setHorario] = useState(initialData.horario || HORARIOS[0]);
+  const [duracao, setDuracao] = useState(Number(initialData.duracao) || 60);
   const [erro, setErro] = useState("");
+
+  // Só os horários que ainda não estão ocupados no dia escolhido.
+  const horariosOpcoes = useMemo(
+    () => (getHorariosDisponiveis ? getHorariosDisponiveis(data) : HORARIOS),
+    [getHorariosDisponiveis, data]
+  );
+
+  // A duração é limitada pelos slots livres consecutivos a partir do início.
+  const duracoesOpcoes = useMemo(
+    () =>
+      getDuracoesDisponiveis
+        ? getDuracoesDisponiveis(data, horario)
+        : DURACOES,
+    [getDuracoesDisponiveis, data, horario]
+  );
+
+  // Se o dia mudou e o horário atual não está mais livre, cai no primeiro livre.
+  useEffect(() => {
+    if (horariosOpcoes.length && !horariosOpcoes.includes(horario)) {
+      setHorario(horariosOpcoes[0]);
+    }
+  }, [horariosOpcoes, horario]);
+
+  // Mesma ideia para a duração: nunca deixa selecionada uma que não cabe.
+  useEffect(() => {
+    if (duracoesOpcoes.length && !duracoesOpcoes.includes(Number(duracao))) {
+      setDuracao(duracoesOpcoes[duracoesOpcoes.length - 1]);
+    }
+  }, [duracoesOpcoes, duracao]);
+
+  const diaLotado = horariosOpcoes.length === 0;
+  const reservaPrevia = { horario, duracao: Number(duracao || 0) };
+  const terminaEm = horarioFinal(reservaPrevia);
+  const slotsMarcados = slotsDaReserva(reservaPrevia);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -29,8 +67,13 @@ export default function AgendaReservaForm({
       return setErro("Informe ao menos um participante.");
     if (!data) return setErro("Selecione a data.");
     if (!horario) return setErro("Selecione o horário.");
-    if (!duracao || duracao < 15) return setErro("Duração mínima: 15 minutos.");
+    if (!duracao) return setErro("Selecione a duração.");
+    if (duracoesOpcoes.length && !duracoesOpcoes.includes(Number(duracao)))
+      return setErro(
+        "A duração escolhida invade um horário já reservado. Reduza a duração."
+      );
 
+    setErro("");
     onSave({
       tema,
       participantes: participantes
@@ -84,30 +127,50 @@ export default function AgendaReservaForm({
 
         <S.FormGroup>
           <S.Label>Horário:</S.Label>
-          <S.Select value={horario} onChange={(e) => setHorario(e.target.value)}>
-            {HORARIOS.map((h) => (
+          <S.Select
+            value={horario}
+            onChange={(e) => setHorario(e.target.value)}
+            disabled={diaLotado}
+          >
+            {horariosOpcoes.map((h) => (
               <option key={h} value={h}>{h}</option>
             ))}
           </S.Select>
         </S.FormGroup>
 
         <S.FormGroup>
-          <S.Label>Duração (min):</S.Label>
-          <S.Input
-            type="number"
+          <S.Label>Duração:</S.Label>
+          <S.Select
             value={duracao}
-            min={15}
-            max={240}
-            step={15}
-            onChange={(e) => setDuracao(e.target.value)}
-          />
+            onChange={(e) => setDuracao(Number(e.target.value))}
+            disabled={diaLotado || duracoesOpcoes.length === 0}
+          >
+            {duracoesOpcoes.map((d) => (
+              <option key={d} value={d}>{rotuloDuracao(d)}</option>
+            ))}
+          </S.Select>
         </S.FormGroup>
       </S.Row>
+
+      {!diaLotado && (
+        <S.Hint style={{ marginLeft: 0 }}>
+          Reunião de {horario} às {terminaEm}. Ficará marcado como reservado na
+          agenda: <strong>{slotsMarcados.join(", ")}</strong>.
+        </S.Hint>
+      )}
+
+      {diaLotado && (
+        <S.ErrorMessage>
+          Todos os horários deste dia já estão reservados. Escolha outra data.
+        </S.ErrorMessage>
+      )}
 
       {erro && <S.ErrorMessage>{erro}</S.ErrorMessage>}
 
       <S.Actions>
-        <S.SubmitButton type="submit">Salvar</S.SubmitButton>
+        <S.SubmitButton type="submit" disabled={diaLotado}>
+          Salvar
+        </S.SubmitButton>
         <S.CancelButton type="button" onClick={onCancel}>
           Cancelar
         </S.CancelButton>
