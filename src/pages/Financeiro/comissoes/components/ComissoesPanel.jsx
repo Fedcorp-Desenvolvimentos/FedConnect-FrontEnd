@@ -156,7 +156,7 @@ export const ComissoesPanel = ({
                   <div className="info">
                     <strong>{nomeFavorecido}</strong>
                     <span>
-                      Fatura {fatura} | Parcela {comissao.PARCELA || comissao.parcela || 1} | Tipo {tipo}
+                      Fatura {fatura} | Parcela {comissao.PARCELA ?? comissao.parcela ?? '-'} | Tipo {tipo}
                     </span>
                     <span>
                       Vencimento: {formatDate(comissao.VENCIMENTO || comissao.vencimento)}

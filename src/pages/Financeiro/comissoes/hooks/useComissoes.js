@@ -45,7 +45,7 @@ export const getComissaoKey = (c) => {
   const documento = c.DOCUMENTO ?? '';
   const favor = c.FAVOR ?? '';
   const tipo = c.TIPO ?? '';
-  const parcela = c.PARCELA ?? '1';
+  const parcela = c.PARCELA ?? '';
   const valor = Number(c.VALOR ?? 0).toFixed(2);
 
   return [fatura, documento, favor, tipo, parcela, valor].join('|');
@@ -537,7 +537,10 @@ export const useEmissaoRecibos = () => {
       
       comissoes: comissoesSelecionadas.map((c) => ({
         fatura: c.FATURA || c.fatura || '',
-        parcela: c.PARCELA || c.parcela || '1',
+        // parcela = PAR.parcela (exibição); parcela_comissao = COM.parcela
+        // (chave de gravação no banco) — nunca cair em '1' fixo
+        parcela: String(c.PARCELA ?? c.parcela ?? ''),
+        parcela_comissao: String(c.PARCELA_2 ?? c.PARCELA ?? c.parcela ?? ''),
         tipo_fat: c.TIPO_FAT || c.tipo_fat || 'A',
         documento: c.DOCUMENTO || c.documento || '',
         vencimento: c.VENCIMENTO || c.vencimento || null,
@@ -695,7 +698,10 @@ export const useEmissaoRecibos = () => {
         usuario: user?.nome_completo || user?.email,
 comissoes: comissoesEnriquecidas.map((c) => ({
           fatura: String(c.FATURA || c.fatura || ''),
-          parcela: String(c.PARCELA || c.parcela || '1'),
+          // parcela = PAR.parcela (exibição no PDF); parcela_comissao =
+          // COM.parcela (chave do UPDATE no banco) — nunca cair em '1' fixo
+          parcela: String(c.PARCELA ?? c.parcela ?? ''),
+          parcela_comissao: String(c.PARCELA_2 ?? c.PARCELA ?? c.parcela ?? ''),
           tipo_fat: c.TIPO_FAT || c.tipo_fat || 'A',
           documento: c.DOCUMENTO || c.documento || '',
           vencimento: c.VENCIMENTO || c.vencimento || null,
