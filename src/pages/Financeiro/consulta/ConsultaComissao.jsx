@@ -70,6 +70,7 @@ const ConsultaComissao = () => {
     pessoas,
     produtos,
     selectedKeys,
+    selectedVouchers,
     hasSearched,
     totalRegistros,
     updateFilter,
@@ -84,13 +85,17 @@ const ConsultaComissao = () => {
   // MEMOIZAÇÃO PARA PERFORMANCE
   // ================================================================
 
+  // Deve permanecer IDÊNTICA à getComissaoKey de useConsultaComissao.js —
+  // FATURA e VOUCHER na chave evitam que linhas distintas colidam na seleção
   const getComissaoKey = useMemo(() => (c) => {
+    const fatura = c.FATURA ?? '';
+    const voucher = c.VOUCHER ?? '';
     const documento = c.DOCUMENTO ?? '';
     const favor = c.FAVOR ?? '';
     const tipo = c.TIPO ?? '';
     const parcela = c.PARCELA ?? '1';
     const valor = Number(c.VALOR ?? 0).toFixed(2);
-    return [documento, favor, tipo, parcela, valor].join('|');
+    return [fatura, voucher, documento, favor, tipo, parcela, valor].join('|');
   }, []);
 
   const allKeys = useMemo(() => comissoes.map(getComissaoKey), [comissoes, getComissaoKey]);
@@ -432,6 +437,14 @@ const ConsultaComissao = () => {
               <p>
                 Tem certeza que deseja cancelar <strong>{selectedKeys.size} comissão(ões)</strong> selecionada(s)?
               </p>
+              {selectedVouchers.length > 0 && (
+                <p style={{ fontSize: 13, color: '#e53e3e', marginTop: 8 }}>
+                  <strong>Atenção:</strong> o cancelamento remove o voucher <strong>inteiro</strong> —
+                  {' '}<strong>todas</strong> as comissões do(s) voucher(s){' '}
+                  <strong>{selectedVouchers.join(', ')}</strong> serão canceladas,
+                  mesmo as que não estão selecionadas.
+                </p>
+              )}
               <p style={{ fontSize: 12, color: '#a0aec0', marginTop: 8 }}>
                 O voucher será removido e as comissões voltarão ao status pendente.
               </p>
