@@ -37,7 +37,10 @@ const INITIAL_FILTERS = {
   produto: '',
 };
 
-const getComissaoKey = (c) => {
+// Chave única de uma comissão na seleção. FONTE ÚNICA: os componentes
+// (ComissoesPanel, RetencoesPanel) devem IMPORTAR esta função — cópias locais
+// dessincronizadas já causaram checkbox/somatório quebrados (WORK_LOG 1.31).
+export const getComissaoKey = (c) => {
   const fatura = c.FATURA ?? '';
   const documento = c.DOCUMENTO ?? '';
   const favor = c.FAVOR ?? '';

@@ -9,6 +9,7 @@ import {
     RetentionOption,
     RetentionStatus
 } from '../ComissoesStyles';
+import { getComissaoKey } from '../hooks/useComissoes';
 
 const RETENTION_OPTIONS = [
     { id: 'iss', label: 'ISS', rate: 0.02 },
@@ -28,15 +29,6 @@ const formatMoney = (value) => {
 };
 
 const formatRate = (rate) => `${(rate * 100).toFixed(rate * 100 % 1 ? 2 : 0)}%`;
-
-const getComissaoKey = (c) => {
-    const documento = c.DOCUMENTO ?? '';
-    const favor = c.FAVOR ?? '';
-    const tipo = c.TIPO ?? '';
-    const parcela = c.PARCELA ?? '1';
-    const valor = Number(c.VALOR ?? 0).toFixed(2);
-    return [documento, favor, tipo, parcela, valor].join('|');
-};
 
 export function RetencoesPanel({ 
     selectedRetentions, 
