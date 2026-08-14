@@ -38,13 +38,14 @@ const INITIAL_FILTERS = {
 };
 
 const getComissaoKey = (c) => {
+  const fatura = c.FATURA ?? '';
   const documento = c.DOCUMENTO ?? '';
   const favor = c.FAVOR ?? '';
   const tipo = c.TIPO ?? '';
   const parcela = c.PARCELA ?? '1';
   const valor = Number(c.VALOR ?? 0).toFixed(2);
 
-  return [documento, favor, tipo, parcela, valor].join('|');
+  return [fatura, documento, favor, tipo, parcela, valor].join('|');
 };
 
 // Data fixa para busca sem período - o backend não usa data_corte na query
@@ -780,6 +781,19 @@ comissoes: comissoesEnriquecidas.map((c) => ({
           `${documentType === 'voucher' ? 'Voucher' : 'Recibo'} emitido com sucesso!`,
           { variant: 'success' }
         );
+
+        // Rede de segurança: o backend informa quantas linhas de COMISSAO
+        // foram carimbadas com o voucher; deve bater com a seleção
+        const registrosAtualizados = response?.registros_atualizados;
+        if (
+          registrosAtualizados != null &&
+          Number(registrosAtualizados) !== comissoesEnriquecidas.length
+        ) {
+          enqueueSnackbar(
+            `Atenção: ${registrosAtualizados} registro(s) atualizados no banco para ${comissoesEnriquecidas.length} comissão(ões) selecionada(s). Verifique o voucher na consulta.`,
+            { variant: 'warning', autoHideDuration: 10000 }
+          );
+        }
 
         resetSelections();
       } else {
