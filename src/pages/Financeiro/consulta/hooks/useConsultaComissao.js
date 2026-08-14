@@ -17,7 +17,8 @@ const INITIAL_FILTERS = {
   vigencia_final: '',
 };
 
-const getComissaoKey = (c) => {
+// FONTE ÚNICA da chave de seleção — ConsultaComissao.jsx importa daqui
+export const getComissaoKey = (c) => {
   const fatura = c.FATURA ?? '';
   const voucher = c.VOUCHER ?? '';
   const documento = c.DOCUMENTO ?? '';

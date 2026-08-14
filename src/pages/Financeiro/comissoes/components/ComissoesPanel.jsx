@@ -12,6 +12,7 @@ import {
   LoadingContainer,
 } from '../ComissoesStyles';
 import styled from 'styled-components';
+import { getComissaoKey } from '../hooks/useComissoes';
 
 
 
@@ -27,16 +28,6 @@ const formatDate = (date) => {
   } catch {
     return '-';
   }
-};
-
-const getComissaoKey = (c) => {
-  const documento = c.DOCUMENTO ?? '';
-  const favor = c.FAVOR ?? '';
-  const tipo = c.TIPO ?? '';
-  const parcela = c.PARCELA ?? '1';
-  const valor = Number(c.VALOR ?? 0).toFixed(2);
-
-  return [documento, favor, tipo, parcela, valor].join('|');
 };
 
 export const ComissoesPanel = ({

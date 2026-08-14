@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { PessoaSelect } from '../comissoes/components/PessoaSelect';
-import { useConsultaComissao } from './hooks/useConsultaComissao';
+import { useConsultaComissao, getComissaoKey } from './hooks/useConsultaComissao';
 import * as S from './ConsultaComissaoStyles';
 import { getStatusInfo } from '../../../utils/status_comissao_helper';
 
@@ -85,20 +85,7 @@ const ConsultaComissao = () => {
   // MEMOIZAÇÃO PARA PERFORMANCE
   // ================================================================
 
-  // Deve permanecer IDÊNTICA à getComissaoKey de useConsultaComissao.js —
-  // FATURA e VOUCHER na chave evitam que linhas distintas colidam na seleção
-  const getComissaoKey = useMemo(() => (c) => {
-    const fatura = c.FATURA ?? '';
-    const voucher = c.VOUCHER ?? '';
-    const documento = c.DOCUMENTO ?? '';
-    const favor = c.FAVOR ?? '';
-    const tipo = c.TIPO ?? '';
-    const parcela = c.PARCELA ?? '1';
-    const valor = Number(c.VALOR ?? 0).toFixed(2);
-    return [fatura, voucher, documento, favor, tipo, parcela, valor].join('|');
-  }, []);
-
-  const allKeys = useMemo(() => comissoes.map(getComissaoKey), [comissoes, getComissaoKey]);
+  const allKeys = useMemo(() => comissoes.map(getComissaoKey), [comissoes]);
   const allSelected = allKeys.length > 0 && allKeys.every((k) => selectedKeys.has(k));
 
   const totalValue = useMemo(() => 
