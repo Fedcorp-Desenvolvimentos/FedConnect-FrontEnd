@@ -8,6 +8,7 @@ import {
   Actions,
   Button,
 } from '../ComissoesStyles';
+import { EMPRESAS_PAGADORAS } from '../constants/empresasPagadoras';
 
 const formatMoney = (value) => {
   if (value === null || value === undefined) return 'R$ 0,00';
@@ -23,7 +24,13 @@ export const EmissaoPanel = ({
   onEmitir,
   onSair,
   loadingPreview = false,
+  empresaPagadora = null,
+  empresaPagadoraTipo = null,
+  tiposMistos = false,
+  onEmpresaPagadoraChange = () => {},
 }) => {
+  const empresaObrigatoria = documentType === 'voucher' && tiposMistos && !empresaPagadoraTipo;
+
   return (
     <Card>
       <CardHeader>
@@ -41,7 +48,46 @@ export const EmissaoPanel = ({
             <option value="voucher">Voucher</option>
           </select>
         </label>
+
+        {documentType === 'voucher' && (
+          <label>
+            Empresa pagadora (Recebemos de)
+            <select
+              value={empresaPagadoraTipo || ''}
+              onChange={(e) => onEmpresaPagadoraChange(e.target.value || null)}
+              style={empresaObrigatoria ? { borderColor: '#e53e3e' } : undefined}
+            >
+              <option value="">
+                {empresaPagadora
+                  ? `Automático — ${empresaPagadora.label}`
+                  : tiposMistos
+                    ? 'Selecione a empresa...'
+                    : 'Automático (pelo tipo da comissão)'}
+              </option>
+              {EMPRESAS_PAGADORAS.map((e) => (
+                <option key={e.tipo} value={e.tipo}>{e.label} — {e.cnpj}</option>
+              ))}
+            </select>
+          </label>
+        )}
       </EmissaoOptions>
+
+      {empresaObrigatoria && (
+        <div
+          style={{
+            marginBottom: '4px',
+            padding: '10px 12px',
+            borderRadius: '9px',
+            background: '#fff5f5',
+            border: '1px solid #feb2b2',
+            color: '#c53030',
+            fontSize: '12.5px',
+          }}
+        >
+          As comissões selecionadas são de empresas diferentes — escolha a empresa
+          pagadora para liberar a emissão do voucher.
+        </div>
+      )}
 
       {!canIssue && (
         <div

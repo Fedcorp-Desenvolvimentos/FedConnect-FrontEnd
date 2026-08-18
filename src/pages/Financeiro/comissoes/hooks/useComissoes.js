@@ -13,6 +13,7 @@ import {
   emitirRecibo
 } from '../../../../services/comissoesService';
 import { getFaturaPorNumeroViaFaturamento } from '../../../../services/consultaFatura';
+import { getEmpresaPorTipo, inferirEmpresaPorTipos } from '../constants/empresasPagadoras';
 import { useAuth } from '../../../../context/AuthContext';
 
 // ⭐ IMPORTA AS FUNÇÕES DO ARQUIVO DE REGRAS
@@ -108,6 +109,9 @@ export const useEmissaoRecibos = () => {
   const [selectedComissoes, setSelectedComissoes] = useState(new Set());
   const [selectedRetentions, setSelectedRetentions] = useState([]);
   const [documentType, setDocumentType] = useState('recibo');
+  // Tipo escolhido no seletor "Empresa pagadora (Recebemos de)".
+  // null = automático (inferida pelo TIPO das comissões selecionadas)
+  const [empresaPagadoraTipo, setEmpresaPagadoraTipo] = useState(null);
   const [lastEmission, setLastEmission] = useState(null);
   const [totalRegistros, setTotalRegistros] = useState(0);
 
@@ -478,6 +482,29 @@ export const useEmissaoRecibos = () => {
     };
   }, [retentionSummary]);
 
+  // ================================================================
+  // EMPRESA PAGADORA (Recebemos de) — spec voucher-recebemos-de-empresa
+  // Inferida pelo TIPO das comissões selecionadas; o seletor sobrescreve.
+  // TIPOs mistos → inferência retorna null e a escolha vira obrigatória.
+  // ================================================================
+  const empresaInferida = useMemo(() => {
+    const selecionadas = comissoes.filter((c) => selectedComissoes.has(getComissaoKey(c)));
+    return inferirEmpresaPorTipos(selecionadas);
+  }, [comissoes, selectedComissoes]);
+
+  const tiposMistos = useMemo(() => {
+    const selecionadas = comissoes.filter((c) => selectedComissoes.has(getComissaoKey(c)));
+    if (selecionadas.length === 0) return false;
+    const tipos = new Set(
+      selecionadas.map((c) => String(c.TIPO ?? c.tipo ?? 'BENEFICIO').trim().toUpperCase())
+    );
+    return tipos.size > 1;
+  }, [comissoes, selectedComissoes]);
+
+  const empresaPagadora = empresaPagadoraTipo
+    ? getEmpresaPorTipo(empresaPagadoraTipo)
+    : empresaInferida;
+
   const buildDocumentPayload = useCallback((comissoesEnriquecidas = null) => {
     const comissoesSelecionadas = comissoesEnriquecidas || comissoes.filter((c) =>
       selectedComissoes.has(getComissaoKey(c))
@@ -534,6 +561,7 @@ export const useEmissaoRecibos = () => {
       valorTotalBruto: resultado.totalBruto,
       valorLiquido: valorLiquidoFinal,
       retencoesAplicadas: retencoesAplicadas,
+      empresaPagadora: empresaPagadora || null,
       
       comissoes: comissoesSelecionadas.map((c) => ({
         fatura: c.FATURA || c.fatura || '',
@@ -613,13 +641,14 @@ export const useEmissaoRecibos = () => {
       registrosBrutos: comissoesSelecionadas,
     };
   }, [
-    comissoes, 
-    selectedComissoes, 
+    comissoes,
+    selectedComissoes,
     selectedRetentions,
-    documentType, 
+    documentType,
     filters,
     retencoesVerificadas,
-    totalBrutoSelecionado
+    totalBrutoSelecionado,
+    empresaPagadora
   ]);
 
   const emitirDocumento = useCallback(async () => {
@@ -630,6 +659,18 @@ export const useEmissaoRecibos = () => {
 
     if (loadingPreview) {
       enqueueSnackbar('Aguarde o carregamento do preview', { variant: 'warning' });
+      return;
+    }
+
+    // Voucher exige empresa pagadora definida (Recebemos de): com TIPOs
+    // mistos a inferência é impossível e a escolha no seletor é obrigatória
+    if (documentType === 'voucher' && !empresaPagadora) {
+      enqueueSnackbar(
+        tiposMistos
+          ? 'As comissões selecionadas são de empresas diferentes — selecione a Empresa pagadora (Recebemos de) antes de emitir.'
+          : 'Selecione a Empresa pagadora (Recebemos de) antes de emitir.',
+        { variant: 'warning' }
+      );
       return;
     }
 
@@ -696,6 +737,8 @@ export const useEmissaoRecibos = () => {
         tipo_documento: documentType,
         data_emissao: new Date().toISOString().split('T')[0],
         usuario: user?.nome_completo || user?.email,
+        empresa_pagadora_nome: empresaPagadora?.nome || null,
+        empresa_pagadora_cnpj: empresaPagadora?.cnpj || null,
 comissoes: comissoesEnriquecidas.map((c) => ({
           fatura: String(c.FATURA || c.fatura || ''),
           // parcela = PAR.parcela (exibição no PDF); parcela_comissao =
@@ -827,6 +870,8 @@ comissoes: comissoesEnriquecidas.map((c) => ({
     user,
     totalBrutoSelecionado,
     loadingPreview,
+    empresaPagadora,
+    tiposMistos,
   ]);
 
   const previewDocument = useCallback(async () => {
@@ -900,6 +945,10 @@ comissoes: comissoesEnriquecidas.map((c) => ({
     previewData,
     retencoesVerificadas,
     loadingPreview,
+    empresaPagadora,
+    empresaInferida,
+    empresaPagadoraTipo,
+    tiposMistos,
 
     buscarTudo,
     updateFilter,
@@ -909,6 +958,7 @@ comissoes: comissoesEnriquecidas.map((c) => ({
     toggleAllComissoes,
     toggleRetention,
     setDocumentType,
+    setEmpresaPagadoraTipo,
     emitirDocumento,
     previewDocument,
     closePreview,
