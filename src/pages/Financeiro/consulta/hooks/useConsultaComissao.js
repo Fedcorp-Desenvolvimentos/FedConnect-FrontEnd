@@ -17,15 +17,16 @@ const INITIAL_FILTERS = {
   vigencia_final: '',
 };
 
-const SIMULAR_CANCELAMENTO = true;
-
-const getComissaoKey = (c) => {
+// FONTE ÚNICA da chave de seleção — ConsultaComissao.jsx importa daqui
+export const getComissaoKey = (c) => {
+  const fatura = c.FATURA ?? '';
+  const voucher = c.VOUCHER ?? '';
   const documento = c.DOCUMENTO ?? '';
   const favor = c.FAVOR ?? '';
   const tipo = c.TIPO ?? '';
   const parcela = c.PARCELA ?? '1';
   const valor = Number(c.VALOR ?? 0).toFixed(2);
-  return [documento, favor, tipo, parcela, valor].join('|');
+  return [fatura, voucher, documento, favor, tipo, parcela, valor].join('|');
 };
 
 const normalizeFilters = (filters) => {
@@ -180,9 +181,17 @@ export const useConsultaComissao = () => {
       if (!response?.sucesso) {
         throw new Error(response?.erro || 'Erro ao cancelar');
       }
-      
 
-      enqueueSnackbar(`${selectedKeys.size} comissão(ões) cancelada(s) com sucesso!`, { variant: 'success' });
+      // total_canceladas = linhas realmente afetadas no banco (cancelamento é
+      // por voucher inteiro, pode ser maior que o nº de linhas selecionadas)
+      const totalCanceladas = response?.total_canceladas ?? selectedKeys.size;
+      const vouchersCancelados = Object.keys(response?.vouchers_cancelados || {});
+      enqueueSnackbar(
+        vouchersCancelados.length > 0
+          ? `${totalCanceladas} comissão(ões) cancelada(s) — voucher(s) ${vouchersCancelados.join(', ')} cancelado(s) por inteiro.`
+          : `${totalCanceladas} comissão(ões) cancelada(s) com sucesso!`,
+        { variant: 'success' }
+      );
 
       setSelectedKeys(new Set());
       setComissoes([]);
@@ -195,6 +204,15 @@ export const useConsultaComissao = () => {
     }
   }, [selectedKeys, comissoes, enqueueSnackbar, startLoading, stopLoading]);
 
+  // Vouchers únicos entre as comissões selecionadas — usado no modal para
+  // avisar que o cancelamento remove o voucher INTEIRO (todas as linhas dele)
+  const selectedVouchers = [...new Set(
+    comissoes
+      .filter((c) => selectedKeys.has(getComissaoKey(c)))
+      .map((c) => String(c.VOUCHER ?? c.voucher ?? '').trim())
+      .filter(Boolean)
+  )];
+
   return {
     loading,
     filters,
@@ -202,6 +220,7 @@ export const useConsultaComissao = () => {
     pessoas,
     produtos,
     selectedKeys,
+    selectedVouchers,
     hasSearched,
     totalRegistros,
     updateFilter,

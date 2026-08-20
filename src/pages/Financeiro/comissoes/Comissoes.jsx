@@ -62,6 +62,10 @@ export default function Comissoes() {
     hasActiveFilters,
     retencoesVerificadas,
     loadingPreview,
+    empresaPagadora,
+    empresaPagadoraTipo,
+    tiposMistos,
+    setEmpresaPagadoraTipo,
   } = useEmissaoRecibos();
 
   const canIssue = selectedComissoes?.size > 0;
@@ -172,6 +176,10 @@ export default function Comissoes() {
             onSair={() => navigate('/')}
             selectedComissoes={selectedComissoes}
             comissoes={comissoes}
+            empresaPagadora={empresaPagadora}
+            empresaPagadoraTipo={empresaPagadoraTipo}
+            tiposMistos={tiposMistos}
+            onEmpresaPagadoraChange={setEmpresaPagadoraTipo}
           />
         </Sidebar>
       </PageLayout>

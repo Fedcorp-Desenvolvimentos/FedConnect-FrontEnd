@@ -75,6 +75,12 @@ export const PreviewModalDetails = ({ open, data, onClose, onEmitir, loading }) 
               <span>Tipo de documento</span>
               <strong>{tituloDocumento}</strong>
             </div>
+            {data.tipoDocumento === 'voucher' && data.empresaPagadora && (
+              <div>
+                <span>Empresa pagadora (Recebemos de)</span>
+                <strong>{data.empresaPagadora.nome} · {data.empresaPagadora.cnpj}</strong>
+              </div>
+            )}
             {data.comissoes.length > 0 && (data.comissoes[0].administradora || data.comissoes[0].cedente_nome) && (
               <div>
                 <span>Administradora</span>
