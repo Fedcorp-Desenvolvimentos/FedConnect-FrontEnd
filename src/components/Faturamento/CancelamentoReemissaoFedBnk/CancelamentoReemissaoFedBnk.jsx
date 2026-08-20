@@ -21,6 +21,7 @@ const NIVEIS_ADMIN = ["admin", "ti"];
 const FORM_VAZIO = {
   vencimento: "",
   valor: "",
+  valor_cheio: "",
   nome_cobrado: "",
   cnpj_cobrado: "",
   cep: "",
@@ -142,6 +143,7 @@ const CancelamentoReemissaoFedBnk = () => {
           nossoNumero: boleto.NOSSO_NUMERO || boleto.NOSSO_NUMERO_ADICIONAL || "",
           sacado: boleto.NOME_COBRADO || "Não informado",
           valor: boleto.VALOR,
+          retencao: boleto.VALOR_CHEIO ?? null,
           vencimento: boleto.VENCIMENTO || parcela?.VENCIMENTO || null,
           situacao,
           cancelavel: !situacao.pago && !situacao.cancelado,
@@ -389,6 +391,7 @@ const CancelamentoReemissaoFedBnk = () => {
     const alteracoes = {};
     if (form.vencimento) alteracoes.vencimento = form.vencimento;
     if (form.valor !== "") alteracoes.valor = Number(form.valor);
+    if (form.valor_cheio !== "") alteracoes.valor_cheio = Number(form.valor_cheio);
     if (isAdmin) {
       if (form.nome_cobrado.trim()) alteracoes.nome_cobrado = form.nome_cobrado.trim();
       if (form.cnpj_cobrado.trim()) alteracoes.cnpj_cobrado = form.cnpj_cobrado.trim();
@@ -406,6 +409,7 @@ const CancelamentoReemissaoFedBnk = () => {
     const rotulos = {
       vencimento: "Vencimento",
       valor: "Valor",
+      valor_cheio: "Retenção",
       nome_cobrado: "Nome cobrado",
       cnpj_cobrado: "CNPJ/CPF cobrado",
       endereco: "Endereço (cadastro)",
@@ -414,8 +418,8 @@ const CancelamentoReemissaoFedBnk = () => {
       rotulo: rotulos[campo],
       valor: campo === "endereco"
         ? Object.values(alteracoes.endereco).join(", ")
-        : campo === "valor"
-          ? formatarMoeda(alteracoes.valor)
+        : campo === "valor" || campo === "valor_cheio"
+          ? formatarMoeda(alteracoes[campo])
           : String(alteracoes[campo]),
     }));
   };
@@ -604,6 +608,7 @@ const CancelamentoReemissaoFedBnk = () => {
                       <th>Documento</th>
                       <th>Sacado</th>
                       <th>Valor</th>
+                      <th>Retenção</th>
                       <th>Vencimento</th>
                       <th>Situação</th>
                       {emCancelamento && <th style={{ width: "80px" }}>Ações</th>}
@@ -633,6 +638,7 @@ const CancelamentoReemissaoFedBnk = () => {
                         <S.MonoCell>{boleto.documento}</S.MonoCell>
                         <td>{boleto.sacado}</td>
                         <td>{formatarMoeda(boleto.valor)}</td>
+                        <td>{boleto.retencao != null ? formatarMoeda(boleto.retencao) : "—"}</td>
                         <td>{formatarData(boleto.vencimento)}</td>
                         <td>
                           <S.StatusBadge $status={boleto.situacao.chave}>{boleto.situacao.rotulo}</S.StatusBadge>
@@ -679,6 +685,18 @@ const CancelamentoReemissaoFedBnk = () => {
                     onChange={atualizarCampo("valor")}
                     disabled={tratando}
                     placeholder="Manter valor atual"
+                  />
+                </S.FormField>
+                <S.FormField>
+                  <S.Label>Retenção (R$)</S.Label>
+                  <S.Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.valor_cheio}
+                    onChange={atualizarCampo("valor_cheio")}
+                    disabled={tratando}
+                    placeholder="Manter retenção atual"
                   />
                 </S.FormField>
                 {isAdmin && (
