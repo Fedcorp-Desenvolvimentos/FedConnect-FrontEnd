@@ -18,6 +18,11 @@ const NIVEIS_CANCELAMENTO = ["admin", "usuario", "comercial", "faturamento"];
 const NIVEIS_REEMISSAO = ["admin", "faturamento", "ti"];
 const NIVEIS_ADMIN = ["admin", "ti"];
 
+// Retenção sugerida ao digitar o novo valor: 4,8768% do valor, arredondado
+// em 2 casas — só quando o valor passa de R$ 215
+const LIMITE_RETENCAO = 215;
+const PERCENTUAL_RETENCAO = 4.8768 / 100;
+
 const FORM_VAZIO = {
   vencimento: "",
   valor: "",
@@ -472,6 +477,16 @@ const CancelamentoReemissaoFedBnk = () => {
 
   const atualizarCampo = (campo) => (e) => setForm((prev) => ({ ...prev, [campo]: e.target.value }));
 
+  // Digitou o novo valor: sugere a retenção (continua editável no campo)
+  const atualizarValor = (e) => {
+    const valor = e.target.value;
+    const v = Number(valor);
+    const retencao = v > LIMITE_RETENCAO
+      ? (Math.round(v * PERCENTUAL_RETENCAO * 100) / 100).toFixed(2)
+      : "";
+    setForm((prev) => ({ ...prev, valor, valor_cheio: retencao }));
+  };
+
   if (!isAuthenticated) {
     return (
       <S.ErrorContainer>
@@ -682,7 +697,7 @@ const CancelamentoReemissaoFedBnk = () => {
                     min="0.01"
                     step="0.01"
                     value={form.valor}
-                    onChange={atualizarCampo("valor")}
+                    onChange={atualizarValor}
                     disabled={tratando}
                     placeholder="Manter valor atual"
                   />
