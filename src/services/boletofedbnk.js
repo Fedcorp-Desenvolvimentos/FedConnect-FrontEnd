@@ -13,6 +13,7 @@ export const cancelarBoletoFedBNK = async (payload) => {
       metodo: payload.metodo,
       fatura: payload.fatura,
       documento: payload.documento || null,
+      documentos: payload.documentos || null,
       motivo: payload.motivo,
       mail: payload.mail
     };
@@ -24,7 +25,9 @@ export const cancelarBoletoFedBNK = async (payload) => {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        }
+        },
+        // SELECIONADOS cancela no FedHub um a um — o lote pode demorar
+        timeout: 300000
       }
     );
 

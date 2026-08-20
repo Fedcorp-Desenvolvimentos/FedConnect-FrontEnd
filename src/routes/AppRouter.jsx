@@ -71,7 +71,7 @@ import Comissoes from '../pages/Financeiro/comissoes/Comissoes.jsx';
 import FaturamentoHome from '../pages/Faturamento/FaturamentoHome';
 import PdfAutomation from '../components/Faturamento/PdfAutomation';
 // import OperacionalCancelamento from '../components/Faturamento/OperacionalCancelamento';
-import FaturamentoCancelamentoFedBnk from '../components/Faturamento/FaturamentoCancelamentoFedBnk/FaturamentoCancelamentoFedBnk';
+import CancelamentoReemissaoFedBnk from '../components/Faturamento/CancelamentoReemissaoFedBnk/CancelamentoReemissaoFedBnk';
 import ReimpressaoBoleto from '../components/Faturamento/ReimpressaoBoleto';
 import Payxbox from '../components/Faturamento/Paybox';
 import SegundaVia from '../pages/SegundaVia/SegundaVia.jsx';
@@ -188,7 +188,7 @@ const AppRouter = () => {
           {/* Faturamento */}
           <Route path="/faturamento" element={<FaturamentoHome />} />
           <Route path="/faturamento/pdf-automation" element={<PdfAutomation />} />
-          <Route path="/faturamento/cancelamento" element={<FaturamentoCancelamentoFedBnk />} />
+          <Route path="/faturamento/cancelamento" element={<CancelamentoReemissaoFedBnk />} />
           <Route path="/faturamento/reimpressao-boleto" element={<ReimpressaoBoleto />} />
           <Route path="/faturamento/paybox" element={<Payxbox />} />
           <Route path="/faturamento/segunda-via" element={<SegundaVia />} />

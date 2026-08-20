@@ -30,8 +30,8 @@ export const FaturamentoHelp = () => {
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
           <div style={{ background: '#f8fafc', padding: '0.75rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-            <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}><FaTimesCircle /> Cancelamentos FedBnk</strong>
-            <p style={{ margin: 0, fontSize: '0.875rem', color: '#475569' }}>Solicite e acompanhe cancelamentos de faturas ou boletos de forma rápida.</p>
+            <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}><FaTimesCircle /> Cancelamento/Reemissão FedBnk</strong>
+            <p style={{ margin: 0, fontSize: '0.875rem', color: '#475569' }}>Cancele faturas ou boletos, ou corrija dados e reemita boletos com número novo.</p>
           </div>
           <div style={{ background: '#f8fafc', padding: '0.75rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
             <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}><FaFileInvoice /> Sistema de NF</strong>
@@ -50,7 +50,7 @@ export const FaturamentoHelp = () => {
           <FaChartLine /> Funcionalidades
         </h3>
         <ul style={{ margin: 0, paddingLeft: '1.5rem', color: '#475569' }}>
-          <li><strong>Cancelamentos:</strong> Gerencie cancelamentos de faturas e boletos</li>
+          <li><strong>Cancelamento/Reemissão:</strong> Gerencie cancelamentos e reemissões de faturas e boletos</li>
           <li><strong>Notas Fiscais:</strong> Emissão e acompanhamento de NF</li>
           <li><strong>Consulta de Faturamento:</strong> Análise detalhada com filtros</li>
           <li><strong>Exportação:</strong> Resultados podem ser exportados em Excel</li>
