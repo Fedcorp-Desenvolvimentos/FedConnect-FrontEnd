@@ -24,6 +24,7 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await api.post('/login/', credentials);
             localStorage.setItem('accessToken', response.data.access);
+            localStorage.setItem('refreshToken', response.data.refresh);
             const userResponse = await api.get('/users/me/');
             setUser(userResponse.data);
             setIsAuthenticated(true);
@@ -32,6 +33,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error("Login failed:", error.response?.data || error.message);
             localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
             setIsAuthenticated(false);
             setUser(null);
 
@@ -56,6 +58,7 @@ export const AuthProvider = ({ children }) => {
             });
 
             localStorage.setItem('accessToken', response.data.access);
+            localStorage.setItem('refreshToken', response.data.refresh);
 
             const userResponse = await api.get('/users/me/');
 
@@ -68,6 +71,7 @@ export const AuthProvider = ({ children }) => {
             console.error(error);
 
             localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
             setIsAuthenticated(false);
             setUser(null);
 
@@ -83,11 +87,28 @@ export const AuthProvider = ({ children }) => {
     const logout = useCallback(() => {
         setLoadingMessage("Fazendo logout...");
         setLoading(true);
+        // Best-effort: blacklista o refresh no backend; falha não trava o logout
+        const refresh = localStorage.getItem('refreshToken');
+        if (refresh) {
+            api.post('/logout/', { refresh }).catch(() => {});
+        }
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         setUser(null);
         setIsAuthenticated(false);
         navigate('/login');
         setLoading(false);
+    }, [navigate]);
+
+    // Sessão expirada detectada pelo interceptor do api.js (refresh falhou)
+    useEffect(() => {
+        const aoExpirarSessao = () => {
+            setUser(null);
+            setIsAuthenticated(false);
+            navigate('/login', { replace: true, state: { sessaoExpirada: true } });
+        };
+        window.addEventListener('auth:sessao-expirada', aoExpirarSessao);
+        return () => window.removeEventListener('auth:sessao-expirada', aoExpirarSessao);
     }, [navigate]);
 
     useEffect(() => {
@@ -133,11 +154,12 @@ export const AuthProvider = ({ children }) => {
             } catch (error) {
                 console.error("Erro ao validar token:", error);
                 localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
                 setUser(null);
                 setIsAuthenticated(false);
 
                 if (!isPublicRoute) {
-                    navigate("/login", { replace: true });
+                    navigate("/login", { replace: true, state: { sessaoExpirada: true } });
                 }
             } finally {
                 setIsLoading(false);

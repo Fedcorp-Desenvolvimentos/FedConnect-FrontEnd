@@ -24,29 +24,80 @@ api.interceptors.request.use(
   }
 );
 
-// CORREÇÃO: Verificação correta de rotas públicas
-const publicRoutes = ["/", "/login", "/recuperar-senha", "/resetar-senha", "/404"];
+// Rotas onde 401 é resposta legítima (credencial/refresh inválido) — nunca renovar
+const ROTAS_AUTH = ["login/", "google-login/", "login/refresh/"];
 
-const isPublic = publicRoutes.some((route) => {
+const isRotaAuth = (url) => {
+  const limpa = String(url || "").replace(/^\//, "");
+  return ROTAS_AUTH.includes(limpa);
+};
+
+// Calculada no momento do erro (spec auth-refresh-token — o cálculo no load
+// do módulo congelava o pathname da primeira página)
+const rotaPublicaAgora = () => {
   const pathname = window.location.pathname;
+  if (pathname.startsWith("/resetar-senha")) return true;
+  return ["/", "/login", "/recuperar-senha", "/404"].includes(pathname);
+};
 
-  // Caso especial para /resetar-senha/:token
-  if (route === "/resetar-senha") {
-    return pathname.startsWith("/resetar-senha/") || pathname === "/resetar-senha";
+// Renovação single-flight: N requisições com 401 simultâneo compartilham a
+// mesma Promise de refresh. Axios cru para não passar pelos interceptors.
+let refreshEmAndamento = null;
+
+const renovarAccess = () => {
+  if (!refreshEmAndamento) {
+    const refresh = localStorage.getItem("refreshToken");
+    refreshEmAndamento = axios
+      .post(`${api.defaults.baseURL}login/refresh/`, { refresh })
+      .then((response) => {
+        const { access, refresh: novoRefresh } = response.data;
+        localStorage.setItem("accessToken", access);
+        // Rotação ativa no backend: o refresh usado foi blacklistado
+        if (novoRefresh) {
+          localStorage.setItem("refreshToken", novoRefresh);
+        }
+        return access;
+      })
+      .finally(() => {
+        refreshEmAndamento = null;
+      });
   }
+  return refreshEmAndamento;
+};
 
-  // Para as outras rotas, verificação exata
-  return pathname === route;
-});
+const encerrarSessao = () => {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  if (!rotaPublicaAgora()) {
+    window.dispatchEvent(new CustomEvent("auth:sessao-expirada"));
+  }
+};
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401 && !isPublic) {
-      localStorage.removeItem("accessToken");
+  async (error) => {
+    const config = error.config;
+
+    if (error.response?.status !== 401 || !config || isRotaAuth(config.url)) {
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+
+    // Retry único por requisição; sem refresh armazenado não há o que renovar
+    if (config._retry || !localStorage.getItem("refreshToken")) {
+      encerrarSessao();
+      return Promise.reject(error);
+    }
+
+    config._retry = true;
+    try {
+      const access = await renovarAccess();
+      config.headers.Authorization = `Bearer ${access}`;
+      return api(config);
+    } catch (refreshError) {
+      encerrarSessao();
+      return Promise.reject(error);
+    }
   }
-)
+);
 
 export default api;

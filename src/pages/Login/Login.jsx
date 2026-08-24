@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useLoading } from '../../hooks/useLoading';
@@ -15,6 +15,16 @@ const Login = () => {
     const { startLoading, stopLoading, updateProgress } = useLoading();
     const { login, loginGoogle } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Aviso de sessão expirada (spec auth-refresh-token); limpa o state do
+    // histórico para a mensagem não reaparecer num F5
+    useEffect(() => {
+        if (location.state?.sessaoExpirada) {
+            setError('Sua sessão expirou. Faça login novamente.');
+            navigate('/login', { replace: true, state: null });
+        }
+    }, [location.state, navigate]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
