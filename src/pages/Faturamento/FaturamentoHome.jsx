@@ -17,10 +17,20 @@ const operacionais = [
   {
     key: "cancelamento-fatura",
     icon: <FaTimesCircle />,
-    title: "Cancelamento/Reemissão FedBnk",
+    title: "Cancelamento/Reemissão de Boletos",
     desc: "Cancele boletos ou corrija dados e reemita com número novo.",
     to: "/faturamento/cancelamento",
     niveis: ["admin", "faturamento", "ti"],
+    color: "#2463eb",
+    external: false,
+  },
+  {
+    key: "segunda-via",
+    icon: <FaFunnelDollar  />,
+    title: "Segunda Via de Boletos",
+    desc: "Consulte e emita a segunda via dos seus boletos.",
+    to: "/faturamento/segunda-via",
+    niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
     color: "#2463eb",
     external: false,
   },
@@ -64,16 +74,7 @@ const operacionais = [
     color: "#2463eb",
     external: false,
   },
-  {
-    key: "segunda-via",
-    icon: <FaFunnelDollar  />,
-    title: "Segunda Via de Boletos",
-    desc: "Consulte e emita a segunda via dos seus boletos.",
-    to: "/faturamento/segunda-via",
-    niveis: ["admin", "usuario", "comercial", "faturamento", "ti"],
-    color: "#2463eb",
-    external: false,
-  },
+  
 ];
 
 const FaturamentoHome = () => {

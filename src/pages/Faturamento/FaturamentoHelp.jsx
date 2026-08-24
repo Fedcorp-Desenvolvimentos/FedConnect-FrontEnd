@@ -30,7 +30,7 @@ export const FaturamentoHelp = () => {
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
           <div style={{ background: '#f8fafc', padding: '0.75rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-            <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}><FaTimesCircle /> Cancelamento/Reemissão FedBnk</strong>
+            <strong style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}><FaTimesCircle /> Cancelamento/Reemissão de Boletos</strong>
             <p style={{ margin: 0, fontSize: '0.875rem', color: '#475569' }}>Cancele faturas ou boletos, ou corrija dados e reemita boletos com número novo.</p>
           </div>
           <div style={{ background: '#f8fafc', padding: '0.75rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>

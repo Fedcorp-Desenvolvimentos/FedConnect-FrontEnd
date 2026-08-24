@@ -16,7 +16,7 @@ const operacionais = [
   {
     key: "cancelamento-fatura",
     icon: <i className="bi bi-x-octagon-fill" />,
-    title: "Cancelamento/Reemissão FedBnk",
+    title: "Cancelamento/Reemissão de Boletos",
     desc: "Cancele boletos ou corrija dados e reemita com número novo.",
     to: "/faturamento/cancelamento",
     niveis: ["admin", "faturamento", "ti"],

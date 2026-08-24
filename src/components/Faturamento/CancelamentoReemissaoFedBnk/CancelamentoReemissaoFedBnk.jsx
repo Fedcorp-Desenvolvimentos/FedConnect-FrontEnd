@@ -510,7 +510,7 @@ const CancelamentoReemissaoFedBnk = () => {
 
   return (
     <PageLayout
-      title="Cancelamento/Reemissão FedBnk"
+      title="Cancelamento/Reemissão de Boletos"
       subtitle="Consulte uma fatura para cancelar boletos ou corrigir dados e reemitir com número novo"
       icon={<GiCancel />}
     >
@@ -571,7 +571,7 @@ const CancelamentoReemissaoFedBnk = () => {
                 <S.InfoTitle>Informações da Fatura</S.InfoTitle>
                 {emCancelamento && cancelaveis.length > 0 && (
                   <S.CancelAllButton onClick={abrirConfirmTodos} disabled={ocupado}>
-                    <GiTrashCan /> Cancelar todos ({cancelaveis.length})
+                    <GiTrashCan /> Cancelar fatura e boletos ({cancelaveis.length})
                   </S.CancelAllButton>
                 )}
               </S.InfoHeader>
