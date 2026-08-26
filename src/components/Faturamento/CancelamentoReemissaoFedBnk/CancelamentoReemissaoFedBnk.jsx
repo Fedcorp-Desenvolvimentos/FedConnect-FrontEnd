@@ -81,6 +81,9 @@ const CancelamentoReemissaoFedBnk = () => {
     const pago = parcela?.DT_BAIXA != null || boleto.QUITADO === "S" || parcela?.STATUS === "B";
     const cancelado = boleto.STATUS_BOLETO === "C" || boleto.STATUS === "C" || boleto.DT_CANCEL != null;
     const temIdentificador = String(boleto.IDENTIFICADOR ?? "").trim() !== "";
+    // A reemissão MOVE a parcela para o documento novo; sem parcela vinculada
+    // nasceria um boleto invisível para o ERP (FedHub RF-FPY-009 recusa igual)
+    const temParcela = parcela != null;
 
     // Rótulo é só exibição — a elegibilidade (cancelável/tratável) usa os
     // flags pago/cancelado, pra um C sem identificador não virar cancelável
@@ -89,12 +92,13 @@ const CancelamentoReemissaoFedBnk = () => {
     // Status C sem identificador nunca chegou ao banco emissor
     else if (cancelado && !temIdentificador) rotulo = { chave: "nao_registrado", rotulo: "NÃO REGISTRADO" };
     else if (cancelado) rotulo = { chave: "cancelado", rotulo: "CANCELADO" };
+    else if (!temParcela) rotulo = { chave: "sem_parcela", rotulo: "SEM PARCELA" };
     else if (registro === "success") rotulo = { chave: "registrado", rotulo: "REGISTRADO" };
     else if (registro === "nao_registrado") rotulo = { chave: "nao_registrado", rotulo: "NÃO REGISTRADO" };
     else if (!consultaFedpayOk) rotulo = { chave: "ativo", rotulo: "ATIVO" };
     else rotulo = { chave: "desconhecido", rotulo: "A CONFERIR" };
 
-    return { ...rotulo, pago, cancelado };
+    return { ...rotulo, pago, cancelado, temParcela };
   };
 
   const buscarFatura = async () => {
@@ -152,7 +156,7 @@ const CancelamentoReemissaoFedBnk = () => {
           vencimento: boleto.VENCIMENTO || parcela?.VENCIMENTO || null,
           situacao,
           cancelavel: !situacao.pago && !situacao.cancelado,
-          tratavel: !situacao.pago,
+          tratavel: !situacao.pago && situacao.temParcela,
         };
       });
 
@@ -161,9 +165,13 @@ const CancelamentoReemissaoFedBnk = () => {
 
       const cancelaveis = linhas.filter((l) => l.cancelavel).length;
       const trataveis = linhas.filter((l) => l.tratavel).length;
+      const semParcela = linhas.filter((l) => !l.situacao.pago && !l.situacao.temParcela).length;
       const partes = [];
       if (podeCancelar) partes.push(`${cancelaveis} disponível(is) para cancelamento`);
-      if (podeReemitir) partes.push(`${trataveis} disponível(is) para reemissão`);
+      if (podeReemitir) {
+        partes.push(`${trataveis} disponível(is) para reemissão`);
+        if (semParcela > 0) partes.push(`${semParcela} sem parcela vinculada (reemissão indisponível)`);
+      }
 
       if (podeReemitir && !consultaFedpayOk) {
         setStatus({
@@ -645,7 +653,9 @@ const CancelamentoReemissaoFedBnk = () => {
                                   : "Este boleto não pode ser cancelado"
                                 : boleto.tratavel
                                   ? "Selecionar para reemissão"
-                                  : "Boleto pago não pode ser retrabalhado"
+                                  : boleto.situacao.pago
+                                    ? "Boleto pago não pode ser retrabalhado"
+                                    : "Sem parcela vinculada — reemita o boleto desta cobrança que detém a parcela"
                             }
                           />
                         </td>

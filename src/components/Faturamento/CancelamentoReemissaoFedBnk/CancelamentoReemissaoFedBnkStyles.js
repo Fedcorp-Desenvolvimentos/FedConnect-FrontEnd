@@ -305,6 +305,11 @@ export const StatusBadge = styled.span`
     background: #fffbeb;
     color: #92400e;
   `}
+
+  ${props => props.$status === 'sem_parcela' && css`
+    background: #fef3c7;
+    color: #b45309;
+  `}
 `;
 
 // Boletos
