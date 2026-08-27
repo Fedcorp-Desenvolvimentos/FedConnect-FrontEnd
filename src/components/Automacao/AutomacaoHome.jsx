@@ -13,6 +13,15 @@ const automacoes = [
     //     niveis: ["admin", "faturamento"]
     // },
     {
+        // Envio Porto (spec specs/envio-porto): níveis da PA-023 do FedHub (faturista = "faturamento")
+        key: "envio-porto",
+        icon: <i className="bi bi-send-fill" />,
+        title: "Envio Porto",
+        desc: "Gere a relação mensal para a Porto Seguro, envie por SFTP com confirmação e emita os relatórios de Subgrupos Vida.",
+        to: "/automacao/envio-porto",
+        niveis: ["admin", "faturamento", "ti"]
+    },
+    {
         key: "bbz-automation",
         icon: <i className="bi bi-file-earmark-pdf-fill" />,
         title: "Automações com BBZ",
