@@ -915,13 +915,20 @@ comissoes: comissoesEnriquecidas.map((c) => ({
     }
 
     try {
-      const fileName = await exportarComissoesParaExcel(comissoesSelecionadas, totals, documentType);
+      // Mesmo enriquecimento do Preview/emissão (cache por fatura em useRef):
+      // sem ele, Administradora/CNPJ saíam vazias quando o usuário exportava
+      // antes de gerar o preview
+      startLoading('Buscando administradoras para o Excel...');
+      const comissoesEnriquecidas = await enrichComissoesWithAdministradora(comissoesSelecionadas);
+      const fileName = await exportarComissoesParaExcel(comissoesEnriquecidas, totals, documentType);
       enqueueSnackbar(`Arquivo ${fileName} baixado com sucesso!`, { variant: 'success' });
     } catch (error) {
       console.error('Erro ao exportar para Excel:', error);
       enqueueSnackbar('Erro ao exportar para Excel', { variant: 'error' });
+    } finally {
+      stopLoading();
     }
-  }, [comissoes, selectedComissoes, totals, documentType, enqueueSnackbar]);
+  }, [comissoes, selectedComissoes, totals, documentType, enqueueSnackbar, startLoading, stopLoading]);
 
   return {
     loading,
