@@ -116,6 +116,7 @@ const ConsultaComissao = () => {
       'Favorecido': c.NOME || c.nome || '',
       'Documento': c.DOCUMENTO || c.doc_favorecido || '',
       'Produto': c.PRODUTO || c.produto || '',
+      'Segurado': c.NOME_SEGURADO || c.nome_segurado || '',
       'Administradora': c.ADMINISTRADORA || c.administradora || c.CEDENTE_NOME || c.cedente_nome || '',
       'Fatura': c.FATURA || c.fatura || '',
       'Parcela': c.PARCELA || c.parcela || '',
@@ -128,8 +129,8 @@ const ConsultaComissao = () => {
 
     const ws = XLSX.utils.json_to_sheet(data);
     ws['!cols'] = [
-      { wch: 40 }, { wch: 18 }, { wch: 25 }, { wch: 30 }, { wch: 12 },
-      { wch: 8 }, { wch: 14 }, { wch: 14 }, { wch: 14 },
+      { wch: 40 }, { wch: 18 }, { wch: 25 }, { wch: 30 }, { wch: 30 },
+      { wch: 12 }, { wch: 8 }, { wch: 14 }, { wch: 14 }, { wch: 14 },
       { wch: 12 }, { wch: 10 },
     ];
     const wb = XLSX.utils.book_new();
@@ -325,6 +326,9 @@ const ConsultaComissao = () => {
                   const produto = c.PRODUTO || c.produto || '';
                   const dtIniVig = c.DT_INI_VIG || c.dt_ini_vig || '';
                   const cedenteNome = c.ADMINISTRADORA || c.administradora || c.CEDENTE_NOME || c.cedente_nome || '';
+                  // NOME_SEGURADO = condomínio nas faturas coletivas (mesma
+                  // origem da coluna Condomínio da tela de emissão)
+                  const condominio = c.NOME_SEGURADO || c.nome_segurado || '';
 
                   return (
                     <S.TableRow
@@ -344,6 +348,9 @@ const ConsultaComissao = () => {
                       <S.FavorecidoCell>
                         <strong>{nome}</strong>
                         <span>{documento} · {produto}</span>
+                        {condominio && (
+                          <span style={{ fontSize: 11, color: '#4a5568' }}>Segurado: {condominio}</span>
+                        )}
                         {cedenteNome && (
                           <span style={{ fontSize: 11, color: '#718096' }}>Admin: {cedenteNome}</span>
                         )}
