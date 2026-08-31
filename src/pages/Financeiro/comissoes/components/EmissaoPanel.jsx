@@ -24,6 +24,7 @@ export const EmissaoPanel = ({
   onEmitir,
   onSair,
   loadingPreview = false,
+  loading = false,
   empresaPagadora = null,
   empresaPagadoraTipo = null,
   tiposMistos = false,
@@ -108,7 +109,7 @@ export const EmissaoPanel = ({
       <Actions style={{ flexDirection: 'column' }}>
         <Button
           className="primary block"
-          disabled={!canIssue || loadingPreview}
+          disabled={!canIssue || loadingPreview || loading}
           onClick={onPreview}
         >
           <FaEye />
@@ -117,11 +118,13 @@ export const EmissaoPanel = ({
 
         <Button
           className="success block"
-          disabled={!canIssue}
+          disabled={!canIssue || loadingPreview || loading}
           onClick={onEmitir}
         >
           <FaPrint />
-          Emitir {documentType === 'voucher' ? 'Voucher' : 'Recibo'}
+          {loading
+            ? 'Emitindo...'
+            : `Emitir ${documentType === 'voucher' ? 'Voucher' : 'Recibo'}`}
         </Button>
 
         <Button className="ghost block" onClick={onSair}>
