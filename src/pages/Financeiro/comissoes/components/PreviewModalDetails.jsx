@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatDateBR } from '../../../../utils/formatters';
 import { FaTimes, FaFileInvoice, FaChevronRight, FaPrint, FaSpinner } from 'react-icons/fa';
 import {
   ModalOverlay,
@@ -20,14 +21,9 @@ const formatMoney = (value) => {
   return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
 };
 
-const formatDate = (date) => {
-  if (!date) return '-';
-  try {
-    return new Date(date).toLocaleDateString('pt-BR');
-  } catch {
-    return '-';
-  }
-};
+// Fonte única em utils/formatters: `new Date('2026-08-01')` é meia-noite UTC
+// e volta um dia ao renderizar em UTC-3 — datas do ERP vêm como YYYY-MM-DD.
+const formatDate = (date) => formatDateBR(date, '-');
 
 const formatDateTime = (date) => {
   if (!date) return '-';

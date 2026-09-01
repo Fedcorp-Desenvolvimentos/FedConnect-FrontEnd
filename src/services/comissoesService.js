@@ -1,6 +1,7 @@
 // src/services/comissoesService.js
 
 import api from "./api";
+import { formatDateBR } from "../utils/formatters";
 
 /**
  * Busca pessoas (favorecidos) para filtros
@@ -287,14 +288,8 @@ export const exportarComissoesParaExcel = async (comissoes, totals, tipoDocument
     return Number(value);
   };
 
-  const formatDate = (date) => {
-    if (!date) return '';
-    try {
-      return new Date(date).toLocaleDateString('pt-BR');
-    } catch {
-      return '';
-    }
-  };
+  // Fonte única em utils/formatters — ver comentário em ComissoesPanel.
+  const formatDate = (date) => formatDateBR(date, '');
 
   const data = comissoes.map((c, index) => ({
     'Nº': index + 1,
