@@ -13,6 +13,7 @@ import {
 } from '../ComissoesStyles';
 import styled from 'styled-components';
 import { getComissaoKey } from '../hooks/useComissoes';
+import { formatDateBR } from '../../../../utils/formatters';
 
 
 
@@ -21,14 +22,9 @@ const formatMoney = (value) => {
   return `R$ ${Number(value).toFixed(2).replace('.', ',')}`;
 };
 
-const formatDate = (date) => {
-  if (!date) return '-';
-  try {
-    return new Date(date).toLocaleDateString('pt-BR');
-  } catch {
-    return '-';
-  }
-};
+// Fonte única em utils/formatters: `new Date('2026-08-01')` é meia-noite UTC
+// e volta um dia ao renderizar em UTC-3 — datas do ERP vêm como YYYY-MM-DD.
+const formatDate = (date) => formatDateBR(date, '-');
 
 export const ComissoesPanel = ({
   comissoes,

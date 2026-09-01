@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { PessoaSelect } from '../comissoes/components/PessoaSelect';
+import { formatDateBR } from '../../../utils/formatters';
 import { useConsultaComissao, getComissaoKey } from './hooks/useConsultaComissao';
 import * as S from './ConsultaComissaoStyles';
 import { getStatusInfo } from '../../../utils/status_comissao_helper';
@@ -20,14 +21,9 @@ const formatMoney = (value) => {
   })}`;
 };
 
-const formatDate = (date) => {
-  if (!date) return '-';
-  try {
-    return new Date(date).toLocaleDateString('pt-BR');
-  } catch {
-    return '-';
-  }
-};
+// Fonte única em utils/formatters: `new Date('2026-08-01')` é meia-noite UTC
+// e volta um dia ao renderizar em UTC-3 — datas do ERP vêm como YYYY-MM-DD.
+const formatDate = (date) => formatDateBR(date, '-');
 
 // ================================================================
 // COMPONENTES INTERNOS
