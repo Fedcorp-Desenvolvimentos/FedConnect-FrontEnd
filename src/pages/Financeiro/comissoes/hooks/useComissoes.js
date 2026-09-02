@@ -13,6 +13,7 @@ import {
   emitirRecibo
 } from '../../../../services/comissoesService';
 import { getFaturaPorNumeroViaFaturamento } from '../../../../services/consultaFatura';
+import { dataLocalISO } from '../../../../utils/formatters';
 import { getEmpresaPorTipo, inferirEmpresaPorTipos } from '../constants/empresasPagadoras';
 import { useAuth } from '../../../../context/AuthContext';
 
@@ -735,7 +736,8 @@ export const useEmissaoRecibos = () => {
 
       const payload = {
         tipo_documento: documentType,
-        data_emissao: new Date().toISOString().split('T')[0],
+        // Data local: toISOString() é UTC e vira o mês seguinte a partir das 21h.
+        data_emissao: dataLocalISO(),
         usuario: user?.nome_completo || user?.email,
         empresa_pagadora_nome: empresaPagadora?.nome || null,
         empresa_pagadora_cnpj: empresaPagadora?.cnpj || null,

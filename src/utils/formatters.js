@@ -97,3 +97,16 @@ export function formatTimeHHMM(value, fallback = "--:--") {
 
   return String(value).slice(0, 5) || fallback;
 }
+
+/**
+ * Data de hoje em AAAA-MM-DD pelo fuso local.
+ *
+ * `new Date().toISOString()` devolve a data em UTC: às 21h de 31/08 em Brasília
+ * ela já é 01/09, e o documento sairia com o mês errado.
+ */
+export function dataLocalISO(data = new Date()) {
+  const ano = data.getFullYear();
+  const mes = String(data.getMonth() + 1).padStart(2, "0");
+  const dia = String(data.getDate()).padStart(2, "0");
+  return `${ano}-${mes}-${dia}`;
+}
