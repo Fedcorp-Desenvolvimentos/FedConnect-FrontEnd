@@ -63,6 +63,28 @@ export const CursoCipaService = {
   excluirInscrito: async (turmaId, inscricaoId) => {
     await api.delete(`${API_URL}${turmaId}/inscricoes/${inscricaoId}/`);
   },
+
+  /** Planilha modelo dos inscritos (xlsx gerado pelo backend). */
+  baixarPlanilhaModelo: async () => {
+    const response = await api.get(`${API_URL}planilha-modelo/`, {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  /**
+   * Cria a turma com os inscritos da planilha em uma única transação: ou
+   * nasce completa, ou não nasce.
+   */
+  importarTurma: async ({ local, data, observacao, inscricoes }) => {
+    const response = await api.post(`${API_URL}importar/`, {
+      local,
+      data,
+      observacao,
+      inscricoes,
+    });
+    return response.data;
+  },
 };
 
 export default CursoCipaService;

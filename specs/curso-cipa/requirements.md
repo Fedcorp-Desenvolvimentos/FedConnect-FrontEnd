@@ -1,6 +1,6 @@
 # Requisitos — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0006 · Questões: PA-001..003, PA-024, PA-025
+> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0007 · Questões: PA-001..003, PA-024, PA-025
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 
 ## Contexto e Problema
@@ -11,7 +11,7 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 
 ## Escopo
 
-**Dentro do escopo:** home da área Condomed com um cartão por ferramenta; página `CursoCipa` com faixa de medidas, filtros (mês, local, situação, busca), calendário mensal dos dois locais e painel lateral (hoje, próximas, alertas, ocupação por local); modal de turma (data, local, situação, observação); painel de inscritos com o vínculo de cada participante; service; rota, item de menu e guarda de rota por nível.
+**Dentro do escopo:** home da área Condomed com um cartão por ferramenta; criação de turma por planilha com pré-visualização; página `CursoCipa` com faixa de medidas, filtros (mês, local, situação, busca), calendário mensal dos dois locais e painel lateral (hoje, próximas, alertas, ocupação por local); modal de turma (data, local, situação, observação); painel de inscritos com o vínculo de cada participante; service; rota, item de menu e guarda de rota por nível.
 
 **Fora do escopo:** alterações na agenda atual; cadastro de funcionários; `src/pages/RH` (mock, PA-002).
 
@@ -58,6 +58,18 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 - **QUANDO** abro `/condomed`, **ENTÃO** a interface **DEVE** listar as ferramentas da área em cartões, no mesmo padrão de Financeiro e Faturamento, mostrando apenas as permitidas para o meu nível. `[D]` ADR-0004
 - **SE** nenhuma ferramenta é permitida para o meu nível, **ENTÃO** a interface **DEVE** exibir a mensagem de área vazia em vez de uma grade em branco. `[E]` `CardGridLayout` (`empty`/`emptyMessage`)
 - **QUANDO** cadastro ou edito um usuário, **ENTÃO** o seletor de nível de acesso **DEVE** oferecer `condomed` — e todos os demais níveis aceitos pelo backend. `[E]` os dois formulários tinham listas fixas e divergentes; nenhuma citava `condomed` (nem `recepcionista` ou `vistoria`), enquanto `users.Usuario.NIVEL_ACESSO_CHOICES` aceita dez níveis
+
+### RF-CIP-005: Criar turma por planilha
+
+**Como** operador da Condomed, **quero** anexar a planilha que o condomínio mandou e ver o que entra antes de gravar, **para** não digitar 30 pessoas nem descobrir erro depois de salvar.
+
+- **QUANDO** abro "Turma por planilha", **ENTÃO** a interface **DEVE** pedir local e data e oferecer o download da planilha modelo. `[D]` ADR-0007
+- **QUANDO** anexo o arquivo, **ENTÃO** a interface **DEVE** ler no navegador e mostrar cada linha com o que ela tem e a situação dela — entra, ou o motivo de não entrar (campo em branco, CPF inválido, CPF repetido na planilha, administradora fora da base). `[D]` ADR-0007
+- **SE** faltam colunas obrigatórias no cabeçalho, **ENTÃO** a interface **DEVE** dizer quais e não tentar ler as linhas. `[D]` ADR-0007
+- **SE** há linhas com problema, **ENTÃO** a interface **DEVE** deixar importar só as válidas, avisando que as outras ficam de fora. `[D]` ADR-0007
+- **SE** as linhas válidas passam da capacidade do local, **ENTÃO** a interface **DEVE** bloquear a importação e dizer quantas sobram. `[D]` ADR-0007
+- **QUANDO** a importação dá certo, **ENTÃO** a interface **DEVE** abrir a lista de inscritos da turma criada, para conferência. `[D]` ADR-0007
+- **ENQUANTO** a lista de administradoras não carregou, a interface **DEVE** impedir a escolha do arquivo — sem ela toda linha erraria por "administradora não encontrada". `[E]` `ImportarPlanilhaModal` (botão desabilitado)
 
 ## Requisitos Não Funcionais
 

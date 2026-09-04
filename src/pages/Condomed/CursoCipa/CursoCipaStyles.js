@@ -923,6 +923,123 @@ export const Tabela = styled.table`
   tbody tr[data-duplicado="true"] td {
     background: #fffbeb;
   }
+
+  /* Linha da planilha que não passou na leitura: fica de fora da importação. */
+  tbody tr[data-invalida="true"] td {
+    background: #fef2f2;
+    color: #7f1d1d;
+  }
+`;
+
+/** Ações do cabeçalho da página (nova turma e turma por planilha). */
+export const AcoesCabecalho = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+`;
+
+/* ---------- Importação por planilha ---------- */
+
+export const AreaPlanilha = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.35rem;
+  padding: 0.9rem 1rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  flex-wrap: wrap;
+
+  strong {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: #0f3d5d;
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    max-width: 34rem;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: #64748b;
+  }
+`;
+
+export const AcoesPlanilha = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+`;
+
+export const NomeArquivo = styled.p`
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+`;
+
+export const AvisoBloco = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+
+  border: 1px solid
+    ${({ $tom }) => ($tom === "erro" ? "#fecaca" : "#fcd34d")};
+  background: ${({ $tom }) => ($tom === "erro" ? "#fef2f2" : "#fffbeb")};
+  color: ${({ $tom }) => ($tom === "erro" ? "#991b1b" : "#92400e")};
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+`;
+
+export const ResumoImportacao = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+  flex-wrap: wrap;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  span.ok {
+    color: #0f7b52;
+  }
+
+  span.erro {
+    color: #b91c1c;
+  }
+`;
+
+export const Selo = styled.span`
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+
+  background: ${({ $tom }) => ($tom === "ok" ? "#dcfce7" : "#fee2e2")};
+  color: ${({ $tom }) => ($tom === "ok" ? "#166534" : "#991b1b")};
 `;
 
 export const AvisoCampo = styled.span`

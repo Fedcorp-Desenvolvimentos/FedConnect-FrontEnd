@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FaChalkboardTeacher, FaPlus } from "react-icons/fa";
+import { FaChalkboardTeacher, FaFileExcel, FaPlus } from "react-icons/fa";
 import { format, parseISO } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import PageLayout from "../../../Layouts/PageLayout/PageLayout";
@@ -10,6 +10,7 @@ import PainelLateral from "./components/PainelLateral";
 import TurmaModal from "./components/TurmaModal";
 import InscritosPanel from "./components/InscritosPanel";
 import ConfirmarModal from "./components/ConfirmarModal";
+import ImportarPlanilhaModal from "./components/ImportarPlanilhaModal";
 import CursoCipaHelp from "./CursoCipaHelp";
 import { useCursoCipa } from "./hooks/useCursoCipa";
 import * as S from "./CursoCipaStyles";
@@ -37,6 +38,7 @@ export default function CursoCipa() {
     salvando,
     criarTurma,
     atualizarTurma,
+    importarTurma,
     excluirTurma,
     abrirTurma,
     fecharTurma,
@@ -52,6 +54,8 @@ export default function CursoCipa() {
   const [focarNovoInscrito, setFocarNovoInscrito] = useState(false);
   // Turma aguardando confirmação de exclusão (apaga inscritos e reserva).
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(null);
+  // { data } — criação de turma a partir de planilha de inscritos.
+  const [modalPlanilha, setModalPlanilha] = useState(null);
 
   const mesPorExtenso = useMemo(
     () => format(new Date(ano, mes - 1, 1), "MMMM 'de' yyyy", { locale: ptBR }),
@@ -75,6 +79,15 @@ export default function CursoCipa() {
     } else if (voltarParaInscritos) {
       await abrirTurma(salva);
     }
+  };
+
+  /** Importa a planilha e emenda na lista da turma criada, para conferência. */
+  const importarPlanilha = async (dados) => {
+    const turma = await importarTurma(dados);
+    if (!turma) return;
+    setModalPlanilha(null);
+    setFocarNovoInscrito(false);
+    await abrirTurma(turma);
   };
 
   /**
@@ -127,12 +140,21 @@ export default function CursoCipa() {
       helpContent={<CursoCipaHelp />}
       helpTitle="Guia rápido — Cursos CIPA"
       actions={
-        <S.Botao
-          type="button"
-          onClick={() => setModalTurma({ data: hoje, local: "", turma: null })}
-        >
-          <FaPlus size={11} /> Nova turma
-        </S.Botao>
+        <S.AcoesCabecalho>
+          <S.Botao
+            type="button"
+            $variante="secundario"
+            onClick={() => setModalPlanilha({ data: hoje })}
+          >
+            <FaFileExcel size={11} /> Turma por planilha
+          </S.Botao>
+          <S.Botao
+            type="button"
+            onClick={() => setModalTurma({ data: hoje, local: "", turma: null })}
+          >
+            <FaPlus size={11} /> Nova turma
+          </S.Botao>
+        </S.AcoesCabecalho>
       }
     >
       <S.Container>
@@ -206,6 +228,15 @@ export default function CursoCipa() {
             setFocarNovoInscrito(false);
             fecharTurma();
           }}
+        />
+
+        <ImportarPlanilhaModal
+          aberto={Boolean(modalPlanilha)}
+          dataInicial={modalPlanilha?.data}
+          locais={locais}
+          salvando={salvando}
+          onImportar={importarPlanilha}
+          onFechar={() => setModalPlanilha(null)}
         />
 
         <ConfirmarModal

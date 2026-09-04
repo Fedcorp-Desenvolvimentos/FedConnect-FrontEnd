@@ -1,6 +1,6 @@
 # Tarefas — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · CT: CT-CIP-001..013 · Questões: PA-003
+> **Rastreabilidade** — RF: RF-CIP-001..005 · CT: CT-CIP-001..018 · Questões: PA-003
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 > **Baseado em:** `design.md` (aprovado)
 
@@ -39,8 +39,16 @@
 - [x] T-CIP-5.2 Exclusão da turma pelo `ConfirmarModal`, nomeando local, dia, total de inscritos e a perda por condomínio; fim do `window.confirm` _(RF-CIP-002 · CT-CIP-013)_
 - [x] T-CIP-5.4 "Excluir turma" na barra do `InscritosPanel` _(RF-CIP-002 · CT-CIP-013)_
 
+## Fase 6 — Criar turma por planilha (ADR-0007)
+
+- [x] T-CIP-6.1 `lerPlanilhaInscritos`: cabeçalhos com apelidos, número da linha, obrigatórios, CPF, duplicidade e administradora contra a base _(RF-CIP-005 · CT-CIP-016, CT-CIP-017)_
+- [x] T-CIP-6.2 `ImportarPlanilhaModal` com local, data, download do modelo, anexo e pré-visualização _(RF-CIP-005 · CT-CIP-015)_
+- [x] T-CIP-6.3 Bloqueio por capacidade e aviso de linhas fora _(RF-CIP-005 · CT-CIP-018)_
+- [x] T-CIP-6.4 `importarTurma` no hook e no service; ação "Turma por planilha" no cabeçalho; abre a lista da turma criada _(RF-CIP-005 · CT-CIP-015)_
+- [x] T-CIP-6.5 Ajuda da tela com a seção de planilha _(RF-CIP-005)_
+
 ## Verificação Final
 
 - [x] Build passa (`npm run build`) em 2026-09-04, incluindo a Fase 4; detector de design sem achados em `src/pages/Condomed/CursoCipa`
-- [ ] Roteiro dos CT executado — CT-CIP-001..013 dependem de ambiente rodando
+- [ ] Roteiro dos CT executado — CT-CIP-001..018 dependem de ambiente rodando
 - [x] `bash specs/verificar.sh` sem violações no `curso-cipa` (R6 falha por PA-023 de `envio-porto`, cross-repo, pré-existente); STATUS.md atualizado

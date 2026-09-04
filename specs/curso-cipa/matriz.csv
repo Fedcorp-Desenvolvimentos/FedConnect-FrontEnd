@@ -5,3 +5,4 @@ RF-CIP-003;src/components/Sidebar/Sidebar.jsx:78-91|src/routes/PrivateRouter.jsx
 RF-CIP-004;ADR-0004|src/Layouts/CardGridLayout|users.Usuario.NIVEL_ACESSO_CHOICES;Arquitetura de Componentes|Decisões|Tratamento de Erros;;T-CIP-3.3|T-CIP-3.4;CT-CIP-007|CT-CIP-008;
 RNF-CIP-001;CONVENCOES.md secao 7;Contratos de API e Estado;;T-CIP-1.1;CT-CIP-002;
 RNF-CIP-002;CLAUDE.md Contexto crítico;Contratos de API e Estado;INV-CIP-001;T-CIP-2.4;CT-CIP-004;
+RF-CIP-005;ADR-0007|FedConnect-Back-End specs curso-cipa design.md;Arquitetura de Componentes|Decisões;;T-CIP-6.1|T-CIP-6.2|T-CIP-6.3|T-CIP-6.4|T-CIP-6.5;CT-CIP-015|CT-CIP-016|CT-CIP-017|CT-CIP-018;

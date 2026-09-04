@@ -31,7 +31,7 @@ const paraISO = (data) => {
   return `${data.getFullYear()}-${mes}-${dia}`;
 };
 
-const semAcento = (texto) =>
+export const semAcento = (texto) =>
   String(texto || "")
     .toLowerCase()
     .normalize("NFD")
@@ -155,6 +155,29 @@ export function useCursoCipa() {
         return turma;
       } catch (erro) {
         avisarErro(erro, "Não foi possível atualizar a turma.");
+        return null;
+      } finally {
+        setSalvando(false);
+      }
+    },
+    [carregarTurmas, enqueueSnackbar, avisarErro]
+  );
+
+  /** Cria a turma com os inscritos da planilha (uma requisição, uma transação). */
+  const importarTurma = useCallback(
+    async (dados) => {
+      setSalvando(true);
+      try {
+        const turma = await CursoCipaService.importarTurma(dados);
+        const total = dados.inscricoes.length;
+        enqueueSnackbar(
+          `Turma criada com ${total} ${total === 1 ? "inscrito" : "inscritos"}.`,
+          { variant: "success" }
+        );
+        await carregarTurmas();
+        return turma;
+      } catch (erro) {
+        avisarErro(erro, "Não foi possível importar a planilha.");
         return null;
       } finally {
         setSalvando(false);
@@ -417,6 +440,7 @@ export function useCursoCipa() {
     salvando,
     criarTurma,
     atualizarTurma,
+    importarTurma,
     excluirTurma,
     abrirTurma,
     fecharTurma,

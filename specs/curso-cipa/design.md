@@ -1,6 +1,6 @@
 # Design — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · INV: INV-CIP-001 · ADR: ADR-0002, ADR-0004..0006 · Questões: PA-001..003
+> **Rastreabilidade** — RF: RF-CIP-001..004 · INV: INV-CIP-001 · ADR: ADR-0002, ADR-0004..0007 · Questões: PA-001..003
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 > **Baseado em:** `requirements.md` (aprovado)
 
@@ -21,6 +21,9 @@ Home da área em `src/pages/Condomed/Home/` reusando o `CardGridLayout` das outr
 | `CalendarioMensal`, `PainelLateral` (ADR-0005) | etiqueta e linha passam a local + ocupação; o `title` da etiqueta lista as administradoras presentes |
 | `BarraFiltros` (ADR-0005) | a busca casa contra `turma.administradoras` e `turma.condominios` (derivados) |
 | `useCursoCipa` (ADR-0005) | remove o vínculo do payload da turma; guarda o último vínculo usado na sessão; busca sobre as listas derivadas |
+| `src/pages/Condomed/CursoCipa/lerPlanilhaInscritos.js` (novo, ADR-0007) | leitura e validação da planilha no navegador (xlsx), com apelidos de cabeçalho, número da linha do Excel e `semAcento` importado do hook (fonte única, regra do CLAUDE.md) |
+| `components/ImportarPlanilhaModal.jsx` (novo, ADR-0007) | local, data, download do modelo, anexo, pré-visualização linha a linha e bloqueio por capacidade |
+| `useCursoCipa` (ADR-0007) | `importarTurma` sobre `POST cursos-cipa/importar/`; `semAcento` passa a ser exportado |
 | `CursoCipa.jsx`, `ConfirmarModal` (ADR-0006) | exclusão da turma pelo `ConfirmarModal` (não mais `window.confirm`), com a perda agrupada por condomínio; `InscritosPanel` ganha "Excluir turma" |
 | `src/utils/formatters.js` | `formatCPF`, `validarCPF` (novos) |
 | `src/pages/Condomed/Home/CondomedHome.jsx` (novo) | home da área sobre `CardGridLayout`; cartões declarados em `opcoesCondomed` com `niveis`, hoje só Cursos CIPA |
@@ -61,6 +64,7 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 
 - ADR-0002: painel único dos dois locais no lugar das abas por local.
 - ADR-0005: vínculo (administradora + condomínio) no formulário do inscrito; turma identificada por local + ocupação; busca sobre as listas derivadas.
+- ADR-0007: planilha lida e validada no navegador, com pré-visualização antes de gravar; a decisão sobre as linhas ruins é do operador.
 - ADR-0006: exclusão da turma com confirmação que nomeia a perda, alcançável da lista de inscritos. Excluir é o único caminho oferecido ali: cancelar continua existindo como situação da turma, no formulário, não como desvio da exclusão.
 - ADR-0004: home da área no menu (padrão `CardGridLayout` de Financeiro e Faturamento) em vez de a rota abrir direto a tela do CIPA; e `accessLevels.js` como fonte única dos níveis, espelhando os choices do backend.
 - Guarda de rota via prop `allowed` no `PrivateRouter` (aditiva; rotas atuais sem a prop mantêm comportamento). Decisão local, sem ADR — vira ADR se for generalizada às outras rotas.
@@ -90,6 +94,10 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 | CT-CIP-010 | RF-CIP-002 | Segundo inscrito na mesma sessão já vem com administradora e condomínio do anterior, e o campo aceita troca |
 | CT-CIP-011 | RF-CIP-001 | Etiqueta do calendário, painel lateral e título da lista mostram local + ocupação; turma vazia mostra `0/capacidade` |
 | CT-CIP-012 | RF-CIP-001 | Busca por nome de administradora traz as turmas que têm inscritos dela; busca por condomínio idem |
+| CT-CIP-015 | RF-CIP-005 | Planilha do modelo com 3 linhas boas → pré-visualização com 3 "entra"; importar cria a turma e abre a lista com os 3 |
+| CT-CIP-016 | RF-CIP-005 | Planilha com CPF inválido, campo em branco, CPF repetido e administradora inexistente → cada linha mostra o motivo; importa só as válidas |
+| CT-CIP-017 | RF-CIP-005 | Cabeçalho sem a coluna `cpf` → aviso nomeando a coluna, sem listar linhas; planilha vazia → aviso |
+| CT-CIP-018 | RF-CIP-005 | 11 linhas válidas para a sala de reunião → importação bloqueada dizendo que sobra 1; "Baixar modelo" salva o arquivo |
 | CT-CIP-013 | RF-CIP-002 | Excluir turma pela lista de inscritos e pelo formulário: a confirmação nomeia local, dia, total de inscritos e condomínios; confirmar apaga e fecha os painéis |
 
 ## Impacto e Riscos

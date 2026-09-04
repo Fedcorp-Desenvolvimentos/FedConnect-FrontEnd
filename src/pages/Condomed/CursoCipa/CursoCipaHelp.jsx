@@ -1,4 +1,9 @@
-import { FaCalendarAlt, FaUsers, FaExclamationTriangle } from "react-icons/fa";
+import {
+  FaCalendarAlt,
+  FaUsers,
+  FaFileExcel,
+  FaExclamationTriangle,
+} from "react-icons/fa";
 
 const secao = { marginBottom: "1.5rem" };
 
@@ -53,6 +58,26 @@ export const CursoCipaHelp = () => (
         condomínio inteiro e só troque o vínculo ao passar para o próximo. Os dois campos
         continuam editáveis a qualquer momento, inclusive ao corrigir um inscrito já
         gravado.
+      </p>
+    </div>
+
+    <div style={secao}>
+      <h3 style={titulo}>
+        <FaFileExcel /> Turma por planilha
+      </h3>
+      <p style={texto}>
+        Use <strong>Turma por planilha</strong> quando a lista já vier pronta do
+        condomínio. Escolha o local e o dia na tela, baixe o <strong>modelo</strong>{" "}
+        e preencha uma linha por pessoa — a planilha não tem colunas de local e data
+        de propósito: uma planilha é uma turma.
+      </p>
+      <p style={{ ...texto, marginTop: "0.5rem" }}>
+        Ao anexar o arquivo, a tela mostra linha por linha o que entra e o que tem
+        problema (CPF inválido, campo em branco, CPF repetido, administradora que
+        não existe na base) — <strong>nada é gravado antes de você conferir</strong>.
+        Dá para importar só as linhas boas ou corrigir a planilha e anexar de novo.
+        Se a lista tiver mais gente do que as vagas do local, a importação não sai:
+        quem fica de fora do curso é decisão sua, não da ordem das linhas.
       </p>
     </div>
 
