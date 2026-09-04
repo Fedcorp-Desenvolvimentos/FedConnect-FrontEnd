@@ -1,12 +1,12 @@
 # Design — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · INV: INV-CIP-001 · ADR: ADR-0002, ADR-0004 · Questões: PA-001..003
-> **Status:** aprovado · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
+> **Rastreabilidade** — RF: RF-CIP-001..004 · INV: INV-CIP-001 · ADR: ADR-0002, ADR-0004, ADR-0005 · Questões: PA-001..003
+> **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 > **Baseado em:** `requirements.md` (aprovado)
 
 ## Visão Geral da Solução
 
-Home da área em `src/pages/Condomed/Home/` reusando o `CardGridLayout` das outras áreas (um cartão por ferramenta, filtrado pelo nível) — o menu passa a apontar para o setor, não para uma tela dele. Página nova `src/pages/Condomed/CursoCipa/` com `PageLayout` (ação "Nova turma" no cabeçalho): faixa de quatro medidas, barra de filtros, calendário mensal próprio (dias, não slots — `agendaSlots.js` não se aplica e fica intocado) onde cada turma é uma etiqueta dentro do dia, e painel lateral com hoje, próximas turmas, alertas e ocupação por local. Service `cursoCipaService.js` sobre `api.js`. Modal de turma com administradora em select digitável (`input` + `datalist` sobre `/vistorias/administradoras/`) e condomínio digitado; painel de inscritos no padrão `PessoaFormFields`. Guarda de rota por nível adicionada ao `PrivateRouter` (prop `allowed`), fechando o gap para esta rota sem alterar as demais.
+Home da área em `src/pages/Condomed/Home/` reusando o `CardGridLayout` das outras áreas (um cartão por ferramenta, filtrado pelo nível) — o menu passa a apontar para o setor, não para uma tela dele. Página nova `src/pages/Condomed/CursoCipa/` com `PageLayout` (ação "Nova turma" no cabeçalho): faixa de quatro medidas, barra de filtros, calendário mensal próprio (dias, não slots — `agendaSlots.js` não se aplica e fica intocado) onde cada turma é uma etiqueta dentro do dia, e painel lateral com hoje, próximas turmas, alertas e ocupação por local. Service `cursoCipaService.js` sobre `api.js`. Modal de turma **só com local, data, situação e observação** (ADR-0005). O select digitável de administradora (`input` + `datalist` sobre `/vistorias/administradoras/`) e o condomínio digitado migram para o formulário de inscrito, dentro do painel de inscritos, que segue o padrão `PessoaFormFields`. Guarda de rota por nível adicionada ao `PrivateRouter` (prop `allowed`), fechando o gap para esta rota sem alterar as demais.
 
 ## Arquitetura de Componentes
 
@@ -16,6 +16,11 @@ Home da área em `src/pages/Condomed/Home/` reusando o `CardGridLayout` das outr
 | `src/pages/Condomed/CursoCipa/CursoCipa.jsx` (novo) | container: resumo, calendário, trilho, modais |
 | `src/pages/Condomed/CursoCipa/hooks/useCursoCipa.js` (novo) | estado, chamadas, tratamento 409/400 (fonte única das regras de tela) |
 | `src/pages/Condomed/CursoCipa/components/` (novo) | `FaixaMedidas`, `BarraFiltros`, `CalendarioMensal`, `PainelLateral`, `TurmaModal`, `InscritosPanel`, `ConfirmarModal`; `CursoCipaHelp` e `CursoCipaStyles` na raiz da página |
+| `TurmaModal` (ADR-0005) | perde administradora e condomínio; fica local, data, situação e observação |
+| `InscritosPanel` (ADR-0005) | ganha administradora (select digitável) e condomínio (digitado) por inscrito, obrigatórios, com repetição do vínculo do inscrito anterior; a tabela ganha as duas colunas; o título passa a local + ocupação |
+| `CalendarioMensal`, `PainelLateral` (ADR-0005) | etiqueta e linha passam a local + ocupação; o `title` da etiqueta lista as administradoras presentes |
+| `BarraFiltros` (ADR-0005) | a busca casa contra `turma.administradoras` e `turma.condominios` (derivados) |
+| `useCursoCipa` (ADR-0005) | remove o vínculo do payload da turma; guarda o último vínculo usado na sessão; busca sobre as listas derivadas |
 | `src/utils/formatters.js` | `formatCPF`, `validarCPF` (novos) |
 | `src/pages/Condomed/Home/CondomedHome.jsx` (novo) | home da área sobre `CardGridLayout`; cartões declarados em `opcoesCondomed` com `niveis`, hoje só Cursos CIPA |
 | `src/pages/Condomed/Home/CondomedHomeHelp.jsx` (novo) | ajuda da área (o que é a Condomed, o que é cada cartão, quem tem acesso) |
@@ -54,10 +59,13 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 ## Decisões
 
 - ADR-0002: painel único dos dois locais no lugar das abas por local.
+- ADR-0005: vínculo (administradora + condomínio) no formulário do inscrito; turma identificada por local + ocupação; busca sobre as listas derivadas.
 - ADR-0004: home da área no menu (padrão `CardGridLayout` de Financeiro e Faturamento) em vez de a rota abrir direto a tela do CIPA; e `accessLevels.js` como fonte única dos níveis, espelhando os choices do backend.
 - Guarda de rota via prop `allowed` no `PrivateRouter` (aditiva; rotas atuais sem a prop mantêm comportamento). Decisão local, sem ADR — vira ADR se for generalizada às outras rotas.
 
 ## Divergência vs. produção
+
+- A tela em produção (branch `feat/curso-cipa`) ainda cadastra administradora e condomínio na turma: a Fase 4 desta spec é o que a alinha ao ADR-0005. O deploy do frontend e do backend é o mesmo evento — a migração `0002` do backend remove os campos do contrato da turma.
 
 - O seletor em cascata administradora → condomínio não foi possível: não existe endpoint de condomínios por administradora. A administradora é um select digitável sobre `/vistorias/administradoras/` e o condomínio é só o nome digitado — o código do condomínio e o técnico instrutor foram retirados do escopo pelo dono em 2026-08-31. `[P]` PA-003
 
@@ -76,6 +84,10 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 | CT-CIP-006 | RF-CIP-001 | Turma na sala aparece como "Reservado" 09:00–17:30 na tela `/agenda` (verifica PA-001) |
 | CT-CIP-007 | RF-CIP-004 | `/condomed` lista o cartão de Cursos CIPA para `condomed`/`admin` e a mensagem de área vazia para outro nível; menu marca "Condomed" também dentro da tela do CIPA |
 | CT-CIP-008 | RF-CIP-004 | Cadastro e edição de usuário oferecem `Condomed` no seletor de nível, e o usuário salvo com esse nível entra em `/condomed` |
+| CT-CIP-009 | RF-CIP-002 | Inscrito sem administradora ou sem condomínio: envio bloqueado apontando o campo; com os dois, salva e a tabela mostra as colunas |
+| CT-CIP-010 | RF-CIP-002 | Segundo inscrito na mesma sessão já vem com administradora e condomínio do anterior, e o campo aceita troca |
+| CT-CIP-011 | RF-CIP-001 | Etiqueta do calendário, painel lateral e título da lista mostram local + ocupação; turma vazia mostra `0/capacidade` |
+| CT-CIP-012 | RF-CIP-001 | Busca por nome de administradora traz as turmas que têm inscritos dela; busca por condomínio idem |
 
 ## Impacto e Riscos
 

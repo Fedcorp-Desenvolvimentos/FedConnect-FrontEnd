@@ -10,7 +10,9 @@ function LinhaTurma({ turma, onAbrir, rotuloData }) {
     <S.LinhaTurma type="button" onClick={() => onAbrir(turma)}>
       <S.LinhaData dateTime={turma.data}>{rotuloData}</S.LinhaData>
       <span>
-        <S.LinhaNome>{turma.condominio_nome}</S.LinhaNome>
+        <S.LinhaNome>
+          {turma.local_nome} · {turma.total_inscritos}/{turma.capacidade}
+        </S.LinhaNome>
         <S.LinhaMeta>
           <S.Etiqueta $local={turma.local}>{turma.local_nome}</S.Etiqueta>
           {String(turma.hora_inicio).slice(0, 5)}–{String(turma.hora_fim).slice(0, 5)}

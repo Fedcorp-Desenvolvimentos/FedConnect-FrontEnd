@@ -66,7 +66,12 @@ export default function CalendarioMensal({
                     type="button"
                     $local={turma.local}
                     $cancelada={turma.status === "cancelada"}
-                    title={`${turma.condominio_nome} — ${turma.local_nome}, ${turma.total_inscritos} de ${turma.capacidade} inscritos`}
+                    title={[
+                      `${turma.local_nome}: ${turma.total_inscritos} de ${turma.capacidade} inscritos`,
+                      (turma.condominios || []).length
+                        ? (turma.condominios || []).join(", ")
+                        : "sem inscritos ainda",
+                    ].join(" — ")}
                     onClick={(evento) => {
                       evento.stopPropagation();
                       onAbrirTurma(turma);
@@ -76,7 +81,7 @@ export default function CalendarioMensal({
                       {String(turma.hora_inicio).slice(0, 5)} –{" "}
                       {String(turma.hora_fim).slice(0, 5)}
                     </S.TurmaHora>
-                    <S.TurmaNome $local={turma.local}>{turma.condominio_nome}</S.TurmaNome>
+                    <S.TurmaNome $local={turma.local}>{turma.local_nome}</S.TurmaNome>
                     <S.TurmaContagem>
                       {turma.total_inscritos} / {turma.capacidade}
                       {turma.tem_espelho === false && (

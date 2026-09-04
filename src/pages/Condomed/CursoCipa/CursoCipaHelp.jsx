@@ -25,6 +25,14 @@ export const CursoCipaHelp = () => (
         não há campo de horário. Se o dia já estiver ocupado, o sistema recusa e diz o que
         está no caminho.
       </p>
+      <p style={{ ...texto, marginTop: "0.5rem" }}>
+        A turma <strong>não tem um condomínio dono</strong>: ela é um dia de curso em um
+        local, e as vagas são preenchidas com funcionários de administradoras e
+        condomínios diferentes. Por isso o formulário da turma pede só local, data,
+        situação e observação — a administradora e o condomínio de cada pessoa são
+        informados na lista de inscritos. No calendário, a turma aparece pelo local e pela
+        ocupação (por exemplo, <strong>Auditório · 12/30</strong>).
+      </p>
     </div>
 
     <div style={secao}>
@@ -32,10 +40,19 @@ export const CursoCipaHelp = () => (
         <FaUsers /> Inscritos
       </h3>
       <p style={texto}>
-        Clique na turma dentro do calendário para abrir a lista. Nome, CPF e função são
-        obrigatórios; e-mail e telefone, opcionais. O contador mostra{" "}
+        Clique na turma dentro do calendário para abrir a lista.{" "}
+        <strong>Administradora, condomínio, nome, CPF e função</strong> são obrigatórios;
+        e-mail e telefone, opcionais. A administradora vem da lista da companhia (digite
+        para filtrar) e o condomínio é digitado. O contador mostra{" "}
         <strong>inscritos / capacidade</strong> — 30 no auditório, 10 na sala de reunião —
         e o botão desabilita quando a turma lota.
+      </p>
+      <p style={{ ...texto, marginTop: "0.5rem" }}>
+        Depois de adicionar alguém, o formulário já vem com a mesma administradora e o
+        mesmo condomínio, porque em geral as pessoas entram em blocos — cadastre o
+        condomínio inteiro e só troque o vínculo ao passar para o próximo. Os dois campos
+        continuam editáveis a qualquer momento, inclusive ao corrigir um inscrito já
+        gravado.
       </p>
     </div>
 

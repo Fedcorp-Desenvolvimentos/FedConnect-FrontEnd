@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { parseISO, format } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import {
@@ -14,10 +14,20 @@ import {
   formatDateBR,
   validarCPF,
 } from "../../../../utils/formatters";
+import { listarAdministradoras } from "../../../../services/vistoriasService";
 import ConfirmarModal from "./ConfirmarModal";
 import * as S from "../CursoCipaStyles";
 
-const VAZIO = { nome: "", cpf: "", funcao: "", email: "", telefone: "" };
+const VAZIO = {
+  nome: "",
+  cpf: "",
+  funcao: "",
+  email: "",
+  telefone: "",
+  administradora_nome: "",
+  administradora_codigo: "",
+  condominio_nome: "",
+};
 
 /**
  * Painel de inscritos da turma. Capacidade e contagem vêm da resposta do
@@ -25,6 +35,11 @@ const VAZIO = { nome: "", cpf: "", funcao: "", email: "", telefone: "" };
  *
  * O mesmo formulário adiciona e edita: `editando` guarda o inscrito em edição,
  * e nulo significa cadastro novo.
+ *
+ * Cada participante traz o próprio vínculo — administradora e condomínio
+ * (ADR-0005) —, porque a turma recebe gente de administradoras diferentes. As
+ * pessoas entram em blocos por condomínio, então o formulário repete o vínculo
+ * do último inscrito adicionado na sessão.
  */
 export default function InscritosPanel({
   turma,
@@ -38,12 +53,44 @@ export default function InscritosPanel({
   onFechar,
 }) {
   const [form, setForm] = useState(VAZIO);
+  const [administradoras, setAdministradoras] = useState([]);
+  // Vínculo do último inscrito gravado nesta sessão, para repetir no próximo.
+  const [ultimoVinculo, setUltimoVinculo] = useState(null);
   const [erros, setErros] = useState({});
   const [enviando, setEnviando] = useState(false);
   const [editando, setEditando] = useState(null);
   const [confirmandoRemocao, setConfirmandoRemocao] = useState(null);
   // { dados, turmas } — CPF já inscrito em outra turma, aguardando confirmação.
   const [confirmandoDuplicidade, setConfirmandoDuplicidade] = useState(null);
+
+  useEffect(() => {
+    if (administradoras.length) return;
+    listarAdministradoras()
+      .then((resposta) => {
+        if (resposta?.sucesso) setAdministradoras(resposta.data || []);
+      })
+      .catch(() => setAdministradoras([]));
+  }, [administradoras.length]);
+
+  // Select digitável: o operador filtra pelo nome; o código vem da opção casada.
+  const opcoesAdm = useMemo(
+    () =>
+      administradoras.map((item) => ({
+        nome: item.nome,
+        codigo: String(item.pessoa),
+      })),
+    [administradoras]
+  );
+
+  const admCasada = useMemo(
+    () =>
+      opcoesAdm.find(
+        (opcao) =>
+          opcao.nome.trim().toLowerCase() ===
+          (form.administradora_nome || "").trim().toLowerCase()
+      ),
+    [opcoesAdm, form.administradora_nome]
+  );
 
   if (!turma) return null;
 
@@ -75,13 +122,19 @@ export default function InscritosPanel({
       funcao: inscrito.funcao || "",
       email: inscrito.email || "",
       telefone: inscrito.telefone || "",
+      administradora_nome: inscrito.administradora_nome || "",
+      administradora_codigo: inscrito.administradora_codigo || "",
+      condominio_nome: inscrito.condominio_nome || "",
     });
   };
+
+  /** Formulário limpo, mantendo o vínculo do último inscrito da sessão. */
+  const formNovo = () => ({ ...VAZIO, ...(ultimoVinculo || {}) });
 
   const cancelarEdicao = () => {
     setEditando(null);
     setErros({});
-    setForm(VAZIO);
+    setForm(formNovo());
   };
 
   const submeter = async (evento) => {
@@ -91,10 +144,24 @@ export default function InscritosPanel({
     if (!validarCPF(form.cpf)) novosErros.cpf = "CPF inválido.";
     else if (jaInscrito) novosErros.cpf = `Já inscrito nesta turma: ${jaInscrito.nome}.`;
     if (!form.funcao.trim()) novosErros.funcao = "Informe a função.";
+    if (!(form.administradora_nome || "").trim()) {
+      novosErros.administradora_nome = "Informe a administradora.";
+    } else if (!admCasada) {
+      novosErros.administradora_nome = "Escolha uma administradora da lista.";
+    }
+    if (!(form.condominio_nome || "").trim()) {
+      novosErros.condominio_nome = "Informe o condomínio.";
+    }
     setErros(novosErros);
     if (Object.keys(novosErros).length) return;
 
-    const dados = { ...form, cpf: apenasDigitos(form.cpf) };
+    const dados = {
+      ...form,
+      cpf: apenasDigitos(form.cpf),
+      administradora_nome: admCasada.nome,
+      administradora_codigo: admCasada.codigo,
+      condominio_nome: form.condominio_nome.trim(),
+    };
     const cpfMudou = !editando || editando.cpf !== dados.cpf;
 
     setEnviando(true);
@@ -115,8 +182,14 @@ export default function InscritosPanel({
       ? await onEditar(editando.id, dados)
       : await onAdicionar(dados);
     if (!ok) return false;
+    const vinculo = {
+      administradora_nome: dados.administradora_nome,
+      administradora_codigo: dados.administradora_codigo,
+      condominio_nome: dados.condominio_nome,
+    };
+    setUltimoVinculo(vinculo);
     setEditando(null);
-    setForm(VAZIO);
+    setForm({ ...VAZIO, ...vinculo });
     return true;
   };
 
@@ -140,11 +213,19 @@ export default function InscritosPanel({
       <S.Modal $largo onClick={(evento) => evento.stopPropagation()}>
         <S.ModalHeader>
           <div>
-            <h2>{turma.condominio_nome}</h2>
+            <h2>
+              {turma.local_nome} · {inscritos.length}/{turma.capacidade}
+            </h2>
             <p>
-              {turma.local_nome} ·{" "}
-              {format(parseISO(turma.data), "d 'de' MMMM", { locale: ptBR })} ·
+              {format(parseISO(turma.data), "EEEE, d 'de' MMMM", { locale: ptBR })} ·
               09:00 às 17:30
+              {turma.administradoras?.length
+                ? ` · ${turma.administradoras.length} ${
+                    turma.administradoras.length === 1
+                      ? "administradora"
+                      : "administradoras"
+                  }`
+                : ""}
             </p>
           </div>
           <S.FecharButton type="button" onClick={onFechar} aria-label="Fechar">
@@ -182,8 +263,9 @@ export default function InscritosPanel({
               <tr>
                 <th>Nome</th>
                 <th>CPF</th>
+                <th>Condomínio</th>
+                <th>Administradora</th>
                 <th>Função</th>
-                <th>Contato</th>
                 <th />
               </tr>
             </thead>
@@ -196,8 +278,9 @@ export default function InscritosPanel({
                 >
                   <td>{inscrito.nome}</td>
                   <td className="numero">{formatCPF(inscrito.cpf)}</td>
+                  <td>{inscrito.condominio_nome}</td>
+                  <td>{inscrito.administradora_nome || "—"}</td>
                   <td>{inscrito.funcao}</td>
-                  <td>{inscrito.email || inscrito.telefone || "—"}</td>
                   <td>
                     <S.AcoesLinha>
                       <S.BotaoIcone
@@ -230,6 +313,42 @@ export default function InscritosPanel({
             {editando ? `Editando ${editando.nome}` : "Adicionar inscrito"}
           </S.SecaoTitulo>
           <form onSubmit={submeter}>
+            <S.Linha>
+              <S.Campo $erro={Boolean(erros.administradora_nome)}>
+                Administradora
+                <input
+                  list="cipa-administradoras"
+                  value={form.administradora_nome}
+                  onChange={(evento) =>
+                    alterar("administradora_nome", evento.target.value)
+                  }
+                  placeholder="Digite para buscar..."
+                  autoComplete="off"
+                  disabled={camposBloqueados}
+                />
+                <datalist id="cipa-administradoras">
+                  {opcoesAdm.map((opcao) => (
+                    <option key={opcao.codigo} value={opcao.nome} />
+                  ))}
+                </datalist>
+                {erros.administradora_nome && (
+                  <span className="erro">{erros.administradora_nome}</span>
+                )}
+              </S.Campo>
+              <S.Campo $erro={Boolean(erros.condominio_nome)}>
+                Condomínio
+                <input
+                  value={form.condominio_nome}
+                  onChange={(evento) => alterar("condominio_nome", evento.target.value)}
+                  placeholder="Ex.: Residencial Aurora"
+                  disabled={camposBloqueados}
+                />
+                {erros.condominio_nome && (
+                  <span className="erro">{erros.condominio_nome}</span>
+                )}
+              </S.Campo>
+            </S.Linha>
+
             <S.Linha>
               <S.Campo $erro={Boolean(erros.nome)}>
                 Nome
@@ -348,7 +467,9 @@ export default function InscritosPanel({
           }
           itens={(confirmandoDuplicidade?.turmas || []).map((t) => ({
             chave: t.inscricao_id,
-            titulo: t.condominio_nome,
+            titulo: `${t.condominio_nome}${
+              t.administradora_nome ? ` — ${t.administradora_nome}` : ""
+            }`,
             detalhe: `${t.local_nome} · ${formatDateBR(t.data, "-")}${
               t.status === "cancelada" ? " · turma cancelada" : ""
             }`,

@@ -1,7 +1,7 @@
 # Tarefas — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · CT: CT-CIP-001..008 · Questões: PA-003
-> **Status:** aprovado · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
+> **Rastreabilidade** — RF: RF-CIP-001..004 · CT: CT-CIP-001..012 · Questões: PA-003
+> **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 > **Baseado em:** `design.md` (aprovado)
 
 ## Fase 1 — Fundação
@@ -24,8 +24,18 @@
 - [x] T-CIP-3.4 `accessLevels.js` como fonte única (`ACCESS_LEVEL_OPTIONS`) e os seletores de Cadastro e Gerenciar Usuários passando a consumi-la _(RF-CIP-004 · CT-CIP-008)_
 - [ ] T-CIP-3.2 Verificação do espelho na `/agenda` _(RF-CIP-001 · CT-CIP-006)_ — pendente: exige app rodando contra o backend com a migração aplicada
 
+## Fase 4 — Vínculo no inscrito (ADR-0005)
+
+- [x] T-CIP-4.1 `TurmaModal` sem administradora e condomínio (fica local, data, situação, observação) _(RF-CIP-001 · CT-CIP-011)_
+- [x] T-CIP-4.2 `InscritosPanel`: administradora (select digitável) e condomínio por inscrito, obrigatórios, com as duas colunas na tabela _(RF-CIP-002 · CT-CIP-009)_
+- [x] T-CIP-4.3 Repetição do vínculo do inscrito anterior na mesma sessão _(RF-CIP-002 · CT-CIP-010)_
+- [x] T-CIP-4.4 Identificação por local + ocupação em `CalendarioMensal`, `PainelLateral` e no título do `InscritosPanel` _(RF-CIP-001 · CT-CIP-011)_
+- [x] T-CIP-4.5 Busca da `BarraFiltros` sobre `turma.administradoras`/`turma.condominios`; `useCursoCipa` sem o vínculo no payload da turma _(RF-CIP-001 · CT-CIP-012)_
+- [x] T-CIP-4.6 Aviso de CPF em outra turma exibindo administradora e condomínio da inscrição encontrada _(RF-CIP-002 · CT-CIP-009)_
+- [x] T-CIP-4.7 Reescrever `CursoCipaHelp` nas partes de agendamento e inscritos _(RF-CIP-001, RF-CIP-002)_
+
 ## Verificação Final
 
-- [x] Build passa (`npm run build`) em 2026-09-04; detector de design sem achados em `src/pages/Condomed/CursoCipa`
-- [ ] Roteiro dos CT executado — CT-CIP-001..008 dependem de ambiente rodando
+- [x] Build passa (`npm run build`) em 2026-09-04, incluindo a Fase 4; detector de design sem achados em `src/pages/Condomed/CursoCipa`
+- [ ] Roteiro dos CT executado — CT-CIP-001..012 dependem de ambiente rodando
 - [x] `bash specs/verificar.sh` sem violações no `curso-cipa` (R6 falha por PA-023 de `envio-porto`, cross-repo, pré-existente); STATUS.md atualizado

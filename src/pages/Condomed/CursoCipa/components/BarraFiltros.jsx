@@ -58,7 +58,7 @@ export default function BarraFiltros({
           <input
             value={filtros.busca}
             onChange={(evento) => onAlterarFiltro("busca", evento.target.value)}
-            placeholder="Buscar condomínio ou administradora"
+            placeholder="Buscar por condomínio ou administradora dos inscritos"
             aria-label="Buscar turma"
           />
         </S.Busca>

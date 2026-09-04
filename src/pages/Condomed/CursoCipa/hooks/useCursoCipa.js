@@ -275,8 +275,15 @@ export function useCursoCipa() {
       if (filtros.local && turma.local !== filtros.local) return false;
       if (filtros.status && turma.status !== filtros.status) return false;
       if (!busca) return true;
+      // A turma não tem cliente: busca contra as administradoras e os
+      // condomínios que ela devolve, derivados dos inscritos (ADR-0005).
+      // Responde "quais turmas têm gente da administradora X".
+      const administradoras = (turma.administradoras || [])
+        .map((adm) => adm.nome)
+        .join(" ");
+      const condominios = (turma.condominios || []).join(" ");
       const alvo = semAcento(
-        `${turma.condominio_nome} ${turma.administradora_nome} ${turma.local_nome}`
+        `${condominios} ${administradoras} ${turma.local_nome}`
       );
       return alvo.includes(busca);
     });

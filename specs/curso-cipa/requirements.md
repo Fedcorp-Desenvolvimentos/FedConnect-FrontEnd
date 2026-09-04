@@ -1,11 +1,13 @@
 # Requisitos — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0004 · Questões: PA-001..003
-> **Status:** aprovado · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
+> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0005 · Questões: PA-001..003, PA-024
+> **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 
 ## Contexto e Problema
 
 Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo e regras de conflito estão lá). `[E]` Não há tela de cursos; a agenda atual (`src/pages/Agenda/Agenda.jsx`) assume sala única (`src/utils/agendaSlots.js:1-2`) e grade por hora; o CIPA precisa de calendário por dia em dois locais. `[E]` A restrição por nível hoje é só visual: `src/routes/PrivateRouter.jsx` checa apenas autenticação; o filtro por nível fica no menu (`src/components/Sidebar/Sidebar.jsx:78-91,135`).
+
+**Correção de premissa (2026-09-04).** A tela nasceu tratando a turma como o curso de um condomínio: o formulário de turma pedia administradora e condomínio, e a etiqueta do calendário mostrava o condomínio como nome da turma. A operação é outra: a turma é um dia de curso em um local, com funcionários de **várias** administradoras. O vínculo passa para o inscrito (ADR-0005; par no backend: `FedConnect-Back-End/specs/adr/0004-vinculo-do-inscrito-nao-da-turma.md`).
 
 ## Escopo
 
@@ -20,6 +22,8 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 **Como** operador da Condomed, **quero** ver as turmas dos dois locais em um painel mensal com os números do mês, **para** escolher dias livres e enxergar o que exige ação.
 
 - **QUANDO** abro a tela, **ENTÃO** a interface **DEVE** exibir as medidas do mês (turmas, inscritos, ocupação, turmas nos próximos 7 dias), a barra de filtros, o calendário do mês corrente com as turmas dos dois locais e o painel lateral com hoje, próximas turmas, alertas e ocupação por local. `[D]` ADR-0002
+- **QUANDO** a turma aparece no calendário, no painel lateral ou no título da lista de inscritos, **ENTÃO** a interface **DEVE** identificá-la por **local + ocupação** (ex.: "Auditório · 12/30"), e não por um nome de cliente — a turma não tem um. `[D]` ADR-0005
+- **QUANDO** busco por texto, **ENTÃO a** interface **DEVE** casar contra as administradoras e os condomínios que a turma devolve (derivados dos inscritos), respondendo "quais turmas têm gente desta administradora". `[D]` ADR-0005
 - **QUANDO** clico em um dia do calendário, **ENTÃO** a interface **DEVE** abrir o formulário de nova turma com aquela data; o local é escolhido no próprio formulário. `[D]` ADR-0002
 - **QUANDO** filtro por local, situação ou texto, **ENTÃO** calendário, painel lateral e medidas **DEVEM** refletir o mesmo recorte. `[P]` PA-001 (renderização do espelho na agenda atual — registrada, não bloqueia)
 - **SE** o backend responde 409, **ENTÃO** a interface **DEVE** exibir a mensagem de conflito recebida (turma ou reunião existente). `[E]` padrão `extrairMensagemApi` em `src/pages/Agenda/Agenda.jsx:48-56`
@@ -28,7 +32,9 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 
 **Como** operador, **quero** informar o condomínio cliente e cadastrar os funcionários inscritos, **para** que a turma tenha a lista de participantes.
 
-- **QUANDO** digito no campo de administradora, **ENTÃO** a interface **DEVE** filtrar a lista de administradoras enquanto digito e só aceitar uma opção da lista; o condomínio é o nome digitado. `[P]` PA-003 (não há fonte de condomínios por administradora)
+- **QUANDO** digito no campo de administradora **do inscrito**, **ENTÃO** a interface **DEVE** filtrar a lista de administradoras enquanto digito e só aceitar uma opção da lista; o condomínio é o nome digitado, ao lado. `[D]` ADR-0005 · `[P]` PA-003
+- **SE** tento salvar um inscrito sem administradora ou sem condomínio, **ENTÃO** a interface **DEVE** bloquear o envio apontando o campo. `[D]` ADR-0005
+- **QUANDO** adiciono um inscrito depois de outro na mesma sessão, **ENTÃO** o formulário **DEVE** vir com a administradora e o condomínio do anterior já preenchidos, editáveis — as pessoas entram em blocos por condomínio. `[D]` ADR-0005 (não há fonte de condomínios por administradora)
 - **QUANDO** salvo uma turma nova, **ENTÃO** a interface **DEVE** abrir a lista de inscritos dessa turma com o cursor no campo Nome. `[D]` ADR-0002
 - **QUANDO** adiciono um inscrito, **ENTÃO** o formulário **DEVE** exigir nome, CPF (com máscara e validação de dígitos) e função; e-mail e telefone opcionais. `[E]` não existe máscara de CPF em `src/utils/formatters.js` — será criada
 - **QUANDO** clico em editar um inscrito, **ENTÃO** o formulário **DEVE** carregar os dados dele e passar a salvar alterações, com a linha correspondente destacada na tabela; editar continua permitido com a turma lotada. `[D]` ADR-0002

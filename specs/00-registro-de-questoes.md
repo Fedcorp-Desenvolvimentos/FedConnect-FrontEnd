@@ -32,3 +32,10 @@ Formato de cada entrada: título, status (`aberta` | `fechada`), dono, severidad
 - **Trava:** nada.
 - **Questão:** a spec `envio-porto` deste repositório cita `PA-023`, mas a questão nasceu no registro do **FedHub-Backend**. Registrada aqui para o número resolver neste repo — a numeração não é reciclada.
 - **Resposta:** `admin`, `faturamento` (faturista) e `ti`, sem distinção entre gerar, baixar e enviar. A tela esconde o card e a rota, e o Django reforça o gate.
+
+## PA-024 — Uma turma atende um condomínio ou vários?
+
+- **Status:** fechada (2026-09-04) · **Dono:** Ingrid Aylana · **Severidade:** bloqueia
+- **Trava:** o `TurmaModal`, o `InscritosPanel` e a identificação da turma no calendário.
+- **Questão:** a tela nasceu tratando a turma como o curso de um condomínio (administradora e condomínio no formulário da turma, condomínio como nome da etiqueta). Uma turma pode receber funcionários de administradoras diferentes?
+- **Resposta:** sim, e é a regra. O vínculo (administradora + condomínio) passa para o formulário do inscrito, obrigatório, e a turma é identificada por local + ocupação — "Auditório · 12/30" (ADR-0005). Par no backend: a questão de mesmo teor no registro do `FedConnect-Back-End` (número 006) e o `ADR-0004` de lá.

@@ -1,26 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { parseISO, format } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import { FaTimes } from "react-icons/fa";
-import { listarAdministradoras } from "../../../../services/vistoriasService";
 import { ORDEM_LOCAIS, STATUS_TURMA } from "../hooks/useCursoCipa";
 import * as S from "../CursoCipaStyles";
 
 const VAZIA = {
   local: "",
   data: "",
-  administradora_nome: "",
-  condominio_nome: "",
   observacao: "",
   status: "agendada",
 };
 
 /**
- * Formulário da turma. O horário é fixo (09:00–17:30, uma turma por dia em
- * cada local), então não há campo de hora.
+ * Formulário da turma: local, data, situação e observação. O horário é fixo
+ * (09:00–17:30, uma turma por dia em cada local), então não há campo de hora.
  *
- * O condomínio é digitado: não existe fonte de condomínios por administradora
- * (PA-003 no registro de questões).
+ * A turma não tem cliente (ADR-0005): administradora e condomínio são de cada
+ * participante e ficam no painel de inscritos, porque um mesmo dia recebe
+ * gente de várias administradoras.
  */
 export default function TurmaModal({
   aberto,
@@ -34,7 +32,6 @@ export default function TurmaModal({
   onFechar,
 }) {
   const [form, setForm] = useState(VAZIA);
-  const [administradoras, setAdministradoras] = useState([]);
   const [erros, setErros] = useState({});
 
   useEffect(() => {
@@ -45,8 +42,6 @@ export default function TurmaModal({
         ? {
             local: turma.local,
             data: turma.data,
-            administradora_nome: turma.administradora_nome || "",
-            condominio_nome: turma.condominio_nome || "",
             observacao: turma.observacao || "",
             status: turma.status || "agendada",
           }
@@ -58,30 +53,6 @@ export default function TurmaModal({
     );
   }, [aberto, turma, dataInicial, localInicial]);
 
-  useEffect(() => {
-    if (!aberto || administradoras.length) return;
-    listarAdministradoras()
-      .then((resposta) => {
-        if (resposta?.sucesso) setAdministradoras(resposta.data || []);
-      })
-      .catch(() => setAdministradoras([]));
-  }, [aberto, administradoras.length]);
-
-  // Select digitável: o operador filtra pelo nome; o código vem da opção casada.
-  const opcoes = useMemo(
-    () => administradoras.map((item) => ({ nome: item.nome, codigo: String(item.pessoa) })),
-    [administradoras]
-  );
-
-  const casada = useMemo(
-    () =>
-      opcoes.find(
-        (opcao) =>
-          opcao.nome.trim().toLowerCase() === form.administradora_nome.trim().toLowerCase()
-      ),
-    [opcoes, form.administradora_nome]
-  );
-
   if (!aberto) return null;
 
   const alterar = (campo, valor) => setForm((atual) => ({ ...atual, [campo]: valor }));
@@ -92,20 +63,10 @@ export default function TurmaModal({
     const novos = {};
     if (!form.local) novos.local = "Escolha o local.";
     if (!form.data) novos.data = "Escolha a data.";
-    if (!form.administradora_nome.trim()) {
-      novos.administradora_nome = "Informe a administradora.";
-    } else if (!casada) {
-      novos.administradora_nome = "Escolha uma administradora da lista.";
-    }
-    if (!form.condominio_nome.trim()) novos.condominio_nome = "Informe o condomínio.";
     setErros(novos);
     if (Object.keys(novos).length) return;
 
-    onSalvar({
-      ...form,
-      administradora_nome: casada.nome,
-      administradora_codigo: casada.codigo,
-    });
+    onSalvar({ ...form });
   };
 
   return (
@@ -156,37 +117,6 @@ export default function TurmaModal({
             </S.Campo>
           </S.Linha>
 
-          <S.Campo $erro={Boolean(erros.administradora_nome)}>
-            Administradora
-            <input
-              list="cipa-administradoras"
-              value={form.administradora_nome}
-              onChange={(evento) => alterar("administradora_nome", evento.target.value)}
-              placeholder="Digite para buscar..."
-              autoComplete="off"
-            />
-            <datalist id="cipa-administradoras">
-              {opcoes.map((opcao) => (
-                <option key={opcao.codigo} value={opcao.nome} />
-              ))}
-            </datalist>
-            {erros.administradora_nome && (
-              <span className="erro">{erros.administradora_nome}</span>
-            )}
-          </S.Campo>
-
-          <S.Campo $erro={Boolean(erros.condominio_nome)}>
-            Condomínio
-            <input
-              value={form.condominio_nome}
-              onChange={(evento) => alterar("condominio_nome", evento.target.value)}
-              placeholder="Ex.: Residencial Aurora"
-            />
-            {erros.condominio_nome && (
-              <span className="erro">{erros.condominio_nome}</span>
-            )}
-          </S.Campo>
-
           <S.Linha>
             <S.Campo>
               Situação
@@ -213,8 +143,9 @@ export default function TurmaModal({
 
           {capacidade && (
             <S.MedidaNota>
-              O local comporta {capacidade} participantes; a lista de inscritos é
-              preenchida depois de salvar.
+              O local comporta {capacidade} participantes. A administradora e o
+              condomínio de cada um são informados na lista de inscritos, depois de
+              salvar — a turma pode receber gente de administradoras diferentes.
             </S.MedidaNota>
           )}
 
