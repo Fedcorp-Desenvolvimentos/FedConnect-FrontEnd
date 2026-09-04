@@ -1,12 +1,7 @@
-export const NIVEL_ACESSO_OPTIONS = [
-  { value: 'admin', label: 'Administrador' },
-  { value: 'usuario', label: 'Usuário' },
-  { value: 'comercial', label: 'Comercial' },
-  { value: 'moderador', label: 'Moderador' },
-  { value: 'faturamento', label: 'Faturamento' },
-  { value: 'ti', label: 'TI' },
-  { value: 'financeiro', label: 'Financeiro' }
-];
+import { ACCESS_LEVEL_OPTIONS } from '../../../utils/accessLevels';
+
+// Uma lista só, em utils/accessLevels.js, espelhando os choices do backend.
+export const NIVEL_ACESSO_OPTIONS = ACCESS_LEVEL_OPTIONS;
 
 export const FORM_FIELDS = {
   NOME_COMPLETO: 'nome_completo',

@@ -121,6 +121,7 @@ import AtualizarPessoas from '../pages/CadastroPessoas/AtualizarPessoas';
 import ConsultaVistorias from '../pages/Vistorias/ConsultaVistorias';
 
 // Condomed
+import CondomedHome from '../pages/Condomed/Home/CondomedHome';
 import CursoCipa from '../pages/Condomed/CursoCipa/CursoCipa';
 import Loading from '../components/Loading/Loading.jsx';
 
@@ -248,8 +249,9 @@ const AppRouter = () => {
           {/* Vistorias */}
           <Route path="/vistorias" element={<ConsultaVistorias />} />
 
-          {/* Condomed — rota restrita de verdade, não só escondida no menu */}
+          {/* Condomed — rotas restritas de verdade, não só escondidas no menu */}
           <Route element={<PrivateRouter allowed={['admin', 'condomed']} />}>
+            <Route path="/condomed" element={<CondomedHome />} />
             <Route path="/condomed/cursos-cipa" element={<CursoCipa />} />
           </Route>
 
