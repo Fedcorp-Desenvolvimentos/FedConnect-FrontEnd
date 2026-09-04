@@ -21,9 +21,9 @@ import * as S from "../CursoCipaStyles";
  * em célula é o erro mais caro de achar depois. A leitura é local e o resultado
  * aparece linha a linha antes de qualquer gravação — quem decide é o operador.
  *
- * Se a planilha tem mais gente do que o local comporta, nada é enviado: deixar
- * a ordem das linhas escolher quem fica de fora do curso não é decisão de
- * software.
+ * Planilha maior que a capacidade do local importa igual (ADR-0008): chegam
+ * funcionários extras de última hora, e cortar a lista faria a ordem das linhas
+ * escolher quem faz o curso. O excesso é avisado, não impedido.
  */
 export default function ImportarPlanilhaModal({
   aberto,
@@ -80,15 +80,11 @@ export default function ImportarPlanilhaModal({
   );
 
   const invalidas = leitura?.linhas.filter((linha) => !linha.valida) || [];
-  const excedeCapacidade =
-    Boolean(leitura) && capacidade && leitura.validas.length > capacidade;
+  const excedente =
+    leitura && capacidade ? leitura.validas.length - capacidade : 0;
 
   const podeImportar =
-    Boolean(local) &&
-    Boolean(data) &&
-    leitura?.validas.length > 0 &&
-    !excedeCapacidade &&
-    !salvando;
+    Boolean(local) && Boolean(data) && leitura?.validas.length > 0 && !salvando;
 
   const escolherArquivo = async (evento) => {
     const escolhido = evento.target.files?.[0];
@@ -258,16 +254,17 @@ export default function ImportarPlanilhaModal({
                 )}
               </S.ResumoImportacao>
 
-              {excedeCapacidade && (
-                <S.AvisoBloco $tom="erro">
+              {excedente > 0 && (
+                <S.AvisoBloco $tom="aviso">
                   <FaExclamationTriangle size={11} />
-                  A planilha tem {leitura.validas.length} pessoas válidas e o local
-                  comporta {capacidade}: sobram {leitura.validas.length - capacidade}.
-                  Tire gente da planilha ou use outra data — nada foi importado.
+                  {leitura.validas.length} pessoas para {capacidade} vagas no local:{" "}
+                  {excedente} {excedente === 1 ? "pessoa" : "pessoas"} além do
+                  previsto. A importação segue — só garanta cadeira e material para
+                  todos.
                 </S.AvisoBloco>
               )}
 
-              {invalidas.length > 0 && !excedeCapacidade && (
+              {invalidas.length > 0 && (
                 <S.AvisoBloco $tom="aviso">
                   <FaExclamationTriangle size={11} />
                   As linhas com problema ficam de fora. Dá para importar só as

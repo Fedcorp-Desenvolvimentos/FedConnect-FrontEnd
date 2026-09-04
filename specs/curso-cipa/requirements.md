@@ -1,6 +1,6 @@
 # Requisitos — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0007 · Questões: PA-001..003, PA-024, PA-025
+> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0008 · Questões: PA-001..003, PA-024, PA-025
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 
 ## Contexto e Problema
@@ -44,7 +44,8 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 - **QUANDO** estou na lista de inscritos, **ENTÃO** a interface **DEVE** oferecer excluir a turma dali, sem passar pelo formulário de edição. `[D]` ADR-0006
 - **SE** o CPF informado já consta **nesta** turma, **ENTÃO** a interface **DEVE** avisar assim que o CPF for completado, nomeando quem já está inscrito, destacar a linha correspondente na tabela e desabilitar o envio. `[D]` ADR-0003
 - **SE** o CPF informado já consta em **outra** turma, **ENTÃO** a interface **DEVE** avisar antes de gravar, listando condomínio, local e data de cada turma, e só inscrever após confirmação — a duplicidade entre turmas é permitida. `[D]` ADR-0003 (par no backend: `FedConnect-Back-End/specs/adr/0003-duplicidade-de-inscrito-entre-turmas.md`)
-- **ENQUANTO** a turma está na capacidade, a interface **DEVE** mostrar `inscritos/capacidade` e desabilitar novas inscrições. `[E]` capacidade e contagem vêm do backend na resposta da turma
+- **ENQUANTO** a turma está na capacidade ou acima dela, a interface **DEVE** mostrar `inscritos/capacidade`, dizer quantas pessoas passam do previsto e **continuar aceitando** inscrições — chegam extras de última hora. `[D]` ADR-0008
+- **QUANDO** gravo um inscrito que passa da capacidade, **ENTÃO** a interface **DEVE** confirmar a inscrição avisando o excesso, em tom de aviso. `[D]` ADR-0008
 
 ### RF-CIP-003: Acesso e navegação
 
@@ -67,7 +68,7 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 - **QUANDO** anexo o arquivo, **ENTÃO** a interface **DEVE** ler no navegador e mostrar cada linha com o que ela tem e a situação dela — entra, ou o motivo de não entrar (campo em branco, CPF inválido, CPF repetido na planilha, administradora fora da base). `[D]` ADR-0007
 - **SE** faltam colunas obrigatórias no cabeçalho, **ENTÃO** a interface **DEVE** dizer quais e não tentar ler as linhas. `[D]` ADR-0007
 - **SE** há linhas com problema, **ENTÃO** a interface **DEVE** deixar importar só as válidas, avisando que as outras ficam de fora. `[D]` ADR-0007
-- **SE** as linhas válidas passam da capacidade do local, **ENTÃO** a interface **DEVE** bloquear a importação e dizer quantas sobram. `[D]` ADR-0007
+- **SE** as linhas válidas passam da capacidade do local, **ENTÃO** a interface **DEVE** avisar quantas passam e **deixar importar** — cortar a lista faria a ordem das linhas escolher quem faz o curso. `[D]` ADR-0008
 - **QUANDO** a importação dá certo, **ENTÃO** a interface **DEVE** abrir a lista de inscritos da turma criada, para conferência. `[D]` ADR-0007
 - **ENQUANTO** a lista de administradoras não carregou, a interface **DEVE** impedir a escolha do arquivo — sem ela toda linha erraria por "administradora não encontrada". `[E]` `ImportarPlanilhaModal` (botão desabilitado)
 

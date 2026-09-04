@@ -5,7 +5,7 @@ import { ORDEM_LOCAIS } from "../hooks/useCursoCipa";
 import * as S from "../CursoCipaStyles";
 
 function LinhaTurma({ turma, onAbrir, rotuloData }) {
-  const lotada = turma.total_inscritos >= turma.capacidade;
+  const acima = (turma.acima_da_capacidade ?? 0) > 0;
   return (
     <S.LinhaTurma type="button" onClick={() => onAbrir(turma)}>
       <S.LinhaData dateTime={turma.data}>{rotuloData}</S.LinhaData>
@@ -18,7 +18,7 @@ function LinhaTurma({ turma, onAbrir, rotuloData }) {
           {String(turma.hora_inicio).slice(0, 5)}–{String(turma.hora_fim).slice(0, 5)}
         </S.LinhaMeta>
       </span>
-      <S.Ocupacao $lotada={lotada}>
+      <S.Ocupacao $lotada={acima} title={acima ? "Acima da capacidade do local" : undefined}>
         {turma.total_inscritos}/{turma.capacidade}
       </S.Ocupacao>
     </S.LinhaTurma>

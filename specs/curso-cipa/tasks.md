@@ -47,6 +47,14 @@
 - [x] T-CIP-6.4 `importarTurma` no hook e no service; ação "Turma por planilha" no cabeçalho; abre a lista da turma criada _(RF-CIP-005 · CT-CIP-015)_
 - [x] T-CIP-6.5 Ajuda da tela com a seção de planilha _(RF-CIP-005)_
 
+## Fase 7 — Capacidade sinaliza, não bloqueia (ADR-0008)
+
+- [x] T-CIP-7.1 `InscritosPanel`: contador com três estados, aviso em bloco do excesso e fim do `camposBloqueados` _(RF-CIP-002 · CT-CIP-004)_
+- [x] T-CIP-7.2 `useCursoCipa`: sai a checagem antes do envio; snackbar avisa o excesso ao gravar _(RF-CIP-002 · CT-CIP-004)_
+- [x] T-CIP-7.3 `ImportarPlanilhaModal`: excesso vira aviso e deixa importar _(RF-CIP-005 · CT-CIP-018)_
+- [x] T-CIP-7.4 Alerta do mês passa a "Turmas acima da capacidade", somando as pessoas além das vagas _(RF-CIP-001)_
+- [x] T-CIP-7.5 Ajuda reescrita nos três trechos que prometiam o bloqueio _(RF-CIP-002, RF-CIP-005)_
+
 ## Verificação Final
 
 - [x] Build passa (`npm run build`) em 2026-09-04, incluindo a Fase 4; detector de design sem achados em `src/pages/Condomed/CursoCipa`

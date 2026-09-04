@@ -49,8 +49,10 @@ export const CursoCipaHelp = () => (
         <strong>Administradora, condomínio, nome, CPF e função</strong> são obrigatórios;
         e-mail e telefone, opcionais. A administradora vem da lista da companhia (digite
         para filtrar) e o condomínio é digitado. O contador mostra{" "}
-        <strong>inscritos / capacidade</strong> — 30 no auditório, 10 na sala de reunião —
-        e o botão desabilita quando a turma lota.
+        <strong>inscritos / capacidade</strong> — 30 no auditório, 10 na sala de
+        reunião. A capacidade é referência, não trava: se chegar gente a mais de
+        última hora, a inscrição entra e a tela marca quantos passaram do previsto,
+        para você garantir cadeira e material.
       </p>
       <p style={{ ...texto, marginTop: "0.5rem" }}>
         Depois de adicionar alguém, o formulário já vem com a mesma administradora e o
@@ -76,8 +78,9 @@ export const CursoCipaHelp = () => (
         problema (CPF inválido, campo em branco, CPF repetido, administradora que
         não existe na base) — <strong>nada é gravado antes de você conferir</strong>.
         Dá para importar só as linhas boas ou corrigir a planilha e anexar de novo.
-        Se a lista tiver mais gente do que as vagas do local, a importação não sai:
-        quem fica de fora do curso é decisão sua, não da ordem das linhas.
+        Se a lista tiver mais gente do que as vagas do local, a importação segue e a
+        tela avisa quantos passaram — cortar a lista faria a ordem das linhas
+        escolher quem faz o curso.
       </p>
     </div>
 
@@ -88,7 +91,8 @@ export const CursoCipaHelp = () => (
       <p style={texto}>
         <strong>Hoje</strong> e <strong>Próximas turmas</strong> levam direto à lista de
         inscritos. <strong>Pedem atenção</strong> junta o que precisa de providência:
-        turmas sem ninguém inscrito, turmas lotadas e turmas na sala de reunião que
+        turmas sem ninguém inscrito, turmas acima da capacidade do local e turmas na
+        sala de reunião que
         perderam a reserva na agenda. Os filtros do topo valem para o calendário e para o
         painel ao mesmo tempo.
       </p>

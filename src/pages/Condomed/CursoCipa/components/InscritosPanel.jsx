@@ -95,9 +95,11 @@ export default function InscritosPanel({
 
   if (!turma) return null;
 
-  const lotada = inscritos.length >= turma.capacidade;
-  // Editar quem já está na lista não consome vaga: só o cadastro novo trava.
-  const camposBloqueados = lotada && !editando;
+  // A capacidade do local é referência, não trava (ADR-0008): chega gente
+  // extra de última hora e a turma recebe. O painel sinaliza o excesso.
+  const excedente = inscritos.length - turma.capacidade;
+  const acimaDaCapacidade = excedente > 0;
+  const naCapacidade = excedente === 0;
 
   const alterar = (campo, valor) => setForm((atual) => ({ ...atual, [campo]: valor }));
 
@@ -235,9 +237,15 @@ export default function InscritosPanel({
         </S.ModalHeader>
 
         <S.BarraTurma>
-          <S.Contador $lotado={lotada}>
+          <S.Contador $lotado={acimaDaCapacidade || naCapacidade}>
             {inscritos.length}/{turma.capacidade}
-            <small>{lotada ? "turma lotada" : "inscritos"}</small>
+            <small>
+              {acimaDaCapacidade
+                ? `${excedente} acima da capacidade`
+                : naCapacidade
+                ? "capacidade do local"
+                : "inscritos"}
+            </small>
           </S.Contador>
           <S.BarraTurmaAcoes>
             <S.Botao type="button" $variante="secundario" onClick={onEditarTurma}>
@@ -250,6 +258,16 @@ export default function InscritosPanel({
             )}
           </S.BarraTurmaAcoes>
         </S.BarraTurma>
+
+        {acimaDaCapacidade && (
+          <S.AvisoBloco $tom="aviso">
+            <FaExclamationTriangle size={11} />
+            {inscritos.length} inscritos para {turma.capacidade} vagas no{" "}
+            {turma.local_nome.toLowerCase()}: {excedente}{" "}
+            {excedente === 1 ? "pessoa" : "pessoas"} além do previsto. Dá para
+            inscrever mesmo assim — só garanta cadeira e material para todos.
+          </S.AvisoBloco>
+        )}
 
         {turma.tem_espelho === false && (
           <S.AvisoEspelho>
@@ -332,7 +350,6 @@ export default function InscritosPanel({
                   }
                   placeholder="Digite para buscar..."
                   autoComplete="off"
-                  disabled={camposBloqueados}
                 />
                 <datalist id="cipa-administradoras">
                   {opcoesAdm.map((opcao) => (
@@ -349,7 +366,6 @@ export default function InscritosPanel({
                   value={form.condominio_nome}
                   onChange={(evento) => alterar("condominio_nome", evento.target.value)}
                   placeholder="Ex.: Residencial Aurora"
-                  disabled={camposBloqueados}
                 />
                 {erros.condominio_nome && (
                   <span className="erro">{erros.condominio_nome}</span>
@@ -363,7 +379,6 @@ export default function InscritosPanel({
                 <input
                   value={form.nome}
                   onChange={(evento) => alterar("nome", evento.target.value)}
-                  disabled={camposBloqueados}
                   autoFocus={autoFocoNome}
                 />
                 {erros.nome && <span className="erro">{erros.nome}</span>}
@@ -374,7 +389,6 @@ export default function InscritosPanel({
                   value={formatCPF(form.cpf)}
                   onChange={(evento) => alterar("cpf", evento.target.value)}
                   placeholder="000.000.000-00"
-                  disabled={camposBloqueados}
                 />
                 {erros.cpf ? (
                   <span className="erro">{erros.cpf}</span>
@@ -396,7 +410,6 @@ export default function InscritosPanel({
                 <input
                   value={form.funcao}
                   onChange={(evento) => alterar("funcao", evento.target.value)}
-                  disabled={camposBloqueados}
                 />
                 {erros.funcao && <span className="erro">{erros.funcao}</span>}
               </S.Campo>
@@ -406,7 +419,6 @@ export default function InscritosPanel({
                   type="email"
                   value={form.email}
                   onChange={(evento) => alterar("email", evento.target.value)}
-                  disabled={camposBloqueados}
                 />
               </S.Campo>
               <S.Campo>
@@ -414,7 +426,6 @@ export default function InscritosPanel({
                 <input
                   value={form.telefone}
                   onChange={(evento) => alterar("telefone", evento.target.value)}
-                  disabled={camposBloqueados}
                 />
               </S.Campo>
             </S.Linha>
@@ -427,14 +438,8 @@ export default function InscritosPanel({
               )}
               <S.Botao
                 type="submit"
-                disabled={camposBloqueados || enviando || Boolean(jaInscrito)}
-                title={
-                  jaInscrito
-                    ? "Este CPF já está nesta turma"
-                    : camposBloqueados
-                    ? "Turma lotada"
-                    : undefined
-                }
+                disabled={enviando || Boolean(jaInscrito)}
+                title={jaInscrito ? "Este CPF já está nesta turma" : undefined}
               >
                 {editando ? <FaPencilAlt size={12} /> : <FaUserPlus />}
                 {enviando

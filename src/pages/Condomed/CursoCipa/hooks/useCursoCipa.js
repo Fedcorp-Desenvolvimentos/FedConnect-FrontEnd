@@ -223,16 +223,21 @@ export function useCursoCipa() {
   const adicionarInscrito = useCallback(
     async (dados) => {
       if (!turmaSelecionada) return false;
-      // INV-CIP-001: nunca envia quando a turma já está na capacidade.
-      if (inscritos.length >= turmaSelecionada.capacidade) {
-        enqueueSnackbar("Turma lotada.", { variant: "warning" });
-        return false;
-      }
+      // A capacidade do local não barra a inscrição (ADR-0006): chega
+      // funcionário extra de última hora e a turma recebe. O aviso abaixo
+      // sinaliza o excesso; a decisão é do operador.
       try {
         await CursoCipaService.criarInscrito(turmaSelecionada.id, dados);
         setInscritos(await CursoCipaService.listarInscritos(turmaSelecionada.id));
         await carregarTurmas();
-        enqueueSnackbar("Inscrito adicionado.", { variant: "success" });
+        const total = inscritos.length + 1;
+        const excesso = total - turmaSelecionada.capacidade;
+        enqueueSnackbar(
+          excesso > 0
+            ? `Inscrito adicionado. A turma está ${excesso} acima da capacidade do local (${turmaSelecionada.capacidade}).`
+            : "Inscrito adicionado.",
+          { variant: excesso > 0 ? "warning" : "success" }
+        );
         return true;
       } catch (erro) {
         avisarErro(erro, "Não foi possível adicionar o inscrito.");
@@ -374,13 +379,16 @@ export function useCursoCipa() {
 
   /**
    * O que exige ação, sempre daqui para a frente: turma sem ninguém inscrito,
-   * turma lotada e turma na sala que perdeu a reserva espelho na agenda.
+   * turma acima da capacidade do local e turma na sala que perdeu a reserva
+   * espelho na agenda.
    */
   const alertas = useMemo(() => {
     const futuras = ativas.filter((turma) => turma.data >= hoje);
     const vazias = futuras.filter((turma) => turma.total_inscritos === 0);
-    const lotadas = futuras.filter(
-      (turma) => turma.total_inscritos >= turma.capacidade
+    // Acima da capacidade é informação de operação (mais cadeiras, mais
+    // material), não erro — mas o técnico precisa saber antes do dia.
+    const acimaDaCapacidade = futuras.filter(
+      (turma) => (turma.acima_da_capacidade ?? 0) > 0
     );
     const semEspelho = futuras.filter((turma) => turma.tem_espelho === false);
 
@@ -403,13 +411,19 @@ export function useCursoCipa() {
         turmas: vazias,
       });
     }
-    if (lotadas.length) {
+    if (acimaDaCapacidade.length) {
+      const pessoas = acimaDaCapacidade.reduce(
+        (soma, turma) => soma + (turma.acima_da_capacidade ?? 0),
+        0
+      );
       lista.push({
-        id: "lotadas",
+        id: "acima-da-capacidade",
         grave: false,
-        titulo: "Turmas lotadas",
-        detalhe: `${lotadas.length} na capacidade máxima do local`,
-        turmas: lotadas,
+        titulo: "Turmas acima da capacidade",
+        detalhe: `${acimaDaCapacidade.length} ${
+          acimaDaCapacidade.length === 1 ? "turma" : "turmas"
+        } com ${pessoas} ${pessoas === 1 ? "pessoa" : "pessoas"} além das vagas do local`,
+        turmas: acimaDaCapacidade,
       });
     }
     return lista;

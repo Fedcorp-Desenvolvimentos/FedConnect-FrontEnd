@@ -1,6 +1,6 @@
 # Design — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · INV: INV-CIP-001 · ADR: ADR-0002, ADR-0004..0007 · Questões: PA-001..003
+> **Rastreabilidade** — RF: RF-CIP-001..004 · INV: INV-CIP-001 · ADR: ADR-0002, ADR-0004..0008 · Questões: PA-001..003
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 > **Baseado em:** `requirements.md` (aprovado)
 
@@ -42,7 +42,7 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 
 | ID | Invariante | Garantido em |
 |---|---|---|
-| INV-CIP-001 | A interface nunca envia inscrição quando `total_inscritos >= capacidade` retornados pelo backend | aplicação (botão desabilitado + checagem no hook) + backend (400) |
+| INV-CIP-001 | Turma acima da capacidade nunca aparece sem sinalização: contador, aviso do painel, prévia da importação e alertas do mês usam `acima_da_capacidade` do backend — e nenhum deles bloqueia (ADR-0008) | aplicação (`InscritosPanel`, `ImportarPlanilhaModal`, `useCursoCipa`) |
 
 ## Fluxo Principal
 
@@ -56,7 +56,7 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 |---|---|---|
 | 409 do backend | snackbar com a mensagem de conflito recebida | RF-CIP-001 |
 | API indisponível | snackbar de erro; calendário mantém último estado | RF-CIP-001 |
-| Capacidade atingida | botão "Adicionar inscrito" desabilitado com tooltip | RF-CIP-002 |
+| Capacidade atingida ou excedida | contador com o excesso, aviso em bloco no painel e snackbar de aviso ao gravar; nada desabilitado | RF-CIP-002 |
 | Nível sem acesso digita a URL | redireciona para `/` | RF-CIP-003 |
 | Nível sem nenhuma ferramenta permitida | home mostra a mensagem de área vazia | RF-CIP-004 |
 
@@ -64,6 +64,7 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 
 - ADR-0002: painel único dos dois locais no lugar das abas por local.
 - ADR-0005: vínculo (administradora + condomínio) no formulário do inscrito; turma identificada por local + ocupação; busca sobre as listas derivadas.
+- ADR-0008: capacidade sinaliza e não bloqueia, nos três pontos onde era parede (painel de inscritos, gravação e prévia da importação).
 - ADR-0007: planilha lida e validada no navegador, com pré-visualização antes de gravar; a decisão sobre as linhas ruins é do operador.
 - ADR-0006: exclusão da turma com confirmação que nomeia a perda, alcançável da lista de inscritos. Excluir é o único caminho oferecido ali: cancelar continua existindo como situação da turma, no formulário, não como desvio da exclusão.
 - ADR-0004: home da área no menu (padrão `CardGridLayout` de Financeiro e Faturamento) em vez de a rota abrir direto a tela do CIPA; e `accessLevels.js` como fonte única dos níveis, espelhando os choices do backend.
@@ -85,7 +86,7 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 | CT-CIP-001 | RF-CIP-001 | Medidas do mês conferem (turmas, inscritos, próximas 7 dias — sem ocupação total); calendário mostra as turmas dos dois locais; clique no dia abre o formulário com a data; filtros recortam calendário, painel e medidas juntos |
 | CT-CIP-002 | RF-CIP-001 | Turma em dia ocupado → snackbar com a mensagem 409 do backend |
 | CT-CIP-003 | RF-CIP-002 | Campo de administradora filtra ao digitar e recusa valor fora da lista; inscrito com CPF inválido bloqueado no formulário |
-| CT-CIP-004 | RF-CIP-002 | Ao atingir a capacidade, botão desabilita e contador mostra `n/capacidade` |
+| CT-CIP-004 | RF-CIP-002 | Na capacidade, contador mostra `n/capacidade` e o formulário segue ativo; acima dela, contador diz "N acima da capacidade", aparece o aviso em bloco e o snackbar sai em tom de aviso |
 | CT-CIP-005 | RF-CIP-003 | Nível `usuario`: sem item no menu e URL redireciona; `condomed`/`admin`: acesso normal |
 | CT-CIP-006 | RF-CIP-001 | Turma na sala aparece como "Reservado" 09:00–17:30 na tela `/agenda` (verifica PA-001) |
 | CT-CIP-007 | RF-CIP-004 | `/condomed` lista o cartão de Cursos CIPA para `condomed`/`admin` e a mensagem de área vazia para outro nível; menu marca "Condomed" também dentro da tela do CIPA |
@@ -97,7 +98,7 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 | CT-CIP-015 | RF-CIP-005 | Planilha do modelo com 3 linhas boas → pré-visualização com 3 "entra"; importar cria a turma e abre a lista com os 3 |
 | CT-CIP-016 | RF-CIP-005 | Planilha com CPF inválido, campo em branco, CPF repetido e administradora inexistente → cada linha mostra o motivo; importa só as válidas |
 | CT-CIP-017 | RF-CIP-005 | Cabeçalho sem a coluna `cpf` → aviso nomeando a coluna, sem listar linhas; planilha vazia → aviso |
-| CT-CIP-018 | RF-CIP-005 | 11 linhas válidas para a sala de reunião → importação bloqueada dizendo que sobra 1; "Baixar modelo" salva o arquivo |
+| CT-CIP-018 | RF-CIP-005 | 11 linhas válidas para a sala de reunião → aviso de 1 além do previsto e importação permitida; "Baixar modelo" salva o arquivo |
 | CT-CIP-013 | RF-CIP-002 | Excluir turma pela lista de inscritos e pelo formulário: a confirmação nomeia local, dia, total de inscritos e condomínios; confirmar apaga e fecha os painéis |
 
 ## Impacto e Riscos
