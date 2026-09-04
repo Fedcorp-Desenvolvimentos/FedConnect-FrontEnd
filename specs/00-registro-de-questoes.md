@@ -52,3 +52,10 @@ Formato de cada entrada: título, status (`aberta` | `fechada`), dono, severidad
 - **Status:** aberta · **Dono:** Ingrid Aylana · **Severidade:** alta
 - **Trava:** fases C (presença) e D (certificado) do `MAPEAMENTO_CIPA_FASE2.md`. Não trava a fase A (`specs/curso-cipa-historico/`).
 - **Questão:** carga horária do certificado; texto e base legal; quem assina (reabre o instrutor da turma); numeração; layout; prazo para marcar presença; presença parcial; quem pode marcar; envio por e-mail; linhas extras na lista de presença. Lista completa na seção 7 do mapeamento. Espelha a questão de mesmo teor no registro do `FedConnect-Back-End` (número 007).
+
+## PA-027 — O que o certificado exige do cadastro
+
+- **Status:** fechada (2026-09-04) · **Dono:** Ingrid Aylana · **Severidade:** alta
+- **Trava:** a emissão do certificado (fase D do mapeamento).
+- **Questão:** os modelos de certificado em uso (`ANALISE_CERTIFICADO_CIPA.md`) citam o condomínio com CNPJ e levam o instrutor com registro MTE e assinatura. A tela não pedia nenhum dos dois.
+- **Resposta:** CNPJ do condomínio no formulário de inscrito e na planilha, **opcional para inscrever e obrigatório para emitir**; instrutor num **select** da lista fixa do backend (sem cadastro editável), no formulário da turma e na importação. Espelha a questão de mesmo teor no registro do backend (número 008).

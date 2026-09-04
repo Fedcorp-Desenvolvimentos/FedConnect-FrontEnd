@@ -3,11 +3,13 @@ import { parseISO, format } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import { FaTimes } from "react-icons/fa";
 import { ORDEM_LOCAIS, STATUS_TURMA } from "../hooks/useCursoCipa";
+import { useInstrutores } from "../hooks/useInstrutores";
 import * as S from "../CursoCipaStyles";
 
 const VAZIA = {
   local: "",
   data: "",
+  instrutor: "",
   observacao: "",
   status: "agendada",
 };
@@ -33,6 +35,7 @@ export default function TurmaModal({
 }) {
   const [form, setForm] = useState(VAZIA);
   const [erros, setErros] = useState({});
+  const instrutores = useInstrutores(aberto);
 
   useEffect(() => {
     if (!aberto) return;
@@ -42,6 +45,7 @@ export default function TurmaModal({
         ? {
             local: turma.local,
             data: turma.data,
+            instrutor: turma.instrutor || "",
             observacao: turma.observacao || "",
             status: turma.status || "agendada",
           }
@@ -116,6 +120,25 @@ export default function TurmaModal({
               {erros.data && <span className="erro">{erros.data}</span>}
             </S.Campo>
           </S.Linha>
+
+          <S.Campo>
+            Instrutor
+            <select
+              value={form.instrutor}
+              onChange={(evento) => alterar("instrutor", evento.target.value)}
+            >
+              <option value="">A definir</option>
+              {instrutores.map((item) => (
+                <option key={item.codigo} value={item.codigo}>
+                  {item.nome} · {item.registro}
+                </option>
+              ))}
+            </select>
+            <span className="ajuda">
+              Quem assina o certificado. Pode ficar em branco até o dia; é obrigatório para
+              emitir.
+            </span>
+          </S.Campo>
 
           <S.Linha>
             <S.Campo>

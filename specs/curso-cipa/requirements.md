@@ -1,6 +1,6 @@
 # Requisitos — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0008 · Questões: PA-001..003, PA-024, PA-025
+> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0008 · Questões: PA-001..003, PA-024, PA-025, PA-027
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 
 ## Contexto e Problema
@@ -26,6 +26,7 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 - **QUANDO** a turma aparece no calendário, no painel lateral ou no título da lista de inscritos, **ENTÃO** a interface **DEVE** identificá-la por **local + ocupação** (ex.: "Auditório · 12/30"), e não por um nome de cliente — a turma não tem um. `[D]` ADR-0005
 - **QUANDO** busco por texto, **ENTÃO a** interface **DEVE** casar contra as administradoras e os condomínios que a turma devolve (derivados dos inscritos), respondendo "quais turmas têm gente desta administradora". `[D]` ADR-0005
 - **QUANDO** clico em um dia do calendário, **ENTÃO** a interface **DEVE** abrir o formulário de nova turma com aquela data; o local é escolhido no próprio formulário. `[D]` ADR-0002
+- **QUANDO** preencho a turma (formulário ou importação), **ENTÃO** a interface **DEVE** oferecer o instrutor num select alimentado pela lista fixa do backend, com "A definir" como opção — e o detalhe da turma **DEVE** mostrar quem é, ou avisar que falta. `[D]` PA-027
 - **QUANDO** filtro por local, situação ou texto, **ENTÃO** calendário, painel lateral e medidas **DEVEM** refletir o mesmo recorte. `[P]` PA-001 (renderização do espelho na agenda atual — registrada, não bloqueia)
 - **SE** o backend responde 409, **ENTÃO** a interface **DEVE** exibir a mensagem de conflito recebida (turma ou reunião existente). `[E]` padrão `extrairMensagemApi` em `src/pages/Agenda/Agenda.jsx:48-56`
 
@@ -34,6 +35,7 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 **Como** operador, **quero** informar o condomínio cliente e cadastrar os funcionários inscritos, **para** que a turma tenha a lista de participantes.
 
 - **QUANDO** digito no campo de administradora **do inscrito**, **ENTÃO** a interface **DEVE** filtrar a lista de administradoras enquanto digito e só aceitar uma opção da lista; o condomínio é o nome digitado, ao lado. `[D]` ADR-0005 · `[P]` PA-003
+- **QUANDO** informo o CNPJ do condomínio do inscrito, **ENTÃO** a interface **DEVE** aplicar a máscara, validar os dígitos e repetir o CNPJ junto do vínculo no próximo inscrito; **SE** deixo em branco, **ENTÃO** a inscrição **DEVE** seguir, e a tabela marca "sem CNPJ" — ele é exigido só para emitir o certificado. `[D]` PA-027
 - **SE** tento salvar um inscrito sem administradora ou sem condomínio, **ENTÃO** a interface **DEVE** bloquear o envio apontando o campo. `[D]` ADR-0005
 - **QUANDO** adiciono um inscrito depois de outro na mesma sessão, **ENTÃO** o formulário **DEVE** vir com a administradora e o condomínio do anterior já preenchidos, editáveis — as pessoas entram em blocos por condomínio. `[D]` ADR-0005 (não há fonte de condomínios por administradora)
 - **QUANDO** salvo uma turma nova, **ENTÃO** a interface **DEVE** abrir a lista de inscritos dessa turma com o cursor no campo Nome. `[D]` ADR-0002
@@ -87,3 +89,4 @@ Contagem de inscritos e capacidade exibidas vêm da resposta do backend, não do
 - PA-001: renderização da Reserva espelho (510 min) na grade da agenda atual
 - PA-002: `src/pages/RH` mock com rotas inexistentes (fora do escopo; registrado)
 - PA-003: não existe fonte de condomínios por administradora — condomínio digitado
+- PA-027: **fechada (2026-09-04)** — o certificado exige CNPJ do condomínio e instrutor; CNPJ opcional na inscrição e obrigatório para emitir; instrutor em select da lista fixa do backend

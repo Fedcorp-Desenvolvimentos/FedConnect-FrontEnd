@@ -11,6 +11,7 @@ import {
 import { listarAdministradoras } from "../../../../services/vistoriasService";
 import CursoCipaService from "../../../../services/cursoCipaService";
 import { ORDEM_LOCAIS } from "../hooks/useCursoCipa";
+import { useInstrutores } from "../hooks/useInstrutores";
 import lerPlanilhaInscritos from "../lerPlanilhaInscritos";
 import * as S from "../CursoCipaStyles";
 
@@ -35,7 +36,9 @@ export default function ImportarPlanilhaModal({
 }) {
   const [local, setLocal] = useState(ORDEM_LOCAIS[0]);
   const [data, setData] = useState("");
+  const [instrutor, setInstrutor] = useState("");
   const [observacao, setObservacao] = useState("");
+  const instrutores = useInstrutores(aberto);
   const [administradoras, setAdministradoras] = useState([]);
   const [carregandoAdms, setCarregandoAdms] = useState(false);
   const [arquivo, setArquivo] = useState(null);
@@ -48,6 +51,7 @@ export default function ImportarPlanilhaModal({
     if (!aberto) return;
     setLocal(ORDEM_LOCAIS[0]);
     setData(dataInicial || "");
+    setInstrutor("");
     setObservacao("");
     setArquivo(null);
     setLeitura(null);
@@ -133,7 +137,7 @@ export default function ImportarPlanilhaModal({
   const submeter = (evento) => {
     evento.preventDefault();
     if (!podeImportar) return;
-    onImportar({ local, data, observacao, inscricoes: leitura.validas });
+    onImportar({ local, data, instrutor, observacao, inscricoes: leitura.validas });
   };
 
   if (!aberto) return null;
@@ -178,6 +182,17 @@ export default function ImportarPlanilhaModal({
               />
             </S.Campo>
             <S.Campo>
+              Instrutor
+              <select value={instrutor} onChange={(e) => setInstrutor(e.target.value)}>
+                <option value="">A definir</option>
+                {instrutores.map((item) => (
+                  <option key={item.codigo} value={item.codigo}>
+                    {item.nome}
+                  </option>
+                ))}
+              </select>
+            </S.Campo>
+            <S.Campo>
               Observação
               <input
                 value={observacao}
@@ -194,8 +209,9 @@ export default function ImportarPlanilhaModal({
               </strong>
               <p>
                 Colunas: administradora, condomínio, nome, CPF e função
-                (obrigatórias), e-mail e telefone (opcionais). O nome da
-                administradora precisa ser o mesmo da base da companhia.
+                (obrigatórias); CNPJ do condomínio, e-mail e telefone (opcionais —
+                o CNPJ passa a ser exigido só na hora de emitir o certificado). O
+                nome da administradora precisa ser o mesmo da base da companhia.
               </p>
             </div>
             <S.AcoesPlanilha>
@@ -279,6 +295,7 @@ export default function ImportarPlanilhaModal({
                     <th>Nome</th>
                     <th>CPF</th>
                     <th>Condomínio</th>
+                    <th>CNPJ</th>
                     <th>Administradora</th>
                     <th>Situação</th>
                   </tr>
@@ -290,6 +307,7 @@ export default function ImportarPlanilhaModal({
                       <td>{linha.exibicao.nome || "—"}</td>
                       <td className="numero">{linha.exibicao.cpf || "—"}</td>
                       <td>{linha.exibicao.condominio || "—"}</td>
+                      <td className="numero">{linha.exibicao.cnpj_condominio || "—"}</td>
                       <td>{linha.exibicao.administradora || "—"}</td>
                       <td>
                         {linha.valida ? (

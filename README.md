@@ -1,159 +1,247 @@
-📊 Fed Connect - Sistema de Consulta de Dados | Grupo FedCorp
+📊 Fed Connect — Front-End | Grupo FedCorp
 
-**Fed Connect** é uma plataforma interna desenvolvida para facilitar a consulta de informações de pessoas físicas, jurídicas e endereços em uma interface moderna, rápida e intuitiva. O sistema é voltado para uso corporativo com foco em seguradoras, empresas de serviços e outras instituições que necessitam de validação e análise de dados cadastrais.
+**Fed Connect** é a plataforma interna do Grupo FedCorp que reúne, em uma única interface, a consulta de dados cadastrais (pessoas físicas, jurídicas e endereços) e as ferramentas operacionais da companhia — comissões, vistorias, faturamento, cotações, agenda e métricas. O sistema é voltado para uso corporativo, com foco em seguradoras, empresas de serviços e instituições que precisam validar e analisar dados cadastrais com segurança e agilidade.
 
-🧩 Visão Geral
+Este repositório contém o **front-end** da plataforma. A API que o alimenta está em [FedConnect-Back-End](https://github.com/Fedcorp-Desenvolvimentos/FedConnect-Back-End).
 
-O Fed Connect foi pensado para agilizar o acesso a informações de clientes por pessoas físicas, empresas e endereços, com foco na integração em plataformas internas da corporação.
-Capacita consultores e administradores a buscar dados específicos ou em massa (por eventual importação de planilhas), com segurança, performance e usabilidade.
+## 🧩 Visão Geral
 
-🎯 Funcionalidades Principais
+O Fed Connect foi pensado para agilizar o acesso às informações de clientes, empresas e endereços, integrando em um só lugar os dados das APIs públicas de consulta, a base da própria organização e os sistemas legados da companhia.
 
-📄 Consulta de dados pessoais 
+Capacita consultores, administradores e as áreas comercial, financeira e de RH a buscar dados específicos ou em massa (por importação de planilhas), emitir documentos e acompanhar métricas — com segurança, performance e usabilidade.
+
+## 🎯 Funcionalidades Principais
+
+### 🔎 Consultas
+
+📄 **Consulta de dados pessoais (CPF)**
 - Retorna dados básicos como nome completo, data de nascimento, situação do CPF, entre outros.
 
-📊 Consulta de Pessoa Jurídica (CNPJ)
-  - Permite verificar informações cadastrais da empresa, como razão social, nome fantasia, situação, CNAE, natureza jurídica e endereço oficial.
-    
-🔎 Consulta de Endereço
-  - Busca de endereços a partir de CEPs com retorno de logradouro, bairro, cidade e estado.
+📊 **Consulta de Pessoa Jurídica (CNPJ)**
+- Permite verificar informações cadastrais da empresa, como razão social, nome fantasia, situação, CNAE, natureza jurídica e endereço oficial.
 
-🔎 Consulta em Massa 
-  - Busca de endereços, dados básicos, dados empresariais a partir de uma planilha com retorno devolvido com os dados preenchidos em planilha.
+📍 **Consulta de Endereço (CEP)**
+- Busca de endereços a partir de CEPs com retorno de logradouro, bairro, cidade e estado.
 
-🔎 Consulta de Beneficiários  
-  - Busca de beneficiários no banco de dados da organização para consulta, trazendo o histórico dos serviços feitos com a companhia.
+📚 **Consulta em Massa**
+- Upload de planilha (XLS/CSV) com CPFs, CNPJs ou CEPs e devolução do arquivo já preenchido com os dados encontrados.
+- Modelos de planilha disponíveis para download direto na interface.
 
-🔎 Consulta de Faturas  
-  - Busca de faturamento no banco de dados da organização para consulta, trazendo os dados do que foi faturado para controle financeiro.
+👥 **Consulta de Beneficiários / Segurados**
+- Busca de beneficiários na base da organização, trazendo o histórico dos serviços feitos com a companhia.
 
-🔎 Ferramentas da Companhia  
-  - Centralização dos acessos de todas as ferramentas em um único lugar.
+🧾 **Consulta de Faturas**
+- Busca de faturamento na base da organização para controle financeiro, com exportação em Excel e PDF.
 
-🔎 Métricas da Companhia  
-  - Acompanhamento das métricas produzidas pela organização em tempo real.
+🗺️ **Consulta por Região e Mapa de Redes**
+- Localização de prestadores e cobertura por região, com visualização em mapa.
 
-📊 Cotação de Produtos
-  - Permite cotar um seguro em tempo real.
+📜 **Histórico de Consultas**
+- Registro de todas as consultas realizadas, por usuário e por período.
+
+### 💼 Operação e Financeiro
+
+💰 **Comissões**
+- Consulta de comissões por fatura e por data de corte.
+- Emissão de **recibo do corretor** e **voucher de comissão** em PDF.
+- Cancelamento de comissões em lote e consulta do histórico de vouchers emitidos.
+
+🔧 **Vistorias**
+- Consulta de vistorias com filtros por período, estado, administradora, vistoriador e fatura.
+- Exportação de relatórios em Excel e PDF.
+- Filtro por vistoriador restrito a perfis administrador/moderador.
+
+🧾 **Faturamento**
+- Segunda via de boleto, tratamento de erros, conversão de formatos de arquivo e integrações de pagamento (FedBnk / FedCorp Pay).
+
+📤 **Envio Porto**
+- Geração e envio dos arquivos de assistência, vida e dental, com acompanhamento de jobs e download dos resultados.
+
+📊 **Cotação de Produtos**
+- Permite cotar um seguro em tempo real (ex.: incêndio conteúdo).
+
+🤖 **Automação**
+- Separação e processamento de PDFs em lote e rotinas de envio automatizado.
+
+### 📈 Gestão e Acesso
+
+📊 **Métricas e Analytics**
+- Dashboards com faturamento, inadimplência, ranking de administradoras e status de faturas em tempo real.
+
+📅 **Agenda**
+- Agenda comercial e reserva de salas.
+
+🧰 **Ferramentas da Companhia**
+- Centralização dos acessos de todas as ferramentas em um único lugar.
+
+📝 **Questionários e Workflow**
+- Questionários de processos e acompanhamento de fluxos internos.
 
 🧑‍💻 **Gerenciamento de Usuários**
-  - Cadastro de novos usuários com função (ex: administrador).
-  - Edição e exclusão de contas existentes com modal de confirmação.
-  - Sistema de autenticação/login de acesso (não documentado aqui, mas presente na interface).
+- Cadastro de novos usuários com função/nível de acesso (ex.: administrador, moderador, consultor).
+- Edição e exclusão de contas existentes com modal de confirmação.
+- Página "Minha Conta" para dados e troca de senha.
 
-📁 Interface Responsiva
-  - Navegação por abas com sidebar fixa.
-  - Uso de ícones para tornar a experiência mais amigável.
-  - Modais de ação (exclusão, confirmação) estilizados manualmente sem dependências externas como Bootstrap.
+🔐 **Autenticação**
+- Login com e-mail e senha (JWT) e login com Google (OAuth).
+- Fluxo completo de recuperação e redefinição de senha.
+- Rotas privadas com controle por nível de acesso.
 
-❌ Exclusão com confirmação (modal de alerta).
+## 📁 Interface e Experiência
 
-✅ Feedbacks visuais de sucesso ou erro.
-
-🔗 Navegação com Sidebar/Dropdown — incluindo páginas de cadastro, login, recuperar senha, etc.
-
-🔐 Login e recuperar senha estruturados, prontos para integração com API de autenticação.
-
-📦 Front-end puro com React e CSS customizado.
-
-## 📂 Funcionalidades Futuras
-
-- **Consulta em de Leads**
-  - Consulta de Leads para comercial buscar informações.
-  - Geração de relatório consolidado com os dados retornados.
- 
-- **Envio de E-mails em Massa**
-  - Upload de uma planilha com informações feitas durante o dia a dia para envio em formato de e-mail.
-  - Histórico de envio.
-  - Cadastro e manutenção da rede de contatos.
+- Navegação por **sidebar** fixa com dropdown, breadcrumb e layout responsivo (desktop e mobile).
+- Modais de ação (exclusão, confirmação) e feedbacks visuais de sucesso/erro via Notistack.
+- Estados de carregamento centralizados e tratamento de erros padronizado.
+- Ajuda contextual por tela (Help / HelpModal).
+- Ícones e componentes acessíveis, sem dependência de frameworks de UI pesados.
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Frontend**: React.js
-- **Axios**: para chamadas HTTP
-- **React Router DOM**: para navegação interna
-- **Roteamento**: React Router
-- **Estilização**: CSS modularizado em arquivos próprios, utilizando classes customizadas
-- **Ícones**: Bootstrap Icons (via CDN ou local)
+| Categoria | Tecnologia |
+|-----------|------------|
+| Framework | React 18 |
+| Build/Dev server | Vite 6 |
+| Linguagem | JavaScript (ES6+) |
+| Roteamento | React Router DOM v6 |
+| HTTP | Axios |
+| Gráficos | Recharts |
+| Mapas | React Leaflet + Leaflet |
+| UI / Ícones | Radix UI, Lucide React, React Icons, Bootstrap Icons |
+| Planilhas | xlsx + file-saver |
+| Datas | date-fns + react-datepicker |
+| Notificações | Notistack |
+| Estilização | CSS modularizado + Styled Components |
+| Autenticação | JWT + `@react-oauth/google` |
+| Deploy | Docker · DigitalOcean App Platform · Vercel (homologação) |
 
-## 🔧 Estrutura de Pastas (Simplificada)
+## 🔧 Estrutura de Pastas
 
-├── public/
-  ├── imagens
+```
+├── public/                # Imagens e assets estáticos
 ├── src/
-│ ├── components/ # Componentes reutilizáveis
-│ ├── consultas/ # Páginas principais (ConsultaPF, ConsultaPJ, ConsultaEnd)
-│ ├── Dropdown/ (menu de escolha)
-│   ├── Dropdown.jsx
-│   ├── DropdownItens/ (itens do menu)
-│    ├── Config.jsx
-│    ├── Cadastro.jsx
-│    ├── Conta.jsx
-│ ├── home/ # Página Home
-│ ├── Login/ (Página de login e página de redefinição de senha)
-│   ├── Login.jsx
-│  ├── RecuperarSenha/ 
-│    ├── RecuperarSenha.jsx/ 
-│ ├── Navbar/ (componente reutilizável)
-│ ├── Cotação/ 
-│   ├── CotacaoConteudo.jsx
-│ ├── styles/ # Arquivos CSS separados
-│ ├── App.jsx # Roteamento principal
-│ └── main.jsz
-├──  index.html
+│   ├── components/        # Componentes reutilizáveis
+│   │   ├── Adm/ Agenda/ Automacao/ Comercial/ Consultas/ Cotação/
+│   │   ├── Faturamento/ Mapa/ Produtos/ Views/
+│   │   └── Breadcrumb/ Dropdown/ Help/ Loading/ Modal/ NotFound/
+│   │       PageLayout/ Sidebar/ TratamentoErros/
+│   ├── pages/             # Páginas da aplicação
+│   │   ├── Consultas/ Comercial/ Financeiro/ Faturamento/ Vistorias/
+│   │   ├── Analytics/ Metricas/ Agenda/ Automacao/ Questionarios/
+│   │   ├── Workflow/ Ferramentas/ MapaRedes/ SegundaVia/ RH/
+│   │   ├── Home/ Historico/ Cadastro/ CadastroPessoas/
+│   │   ├── GerenciarUsuarios/ MinhaConta/
+│   │   └── Login/ RecuperarSenha/ ResetarSenha/
+│   ├── Layouts/           # Layouts de página
+│   ├── routes/            # AppRouter.jsx e PrivateRouter.jsx
+│   ├── services/          # Camada de API (Axios) — um serviço por domínio
+│   ├── context/           # AuthContext e GlobalContext
+│   ├── hooks/             # Custom hooks (useLoading, useIsMobile, etc.)
+│   ├── config/            # Configuração da aplicação
+│   ├── styles/            # Arquivos CSS
+│   ├── utils/             # Utilitários
+│   ├── data/              # Dados estáticos
+│   ├── App.jsx            # Composição e providers
+│   └── main.jsx           # Entry point
+├── specs/                 # Especificações por feature (spec-driven)
+├── Dockerfile
+├── docker-compose.yml
+├── vite.config.js
+└── index.html
+```
 
+## 🚀 Como Rodar
 
-Pré-requisitos
-Node.js (>= 16.x)
+### Pré-requisitos
+- Node.js >= 18.x
+- npm (ou yarn)
+- Back-end do FedConnect acessível (local ou ambiente remoto)
 
-npm ou yarn
+### Instalação
 
-Instalação
-1 - Clone este repositório:
-git clone
+```bash
+# 1 - Clone o repositório
+git clone git@github.com:Fedcorp-Desenvolvimentos/FedConnect-FrontEnd.git
+cd FedConnect-FrontEnd
 
-2 - Instale as dependências:
+# 2 - Instale as dependências
 npm install
-# ou
-yarn install
+```
 
-Uso
-Inicie o ambiente de desenvolvimento:
+### Variáveis de ambiente
+
+Crie um arquivo `.env` na raiz com a URL da API e as credenciais públicas necessárias:
+
+```env
+VITE_API_URL=http://127.0.0.1:8000
+VITE_GOOGLE_CLIENT_ID=seu_client_id_do_google
+```
+
+> ⚠️ O `.env` não é versionado. Solicite os valores de cada ambiente ao time de desenvolvimento.
+
+### Ambiente de desenvolvimento
+
+```bash
 npm run dev
-# ou
-yarn dev
+```
 
-Em seguida, abra http://localhost:3000 no navegador.
+Em seguida, abra `http://localhost:3000` no navegador.
 
-Acesse a tela de Login — insira e-mail e senha (fluxo mock já implementado).
+### Build de produção
 
-Na tela Recuperar senha, solicita suporte por cartão informativo.
+```bash
+npm run build     # gera a pasta dist/
+npm run preview   # serve o build localmente para conferência
+```
 
-Burger/Sidebar acessa as páginas de Consulta de dados, Cadastro de usuários e Configurações.
+### Docker
 
-Dentro de Cadastro de usuário, já existe layout com exemplos e envio para API simulada.
+```bash
+docker compose up --build
+```
 
-Em Configurações, sua tabela permite exibir e excluir usuários com modal de confirmação, botões estilizados e alertas de sucesso.
+## 🌐 Ambientes
 
-Planejamento futuro
-📤 Upload de XLS/CSV para consultas em massa
+| Ambiente | Endereço |
+|----------|----------|
+| Produção | https://fedconnect.com.br |
+| Homologação | https://fedconnect-hml.vercel.app |
+| Local | http://localhost:3000 |
 
-🔐 Integração com backend real, com autenticação JWT
+## 🧭 Processo de Desenvolvimento
 
-🔎 Filtros e paginação avançada na tabela de dados
+O projeto segue um fluxo **spec-driven**: toda feature relevante nasce em `specs/<nome-da-feature>/` com três documentos aprovados em sequência antes da implementação:
 
-🛠️ Perfis diferenciados: administrador, consultor, etc. com permissões específicas
+1. `requirements.md` — o que precisa existir e por quê
+2. `design.md` — como será construído
+3. `tasks.md` — as tarefas executáveis
 
-🧩 Documentação completa (Storybook, Design System)
+Consulte `specs/README.md` para as convenções e o template.
 
-## 🚧 Em Desenvolvimento
+## 📂 Funcionalidades Futuras
 
-O sistema está em constante evolução. A próxima etapa planejada é o desenvolvimento da **consulta em massa**, que permitirá a importação de planilhas para busca automatizada de múltiplos dados.
+- **Consulta de Leads**
+  - Consulta de leads para o comercial buscar informações.
+  - Geração de relatório consolidado com os dados retornados.
 
-🧑‍💻 Desenvolvido por:
+- **Envio de E-mails em Massa**
+  - Upload de planilha com as informações do dia a dia para envio em formato de e-mail.
+  - Histórico de envio e manutenção da rede de contatos.
 
-Ingrid Aylana | Desenvolvedora Front-End | Linkedin: www.linkedin.com/in/ingryd-aylana-silva-dos-santos-4a2701158
+- **Evolução contínua**
+  - Filtros e paginação avançada nas tabelas de dados.
+  - Documentação de componentes (Storybook / Design System).
 
-Michel Policeno | Desenvolvedor Back-end | Linkedin: https://www.linkedin.com/in/michel-policeno-85a866212 | GitHub: https://github.com/Michel-Policeno
+## 🧑‍💻 Desenvolvido por
 
-Daniel Mello | Desenvolvedor Back-end | Linkedin: https://www.linkedin.com/in/danielmellocf/ | GitHub: https://github.com/DMCFaria
+**Ingrid Aylana** — Desenvolvedora Front-End
+[LinkedIn](https://www.linkedin.com/in/ingryd-aylana-silva-dos-santos-4a2701158)
+
+**Michel Policeno** — Desenvolvedor Back-End
+[LinkedIn](https://www.linkedin.com/in/michel-policeno-85a866212) · [GitHub](https://github.com/Michel-Policeno)
+
+**Daniel Mello** — Desenvolvedor Back-End
+[LinkedIn](https://www.linkedin.com/in/danielmellocf/) · [GitHub](https://github.com/DMCFaria)
+
+---
+
+<sub>Projeto interno do Grupo FedCorp. Uso restrito.</sub>

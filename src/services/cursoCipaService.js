@@ -20,6 +20,12 @@ export const CursoCipaService = {
     return data?.results ?? [];
   },
 
+  /** Instrutores que assinam o certificado — lista fixa no backend. */
+  listarInstrutores: async () => {
+    const response = await api.get(`${API_URL}instrutores/`);
+    return response.data;
+  },
+
   obterTurma: async (turmaId) => {
     const response = await api.get(`${API_URL}${turmaId}/`);
     return response.data;
@@ -96,10 +102,11 @@ export const CursoCipaService = {
    * Cria a turma com os inscritos da planilha em uma única transação: ou
    * nasce completa, ou não nasce.
    */
-  importarTurma: async ({ local, data, observacao, inscricoes }) => {
+  importarTurma: async ({ local, data, instrutor, observacao, inscricoes }) => {
     const response = await api.post(`${API_URL}importar/`, {
       local,
       data,
+      instrutor: instrutor || "",
       observacao,
       inscricoes,
     });

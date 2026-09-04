@@ -7,8 +7,10 @@ import {
 } from "react-icons/fa";
 import {
   apenasDigitos,
+  formatCNPJ,
   formatCPF,
   formatDateBR,
+  validarCNPJ,
   validarCPF,
 } from "../../../../utils/formatters";
 import { listarAdministradoras } from "../../../../services/vistoriasService";
@@ -24,6 +26,7 @@ const VAZIO = {
   administradora_nome: "",
   administradora_codigo: "",
   condominio_nome: "",
+  condominio_cnpj: "",
 };
 
 /**
@@ -128,6 +131,7 @@ export default function InscritosConteudo({
       administradora_nome: inscrito.administradora_nome || "",
       administradora_codigo: inscrito.administradora_codigo || "",
       condominio_nome: inscrito.condominio_nome || "",
+      condominio_cnpj: inscrito.condominio_cnpj || "",
     });
   };
 
@@ -155,6 +159,12 @@ export default function InscritosConteudo({
     if (!(form.condominio_nome || "").trim()) {
       novosErros.condominio_nome = "Informe o condomínio.";
     }
+    // CNPJ é opcional aqui (quem chega de última hora entra sem ele) e vira
+    // obrigatório só para emitir o certificado. Se vier, tem de ser válido.
+    const cnpjDigitado = apenasDigitos(form.condominio_cnpj);
+    if (cnpjDigitado && !validarCNPJ(cnpjDigitado)) {
+      novosErros.condominio_cnpj = "CNPJ inválido.";
+    }
     setErros(novosErros);
     if (Object.keys(novosErros).length) return;
 
@@ -164,6 +174,7 @@ export default function InscritosConteudo({
       administradora_nome: admCasada.nome,
       administradora_codigo: admCasada.codigo,
       condominio_nome: form.condominio_nome.trim(),
+      condominio_cnpj: cnpjDigitado,
     };
     const cpfMudou = !editando || editando.cpf !== dados.cpf;
 
@@ -189,6 +200,7 @@ export default function InscritosConteudo({
       administradora_nome: dados.administradora_nome,
       administradora_codigo: dados.administradora_codigo,
       condominio_nome: dados.condominio_nome,
+      condominio_cnpj: dados.condominio_cnpj,
     };
     setUltimoVinculo(vinculo);
     setEditando(null);
@@ -281,7 +293,16 @@ export default function InscritosConteudo({
             >
               <td>{inscrito.nome}</td>
               <td className="numero">{formatCPF(inscrito.cpf)}</td>
-              <td>{inscrito.condominio_nome}</td>
+              <td>
+                {inscrito.condominio_nome}
+                {inscrito.condominio_cnpj ? (
+                  <S.Secundario>{formatCNPJ(inscrito.condominio_cnpj)}</S.Secundario>
+                ) : (
+                  <S.Secundario $alerta title="Sem CNPJ: exigido para emitir o certificado">
+                    sem CNPJ
+                  </S.Secundario>
+                )}
+              </td>
               <td>{inscrito.administradora_nome || "—"}</td>
               <td>{inscrito.funcao}</td>
               <td>
@@ -316,7 +337,7 @@ export default function InscritosConteudo({
         {editando ? `Editando ${editando.nome}` : "Adicionar inscrito"}
       </S.SecaoTitulo>
       <form onSubmit={submeter}>
-        <S.Linha>
+        <S.Linha $colunas={3}>
           <S.Campo $erro={Boolean(erros.administradora_nome)}>
             Administradora
             <input
@@ -346,6 +367,18 @@ export default function InscritosConteudo({
             />
             {erros.condominio_nome && (
               <span className="erro">{erros.condominio_nome}</span>
+            )}
+          </S.Campo>
+          <S.Campo $erro={Boolean(erros.condominio_cnpj)}>
+            CNPJ do condomínio (opcional)
+            <input
+              value={formatCNPJ(form.condominio_cnpj)}
+              onChange={(evento) => alterar("condominio_cnpj", evento.target.value)}
+              placeholder="00.000.000/0000-00"
+              inputMode="numeric"
+            />
+            {erros.condominio_cnpj && (
+              <span className="erro">{erros.condominio_cnpj}</span>
             )}
           </S.Campo>
         </S.Linha>

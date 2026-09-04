@@ -1,6 +1,6 @@
 # Design — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · INV: INV-CIP-001 · ADR: ADR-0002, ADR-0004..0008 · Questões: PA-001..003
+> **Rastreabilidade** — RF: RF-CIP-001..004 · INV: INV-CIP-001 · ADR: ADR-0002, ADR-0004..0008 · Questões: PA-001..003, PA-027
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 > **Baseado em:** `requirements.md` (aprovado)
 
@@ -16,7 +16,9 @@ Home da área em `src/pages/Condomed/Home/` reusando o `CardGridLayout` das outr
 | `src/pages/Condomed/CursoCipa/CursoCipa.jsx` (novo) | container: resumo, calendário, trilho, modais |
 | `src/pages/Condomed/CursoCipa/hooks/useCursoCipa.js` (novo) | estado, chamadas, tratamento 409/400 (fonte única das regras de tela) |
 | `src/pages/Condomed/CursoCipa/components/` (novo) | `FaixaMedidas`, `BarraFiltros`, `CalendarioMensal`, `PainelLateral`, `TurmaModal`, `InscritosPanel`, `ConfirmarModal`; `CursoCipaHelp` e `CursoCipaStyles` na raiz da página |
-| `TurmaModal` (ADR-0005) | perde administradora e condomínio; fica local, data, situação e observação |
+| `TurmaModal` (ADR-0005, PA-027) | perde administradora e condomínio; fica local, data, **instrutor** (select via `useInstrutores`), situação e observação |
+| `InscritosConteudo`, `lerPlanilhaInscritos`, `ImportarPlanilhaModal` (PA-027) | campo/coluna `CNPJ do condomínio` opcional, com `formatCNPJ`/`validarCNPJ` em `utils/formatters`; repetido com o vínculo; "sem CNPJ" na tabela |
+| `hooks/useInstrutores.js` (novo) | fonte única da lista fixa de instrutores para o formulário de turma e a importação |
 | `InscritosPanel` (ADR-0005) | ganha administradora (select digitável) e condomínio (digitado) por inscrito, obrigatórios, com repetição do vínculo do inscrito anterior; a tabela ganha as duas colunas; o título passa a local + ocupação |
 | `CalendarioMensal`, `PainelLateral` (ADR-0005) | etiqueta e linha passam a local + ocupação; o `title` da etiqueta lista as administradoras presentes |
 | `BarraFiltros` (ADR-0005) | a busca casa contra `turma.administradoras` e `turma.condominios` (derivados) |
@@ -99,6 +101,7 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 | CT-CIP-016 | RF-CIP-005 | Planilha com CPF inválido, campo em branco, CPF repetido e administradora inexistente → cada linha mostra o motivo; importa só as válidas |
 | CT-CIP-017 | RF-CIP-005 | Cabeçalho sem a coluna `cpf` → aviso nomeando a coluna, sem listar linhas; planilha vazia → aviso |
 | CT-CIP-018 | RF-CIP-005 | 11 linhas válidas para a sala de reunião → aviso de 1 além do previsto e importação permitida; "Baixar modelo" salva o arquivo |
+| CT-CIP-019 | RF-CIP-001, RF-CIP-002, RF-CIP-005 | Instrutor aparece no formulário de turma, na importação e no detalhe ("a definir" quando falta); CNPJ com máscara, inválido bloqueia, em branco passa e a tabela marca "sem CNPJ"; o CNPJ repete com o vínculo; planilha com coluna de CNPJ inválido mostra o motivo |
 | CT-CIP-013 | RF-CIP-002 | Excluir turma pela lista de inscritos e pelo formulário: a confirmação nomeia local, dia, total de inscritos e condomínios; confirmar apaga e fecha os painéis |
 
 ## Impacto e Riscos

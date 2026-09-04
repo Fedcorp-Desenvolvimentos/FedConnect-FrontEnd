@@ -1,5 +1,11 @@
 import * as XLSX from "xlsx";
-import { apenasDigitos, formatCPF, validarCPF } from "../../../utils/formatters";
+import {
+  apenasDigitos,
+  formatCNPJ,
+  formatCPF,
+  validarCNPJ,
+  validarCPF,
+} from "../../../utils/formatters";
 import { semAcento } from "./hooks/useCursoCipa";
 
 /**
@@ -16,6 +22,7 @@ import { semAcento } from "./hooks/useCursoCipa";
 export const COLUNAS = [
   "administradora",
   "condominio",
+  "cnpj_condominio",
   "nome",
   "cpf",
   "funcao",
@@ -35,6 +42,7 @@ const normalizarChave = (valor) => semAcento(valor).trim().replace(/\s+/g, "");
 const APELIDOS = {
   administradora: ["administradora", "adm", "administradoranome"],
   condominio: ["condominio", "condominionome", "cliente"],
+  cnpj_condominio: ["cnpjcondominio", "cnpj", "cnpjdocondominio", "condominiocnpj"],
   nome: ["nome", "nomecompleto", "participante", "funcionario"],
   cpf: ["cpf", "documento"],
   funcao: ["funcao", "cargo"],
@@ -113,6 +121,11 @@ export async function lerPlanilhaInscritos(arquivo, { administradoras = [] } = {
     const cpf = apenasDigitos(bruto.cpf);
     if (bruto.cpf && !validarCPF(cpf)) erros.push("CPF inválido");
 
+    // CNPJ é opcional (o extra de última hora entra sem ele); quando vem, tem
+    // de ser válido — o certificado vai imprimi-lo.
+    const cnpj = apenasDigitos(bruto.cnpj_condominio);
+    if (bruto.cnpj_condominio && !validarCNPJ(cnpj)) erros.push("CNPJ inválido");
+
     const jaVisto = cpf && cpfsVistos.get(cpf);
     if (jaVisto) erros.push(`CPF repetido (linha ${jaVisto})`);
     else if (cpf) cpfsVistos.set(cpf, numero);
@@ -130,7 +143,11 @@ export async function lerPlanilhaInscritos(arquivo, { administradoras = [] } = {
       numero,
       valida: erros.length === 0,
       erros,
-      exibicao: { ...bruto, cpf: cpf ? formatCPF(cpf) : bruto.cpf },
+      exibicao: {
+        ...bruto,
+        cpf: cpf ? formatCPF(cpf) : bruto.cpf,
+        cnpj_condominio: cnpj ? formatCNPJ(cnpj) : bruto.cnpj_condominio,
+      },
       dados:
         erros.length === 0
           ? {
@@ -142,6 +159,7 @@ export async function lerPlanilhaInscritos(arquivo, { administradoras = [] } = {
               administradora_codigo: administradora.codigo,
               administradora_nome: administradora.nome,
               condominio_nome: bruto.condominio,
+              condominio_cnpj: cnpj,
             }
           : null,
     });

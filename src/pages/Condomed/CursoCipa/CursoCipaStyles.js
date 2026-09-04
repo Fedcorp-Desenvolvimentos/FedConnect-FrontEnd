@@ -775,6 +775,13 @@ export const FecharButton = styled.button`
 `;
 
 export const Campo = styled.label`
+  .ajuda {
+    font-size: 0.72rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #64748b;
+  }
+
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -1040,6 +1047,15 @@ export const Selo = styled.span`
 
   background: ${({ $tom }) => ($tom === "ok" ? "#dcfce7" : "#fee2e2")};
   color: ${({ $tom }) => ($tom === "ok" ? "#166534" : "#991b1b")};
+`;
+
+/** Segunda linha discreta numa célula (ex.: CNPJ sob o nome do condomínio). */
+export const Secundario = styled.small`
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: ${({ $alerta }) => ($alerta ? "#b45309" : "#64748b")};
 `;
 
 export const AvisoCampo = styled.span`

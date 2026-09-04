@@ -28,7 +28,8 @@ export const CursoCipaHelp = () => (
         ou use <strong>Nova turma</strong> e escolha a data no formulário. O curso ocupa o
         dia inteiro, das 09:00 às 17:30, e cabe uma turma por dia em cada local — por isso
         não há campo de horário. Se o dia já estiver ocupado, o sistema recusa e diz o que
-        está no caminho.
+        está no caminho. O <strong>instrutor</strong> é quem assina o certificado: escolha
+        na lista ou deixe "A definir" até saber quem vai dar o curso.
       </p>
       <p style={{ ...texto, marginTop: "0.5rem" }}>
         A turma <strong>não tem um condomínio dono</strong>: ela é um dia de curso em um
@@ -47,8 +48,10 @@ export const CursoCipaHelp = () => (
       <p style={texto}>
         Clique na turma dentro do calendário para abrir a lista.{" "}
         <strong>Administradora, condomínio, nome, CPF e função</strong> são obrigatórios;
-        e-mail e telefone, opcionais. A administradora vem da lista da companhia (digite
-        para filtrar) e o condomínio é digitado. O contador mostra{" "}
+        CNPJ do condomínio, e-mail e telefone, opcionais. A administradora vem da lista da
+        companhia (digite para filtrar) e o condomínio é digitado. O CNPJ pode ficar para
+        depois, mas o certificado sai com ele — quem estiver "sem CNPJ" na lista não
+        recebe certificado até preencher. O contador mostra{" "}
         <strong>inscritos / capacidade</strong> — 30 no auditório, 10 na sala de
         reunião. A capacidade é referência, não trava: se chegar gente a mais de
         última hora, a inscrição entra e a tela marca quantos passaram do previsto,

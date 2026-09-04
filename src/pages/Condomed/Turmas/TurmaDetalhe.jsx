@@ -111,6 +111,15 @@ export default function TurmaDetalhe() {
               Situação <strong>{ROTULO_STATUS[turma.status] || turma.status}</strong>
             </span>
             <span>
+              Instrutor{" "}
+              <strong
+                style={turma.instrutor ? undefined : { color: "#b45309" }}
+                title={turma.instrutor ? undefined : "Obrigatório para emitir certificado"}
+              >
+                {turma.instrutor_nome || "a definir"}
+              </strong>
+            </span>
+            <span>
               Administradoras <strong>{(turma.administradoras || []).length}</strong>
             </span>
             <span>

@@ -1,6 +1,6 @@
 # Tarefas — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..005 · CT: CT-CIP-001..018 · Questões: PA-003
+> **Rastreabilidade** — RF: RF-CIP-001..005 · CT: CT-CIP-001..019 · Questões: PA-003, PA-027
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 > **Baseado em:** `design.md` (aprovado)
 
@@ -55,8 +55,15 @@
 - [x] T-CIP-7.4 Alerta do mês passa a "Turmas acima da capacidade", somando as pessoas além das vagas _(RF-CIP-001)_
 - [x] T-CIP-7.5 Ajuda reescrita nos três trechos que prometiam o bloqueio _(RF-CIP-002, RF-CIP-005)_
 
+## Fase 8 — Cadastro para o certificado (PA-027)
+
+- [x] T-CIP-8.1 `useInstrutores` + select de instrutor no `TurmaModal` e no `ImportarPlanilhaModal`; instrutor no detalhe da turma _(RF-CIP-001 · CT-CIP-019)_
+- [x] T-CIP-8.2 CNPJ opcional no `InscritosConteudo` (máscara, validação, repetição com o vínculo, "sem CNPJ" na tabela) _(RF-CIP-002 · CT-CIP-019)_
+- [x] T-CIP-8.3 Coluna `cnpj_condominio` no parser da planilha e na prévia _(RF-CIP-005 · CT-CIP-019)_
+- [x] T-CIP-8.4 `formatCNPJ`/`validarCNPJ` em `utils/formatters`; `listarInstrutores` e `instrutor` na importação no service _(RF-CIP-002)_
+
 ## Verificação Final
 
 - [x] Build passa (`npm run build`) em 2026-09-04, incluindo a Fase 4; detector de design sem achados em `src/pages/Condomed/CursoCipa`
-- [ ] Roteiro dos CT executado — CT-CIP-001..018 dependem de ambiente rodando
+- [ ] Roteiro dos CT executado — CT-CIP-001..019 dependem de ambiente rodando
 - [x] `bash specs/verificar.sh` sem violações no `curso-cipa` (R6 falha por PA-023 de `envio-porto`, cross-repo, pré-existente); STATUS.md atualizado
