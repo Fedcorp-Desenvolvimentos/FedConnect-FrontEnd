@@ -2,6 +2,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSnackbar } from "notistack";
 import { CursoCipaService } from "../../../../services/cursoCipaService";
+import { extrairMensagemApi, useInscritos } from "./useInscritos";
+
+// Quem importava daqui continua funcionando; a definição mora em useInscritos.
+export { extrairMensagemApi };
 
 export const AUDITORIO = "AUDITORIO";
 export const SALA_REUNIAO = "SALA_REUNIAO";
@@ -14,16 +18,6 @@ export const STATUS_TURMA = [
 ];
 
 const FILTROS_LIMPOS = { local: "", status: "", busca: "" };
-
-/** Extrai a mensagem de erro da API, seja em `detail` ou em erros de campo. */
-export function extrairMensagemApi(data) {
-  if (!data) return "";
-  if (typeof data === "string") return data;
-  if (data.detail) return String(data.detail);
-  const primeiro = Object.values(data)[0];
-  if (Array.isArray(primeiro)) return String(primeiro[0]);
-  return primeiro ? String(primeiro) : "";
-}
 
 const paraISO = (data) => {
   const mes = String(data.getMonth() + 1).padStart(2, "0");
@@ -50,7 +44,6 @@ export function useCursoCipa() {
   const [locais, setLocais] = useState([]);
   const [turmas, setTurmas] = useState([]);
   const [turmaSelecionada, setTurmaSelecionada] = useState(null);
-  const [inscritos, setInscritos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
 
@@ -202,100 +195,24 @@ export function useCursoCipa() {
     [carregarTurmas, enqueueSnackbar, avisarErro]
   );
 
+  // Operações de inscrito: fonte única com a página de detalhe da turma.
+  const inscritosDaTurma = useInscritos({
+    turma: turmaSelecionada,
+    aoMudar: carregarTurmas,
+  });
+
   const abrirTurma = useCallback(
     async (turma) => {
       setTurmaSelecionada(turma);
-      try {
-        setInscritos(await CursoCipaService.listarInscritos(turma.id));
-      } catch (erro) {
-        setInscritos([]);
-        avisarErro(erro, "Não foi possível carregar os inscritos.");
-      }
+      await inscritosDaTurma.carregar(turma.id);
     },
-    [avisarErro]
+    [inscritosDaTurma]
   );
 
   const fecharTurma = useCallback(() => {
     setTurmaSelecionada(null);
-    setInscritos([]);
-  }, []);
-
-  const adicionarInscrito = useCallback(
-    async (dados) => {
-      if (!turmaSelecionada) return false;
-      // A capacidade do local não barra a inscrição (ADR-0006): chega
-      // funcionário extra de última hora e a turma recebe. O aviso abaixo
-      // sinaliza o excesso; a decisão é do operador.
-      try {
-        await CursoCipaService.criarInscrito(turmaSelecionada.id, dados);
-        setInscritos(await CursoCipaService.listarInscritos(turmaSelecionada.id));
-        await carregarTurmas();
-        const total = inscritos.length + 1;
-        const excesso = total - turmaSelecionada.capacidade;
-        enqueueSnackbar(
-          excesso > 0
-            ? `Inscrito adicionado. A turma está ${excesso} acima da capacidade do local (${turmaSelecionada.capacidade}).`
-            : "Inscrito adicionado.",
-          { variant: excesso > 0 ? "warning" : "success" }
-        );
-        return true;
-      } catch (erro) {
-        avisarErro(erro, "Não foi possível adicionar o inscrito.");
-        return false;
-      }
-    },
-    [turmaSelecionada, inscritos.length, carregarTurmas, enqueueSnackbar, avisarErro]
-  );
-
-  /**
-   * Turmas onde este CPF já está inscrito, fora da turma aberta. Serve para
-   * avisar antes de gravar — a duplicidade entre turmas é permitida.
-   * Falha na consulta devolve lista vazia: o aviso é conveniência, não trava
-   * o cadastro.
-   */
-  const verificarCpfEmOutrasTurmas = useCallback(
-    async (cpf) => {
-      if (!turmaSelecionada) return [];
-      try {
-        return await CursoCipaService.verificarCpf(cpf, turmaSelecionada.id);
-      } catch {
-        return [];
-      }
-    },
-    [turmaSelecionada]
-  );
-
-  const editarInscrito = useCallback(
-    async (inscricaoId, dados) => {
-      if (!turmaSelecionada) return false;
-      try {
-        await CursoCipaService.atualizarInscrito(turmaSelecionada.id, inscricaoId, dados);
-        setInscritos(await CursoCipaService.listarInscritos(turmaSelecionada.id));
-        enqueueSnackbar("Inscrito atualizado.", { variant: "success" });
-        return true;
-      } catch (erro) {
-        avisarErro(erro, "Não foi possível salvar as alterações.");
-        return false;
-      }
-    },
-    [turmaSelecionada, enqueueSnackbar, avisarErro]
-  );
-
-  const removerInscrito = useCallback(
-    async (inscricaoId) => {
-      if (!turmaSelecionada) return false;
-      try {
-        await CursoCipaService.excluirInscrito(turmaSelecionada.id, inscricaoId);
-        setInscritos(await CursoCipaService.listarInscritos(turmaSelecionada.id));
-        await carregarTurmas();
-        return true;
-      } catch (erro) {
-        avisarErro(erro, "Não foi possível remover o inscrito.");
-        return false;
-      }
-    },
-    [turmaSelecionada, carregarTurmas, avisarErro]
-  );
+    inscritosDaTurma.limpar();
+  }, [inscritosDaTurma]);
 
   const turmasVisiveis = useMemo(() => {
     const busca = semAcento(filtros.busca).trim();
@@ -449,7 +366,7 @@ export function useCursoCipa() {
     resumo,
     alertas,
     turmaSelecionada,
-    inscritos,
+    inscritos: inscritosDaTurma.inscritos,
     carregando,
     salvando,
     criarTurma,
@@ -458,10 +375,10 @@ export function useCursoCipa() {
     excluirTurma,
     abrirTurma,
     fecharTurma,
-    adicionarInscrito,
-    verificarCpfEmOutrasTurmas,
-    editarInscrito,
-    removerInscrito,
+    adicionarInscrito: inscritosDaTurma.adicionar,
+    verificarCpfEmOutrasTurmas: inscritosDaTurma.verificarCpf,
+    editarInscrito: inscritosDaTurma.editar,
+    removerInscrito: inscritosDaTurma.remover,
     recarregar: carregarTurmas,
   };
 }

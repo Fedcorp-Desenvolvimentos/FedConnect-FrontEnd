@@ -1,4 +1,4 @@
-import { FaUserMd, FaChalkboardTeacher, FaLock } from "react-icons/fa";
+import { FaUserMd, FaChalkboardTeacher, FaHistory, FaLock } from "react-icons/fa";
 
 const secao = { marginBottom: "1.5rem" };
 
@@ -34,6 +34,18 @@ export const CondomedHomeHelp = () => (
         Agendamento das turmas do curso CIPA para os condomínios das administradoras, no
         auditório ou na sala de reunião, com a lista de funcionários inscritos em cada
         turma. A tela tem a própria ajuda, no mesmo botão de interrogação.
+      </p>
+    </div>
+
+    <div style={secao}>
+      <h3 style={titulo}>
+        <FaHistory /> Turmas e participantes
+      </h3>
+      <p style={texto}>
+        Histórico das turmas por período e consulta de participantes: em quais turmas
+        uma pessoa, um condomínio ou uma administradora apareceram. Cada turma abre
+        numa página própria, com a lista de inscritos — e, em breve, presença e
+        documentos.
       </p>
     </div>
 

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaChalkboardTeacher, FaFileExcel, FaPlus } from "react-icons/fa";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import FaixaMedidas from "./components/FaixaMedidas";
@@ -9,13 +10,14 @@ import CalendarioMensal from "./components/CalendarioMensal";
 import PainelLateral from "./components/PainelLateral";
 import TurmaModal from "./components/TurmaModal";
 import InscritosPanel from "./components/InscritosPanel";
-import ConfirmarModal from "./components/ConfirmarModal";
+import ExcluirTurmaModal from "./components/ExcluirTurmaModal";
 import ImportarPlanilhaModal from "./components/ImportarPlanilhaModal";
 import CursoCipaHelp from "./CursoCipaHelp";
 import { useCursoCipa } from "./hooks/useCursoCipa";
 import * as S from "./CursoCipaStyles";
 
 export default function CursoCipa() {
+  const navigate = useNavigate();
   const {
     mes,
     ano,
@@ -106,32 +108,6 @@ export default function CursoCipa() {
     }
   };
 
-  /** Quantos inscritos por condomínio, para a confirmação nomear a perda. */
-  const perdaPorCondominio = useMemo(() => {
-    const inscricoes = confirmandoExclusao?.inscricoes || [];
-    const porCondominio = new Map();
-    inscricoes.forEach((inscrito) => {
-      const chave = inscrito.condominio_nome || "Sem condomínio";
-      const atual = porCondominio.get(chave) || { total: 0, administradora: "" };
-      porCondominio.set(chave, {
-        total: atual.total + 1,
-        administradora: atual.administradora || inscrito.administradora_nome || "",
-      });
-    });
-    return [...porCondominio.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([condominio, dados]) => ({
-        chave: condominio,
-        titulo: condominio,
-        detalhe: [
-          `${dados.total} ${dados.total === 1 ? "inscrito" : "inscritos"}`,
-          dados.administradora,
-        ]
-          .filter(Boolean)
-          .join(" · "),
-      }));
-  }, [confirmandoExclusao]);
-
   return (
     <PageLayout
       title="Cursos CIPA"
@@ -214,6 +190,7 @@ export default function CursoCipa() {
           onEditar={editarInscrito}
           onRemover={removerInscrito}
           onExcluirTurma={() => setConfirmandoExclusao(turmaSelecionada)}
+          onVerDetalhe={(turma) => navigate(`/condomed/turmas/${turma.id}`)}
           onEditarTurma={() => {
             setModalTurma({
               data: turmaSelecionada.data,
@@ -239,35 +216,8 @@ export default function CursoCipa() {
           onFechar={() => setModalPlanilha(null)}
         />
 
-        <ConfirmarModal
-          aberto={Boolean(confirmandoExclusao)}
-          titulo="Excluir a turma inteira?"
-          mensagem={
-            confirmandoExclusao
-              ? [
-                  `${confirmandoExclusao.local_nome} · ${format(
-                    parseISO(confirmandoExclusao.data),
-                    "d 'de' MMMM",
-                    { locale: ptBR }
-                  )}.`,
-                  confirmandoExclusao.total_inscritos > 0
-                    ? `A turma e ${
-                        confirmandoExclusao.total_inscritos === 1
-                          ? "o inscrito abaixo saem"
-                          : `os ${confirmandoExclusao.total_inscritos} inscritos abaixo saem`
-                      } do sistema.`
-                    : "A turma não tem ninguém inscrito.",
-                  confirmandoExclusao.local === "SALA_REUNIAO"
-                    ? "A reserva da sala na agenda é liberada."
-                    : "",
-                  "Não dá para desfazer.",
-                ]
-                  .filter(Boolean)
-                  .join(" ")
-              : ""
-          }
-          itens={perdaPorCondominio}
-          textoConfirmar="Excluir turma"
+        <ExcluirTurmaModal
+          turma={confirmandoExclusao}
           onConfirmar={confirmarExclusao}
           onCancelar={fecharConfirmacaoExclusao}
         />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUserMd, FaChalkboardTeacher } from 'react-icons/fa';
+import { FaUserMd, FaChalkboardTeacher, FaHistory } from 'react-icons/fa';
 import { useAuth } from '../../../context/AuthContext';
 import CardGridLayout from '../../../Layouts/CardGridLayout/CardGridLayout';
 import { Card, CardBody, IconWrapper, Title, Description, Button } from '../../../Layouts/CardGridLayout/CardGridLayoutStyles';
@@ -15,6 +15,15 @@ const opcoesCondomed = [
     title: 'Cursos CIPA',
     desc: 'Agende turmas no auditório ou na sala de reunião e registre os funcionários inscritos.',
     to: '/condomed/cursos-cipa',
+    niveis: ['admin', 'condomed'],
+    color: COR_CONDOMED,
+  },
+  {
+    key: 'turmas',
+    icon: <FaHistory />,
+    title: 'Turmas e participantes',
+    desc: 'Histórico das turmas por período e consulta de quem participou, por nome, CPF, condomínio ou administradora.',
+    to: '/condomed/turmas',
     niveis: ['admin', 'condomed'],
     color: COR_CONDOMED,
   },

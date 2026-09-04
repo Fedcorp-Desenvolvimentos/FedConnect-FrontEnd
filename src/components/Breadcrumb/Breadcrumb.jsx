@@ -52,6 +52,7 @@ function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
     '/historico': 'Histórico',
     '/condomed': 'Condomed',
     '/condomed/cursos-cipa': 'Cursos CIPA',
+    '/condomed/turmas': 'Turmas e participantes',
     '/workflow': 'Workflow Hub',
     '/rh': 'RH Hub'
   };

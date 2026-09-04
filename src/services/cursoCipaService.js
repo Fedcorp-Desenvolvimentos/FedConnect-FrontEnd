@@ -20,6 +20,26 @@ export const CursoCipaService = {
     return data?.results ?? [];
   },
 
+  obterTurma: async (turmaId) => {
+    const response = await api.get(`${API_URL}${turmaId}/`);
+    return response.data;
+  },
+
+  /**
+   * Histórico paginado por período (RF-HIS-001). Rota separada da listagem do
+   * calendário, que devolve o mês inteiro sem envelope de paginação.
+   */
+  listarHistorico: async (params) => {
+    const response = await api.get(`${API_URL}historico/`, { params });
+    return response.data; // { count, next, previous, results }
+  },
+
+  /** Inscrições em todas as turmas, uma linha por inscrição (RF-HIS-002). */
+  listarParticipantes: async (params) => {
+    const response = await api.get(`${API_URL}participantes/`, { params });
+    return response.data; // { count, next, previous, results }
+  },
+
   criarTurma: async (turma) => {
     const response = await api.post(API_URL, turma);
     return response.data;

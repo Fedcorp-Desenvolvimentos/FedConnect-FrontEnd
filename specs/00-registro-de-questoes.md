@@ -46,3 +46,9 @@ Formato de cada entrada: título, status (`aberta` | `fechada`), dono, severidad
 - **Trava:** nada.
 - **Questão:** a faixa mostrava "Ocupação 5% · 2 de 40", somando as vagas dos dois locais, enquanto o painel lateral mostrava 3% no auditório e 10% na sala de reunião. O número está certo e não conversa com nenhum dos dois: os locais têm capacidades muito diferentes (30 e 10), então a média do mês não descreve nem um nem outro.
 - **Resposta:** retirar a medida de ocupação total. Ocupação passa a existir só por local, no painel lateral. A faixa fica com turmas no mês, inscritos e próximas turmas.
+
+## PA-026 — Presença e certificado: regras que só o solicitante pode dar
+
+- **Status:** aberta · **Dono:** Ingrid Aylana · **Severidade:** alta
+- **Trava:** fases C (presença) e D (certificado) do `MAPEAMENTO_CIPA_FASE2.md`. Não trava a fase A (`specs/curso-cipa-historico/`).
+- **Questão:** carga horária do certificado; texto e base legal; quem assina (reabre o instrutor da turma); numeração; layout; prazo para marcar presença; presença parcial; quem pode marcar; envio por e-mail; linhas extras na lista de presença. Lista completa na seção 7 do mapeamento. Espelha a questão de mesmo teor no registro do `FedConnect-Back-End` (número 007).
