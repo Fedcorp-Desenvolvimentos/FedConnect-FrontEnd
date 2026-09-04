@@ -25,3 +25,10 @@ Formato de cada entrada: título, status (`aberta` | `fechada`), dono, severidad
 - **Status:** aberta · **Dono:** Ingrid Aylana · **Severidade:** média
 - **Trava:** o seletor em cascata de RF-CIP-002 (implementado como campo digitado).
 - **Questão:** o design previa "administradora → condomínio via selects existentes", mas não há endpoint que liste condomínios de uma administradora — nem no FedConnect-Back-End nem no FedHub (o condomínio aparece só como `NOME_SEGURADO`/`CO_ESTIPULANTE` dentro de faturas). Implementado por ora: administradora vem de `/vistorias/administradoras/` (select) e o condomínio é digitado (código + nome), que é o que o backend armazena. Decidir se vale criar um endpoint de condomínios por administradora no FedHub.
+
+## PA-023 — Níveis autorizados no Envio Porto (nasceu no FedHub)
+
+- **Status:** fechada (2026-08-27) · **Dono:** Ingrid Aylana · **Severidade:** baixa
+- **Trava:** nada.
+- **Questão:** a spec `envio-porto` deste repositório cita `PA-023`, mas a questão nasceu no registro do **FedHub-Backend**. Registrada aqui para o número resolver neste repo — a numeração não é reciclada.
+- **Resposta:** `admin`, `faturamento` (faturista) e `ti`, sem distinção entre gerar, baixar e enviar. A tela esconde o card e a rota, e o Django reforça o gate.

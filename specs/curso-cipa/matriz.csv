@@ -1,6 +1,7 @@
 requisito;origem;design;invariantes;tarefas;testes;questoes
 RF-CIP-001;ADR-0002|src/pages/Agenda/Agenda.jsx:48-56|PA-001;Arquitetura de Componentes|Fluxo Principal;;T-CIP-1.1|T-CIP-2.1|T-CIP-2.2|T-CIP-2.3|T-CIP-3.2;CT-CIP-001|CT-CIP-002|CT-CIP-006;PA-001
-RF-CIP-002;PA-003|src/services/vistoriasService.js listarAdministradoras|src/utils/formatters.js sem CPF;Fluxo Principal|Tratamento de Erros|Divergencia vs. producao;INV-CIP-001;T-CIP-1.1|T-CIP-1.2|T-CIP-2.3|T-CIP-2.4;CT-CIP-003|CT-CIP-004;PA-003
+RF-CIP-002;ADR-0003|PA-003|src/services/vistoriasService.js listarAdministradoras|src/utils/formatters.js sem CPF;Fluxo Principal|Tratamento de Erros|Divergencia vs. producao;INV-CIP-001;T-CIP-1.1|T-CIP-1.2|T-CIP-2.3|T-CIP-2.4;CT-CIP-003|CT-CIP-004;PA-003
 RF-CIP-003;src/components/Sidebar/Sidebar.jsx:78-91|src/routes/PrivateRouter.jsx|src/utils/accessLevels.js;Arquitetura de Componentes|Decisões;;T-CIP-1.3|T-CIP-3.1;CT-CIP-005;
+RF-CIP-004;ADR-0004|src/Layouts/CardGridLayout|users.Usuario.NIVEL_ACESSO_CHOICES;Arquitetura de Componentes|Decisões|Tratamento de Erros;;T-CIP-3.3|T-CIP-3.4;CT-CIP-007|CT-CIP-008;
 RNF-CIP-001;CONVENCOES.md secao 7;Contratos de API e Estado;;T-CIP-1.1;CT-CIP-002;
 RNF-CIP-002;CLAUDE.md Contexto crítico;Contratos de API e Estado;INV-CIP-001;T-CIP-2.4;CT-CIP-004;

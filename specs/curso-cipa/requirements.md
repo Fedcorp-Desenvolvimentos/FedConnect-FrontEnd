@@ -1,7 +1,7 @@
 # Requisitos — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..003 · RNF: RNF-CIP-001..002 · ADR: ADR-0002, ADR-0003 · Questões: PA-001..003
-> **Status:** aprovado · **Dono:** Ingrid Aylana · **Atualizado:** 2026-08-31
+> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0004 · Questões: PA-001..003
+> **Status:** aprovado · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 
 ## Contexto e Problema
 
@@ -9,7 +9,7 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 
 ## Escopo
 
-**Dentro do escopo:** página `CursoCipa` com faixa de medidas, filtros (mês, local, situação, busca), calendário mensal dos dois locais e painel lateral (hoje, próximas, alertas, ocupação por local); modal de turma (data, local, administradora, condomínio, situação, observação); painel de inscritos; service; rota, item de menu e guarda de rota por nível.
+**Dentro do escopo:** home da área Condomed com um cartão por ferramenta; página `CursoCipa` com faixa de medidas, filtros (mês, local, situação, busca), calendário mensal dos dois locais e painel lateral (hoje, próximas, alertas, ocupação por local); modal de turma (data, local, administradora, condomínio, situação, observação); painel de inscritos; service; rota, item de menu e guarda de rota por nível.
 
 **Fora do escopo:** alterações na agenda atual; cadastro de funcionários; `src/pages/RH` (mock, PA-002).
 
@@ -39,8 +39,16 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 
 ### RF-CIP-003: Acesso e navegação
 
-- **QUANDO** o usuário tem nível `condomed` ou `admin`, **ENTÃO** o item "Cursos CIPA" **DEVE** aparecer no menu e a rota `/condomed/cursos-cipa` **DEVE** abrir. `[E]` `Sidebar.jsx:78-91` (`allowed`), `src/utils/accessLevels.js` (sem `condomed` hoje)
-- **SE** o usuário tem outro nível, **ENTÃO** a rota **DEVE** redirecionar para a home mesmo digitada na URL. `[E]` gap atual em `src/routes/PrivateRouter.jsx` (só autenticação)
+- **QUANDO** o usuário tem nível `condomed` ou `admin`, **ENTÃO** o item "Condomed" **DEVE** aparecer no menu, levando à home da área, e as rotas `/condomed` e `/condomed/cursos-cipa` **DEVEM** abrir. `[E]` `Sidebar.jsx:78-91` (`allowed`), `src/utils/accessLevels.js` (sem `condomed` hoje)
+- **SE** o usuário tem outro nível, **ENTÃO** as rotas **DEVEM** redirecionar para a home mesmo digitadas na URL. `[E]` gap atual em `src/routes/PrivateRouter.jsx` (só autenticação)
+
+### RF-CIP-004: Home da área e concessão do nível
+
+**Como** administrador, **quero** uma porta de entrada da Condomed e poder conceder o nível pela interface, **para** que o setor use as ferramentas sem depender do Django admin.
+
+- **QUANDO** abro `/condomed`, **ENTÃO** a interface **DEVE** listar as ferramentas da área em cartões, no mesmo padrão de Financeiro e Faturamento, mostrando apenas as permitidas para o meu nível. `[D]` ADR-0004
+- **SE** nenhuma ferramenta é permitida para o meu nível, **ENTÃO** a interface **DEVE** exibir a mensagem de área vazia em vez de uma grade em branco. `[E]` `CardGridLayout` (`empty`/`emptyMessage`)
+- **QUANDO** cadastro ou edito um usuário, **ENTÃO** o seletor de nível de acesso **DEVE** oferecer `condomed` — e todos os demais níveis aceitos pelo backend. `[E]` os dois formulários tinham listas fixas e divergentes; nenhuma citava `condomed` (nem `recepcionista` ou `vistoria`), enquanto `users.Usuario.NIVEL_ACESSO_CHOICES` aceita dez níveis
 
 ## Requisitos Não Funcionais
 
