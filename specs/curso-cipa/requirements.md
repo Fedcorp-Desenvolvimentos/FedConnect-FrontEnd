@@ -1,6 +1,6 @@
 # Requisitos — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0006 · Questões: PA-001..003, PA-024
+> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0006 · Questões: PA-001..003, PA-024, PA-025
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 
 ## Contexto e Problema
@@ -11,7 +11,7 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 
 ## Escopo
 
-**Dentro do escopo:** home da área Condomed com um cartão por ferramenta; página `CursoCipa` com faixa de medidas, filtros (mês, local, situação, busca), calendário mensal dos dois locais e painel lateral (hoje, próximas, alertas, ocupação por local); modal de turma (data, local, administradora, condomínio, situação, observação); painel de inscritos; service; rota, item de menu e guarda de rota por nível.
+**Dentro do escopo:** home da área Condomed com um cartão por ferramenta; página `CursoCipa` com faixa de medidas, filtros (mês, local, situação, busca), calendário mensal dos dois locais e painel lateral (hoje, próximas, alertas, ocupação por local); modal de turma (data, local, situação, observação); painel de inscritos com o vínculo de cada participante; service; rota, item de menu e guarda de rota por nível.
 
 **Fora do escopo:** alterações na agenda atual; cadastro de funcionários; `src/pages/RH` (mock, PA-002).
 
@@ -21,7 +21,8 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 
 **Como** operador da Condomed, **quero** ver as turmas dos dois locais em um painel mensal com os números do mês, **para** escolher dias livres e enxergar o que exige ação.
 
-- **QUANDO** abro a tela, **ENTÃO** a interface **DEVE** exibir as medidas do mês (turmas, inscritos, ocupação, turmas nos próximos 7 dias), a barra de filtros, o calendário do mês corrente com as turmas dos dois locais e o painel lateral com hoje, próximas turmas, alertas e ocupação por local. `[D]` ADR-0002
+- **QUANDO** abro a tela, **ENTÃO** a interface **DEVE** exibir as medidas do mês (turmas, inscritos, turmas nos próximos 7 dias), a barra de filtros, o calendário do mês corrente com as turmas dos dois locais e o painel lateral com hoje, próximas turmas, alertas e ocupação por local. `[D]` ADR-0002
+- **QUANDO** mostro ocupação, **ENTÃO** ela **DEVE** ser sempre por local, no painel lateral — não há medida de ocupação total, porque a média dos dois locais não conversa com nenhuma das duas (2 de 40 = 5%, com 3% no auditório e 10% na sala). `[D]` decisão do dono, 2026-09-04 (PA-025, fechada)
 - **QUANDO** a turma aparece no calendário, no painel lateral ou no título da lista de inscritos, **ENTÃO** a interface **DEVE** identificá-la por **local + ocupação** (ex.: "Auditório · 12/30"), e não por um nome de cliente — a turma não tem um. `[D]` ADR-0005
 - **QUANDO** busco por texto, **ENTÃO a** interface **DEVE** casar contra as administradoras e os condomínios que a turma devolve (derivados dos inscritos), respondendo "quais turmas têm gente desta administradora". `[D]` ADR-0005
 - **QUANDO** clico em um dia do calendário, **ENTÃO** a interface **DEVE** abrir o formulário de nova turma com aquela data; o local é escolhido no próprio formulário. `[D]` ADR-0002

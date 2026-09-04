@@ -1,9 +1,13 @@
 import * as S from "../CursoCipaStyles";
 
 /**
- * As quatro medidas do mês em exibição. Sem comparação com o mês anterior: o
- * backend devolve um mês por vez, e uma variação que ninguém calculou seria
- * número inventado.
+ * As medidas do mês em exibição. Sem comparação com o mês anterior: o backend
+ * devolve um mês por vez, e uma variação que ninguém calculou seria número
+ * inventado.
+ *
+ * Não há medida de ocupação total: a média dos dois locais (2 de 40 = 5%) não
+ * conversa com a ocupação por local do painel (3% e 10%) e só confundia. A
+ * ocupação vive no painel lateral, por local, onde ela quer dizer algo.
  */
 export default function FaixaMedidas({ resumo, mesPorExtenso }) {
   const { total, proximosSeteDias } = resumo;
@@ -21,14 +25,6 @@ export default function FaixaMedidas({ resumo, mesPorExtenso }) {
         <S.MedidaValor>{total.inscritos}</S.MedidaValor>
         <S.MedidaNota>
           {total.vagas} {total.vagas === 1 ? "vaga aberta" : "vagas abertas"}
-        </S.MedidaNota>
-      </S.Medida>
-
-      <S.Medida>
-        <S.MedidaRotulo>Ocupação</S.MedidaRotulo>
-        <S.MedidaValor>{total.ocupacao}%</S.MedidaValor>
-        <S.MedidaNota>
-          {total.inscritos} de {total.vagas}
         </S.MedidaNota>
       </S.Medida>
 

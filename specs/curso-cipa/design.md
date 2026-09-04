@@ -6,7 +6,7 @@
 
 ## Visão Geral da Solução
 
-Home da área em `src/pages/Condomed/Home/` reusando o `CardGridLayout` das outras áreas (um cartão por ferramenta, filtrado pelo nível) — o menu passa a apontar para o setor, não para uma tela dele. Página nova `src/pages/Condomed/CursoCipa/` com `PageLayout` (ação "Nova turma" no cabeçalho): faixa de quatro medidas, barra de filtros, calendário mensal próprio (dias, não slots — `agendaSlots.js` não se aplica e fica intocado) onde cada turma é uma etiqueta dentro do dia, e painel lateral com hoje, próximas turmas, alertas e ocupação por local. Service `cursoCipaService.js` sobre `api.js`. Modal de turma **só com local, data, situação e observação** (ADR-0005). O select digitável de administradora (`input` + `datalist` sobre `/vistorias/administradoras/`) e o condomínio digitado migram para o formulário de inscrito, dentro do painel de inscritos, que segue o padrão `PessoaFormFields`. Guarda de rota por nível adicionada ao `PrivateRouter` (prop `allowed`), fechando o gap para esta rota sem alterar as demais.
+Home da área em `src/pages/Condomed/Home/` reusando o `CardGridLayout` das outras áreas (um cartão por ferramenta, filtrado pelo nível) — o menu passa a apontar para o setor, não para uma tela dele. Página nova `src/pages/Condomed/CursoCipa/` com `PageLayout` (ação "Nova turma" no cabeçalho): faixa de três medidas (turmas, inscritos, próximas — ocupação é só por local, no painel), barra de filtros, calendário mensal próprio (dias, não slots — `agendaSlots.js` não se aplica e fica intocado) onde cada turma é uma etiqueta dentro do dia, e painel lateral com hoje, próximas turmas, alertas e ocupação por local. Service `cursoCipaService.js` sobre `api.js`. Modal de turma **só com local, data, situação e observação** (ADR-0005). O select digitável de administradora (`input` + `datalist` sobre `/vistorias/administradoras/`) e o condomínio digitado migram para o formulário de inscrito, dentro do painel de inscritos, que segue o padrão `PessoaFormFields`. Guarda de rota por nível adicionada ao `PrivateRouter` (prop `allowed`), fechando o gap para esta rota sem alterar as demais.
 
 ## Arquitetura de Componentes
 
@@ -78,7 +78,7 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 
 | CT | Requisito | Caso |
 |---|---|---|
-| CT-CIP-001 | RF-CIP-001 | Medidas do mês conferem; calendário mostra as turmas dos dois locais; clique no dia abre o formulário com a data; filtros recortam calendário, painel e medidas juntos |
+| CT-CIP-001 | RF-CIP-001 | Medidas do mês conferem (turmas, inscritos, próximas 7 dias — sem ocupação total); calendário mostra as turmas dos dois locais; clique no dia abre o formulário com a data; filtros recortam calendário, painel e medidas juntos |
 | CT-CIP-002 | RF-CIP-001 | Turma em dia ocupado → snackbar com a mensagem 409 do backend |
 | CT-CIP-003 | RF-CIP-002 | Campo de administradora filtra ao digitar e recusa valor fora da lista; inscrito com CPF inválido bloqueado no formulário |
 | CT-CIP-004 | RF-CIP-002 | Ao atingir a capacidade, botão desabilita e contador mostra `n/capacidade` |

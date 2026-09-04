@@ -39,3 +39,10 @@ Formato de cada entrada: título, status (`aberta` | `fechada`), dono, severidad
 - **Trava:** o `TurmaModal`, o `InscritosPanel` e a identificação da turma no calendário.
 - **Questão:** a tela nasceu tratando a turma como o curso de um condomínio (administradora e condomínio no formulário da turma, condomínio como nome da etiqueta). Uma turma pode receber funcionários de administradoras diferentes?
 - **Resposta:** sim, e é a regra. O vínculo (administradora + condomínio) passa para o formulário do inscrito, obrigatório, e a turma é identificada por local + ocupação — "Auditório · 12/30" (ADR-0005). Par no backend: a questão de mesmo teor no registro do `FedConnect-Back-End` (número 006) e o `ADR-0004` de lá.
+
+## PA-025 — Ocupação total do mês na faixa de medidas
+
+- **Status:** fechada (2026-09-04) · **Dono:** Ingrid Aylana · **Severidade:** baixa
+- **Trava:** nada.
+- **Questão:** a faixa mostrava "Ocupação 5% · 2 de 40", somando as vagas dos dois locais, enquanto o painel lateral mostrava 3% no auditório e 10% na sala de reunião. O número está certo e não conversa com nenhum dos dois: os locais têm capacidades muito diferentes (30 e 10), então a média do mês não descreve nem um nem outro.
+- **Resposta:** retirar a medida de ocupação total. Ocupação passa a existir só por local, no painel lateral. A faixa fica com turmas no mês, inscritos e próximas turmas.
