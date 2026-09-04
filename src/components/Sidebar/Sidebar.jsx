@@ -13,7 +13,8 @@ import {
   FaProjectDiagram,
   FaUsers,
   FaFileInvoiceDollar,
-  FaUserPlus
+  FaUserPlus,
+  FaChalkboardTeacher
 
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
@@ -87,6 +88,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
     { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"] },
     { path: "/financeiro", label: "Financeiro", icon: <FaFileInvoiceDollar />, allowed: ["admin", "ti", "financeiro"] },
     { path: "/cadastro-pessoas", label: "Cadastro", icon: <FaUserPlus />, allowed: ["admin", "ti"] },
+    { path: "/condomed/cursos-cipa", label: "Cursos CIPA", icon: <FaChalkboardTeacher />, allowed: ["admin", "condomed"] },
     // { path: "/workflow", label: "Workflow", icon: <FaProjectDiagram />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     // { path: "/rh", label: "Recursos Humanos", icon: <FaUsers />, allowed: ["admin"] },
   ];

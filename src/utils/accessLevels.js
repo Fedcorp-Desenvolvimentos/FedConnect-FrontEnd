@@ -6,7 +6,8 @@ export const ACCESS_LEVELS = {
   RECEPCIONISTA: "recepcionista",
   TI: "ti",
   FATURAMENTO: "faturamento",
-  VISTORIA: "vistoria"
+  VISTORIA: "vistoria",
+  CONDOMED: "condomed"
 };
 
 export const ACCESS_LEVEL_LABELS = {
@@ -17,7 +18,8 @@ export const ACCESS_LEVEL_LABELS = {
   [ACCESS_LEVELS.RECEPCIONISTA]: "Recepcionista",
   [ACCESS_LEVELS.TI]: "TI",
   [ACCESS_LEVELS.FATURAMENTO]: "Faturista",
-  [ACCESS_LEVELS.VISTORIA]: "Vistoria"
+  [ACCESS_LEVELS.VISTORIA]: "Vistoria",
+  [ACCESS_LEVELS.CONDOMED]: "Condomed"
 };
 
 // Função para obter o label do nível de acesso
@@ -46,6 +48,7 @@ export const getAccessLevelColor = (level) => {
     [ACCESS_LEVELS.MODERADOR]: "#7c3aed", // roxo
     [ACCESS_LEVELS.RECEPCIONISTA]: "#0891b2", // ciano
     [ACCESS_LEVELS.VISTORIA]: "#059669", // verde escuro
+    [ACCESS_LEVELS.CONDOMED]: "#be185d", // rosa escuro
     [ACCESS_LEVELS.USUARIO]: "#64748b" // cinza
   };
   return colors[level] || "#64748b";

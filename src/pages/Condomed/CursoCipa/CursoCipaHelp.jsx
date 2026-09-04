@@ -1,0 +1,76 @@
+import { FaCalendarAlt, FaUsers, FaExclamationTriangle } from "react-icons/fa";
+
+const secao = { marginBottom: "1.5rem" };
+
+const titulo = {
+  display: "flex",
+  alignItems: "center",
+  gap: "0.5rem",
+  color: "#0F3D5D",
+  marginBottom: "0.6rem",
+};
+
+const texto = { margin: 0, color: "#475569", fontSize: "0.9rem", lineHeight: 1.55 };
+
+export const CursoCipaHelp = () => (
+  <>
+    <div style={secao}>
+      <h2 style={titulo}>
+        <FaCalendarAlt /> Agendar uma turma
+      </h2>
+      <p style={texto}>
+        Clique em qualquer dia do calendário para abrir o formulário já com aquela data,
+        ou use <strong>Nova turma</strong> e escolha a data no formulário. O curso ocupa o
+        dia inteiro, das 09:00 às 17:30, e cabe uma turma por dia em cada local — por isso
+        não há campo de horário. Se o dia já estiver ocupado, o sistema recusa e diz o que
+        está no caminho.
+      </p>
+    </div>
+
+    <div style={secao}>
+      <h3 style={titulo}>
+        <FaUsers /> Inscritos
+      </h3>
+      <p style={texto}>
+        Clique na turma dentro do calendário para abrir a lista. Nome, CPF e função são
+        obrigatórios; e-mail e telefone, opcionais. O contador mostra{" "}
+        <strong>inscritos / capacidade</strong> — 30 no auditório, 10 na sala de reunião —
+        e o botão desabilita quando a turma lota.
+      </p>
+    </div>
+
+    <div style={secao}>
+      <h3 style={titulo}>
+        <FaCalendarAlt /> Painel à direita
+      </h3>
+      <p style={texto}>
+        <strong>Hoje</strong> e <strong>Próximas turmas</strong> levam direto à lista de
+        inscritos. <strong>Pedem atenção</strong> junta o que precisa de providência:
+        turmas sem ninguém inscrito, turmas lotadas e turmas na sala de reunião que
+        perderam a reserva na agenda. Os filtros do topo valem para o calendário e para o
+        painel ao mesmo tempo.
+      </p>
+    </div>
+
+    <div
+      style={{
+        border: "1px solid #fcd34d",
+        background: "#fffbeb",
+        borderRadius: "12px",
+        padding: "0.85rem 1rem",
+      }}
+    >
+      <strong
+        style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#92400e" }}
+      >
+        <FaExclamationTriangle /> A sala de reunião é compartilhada
+      </strong>
+      <p style={{ ...texto, marginTop: "0.5rem" }}>
+        Marcar uma turma na sala de reunião reserva a sala na Agenda pelo dia todo, e uma
+        reunião já marcada impede o curso naquele dia. Excluir a turma libera a sala.
+      </p>
+    </div>
+  </>
+);
+
+export default CursoCipaHelp;

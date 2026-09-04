@@ -110,3 +110,34 @@ export function dataLocalISO(data = new Date()) {
   const dia = String(data.getDate()).padStart(2, "0");
   return `${ano}-${mes}-${dia}`;
 }
+
+/** Aplica a máscara 000.000.000-00 conforme o usuário digita. */
+export function formatCPF(value) {
+  const digitos = String(value ?? "").replace(/\D/g, "").slice(0, 11);
+  return digitos
+    .replace(/^(\d{3})(\d)/, "$1.$2")
+    .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+}
+
+/** Valida os dígitos verificadores do CPF (mesma regra do backend). */
+export function validarCPF(value) {
+  const cpf = String(value ?? "").replace(/\D/g, "");
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+
+  for (const tamanho of [9, 10]) {
+    let soma = 0;
+    for (let i = 0; i < tamanho; i += 1) {
+      soma += Number(cpf[i]) * (tamanho + 1 - i);
+    }
+    let digito = (soma * 10) % 11;
+    if (digito === 10) digito = 0;
+    if (digito !== Number(cpf[tamanho])) return false;
+  }
+  return true;
+}
+
+/** Deixa apenas os dígitos (o backend grava CPF sem máscara). */
+export function apenasDigitos(value) {
+  return String(value ?? "").replace(/\D/g, "");
+}
