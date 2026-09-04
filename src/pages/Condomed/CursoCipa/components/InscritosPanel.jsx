@@ -50,6 +50,7 @@ export default function InscritosPanel({
   onEditar,
   onRemover,
   onEditarTurma,
+  onExcluirTurma,
   onFechar,
 }) {
   const [form, setForm] = useState(VAZIO);
@@ -238,9 +239,16 @@ export default function InscritosPanel({
             {inscritos.length}/{turma.capacidade}
             <small>{lotada ? "turma lotada" : "inscritos"}</small>
           </S.Contador>
-          <S.Botao type="button" $variante="secundario" onClick={onEditarTurma}>
-            Editar turma
-          </S.Botao>
+          <S.BarraTurmaAcoes>
+            <S.Botao type="button" $variante="secundario" onClick={onEditarTurma}>
+              Editar turma
+            </S.Botao>
+            {onExcluirTurma && (
+              <S.Botao type="button" $variante="perigo" onClick={onExcluirTurma}>
+                <FaTrashAlt size={11} /> Excluir turma
+              </S.Botao>
+            )}
+          </S.BarraTurmaAcoes>
         </S.BarraTurma>
 
         {turma.tem_espelho === false && (

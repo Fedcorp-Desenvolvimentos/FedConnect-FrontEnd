@@ -1,6 +1,6 @@
 # Design — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · INV: INV-CIP-001 · ADR: ADR-0002, ADR-0004, ADR-0005 · Questões: PA-001..003
+> **Rastreabilidade** — RF: RF-CIP-001..004 · INV: INV-CIP-001 · ADR: ADR-0002, ADR-0004..0006 · Questões: PA-001..003
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 > **Baseado em:** `requirements.md` (aprovado)
 
@@ -21,6 +21,7 @@ Home da área em `src/pages/Condomed/Home/` reusando o `CardGridLayout` das outr
 | `CalendarioMensal`, `PainelLateral` (ADR-0005) | etiqueta e linha passam a local + ocupação; o `title` da etiqueta lista as administradoras presentes |
 | `BarraFiltros` (ADR-0005) | a busca casa contra `turma.administradoras` e `turma.condominios` (derivados) |
 | `useCursoCipa` (ADR-0005) | remove o vínculo do payload da turma; guarda o último vínculo usado na sessão; busca sobre as listas derivadas |
+| `CursoCipa.jsx`, `ConfirmarModal` (ADR-0006) | exclusão da turma pelo `ConfirmarModal` (não mais `window.confirm`), com a perda agrupada por condomínio e a prop `acaoAlternativa`; `InscritosPanel` ganha "Excluir turma" |
 | `src/utils/formatters.js` | `formatCPF`, `validarCPF` (novos) |
 | `src/pages/Condomed/Home/CondomedHome.jsx` (novo) | home da área sobre `CardGridLayout`; cartões declarados em `opcoesCondomed` com `niveis`, hoje só Cursos CIPA |
 | `src/pages/Condomed/Home/CondomedHomeHelp.jsx` (novo) | ajuda da área (o que é a Condomed, o que é cada cartão, quem tem acesso) |
@@ -60,6 +61,7 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 
 - ADR-0002: painel único dos dois locais no lugar das abas por local.
 - ADR-0005: vínculo (administradora + condomínio) no formulário do inscrito; turma identificada por local + ocupação; busca sobre as listas derivadas.
+- ADR-0006: exclusão da turma com confirmação que nomeia a perda, alcançável da lista de inscritos, e com cancelar como saída não destrutiva.
 - ADR-0004: home da área no menu (padrão `CardGridLayout` de Financeiro e Faturamento) em vez de a rota abrir direto a tela do CIPA; e `accessLevels.js` como fonte única dos níveis, espelhando os choices do backend.
 - Guarda de rota via prop `allowed` no `PrivateRouter` (aditiva; rotas atuais sem a prop mantêm comportamento). Decisão local, sem ADR — vira ADR se for generalizada às outras rotas.
 
@@ -88,6 +90,8 @@ Endpoints e campos definidos em `FedConnect-Back-End/specs/curso-cipa/design.md`
 | CT-CIP-010 | RF-CIP-002 | Segundo inscrito na mesma sessão já vem com administradora e condomínio do anterior, e o campo aceita troca |
 | CT-CIP-011 | RF-CIP-001 | Etiqueta do calendário, painel lateral e título da lista mostram local + ocupação; turma vazia mostra `0/capacidade` |
 | CT-CIP-012 | RF-CIP-001 | Busca por nome de administradora traz as turmas que têm inscritos dela; busca por condomínio idem |
+| CT-CIP-013 | RF-CIP-002 | Excluir turma pela lista de inscritos e pelo formulário: a confirmação nomeia local, dia, total de inscritos e condomínios; confirmar apaga e fecha os painéis |
+| CT-CIP-014 | RF-CIP-002 | Turma com inscritos: a confirmação oferece "Só cancelar a turma", que marca `cancelada` e mantém a lista; turma vazia não oferece a alternativa |
 
 ## Impacto e Riscos
 

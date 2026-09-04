@@ -679,6 +679,34 @@ export const AcoesConfirmacao = styled.div`
   flex-wrap: wrap;
 `;
 
+/**
+ * Saída menos destrutiva dentro da confirmação (ex.: cancelar a turma em vez
+ * de apagá-la). Discreta de propósito: é uma alternativa, não a ação principal.
+ */
+export const BotaoAlternativo = styled.button`
+  margin-right: auto;
+  border: none;
+  background: none;
+  padding: 0.55rem 0;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0f3d5d;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+
+  &:hover {
+    color: #164e6f;
+  }
+
+  @media (max-width: 480px) {
+    margin-right: 0;
+    width: 100%;
+    text-align: center;
+  }
+`;
+
 export const ListaConfirmacao = styled.ul`
   list-style: none;
   margin: 0.85rem 0 0;
@@ -860,6 +888,14 @@ export const BarraTurma = styled.div`
   gap: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #e5eaf0;
+  flex-wrap: wrap;
+`;
+
+/** Ações da turma na barra do painel de inscritos, agrupadas à direita. */
+export const BarraTurmaAcoes = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   flex-wrap: wrap;
 `;
 

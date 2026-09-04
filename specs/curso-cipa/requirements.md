@@ -1,6 +1,6 @@
 # Requisitos — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0005 · Questões: PA-001..003, PA-024
+> **Rastreabilidade** — RF: RF-CIP-001..004 · RNF: RNF-CIP-001..002 · ADR: ADR-0002..0006 · Questões: PA-001..003, PA-024
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 
 ## Contexto e Problema
@@ -39,6 +39,9 @@ Lado frontend da spec `FedConnect-Back-End/specs/curso-cipa/` (domínio, modelo 
 - **QUANDO** adiciono um inscrito, **ENTÃO** o formulário **DEVE** exigir nome, CPF (com máscara e validação de dígitos) e função; e-mail e telefone opcionais. `[E]` não existe máscara de CPF em `src/utils/formatters.js` — será criada
 - **QUANDO** clico em editar um inscrito, **ENTÃO** o formulário **DEVE** carregar os dados dele e passar a salvar alterações, com a linha correspondente destacada na tabela; editar continua permitido com a turma lotada. `[D]` ADR-0002
 - **QUANDO** peço para remover um inscrito, **ENTÃO** a interface **DEVE** pedir confirmação nomeando a pessoa antes de excluir. `[D]` ADR-0002
+- **QUANDO** peço para excluir a turma inteira, **ENTÃO** a interface **DEVE** confirmar dizendo qual turma é (local e dia), quantos inscritos saem e quais condomínios perdem gente, e avisar que a reserva da sala é liberada. `[D]` ADR-0006
+- **SE** a turma tem inscritos, **ENTÃO** a confirmação **DEVE** oferecer cancelar a turma como alternativa, que preserva a lista. `[D]` ADR-0006
+- **QUANDO** estou na lista de inscritos, **ENTÃO** a interface **DEVE** oferecer excluir a turma dali, sem passar pelo formulário de edição. `[D]` ADR-0006
 - **SE** o CPF informado já consta **nesta** turma, **ENTÃO** a interface **DEVE** avisar assim que o CPF for completado, nomeando quem já está inscrito, destacar a linha correspondente na tabela e desabilitar o envio. `[D]` ADR-0003
 - **SE** o CPF informado já consta em **outra** turma, **ENTÃO** a interface **DEVE** avisar antes de gravar, listando condomínio, local e data de cada turma, e só inscrever após confirmação — a duplicidade entre turmas é permitida. `[D]` ADR-0003 (par no backend: `FedConnect-Back-End/specs/adr/0003-duplicidade-de-inscrito-entre-turmas.md`)
 - **ENQUANTO** a turma está na capacidade, a interface **DEVE** mostrar `inscritos/capacidade` e desabilitar novas inscrições. `[E]` capacidade e contagem vêm do backend na resposta da turma

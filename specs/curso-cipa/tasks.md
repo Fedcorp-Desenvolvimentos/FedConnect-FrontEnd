@@ -1,6 +1,6 @@
 # Tarefas — Tela de agendamento de cursos CIPA (Condomed)
 
-> **Rastreabilidade** — RF: RF-CIP-001..004 · CT: CT-CIP-001..012 · Questões: PA-003
+> **Rastreabilidade** — RF: RF-CIP-001..004 · CT: CT-CIP-001..014 · Questões: PA-003
 > **Status:** em revisão · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 > **Baseado em:** `design.md` (aprovado)
 
@@ -34,8 +34,15 @@
 - [x] T-CIP-4.6 Aviso de CPF em outra turma exibindo administradora e condomínio da inscrição encontrada _(RF-CIP-002 · CT-CIP-009)_
 - [x] T-CIP-4.7 Reescrever `CursoCipaHelp` nas partes de agendamento e inscritos _(RF-CIP-001, RF-CIP-002)_
 
+## Fase 5 — Excluir a turma inteira (ADR-0006)
+
+- [x] T-CIP-5.1 `ConfirmarModal` com `acaoAlternativa` (saída menos destrutiva) e o estilo `BotaoAlternativo` _(RF-CIP-002 · CT-CIP-014)_
+- [x] T-CIP-5.2 Exclusão da turma pelo `ConfirmarModal`, nomeando local, dia, total de inscritos e a perda por condomínio; fim do `window.confirm` _(RF-CIP-002 · CT-CIP-013)_
+- [x] T-CIP-5.3 "Só cancelar a turma" na confirmação quando há inscritos _(RF-CIP-002 · CT-CIP-014)_
+- [x] T-CIP-5.4 "Excluir turma" na barra do `InscritosPanel` _(RF-CIP-002 · CT-CIP-013)_
+
 ## Verificação Final
 
 - [x] Build passa (`npm run build`) em 2026-09-04, incluindo a Fase 4; detector de design sem achados em `src/pages/Condomed/CursoCipa`
-- [ ] Roteiro dos CT executado — CT-CIP-001..012 dependem de ambiente rodando
+- [ ] Roteiro dos CT executado — CT-CIP-001..014 dependem de ambiente rodando
 - [x] `bash specs/verificar.sh` sem violações no `curso-cipa` (R6 falha por PA-023 de `envio-porto`, cross-repo, pré-existente); STATUS.md atualizado

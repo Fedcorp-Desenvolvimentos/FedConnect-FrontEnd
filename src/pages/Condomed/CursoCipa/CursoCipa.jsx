@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { FaChalkboardTeacher, FaPlus } from "react-icons/fa";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import FaixaMedidas from "./components/FaixaMedidas";
@@ -9,6 +9,7 @@ import CalendarioMensal from "./components/CalendarioMensal";
 import PainelLateral from "./components/PainelLateral";
 import TurmaModal from "./components/TurmaModal";
 import InscritosPanel from "./components/InscritosPanel";
+import ConfirmarModal from "./components/ConfirmarModal";
 import CursoCipaHelp from "./CursoCipaHelp";
 import { useCursoCipa } from "./hooks/useCursoCipa";
 import * as S from "./CursoCipaStyles";
@@ -49,6 +50,8 @@ export default function CursoCipa() {
   const [modalTurma, setModalTurma] = useState(null);
   // Foca o campo Nome ao abrir a lista logo depois de criar a turma.
   const [focarNovoInscrito, setFocarNovoInscrito] = useState(false);
+  // Turma aguardando confirmação de exclusão (apaga inscritos e reserva).
+  const [confirmandoExclusao, setConfirmandoExclusao] = useState(null);
 
   const mesPorExtenso = useMemo(
     () => format(new Date(ano, mes - 1, 1), "MMMM 'de' yyyy", { locale: ptBR }),
@@ -74,14 +77,60 @@ export default function CursoCipa() {
     }
   };
 
-  const removerTurma = async (turma) => {
-    const confirmado = window.confirm(
-      "Excluir a turma? Os inscritos e a reserva na agenda serão removidos."
-    );
-    if (!confirmado) return;
+  /**
+   * Excluir a turma apaga os inscritos em cascata e devolve a sala na agenda.
+   * Não tem desfazer, então a confirmação diz o que se perde — e, quando há
+   * gente inscrita, oferece cancelar a turma, que preserva a lista.
+   */
+  const fecharConfirmacaoExclusao = () => setConfirmandoExclusao(null);
+
+  const confirmarExclusao = async () => {
+    const turma = confirmandoExclusao;
+    fecharConfirmacaoExclusao();
     const ok = await excluirTurma(turma.id);
-    if (ok) setModalTurma(null);
+    if (ok) {
+      setModalTurma(null);
+      if (turmaSelecionada?.id === turma.id) fecharTurma();
+    }
   };
+
+  const cancelarEmVezDeExcluir = async () => {
+    const turma = confirmandoExclusao;
+    fecharConfirmacaoExclusao();
+    const salva = await atualizarTurma(turma.id, {
+      local: turma.local,
+      data: turma.data,
+      observacao: turma.observacao || "",
+      status: "cancelada",
+    });
+    if (salva) setModalTurma(null);
+  };
+
+  /** Quantos inscritos por condomínio, para a confirmação nomear a perda. */
+  const perdaPorCondominio = useMemo(() => {
+    const inscricoes = confirmandoExclusao?.inscricoes || [];
+    const porCondominio = new Map();
+    inscricoes.forEach((inscrito) => {
+      const chave = inscrito.condominio_nome || "Sem condomínio";
+      const atual = porCondominio.get(chave) || { total: 0, administradora: "" };
+      porCondominio.set(chave, {
+        total: atual.total + 1,
+        administradora: atual.administradora || inscrito.administradora_nome || "",
+      });
+    });
+    return [...porCondominio.entries()]
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([condominio, dados]) => ({
+        chave: condominio,
+        titulo: condominio,
+        detalhe: [
+          `${dados.total} ${dados.total === 1 ? "inscrito" : "inscritos"}`,
+          dados.administradora,
+        ]
+          .filter(Boolean)
+          .join(" · "),
+      }));
+  }, [confirmandoExclusao]);
 
   return (
     <PageLayout
@@ -143,7 +192,7 @@ export default function CursoCipa() {
           locais={locais}
           salvando={salvando}
           onSalvar={salvarTurma}
-          onExcluir={removerTurma}
+          onExcluir={setConfirmandoExclusao}
           onFechar={() => setModalTurma(null)}
         />
 
@@ -155,6 +204,7 @@ export default function CursoCipa() {
           onVerificarCpf={verificarCpfEmOutrasTurmas}
           onEditar={editarInscrito}
           onRemover={removerInscrito}
+          onExcluirTurma={() => setConfirmandoExclusao(turmaSelecionada)}
           onEditarTurma={() => {
             setModalTurma({
               data: turmaSelecionada.data,
@@ -169,6 +219,50 @@ export default function CursoCipa() {
             setFocarNovoInscrito(false);
             fecharTurma();
           }}
+        />
+
+        <ConfirmarModal
+          aberto={Boolean(confirmandoExclusao)}
+          titulo="Excluir a turma inteira?"
+          mensagem={
+            confirmandoExclusao
+              ? [
+                  `${confirmandoExclusao.local_nome} · ${format(
+                    parseISO(confirmandoExclusao.data),
+                    "d 'de' MMMM",
+                    { locale: ptBR }
+                  )}.`,
+                  confirmandoExclusao.total_inscritos > 0
+                    ? `A turma e ${
+                        confirmandoExclusao.total_inscritos === 1
+                          ? "o inscrito abaixo saem"
+                          : `os ${confirmandoExclusao.total_inscritos} inscritos abaixo saem`
+                      } do sistema.`
+                    : "A turma não tem ninguém inscrito.",
+                  confirmandoExclusao.local === "SALA_REUNIAO"
+                    ? "A reserva da sala na agenda é liberada."
+                    : "",
+                  "Não dá para desfazer.",
+                ]
+                  .filter(Boolean)
+                  .join(" ")
+              : ""
+          }
+          itens={perdaPorCondominio}
+          textoConfirmar="Excluir turma"
+          acaoAlternativa={
+            confirmandoExclusao?.total_inscritos > 0 &&
+            confirmandoExclusao?.status !== "cancelada"
+              ? {
+                  texto: "Só cancelar a turma",
+                  titulo:
+                    "Mantém a turma e a lista de inscritos no histórico e libera a sala na agenda",
+                  onAcao: cancelarEmVezDeExcluir,
+                }
+              : null
+          }
+          onConfirmar={confirmarExclusao}
+          onCancelar={fecharConfirmacaoExclusao}
         />
       </S.Container>
     </PageLayout>
