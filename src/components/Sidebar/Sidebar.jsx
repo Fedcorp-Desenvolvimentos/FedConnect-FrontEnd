@@ -13,7 +13,8 @@ import {
   FaProjectDiagram,
   FaUsers,
   FaFileInvoiceDollar,
-  FaUserPlus
+  FaUserPlus,
+  FaUserMd
 
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
@@ -87,6 +88,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
     { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"] },
     { path: "/financeiro", label: "Financeiro", icon: <FaFileInvoiceDollar />, allowed: ["admin", "ti", "financeiro"] },
     { path: "/cadastro-pessoas", label: "Cadastro", icon: <FaUserPlus />, allowed: ["admin", "ti"] },
+    { path: "/condomed", label: "Condomed", icon: <FaUserMd />, allowed: ["admin", "condomed"] },
     // { path: "/workflow", label: "Workflow", icon: <FaProjectDiagram />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     // { path: "/rh", label: "Recursos Humanos", icon: <FaUsers />, allowed: ["admin"] },
   ];
@@ -136,7 +138,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
               const isActive = location.pathname === item.path ||
                 (item.path === "/consultas" && location.pathname.startsWith("/consultas")) ||
                 (item.path === "/faturamento" && location.pathname.startsWith("/faturamento")) ||
-                (item.path === "/financeiro" && location.pathname.startsWith("/financeiro"));
+                (item.path === "/financeiro" && location.pathname.startsWith("/financeiro")) ||
+                (item.path === "/condomed" && location.pathname.startsWith("/condomed"));
 
               return (
                 <li key={item.path} className={isActive ? "active" : ""}>

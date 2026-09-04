@@ -119,6 +119,12 @@ import AtualizarPessoas from '../pages/CadastroPessoas/AtualizarPessoas';
 
 // Vistorias
 import ConsultaVistorias from '../pages/Vistorias/ConsultaVistorias';
+
+// Condomed
+import CondomedHome from '../pages/Condomed/Home/CondomedHome';
+import CursoCipa from '../pages/Condomed/CursoCipa/CursoCipa';
+import HistoricoTurmas from '../pages/Condomed/Turmas/HistoricoTurmas';
+import TurmaDetalhe from '../pages/Condomed/Turmas/TurmaDetalhe';
 import Loading from '../components/Loading/Loading.jsx';
 
 const AppRouter = () => {
@@ -244,6 +250,14 @@ const AppRouter = () => {
 
           {/* Vistorias */}
           <Route path="/vistorias" element={<ConsultaVistorias />} />
+
+          {/* Condomed — rotas restritas de verdade, não só escondidas no menu */}
+          <Route element={<PrivateRouter allowed={['admin', 'condomed']} />}>
+            <Route path="/condomed" element={<CondomedHome />} />
+            <Route path="/condomed/cursos-cipa" element={<CursoCipa />} />
+            <Route path="/condomed/turmas" element={<HistoricoTurmas />} />
+            <Route path="/condomed/turmas/:id" element={<TurmaDetalhe />} />
+          </Route>
 
         </Route>
       </Route>

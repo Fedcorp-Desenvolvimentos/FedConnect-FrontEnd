@@ -110,3 +110,61 @@ export function dataLocalISO(data = new Date()) {
   const dia = String(data.getDate()).padStart(2, "0");
   return `${ano}-${mes}-${dia}`;
 }
+
+/** Aplica a máscara 000.000.000-00 conforme o usuário digita. */
+export function formatCPF(value) {
+  const digitos = String(value ?? "").replace(/\D/g, "").slice(0, 11);
+  return digitos
+    .replace(/^(\d{3})(\d)/, "$1.$2")
+    .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+}
+
+/** Valida os dígitos verificadores do CPF (mesma regra do backend). */
+export function validarCPF(value) {
+  const cpf = String(value ?? "").replace(/\D/g, "");
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+
+  for (const tamanho of [9, 10]) {
+    let soma = 0;
+    for (let i = 0; i < tamanho; i += 1) {
+      soma += Number(cpf[i]) * (tamanho + 1 - i);
+    }
+    let digito = (soma * 10) % 11;
+    if (digito === 10) digito = 0;
+    if (digito !== Number(cpf[tamanho])) return false;
+  }
+  return true;
+}
+
+/** Deixa apenas os dígitos (o backend grava CPF sem máscara). */
+export function apenasDigitos(value) {
+  return String(value ?? "").replace(/\D/g, "");
+}
+
+/** Aplica a máscara 00.000.000/0000-00 conforme o usuário digita. */
+export function formatCNPJ(value) {
+  const digitos = String(value ?? "").replace(/\D/g, "").slice(0, 14);
+  return digitos
+    .replace(/^(\d{2})(\d)/, "$1.$2")
+    .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4")
+    .replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, "$1.$2.$3/$4-$5");
+}
+
+/** Valida os dígitos verificadores do CNPJ (mesma regra do backend). */
+export function validarCNPJ(value) {
+  const cnpj = String(value ?? "").replace(/\D/g, "");
+  if (cnpj.length !== 14 || /^(\d)\1{13}$/.test(cnpj)) return false;
+
+  const pesos1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  const pesos2 = [6, ...pesos1];
+  for (const [tamanho, pesos] of [[12, pesos1], [13, pesos2]]) {
+    let soma = 0;
+    for (let i = 0; i < tamanho; i += 1) soma += Number(cnpj[i]) * pesos[i];
+    let digito = 11 - (soma % 11);
+    if (digito >= 10) digito = 0;
+    if (digito !== Number(cnpj[tamanho])) return false;
+  }
+  return true;
+}
