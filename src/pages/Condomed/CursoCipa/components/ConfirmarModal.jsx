@@ -4,10 +4,6 @@ import * as S from "../CursoCipaStyles";
 /**
  * Confirmação de ação destrutiva. Fica acima do painel que a abriu e para a
  * propagação do clique, para o overlay de baixo não fechar junto.
- *
- * `acaoAlternativa` ({ texto, onAcao, titulo }) oferece a saída menos
- * destrutiva quando ela existe — cancelar a turma em vez de apagá-la, por
- * exemplo. Fica à esquerda, discreta, sem competir com o botão vermelho.
  */
 export default function ConfirmarModal({
   aberto,
@@ -16,7 +12,6 @@ export default function ConfirmarModal({
   itens = [],
   tom = "perigo",
   textoConfirmar = "Excluir",
-  acaoAlternativa = null,
   onConfirmar,
   onCancelar,
 }) {
@@ -47,15 +42,6 @@ export default function ConfirmarModal({
           </S.ListaConfirmacao>
         )}
         <S.AcoesConfirmacao>
-          {acaoAlternativa && (
-            <S.BotaoAlternativo
-              type="button"
-              onClick={acaoAlternativa.onAcao}
-              title={acaoAlternativa.titulo}
-            >
-              {acaoAlternativa.texto}
-            </S.BotaoAlternativo>
-          )}
           <S.Botao type="button" $variante="secundario" onClick={onCancelar} autoFocus>
             Cancelar
           </S.Botao>

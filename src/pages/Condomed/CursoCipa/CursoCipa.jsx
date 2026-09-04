@@ -79,8 +79,7 @@ export default function CursoCipa() {
 
   /**
    * Excluir a turma apaga os inscritos em cascata e devolve a sala na agenda.
-   * Não tem desfazer, então a confirmação diz o que se perde — e, quando há
-   * gente inscrita, oferece cancelar a turma, que preserva a lista.
+   * Não tem desfazer, então a confirmação diz o que se perde.
    */
   const fecharConfirmacaoExclusao = () => setConfirmandoExclusao(null);
 
@@ -92,18 +91,6 @@ export default function CursoCipa() {
       setModalTurma(null);
       if (turmaSelecionada?.id === turma.id) fecharTurma();
     }
-  };
-
-  const cancelarEmVezDeExcluir = async () => {
-    const turma = confirmandoExclusao;
-    fecharConfirmacaoExclusao();
-    const salva = await atualizarTurma(turma.id, {
-      local: turma.local,
-      data: turma.data,
-      observacao: turma.observacao || "",
-      status: "cancelada",
-    });
-    if (salva) setModalTurma(null);
   };
 
   /** Quantos inscritos por condomínio, para a confirmação nomear a perda. */
@@ -250,17 +237,6 @@ export default function CursoCipa() {
           }
           itens={perdaPorCondominio}
           textoConfirmar="Excluir turma"
-          acaoAlternativa={
-            confirmandoExclusao?.total_inscritos > 0 &&
-            confirmandoExclusao?.status !== "cancelada"
-              ? {
-                  texto: "Só cancelar a turma",
-                  titulo:
-                    "Mantém a turma e a lista de inscritos no histórico e libera a sala na agenda",
-                  onAcao: cancelarEmVezDeExcluir,
-                }
-              : null
-          }
           onConfirmar={confirmarExclusao}
           onCancelar={fecharConfirmacaoExclusao}
         />

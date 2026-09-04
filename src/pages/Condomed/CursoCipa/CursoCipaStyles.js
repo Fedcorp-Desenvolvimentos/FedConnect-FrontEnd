@@ -679,34 +679,6 @@ export const AcoesConfirmacao = styled.div`
   flex-wrap: wrap;
 `;
 
-/**
- * Saída menos destrutiva dentro da confirmação (ex.: cancelar a turma em vez
- * de apagá-la). Discreta de propósito: é uma alternativa, não a ação principal.
- */
-export const BotaoAlternativo = styled.button`
-  margin-right: auto;
-  border: none;
-  background: none;
-  padding: 0.55rem 0;
-  font: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #0f3d5d;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-
-  &:hover {
-    color: #164e6f;
-  }
-
-  @media (max-width: 480px) {
-    margin-right: 0;
-    width: 100%;
-    text-align: center;
-  }
-`;
-
 export const ListaConfirmacao = styled.ul`
   list-style: none;
   margin: 0.85rem 0 0;
