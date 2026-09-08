@@ -18,6 +18,7 @@ import {
 
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
+import { ROUTE_ACCESS } from "../../utils/routeAccess";
 import * as S from "./SidebarStyles";
 import { DollarSign } from "lucide-react";
 
@@ -76,19 +77,19 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
   ];
 
   const navItems = [
-    { path: "/home", label: "Início", icon: <FaHome />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria", "condomed"] },
-    { path: "/consultas", label: "Consultas", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria", "condomed"] },
-    { path: "/consulta-comercial", label: "Comercial", icon: <FaBriefcase />, allowed: ["admin", "comercial", "financeiro"] },
-    { path: "/ferramentas", label: "Ferramentas", icon: <FaTools />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria", "condomed"] },
-    { path: "/faturamento", label: "Faturamento", icon: <FaWallet />, allowed: ["admin", "faturamento", "ti"] },
-    { path: "/metricas", label: "Métricas", icon: <FaChartBar />, allowed: ["admin"] },
-    { path: "/agenda", label: "Agenda", icon: <FaCalendarAlt />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria", "condomed"] },
-    { path: "/automacao", label: "Automação", icon: <FaCog />, allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin", "faturamento", "ti", "usuario", "comercial", "financeiro"] : ["admin"] },
-    { path: "/analytics", label: "Estatísticas", icon: <FaChartLine />, allowed: ["admin", "ti"] },
-    { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria", "condomed"] },
-    { path: "/financeiro", label: "Financeiro", icon: <FaFileInvoiceDollar />, allowed: ["admin", "ti", "financeiro"] },
-    { path: "/cadastro-pessoas", label: "Cadastro", icon: <FaUserPlus />, allowed: ["admin", "ti"] },
-    { path: "/condomed", label: "Condomed", icon: <FaUserMd />, allowed: ["admin", "condomed"] },
+    { path: "/home", label: "Início", icon: <FaHome />, allowed: ROUTE_ACCESS.home },
+    { path: "/consultas", label: "Consultas", icon: <FaClipboardList />, allowed: ROUTE_ACCESS.consultas },
+    { path: "/consulta-comercial", label: "Comercial", icon: <FaBriefcase />, allowed: ROUTE_ACCESS.comercial },
+    { path: "/ferramentas", label: "Ferramentas", icon: <FaTools />, allowed: ROUTE_ACCESS.ferramentas },
+    { path: "/faturamento", label: "Faturamento", icon: <FaWallet />, allowed: ROUTE_ACCESS.faturamento },
+    { path: "/metricas", label: "Métricas", icon: <FaChartBar />, allowed: ROUTE_ACCESS.metricas },
+    { path: "/agenda", label: "Agenda", icon: <FaCalendarAlt />, allowed: ROUTE_ACCESS.agenda },
+    { path: "/automacao", label: "Automação", icon: <FaCog />, allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ROUTE_ACCESS.automacao : ROUTE_ACCESS.admin },
+    { path: "/analytics", label: "Estatísticas", icon: <FaChartLine />, allowed: ROUTE_ACCESS.analytics },
+    { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ROUTE_ACCESS.questionarios },
+    { path: "/financeiro", label: "Financeiro", icon: <FaFileInvoiceDollar />, allowed: ROUTE_ACCESS.financeiro },
+    { path: "/cadastro-pessoas", label: "Cadastro", icon: <FaUserPlus />, allowed: ROUTE_ACCESS.cadastroPessoas },
+    { path: "/condomed", label: "Condomed", icon: <FaUserMd />, allowed: ROUTE_ACCESS.condomed },
     // { path: "/workflow", label: "Workflow", icon: <FaProjectDiagram />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti"] },
     // { path: "/rh", label: "Recursos Humanos", icon: <FaUsers />, allowed: ["admin"] },
   ];
