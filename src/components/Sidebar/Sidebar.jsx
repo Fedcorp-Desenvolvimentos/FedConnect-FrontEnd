@@ -76,16 +76,16 @@ function Sidebar({ sidebarOpen, setSidebarOpen, toggleSidebar }) {
   ];
 
   const navItems = [
-    { path: "/home", label: "Início", icon: <FaHome />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"] },
-    { path: "/consultas", label: "Consultas", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"] },
+    { path: "/home", label: "Início", icon: <FaHome />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria", "condomed"] },
+    { path: "/consultas", label: "Consultas", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria", "condomed"] },
     { path: "/consulta-comercial", label: "Comercial", icon: <FaBriefcase />, allowed: ["admin", "comercial", "financeiro"] },
-    { path: "/ferramentas", label: "Ferramentas", icon: <FaTools />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"] },
+    { path: "/ferramentas", label: "Ferramentas", icon: <FaTools />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria", "condomed"] },
     { path: "/faturamento", label: "Faturamento", icon: <FaWallet />, allowed: ["admin", "faturamento", "ti"] },
     { path: "/metricas", label: "Métricas", icon: <FaChartBar />, allowed: ["admin"] },
-    { path: "/agenda", label: "Agenda", icon: <FaCalendarAlt />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"] },
+    { path: "/agenda", label: "Agenda", icon: <FaCalendarAlt />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria", "condomed"] },
     { path: "/automacao", label: "Automação", icon: <FaCog />, allowed: emailsPermitidosAutomacao.includes(emailUsuario) ? ["admin", "faturamento", "ti", "usuario", "comercial", "financeiro"] : ["admin"] },
     { path: "/analytics", label: "Estatísticas", icon: <FaChartLine />, allowed: ["admin", "ti"] },
-    { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria"] },
+    { path: "/questionarios", label: "Questionário", icon: <FaClipboardList />, allowed: ["admin", "usuario", "comercial", "faturamento", "ti", "financeiro", "vistoria", "condomed"] },
     { path: "/financeiro", label: "Financeiro", icon: <FaFileInvoiceDollar />, allowed: ["admin", "ti", "financeiro"] },
     { path: "/cadastro-pessoas", label: "Cadastro", icon: <FaUserPlus />, allowed: ["admin", "ti"] },
     { path: "/condomed", label: "Condomed", icon: <FaUserMd />, allowed: ["admin", "condomed"] },
