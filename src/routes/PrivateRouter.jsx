@@ -1,5 +1,5 @@
 // src/routes/PrivateRouter.js
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useOutletContext } from 'react-router-dom';
 import Loading from '../components/Loading/Loading';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,6 +12,9 @@ import { useAuth } from '../context/AuthContext';
  */
 const PrivateRoute = ({ allowed }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
+  // Repassa o contexto do layout pai (ex.: withSidebar do MainLayout) para as
+  // páginas, já que esta guarda pode ficar aninhada entre eles.
+  const outletContext = useOutletContext();
 
   if (isLoading) {
     return <Loading fullScreen message="Verificando autenticação..." />;
@@ -25,7 +28,7 @@ const PrivateRoute = ({ allowed }) => {
     return <Navigate to="/home" replace />;
   }
 
-  return <Outlet />;
+  return <Outlet context={outletContext} />;
 };
 
 export default PrivateRoute;
