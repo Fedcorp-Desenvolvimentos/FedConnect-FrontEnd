@@ -67,3 +67,15 @@ Formato de cada entrada: título, status (`aberta` | `fechada`), dono, severidad
 - **Status:** aberta · **Dono:** Ingrid Aylana · **Severidade:** baixa
 - **Trava:** um critério de RF-HIS-005; não trava a implementação.
 - **Questão:** o backend recusa presença antes da data da turma (hipótese registrada no repositório do backend, questão número 009). A aba Presença deve aparecer desabilitada com o motivo, ou nem aparecer, antes do dia? Hipótese: aparece desabilitada, com "disponível a partir de <data>" — o operador vê que existe e quando poderá usar.
+
+## PA-029 — Palestrantes e locais passam a ser cadastro editável
+
+- **Status:** aberta · **Dono:** Ingrid Aylana · **Severidade:** alta
+- **Trava:** RF-CIP-006 e RF-CIP-007 (`specs/curso-cipa-cadastros/`).
+- **Questão:** espelha a questão de mesmo teor no registro do backend (número 010): em 2026-09-08 o dono pediu área na Condomed para cadastrar palestrantes e locais, revertendo as listas fixas. Para a tela falta decidir quem vê a área (qualquer `condomed` ou só `admin`) e se o cadastro oferece "excluir" ou só "desativar". Hipótese: `condomed` e `admin`; só desativar quando há turma vinculada.
+
+## PA-030 — Como a tela apresenta a emissão parcial de certificados
+
+- **Status:** aberta · **Dono:** Ingrid Aylana · **Severidade:** média
+- **Trava:** um critério de RF-HIS-006 (`specs/curso-cipa-historico/`).
+- **Questão:** espelha a questão de mesmo teor no registro do backend (número 012). Se o backend emite os aptos e devolve os impedidos (ex.: 16 emitidos, 2 sem CNPJ), a aba Certificados mostra o resultado como aviso com atalho para corrigir o inscrito e emitir de novo; se o backend recusar o lote inteiro, a aba precisa bloquear o botão até tudo estar completo. Hipótese: emissão parcial com aviso e atalho.
