@@ -1,6 +1,6 @@
 # Tarefas — Histórico, consulta e detalhe da turma (fase A)
 
-> **Rastreabilidade** — RF: RF-HIS-001..003 · CT: CT-HIS-001..004 · Questões: PA-026
+> **Rastreabilidade** — RF: RF-HIS-001..004 · CT: CT-HIS-001..005 · Questões: PA-026
 > **Status:** aprovado · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 > **Baseado em:** `design.md` (aprovado)
 
@@ -13,12 +13,16 @@
 - [x] T-HIS-1.5 `TurmaDetalhe` + `useTurmaDetalhe`: medidas, inscritos editáveis, editar/excluir turma, 404 _(RF-HIS-003 · CT-HIS-003)_
 - [x] T-HIS-1.6 Rotas sob a guarda, breadcrumb, card e ajuda da home, "Ver detalhe" na agenda _(RF-HIS-003 · CT-HIS-004)_
 
-## Fases B–D (rascunho, travadas em PA-026)
+## Fase 2 (fase B do mapeamento) — Lista de presença
 
-- [ ] Aba Documentos com lista de presença · aba Presença · certificados — ver `../../MAPEAMENTO_CIPA_FASE2.md`
+- [x] T-HIS-2.1 `baixarListaPresenca` no service (blob + nome do header) e no `useTurmaDetalhe`; botão no cabeçalho do detalhe _(RF-HIS-004 · CT-HIS-005)_
+
+## Fases C–D (rascunho, travadas em PA-026)
+
+- [ ] Aba Presença · certificados — ver `../../../FedConnect-Back-End/docs/curso-cipa/MAPEAMENTO_CIPA_FASE2.md`
 
 ## Verificação Final
 
 - [x] Build passa (`npm run build`) em 2026-09-04
-- [ ] Roteiro dos CT executado — CT-HIS-001..004 dependem de ambiente rodando contra o backend com `historico/` e `participantes/`
+- [ ] Roteiro dos CT executado — CT-HIS-001..005 dependem de ambiente rodando contra o backend com `historico/` e `participantes/`
 - [x] `bash specs/verificar.sh` sem violações; STATUS.md atualizado

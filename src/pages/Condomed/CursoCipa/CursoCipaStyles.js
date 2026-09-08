@@ -827,7 +827,8 @@ export const Campo = styled.label`
 
 export const Linha = styled.div`
   display: grid;
-  grid-template-columns: repeat(${({ $colunas = 2 }) => $colunas}, minmax(0, 1fr));
+  grid-template-columns: ${({ $colunas = 2 }) =>
+    typeof $colunas === "number" ? `repeat(${$colunas}, minmax(0, 1fr))` : $colunas};
   gap: 0.75rem;
 
   @media (max-width: 640px) {
@@ -1051,11 +1052,149 @@ export const Selo = styled.span`
 
 /** Segunda linha discreta numa célula (ex.: CNPJ sob o nome do condomínio). */
 export const Secundario = styled.small`
-  display: block;
-  margin-top: 0.1rem;
+  display: ${({ $alerta }) => ($alerta ? "inline-flex" : "block")};
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
   font-size: 0.72rem;
+  font-weight: ${({ $alerta }) => ($alerta ? 600 : 400)};
   font-variant-numeric: tabular-nums;
   color: ${({ $alerta }) => ($alerta ? "#b45309" : "#64748b")};
+  ${({ $alerta }) =>
+    $alerta &&
+    `
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background: #fef3c7;
+  `}
+`;
+
+/* ---------- Cartões da página de detalhe (layout "pagina") ---------- */
+
+export const CartaoDetalhe = styled.section`
+  background: #ffffff;
+  border: 1px solid #e5eaf0;
+  border-radius: 14px;
+  padding: 1.1rem 1.35rem 1.35rem;
+
+  & + & {
+    margin-top: 1rem;
+  }
+`;
+
+export const CartaoCabecalho = styled.header`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+`;
+
+export const CartaoTitulo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    color: #0f3d5d;
+  }
+
+  svg {
+    color: #0f3d5d;
+    flex-shrink: 0;
+  }
+`;
+
+export const CartaoSubtitulo = styled.p`
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: #64748b;
+`;
+
+/** Contagem discreta ao lado do título ("1/30"). */
+export const Pilula = styled.span`
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: ${({ $tom }) => ($tom === "alerta" ? "#fef3c7" : "#eef2f6")};
+  color: ${({ $tom }) => ($tom === "alerta" ? "#b45309" : "#0f3d5d")};
+`;
+
+/** Situação da turma no título da página. */
+export const SeloSituacao = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  vertical-align: middle;
+  background: ${({ $status }) =>
+    $status === "cancelada" ? "#fee2e2" : $status === "realizada" ? "#dbeafe" : "#dcfce7"};
+  color: ${({ $status }) =>
+    $status === "cancelada" ? "#991b1b" : $status === "realizada" ? "#1e40af" : "#166534"};
+`;
+
+/** Medidas da turma em cartões com ícone, uma linha. */
+export const MedidasGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+`;
+
+export const MedidaCartao = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  background: #ffffff;
+  border: 1px solid #e5eaf0;
+  border-radius: 14px;
+  min-width: 0;
+
+  small {
+    display: block;
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 0.15rem;
+  }
+
+  strong {
+    display: block;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+    color: #0f3d5d;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong[data-alerta="true"] {
+    color: #b45309;
+  }
+`;
+
+export const MedidaIcone = styled.div`
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: ${({ $tom }) => ($tom === "ok" ? "#dcfce7" : "#eaf1f8")};
+  color: ${({ $tom }) => ($tom === "ok" ? "#166534" : "#0f3d5d")};
+  font-size: 1.05rem;
 `;
 
 export const AvisoCampo = styled.span`

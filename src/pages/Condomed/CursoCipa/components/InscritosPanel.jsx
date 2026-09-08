@@ -24,6 +24,7 @@ export default function InscritosPanel({ turma, onFechar, onVerDetalhe, ...conte
               {turma.local_nome} · {conteudo.inscritos.length}/{turma.capacidade}
             </h2>
             <p>
+              {turma.codigo && `${turma.codigo} · `}
               {format(parseISO(turma.data), "EEEE, d 'de' MMMM", { locale: ptBR })} ·
               09:00 às 17:30
               {turma.administradoras?.length

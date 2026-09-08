@@ -2,7 +2,20 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { parseISO, format } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
-import { FaArrowLeft, FaCalendarAlt, FaChalkboardTeacher } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaBuilding,
+  FaCalendarAlt,
+  FaChalkboardTeacher,
+  FaCheckCircle,
+  FaCity,
+  FaFilePdf,
+  FaHistory,
+  FaMapMarkerAlt,
+  FaTimesCircle,
+  FaUser,
+  FaUsers,
+} from "react-icons/fa";
 import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import InscritosConteudo from "../CursoCipa/components/InscritosConteudo";
 import TurmaModal from "../CursoCipa/components/TurmaModal";
@@ -11,7 +24,6 @@ import { useInscritos } from "../CursoCipa/hooks/useInscritos";
 import { STATUS_TURMA } from "../CursoCipa/hooks/useCursoCipa";
 import { useTurmaDetalhe } from "./hooks/useTurmaDetalhe";
 import * as C from "../CursoCipa/CursoCipaStyles";
-import * as S from "./TurmasStyles";
 
 const ROTULO_STATUS = Object.fromEntries(STATUS_TURMA.map((s) => [s.valor, s.rotulo]));
 
@@ -70,23 +82,32 @@ export default function TurmaDetalhe() {
     );
   }
 
-  const titulo = turma
-    ? `${turma.local_nome} · ${inscritos.inscritos.length}/${turma.capacidade}`
-    : "Turma";
+  const rotuloSituacao = turma ? ROTULO_STATUS[turma.status] || turma.status : "";
+  const titulo = turma ? (
+    <>
+      {turma.local_nome} · {inscritos.inscritos.length}/{turma.capacidade}{" "}
+      <C.SeloSituacao $status={turma.status}>
+        {turma.status === "cancelada" ? <FaTimesCircle size={11} /> : <FaCalendarAlt size={11} />}
+        {rotuloSituacao}
+      </C.SeloSituacao>
+    </>
+  ) : (
+    "Turma"
+  );
   const subtitulo = turma
-    ? `${format(parseISO(turma.data), "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR })} · 09:00 às 17:30 · ${ROTULO_STATUS[turma.status] || turma.status}`
+    ? `${turma.codigo} · ${format(parseISO(turma.data), "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR })} · 09:00 às 17:30`
     : "";
 
   return (
     <PageLayout
       title={titulo}
       subtitle={subtitulo}
-      icon={<FaChalkboardTeacher />}
+      icon={<FaUsers />}
       loading={detalhe.carregando}
       actions={
         <C.AcoesCabecalho>
           <C.Botao type="button" $variante="secundario" onClick={voltar}>
-            <FaArrowLeft size={11} /> Histórico
+            <FaHistory size={11} /> Histórico
           </C.Botao>
           <C.Botao
             type="button"
@@ -95,45 +116,79 @@ export default function TurmaDetalhe() {
           >
             <FaCalendarAlt size={11} /> Agenda
           </C.Botao>
+          <C.Botao
+            type="button"
+            onClick={detalhe.baixarListaPresenca}
+            disabled={!turma || detalhe.baixandoLista}
+            title="PDF para assinatura no dia, ordenado por condomínio, com linhas em branco para quem chegar de última hora"
+          >
+            <FaFilePdf size={11} />{" "}
+            {detalhe.baixandoLista ? "Gerando..." : "Lista de presença (PDF)"}
+          </C.Botao>
         </C.AcoesCabecalho>
       }
     >
       {turma && (
         <C.Container>
-          <S.Medidas>
-            <span>
-              Data <strong>{format(parseISO(turma.data), "dd/MM/yyyy")}</strong>
-            </span>
-            <span>
-              Local <strong>{turma.local_nome}</strong>
-            </span>
-            <span>
-              Situação <strong>{ROTULO_STATUS[turma.status] || turma.status}</strong>
-            </span>
-            <span>
-              Instrutor{" "}
-              <strong
-                style={turma.instrutor ? undefined : { color: "#b45309" }}
-                title={turma.instrutor ? undefined : "Obrigatório para emitir certificado"}
-              >
-                {turma.instrutor_nome || "a definir"}
-              </strong>
-            </span>
-            <span>
-              Administradoras <strong>{(turma.administradoras || []).length}</strong>
-            </span>
-            <span>
-              Condomínios <strong>{(turma.condominios || []).length}</strong>
-            </span>
-            {turma.observacao && (
-              <span>
-                Observação <strong style={{ fontSize: "0.9rem" }}>{turma.observacao}</strong>
-              </span>
-            )}
-          </S.Medidas>
+          <C.MedidasGrid>
+            <C.MedidaCartao>
+              <C.MedidaIcone><FaCalendarAlt /></C.MedidaIcone>
+              <div>
+                <small>Data</small>
+                <strong>{format(parseISO(turma.data), "dd/MM/yyyy")}</strong>
+              </div>
+            </C.MedidaCartao>
+            <C.MedidaCartao>
+              <C.MedidaIcone><FaMapMarkerAlt /></C.MedidaIcone>
+              <div>
+                <small>Local</small>
+                <strong>{turma.local_nome}</strong>
+              </div>
+            </C.MedidaCartao>
+            <C.MedidaCartao>
+              <C.MedidaIcone $tom={turma.status === "cancelada" ? undefined : "ok"}>
+                {turma.status === "cancelada" ? <FaTimesCircle /> : <FaCheckCircle />}
+              </C.MedidaIcone>
+              <div>
+                <small>Situação</small>
+                <strong>{rotuloSituacao}</strong>
+              </div>
+            </C.MedidaCartao>
+            <C.MedidaCartao>
+              <C.MedidaIcone><FaUser /></C.MedidaIcone>
+              <div>
+                <small>Instrutor</small>
+                <strong
+                  data-alerta={!turma.instrutor}
+                  title={turma.instrutor ? turma.instrutor_nome : "Obrigatório para emitir certificado"}
+                >
+                  {turma.instrutor_nome || "a definir"}
+                </strong>
+              </div>
+            </C.MedidaCartao>
+            <C.MedidaCartao>
+              <C.MedidaIcone><FaBuilding /></C.MedidaIcone>
+              <div>
+                <small>Administradoras</small>
+                <strong>{(turma.administradoras || []).length}</strong>
+              </div>
+            </C.MedidaCartao>
+            <C.MedidaCartao>
+              <C.MedidaIcone><FaCity /></C.MedidaIcone>
+              <div>
+                <small>Condomínios</small>
+                <strong>{(turma.condominios || []).length}</strong>
+              </div>
+            </C.MedidaCartao>
+          </C.MedidasGrid>
+          {turma.observacao && (
+            <C.AvisoBloco $tom="aviso" style={{ marginTop: 0, marginBottom: "1rem" }}>
+              <strong>Observação:</strong>&nbsp;{turma.observacao}
+            </C.AvisoBloco>
+          )}
 
-          <S.Superficie>
-            <InscritosConteudo
+          <InscritosConteudo
+              layout="pagina"
               turma={turma}
               inscritos={inscritos.inscritos}
               onAdicionar={inscritos.adicionar}
@@ -143,7 +198,6 @@ export default function TurmaDetalhe() {
               onEditarTurma={() => setEditando(true)}
               onExcluirTurma={() => setConfirmandoExclusao(true)}
             />
-          </S.Superficie>
 
           <TurmaModal
             aberto={editando}

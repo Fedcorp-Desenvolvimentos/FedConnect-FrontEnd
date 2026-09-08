@@ -70,6 +70,27 @@ export function useTurmaDetalhe(turmaId) {
     [turmaId, enqueueSnackbar, avisarErro]
   );
 
+  /** Baixa a lista de presença em PDF; o navegador salva com o nome do backend. */
+  const [baixandoLista, setBaixandoLista] = useState(false);
+  const baixarListaPresenca = useCallback(async () => {
+    setBaixandoLista(true);
+    try {
+      const { blob, nomeArquivo } = await CursoCipaService.baixarListaPresenca(turmaId);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = nomeArquivo;
+      link.click();
+      URL.revokeObjectURL(url);
+      return true;
+    } catch (erro) {
+      avisarErro(erro, "Não foi possível gerar a lista de presença.");
+      return false;
+    } finally {
+      setBaixandoLista(false);
+    }
+  }, [turmaId, avisarErro]);
+
   const excluir = useCallback(async () => {
     try {
       await CursoCipaService.excluirTurma(turmaId);
@@ -81,7 +102,11 @@ export function useTurmaDetalhe(turmaId) {
     }
   }, [turmaId, enqueueSnackbar, avisarErro]);
 
-  return { turma, locais, carregando, naoEncontrada, salvando, recarregar, atualizar, excluir };
+  return {
+    turma, locais, carregando, naoEncontrada, salvando,
+    recarregar, atualizar, excluir,
+    baixarListaPresenca, baixandoLista,
+  };
 }
 
 export default useTurmaDetalhe;

@@ -90,6 +90,19 @@ export const CursoCipaService = {
     await api.delete(`${API_URL}${turmaId}/inscricoes/${inscricaoId}/`);
   },
 
+  /**
+   * Lista de presença da turma em PDF (RF-HIS-004). Devolve blob e o nome do
+   * arquivo que o backend sugeriu no Content-Disposition.
+   */
+  baixarListaPresenca: async (turmaId) => {
+    const response = await api.get(`${API_URL}${turmaId}/lista-presenca/`, {
+      responseType: "blob",
+    });
+    const disposicao = response.headers?.["content-disposition"] || "";
+    const casado = /filename="?([^";]+)"?/.exec(disposicao);
+    return { blob: response.data, nomeArquivo: casado ? casado[1] : "lista-presenca-cipa.pdf" };
+  },
+
   /** Planilha modelo dos inscritos (xlsx gerado pelo backend). */
   baixarPlanilhaModelo: async () => {
     const response = await api.get(`${API_URL}planilha-modelo/`, {

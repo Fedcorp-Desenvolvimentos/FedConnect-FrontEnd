@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import {
+  FaExclamationCircle,
   FaExclamationTriangle,
   FaPencilAlt,
   FaTrashAlt,
   FaUserPlus,
+  FaUsers,
 } from "react-icons/fa";
 import {
   apenasDigitos,
@@ -55,6 +57,9 @@ export default function InscritosConteudo({
   onRemover,
   onEditarTurma,
   onExcluirTurma,
+  // "modal" (agenda, dentro do InscritosPanel) ou "pagina" (detalhe da turma,
+  // em dois cartões com cabeçalho). O conteúdo e as regras são os mesmos.
+  layout = "modal",
 }) {
   const [form, setForm] = useState(VAZIO);
   const [administradoras, setAdministradoras] = useState([]);
@@ -223,8 +228,42 @@ export default function InscritosConteudo({
     await onRemover(inscrito.id);
   };
 
-  return (
-    <>
+  const emPagina = layout === "pagina";
+  const Cartao = emPagina ? S.CartaoDetalhe : Fragment;
+  const CartaoFormulario = emPagina ? S.CartaoDetalhe : S.Secao;
+
+  const acoesTurma = (
+    <S.BarraTurmaAcoes>
+      <S.Botao type="button" $variante="secundario" onClick={onEditarTurma}>
+        <FaPencilAlt size={11} /> Editar turma
+      </S.Botao>
+      {onExcluirTurma && (
+        <S.Botao type="button" $variante="perigo" onClick={onExcluirTurma}>
+          <FaTrashAlt size={11} /> Excluir turma
+        </S.Botao>
+      )}
+    </S.BarraTurmaAcoes>
+  );
+
+  const cabecalhoLista = emPagina ? (
+    <S.CartaoCabecalho>
+      <div>
+        <S.CartaoTitulo>
+          <FaUsers size={20} />
+          <h2>Inscritos</h2>
+          <S.Pilula $tom={acimaDaCapacidade ? "alerta" : undefined}>
+            {inscritos.length}/{turma.capacidade}
+          </S.Pilula>
+        </S.CartaoTitulo>
+        <S.CartaoSubtitulo>
+          {acimaDaCapacidade
+            ? `${excedente} acima da capacidade do local`
+            : "Lista de participantes desta turma"}
+        </S.CartaoSubtitulo>
+      </div>
+      {acoesTurma}
+    </S.CartaoCabecalho>
+  ) : (
     <S.BarraTurma>
       <S.Contador $lotado={acimaDaCapacidade || naCapacidade}>
         {inscritos.length}/{turma.capacidade}
@@ -236,17 +275,14 @@ export default function InscritosConteudo({
             : "inscritos"}
         </small>
       </S.Contador>
-      <S.BarraTurmaAcoes>
-        <S.Botao type="button" $variante="secundario" onClick={onEditarTurma}>
-          Editar turma
-        </S.Botao>
-        {onExcluirTurma && (
-          <S.Botao type="button" $variante="perigo" onClick={onExcluirTurma}>
-            <FaTrashAlt size={11} /> Excluir turma
-          </S.Botao>
-        )}
-      </S.BarraTurmaAcoes>
+      {acoesTurma}
     </S.BarraTurma>
+  );
+
+  return (
+    <>
+    <Cartao>
+    {cabecalhoLista}
 
     {acimaDaCapacidade && (
       <S.AvisoBloco $tom="aviso">
@@ -281,7 +317,7 @@ export default function InscritosConteudo({
             <th>Condomínio</th>
             <th>Administradora</th>
             <th>Função</th>
-            <th />
+            <th style={{ textAlign: "right" }}>Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -299,7 +335,7 @@ export default function InscritosConteudo({
                   <S.Secundario>{formatCNPJ(inscrito.condominio_cnpj)}</S.Secundario>
                 ) : (
                   <S.Secundario $alerta title="Sem CNPJ: exigido para emitir o certificado">
-                    sem CNPJ
+                    <FaExclamationCircle size={10} /> sem CNPJ
                   </S.Secundario>
                 )}
               </td>
@@ -331,11 +367,28 @@ export default function InscritosConteudo({
         </tbody>
       </S.Tabela>
     )}
+    </Cartao>
 
-    <S.Secao>
-      <S.SecaoTitulo>
-        {editando ? `Editando ${editando.nome}` : "Adicionar inscrito"}
-      </S.SecaoTitulo>
+    <CartaoFormulario>
+      {emPagina ? (
+        <S.CartaoCabecalho>
+          <div>
+            <S.CartaoTitulo>
+              {editando ? <FaPencilAlt size={18} /> : <FaUserPlus size={20} />}
+              <h2>{editando ? `Editando ${editando.nome}` : "Adicionar inscrito"}</h2>
+            </S.CartaoTitulo>
+            <S.CartaoSubtitulo>
+              {editando
+                ? "Altere os dados e salve; o CPF dele mesmo não conta como duplicidade"
+                : "Preencha os dados para adicionar um novo participante nesta turma"}
+            </S.CartaoSubtitulo>
+          </div>
+        </S.CartaoCabecalho>
+      ) : (
+        <S.SecaoTitulo>
+          {editando ? `Editando ${editando.nome}` : "Adicionar inscrito"}
+        </S.SecaoTitulo>
+      )}
       <form onSubmit={submeter}>
         <S.Linha $colunas={3}>
           <S.Campo $erro={Boolean(erros.administradora_nome)}>
@@ -383,7 +436,7 @@ export default function InscritosConteudo({
           </S.Campo>
         </S.Linha>
 
-        <S.Linha>
+        <S.Linha $colunas={emPagina ? "2fr 1fr" : 2}>
           <S.Campo $erro={Boolean(erros.nome)}>
             Nome
             <input
@@ -460,7 +513,7 @@ export default function InscritosConteudo({
           </S.Botao>
         </S.Acoes>
       </form>
-    </S.Secao>
+    </CartaoFormulario>
 
     <ConfirmarModal
       aberto={Boolean(confirmandoRemocao)}
@@ -493,7 +546,7 @@ export default function InscritosConteudo({
         titulo: `${t.condominio_nome}${
           t.administradora_nome ? ` — ${t.administradora_nome}` : ""
         }`,
-        detalhe: `${t.local_nome} · ${formatDateBR(t.data, "-")}${
+        detalhe: `${t.turma_codigo ? `${t.turma_codigo} · ` : ""}${t.local_nome} · ${formatDateBR(t.data, "-")}${
           t.status === "cancelada" ? " · turma cancelada" : ""
         }`,
       }))}
