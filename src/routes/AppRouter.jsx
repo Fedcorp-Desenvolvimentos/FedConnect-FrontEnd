@@ -79,6 +79,7 @@ import SegundaVia from '../pages/SegundaVia/SegundaVia.jsx';
 
 // Utils e Providers
 import PrivateRouter from './PrivateRouter';
+import { ROUTE_ACCESS } from '../utils/routeAccess';
 
 // Automação
 import AutomacaoHome from '../components/Automacao/AutomacaoHome';
@@ -143,116 +144,116 @@ const AppRouter = () => {
       <Route path="/recuperar-senha" element={isAuthenticated ? <Navigate to="/home" /> : <RecuperarSenha />} />
       <Route path="/resetar-senha/:token" element={isAuthenticated ? <Navigate to="/home" /> : <ResetarSenha />} />
 
-      {/* Rotas Protegidas */}
+      {/* Rotas Protegidas — cada grupo tem guarda real por nível (ROUTE_ACCESS),
+          não só o item escondido no menu. */}
       <Route element={<PrivateRouter />}>
         <Route element={<MainLayout />}>
-          {/* Home */}
-          <Route path="/home" element={<HomePage />} />
+
+          {/* Área comum: todos os níveis operacionais */}
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.home} />}>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/minha-conta" element={<MinhaConta />} />
+            <Route path="/historico" element={<HistoricoPage />} />
+            <Route path="/ferramentas" element={<Ferramentas />} />
+            <Route path="/agenda" element={<Agenda />} />
+            <Route path="/questionarios" element={<Questionario />} />
+          </Route>
 
           {/* Consultas */}
-          <Route path="/consultas" element={<ConsultasHome />} />
-          <Route path="/consulta-comercial" element={<ConsultaComercial />} />
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.consultas} />}>
+            <Route path="/consultas" element={<ConsultasHome />} />
+            <Route path="/consultas/consulta-pf" element={<ConsultaPF />} />
+            <Route path="/consultas/consulta-end" element={<ConsultaEnd />} />
+            <Route path="/consultas/consulta-cnpj" element={<ConsultaCNPJ />} />
+            <Route path="/consultas/comercial-regiao" element={<ComercialRegiao />} />
+            <Route path="/consultas/consulta-segurados" element={<ConsultaSegurados />} />
+            <Route path="/consultas/consulta-faturas" element={<ConsultaFat />} />
+            <Route path="/consultas/consulta-faturamento" element={<ConsultaFaturamento />} />
+            <Route path="/consultas/consulta-detalhes/:id" element={<ConsultaDetalhe />} />
+            <Route path="/vistorias" element={<ConsultaVistorias />} />
+          </Route>
 
-          <Route path="/consultas/consulta-pf" element={<ConsultaPF />} />
-          <Route path="/consultas/consulta-end" element={<ConsultaEnd />} />
-          <Route path="/consultas/consulta-cnpj" element={<ConsultaCNPJ />} />
-          <Route path="/consultas/comercial-regiao" element={<ComercialRegiao />} />
-          <Route path="/consultas/consulta-segurados" element={<ConsultaSegurados />} />
-          <Route path="/consultas/consulta-faturas" element={<ConsultaFat />} />
-          <Route path="/consultas/consulta-faturamento" element={<ConsultaFaturamento />} />
-          <Route path="/consultas/consulta-detalhes/:id" element={<ConsultaDetalhe />} />
-
-          {/* Cotação */}
-          <Route path="/cotacao-conteudo" element={<CotacaoConteudo />} />
-
-          {/* Usuário */}
-          <Route path="/gerenciar-usuarios" element={<GerenciarUsuarios />} />
-          <Route path="/minha-conta" element={<MinhaConta />} />
-          <Route path="/cadastro" element={<Cadastro />} />
-          <Route path="/historico" element={<HistoricoPage />} />
-
-          {/* Administrativo */}
-          <Route path="/home-adm" element={<HomeAdm />} />
-          <Route path="/upload" element={<Upload />} />
-          <Route path="/importacao-vida" element={<ImportVida />} />
-
-          {/* Ferramentas e Views */}
-          <Route path="/ferramentas" element={<Ferramentas />} />
-          <Route path="/metricas" element={<Metricas />} />
-          <Route path="/envio-email" element={<EnvEmail />} />
-          <Route path="/config-email" element={<ConfigEmail />} />
-
-          {/* Agenda */}
-          <Route path="/agenda" element={<Agenda />} />
-          <Route path="/agenda-comercial" element={<AgendaComercial />} />
-
-          {/* Comercial e Financeiro */}
-          <Route path="/acompanhamento" element={<Acompanhamento />} />
-          <Route path="/financeiro" element={<FinanceiroHome />} />
-          <Route path="/produtos" element={<Produtos />} />
-          <Route path="/material" element={<Material />} />
+          {/* Comercial */}
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.comercial} />}>
+            <Route path="/consulta-comercial" element={<ConsultaComercial />} />
+            <Route path="/cotacao-conteudo" element={<CotacaoConteudo />} />
+            <Route path="/agenda-comercial" element={<AgendaComercial />} />
+            <Route path="/acompanhamento" element={<Acompanhamento />} />
+            <Route path="/produtos" element={<Produtos />} />
+            <Route path="/material" element={<Material />} />
+          </Route>
 
           {/* Faturamento */}
-          <Route path="/faturamento" element={<FaturamentoHome />} />
-          <Route path="/faturamento/pdf-automation" element={<PdfAutomation />} />
-          <Route path="/faturamento/cancelamento" element={<CancelamentoReemissaoFedBnk />} />
-          <Route path="/faturamento/reimpressao-boleto" element={<ReimpressaoBoleto />} />
-          <Route path="/faturamento/paybox" element={<Payxbox />} />
-          <Route path="/faturamento/segunda-via" element={<SegundaVia />} />
-          
-          {/* Financeiro */}
-          <Route path="/financeiro/comissoes" element={<Comissoes />} />
-          <Route path="/financeiro/consulta-comissao" element={<ConsultaComissao />} />
-          
-          {/* Santander */}
-          {/* <Route path="/financeiro/santander" element={<Santander />} />
-          <Route path="/financeiro/santander/workspaces" element={<SantanderWorkspaces />} />
-          <Route path="/financeiro/santander/empresas" element={<SantanderEmpresas />} />
-          <Route path="/financeiro/santander/boletos" element={<SantanderBoletos />} /> */}
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.faturamento} />}>
+            <Route path="/faturamento" element={<FaturamentoHome />} />
+            <Route path="/faturamento/pdf-automation" element={<PdfAutomation />} />
+            <Route path="/faturamento/cancelamento" element={<CancelamentoReemissaoFedBnk />} />
+            <Route path="/faturamento/reimpressao-boleto" element={<ReimpressaoBoleto />} />
+            <Route path="/faturamento/paybox" element={<Payxbox />} />
+            <Route path="/faturamento/segunda-via" element={<SegundaVia />} />
+            <Route path="/tratamento-erros" element={<TratamentoErros />} />
+            <Route path="/tratamento-erros/tratamento-de-erros-boat" element={<TratamentoErrosBOAT />} />
+            <Route path="/formatos-arquivos" element={<FormatosArquivos />} />
+            <Route path="/formatos-arquivos/converter-boleto-csv" element={<ConverterBoletoCSV />} />
+          </Route>
 
+          {/* Financeiro */}
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.financeiro} />}>
+            <Route path="/financeiro" element={<FinanceiroHome />} />
+            <Route path="/financeiro/comissoes" element={<Comissoes />} />
+            <Route path="/financeiro/consulta-comissao" element={<ConsultaComissao />} />
+            {/* Santander */}
+            {/* <Route path="/financeiro/santander" element={<Santander />} />
+            <Route path="/financeiro/santander/workspaces" element={<SantanderWorkspaces />} />
+            <Route path="/financeiro/santander/empresas" element={<SantanderEmpresas />} />
+            <Route path="/financeiro/santander/boletos" element={<SantanderBoletos />} /> */}
+          </Route>
 
           {/* Automação */}
-          <Route path="/automacao" element={<AutomacaoHome />} />
-          <Route path="/automacao/bbz" element={<BBZAutomacao />} />
-          <Route path="/automacao/pdf" element={<PDFAutomacao />} />
-          <Route path="/automacao/envio-porto" element={<EnvioPorto />} />
-          {/* <Route path="/automacao/email" element={<EmailAutomacao />} /> */}
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.automacao} />}>
+            <Route path="/automacao" element={<AutomacaoHome />} />
+            <Route path="/automacao/bbz" element={<BBZAutomacao />} />
+            <Route path="/automacao/pdf" element={<PDFAutomacao />} />
+            <Route path="/automacao/envio-porto" element={<EnvioPorto />} />
+            {/* <Route path="/automacao/email" element={<EmailAutomacao />} /> */}
+          </Route>
 
-          <Route path="/mapa" element={<Mapa />} />
+          {/* Estatísticas e Cadastro de pessoas (admin e TI) */}
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.analytics} />}>
+            <Route path="/analytics" element={<Analytics />} />
+          </Route>
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.cadastroPessoas} />}>
+            <Route path="/cadastro-pessoas" element={<CadastroPessoasHome />} />
+            <Route path="/cadastro-pessoas/cadastrar" element={<CadastroPessoas />} />
+            <Route path="/cadastro-pessoas/atualizar" element={<AtualizarPessoas />} />
+          </Route>
 
-          <Route path="/analytics" element={<Analytics />} />
+          {/* Métricas */}
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.metricas} />}>
+            <Route path="/metricas" element={<Metricas />} />
+          </Route>
 
-          <Route path="/questionarios" element={<Questionario />} />
+          {/* Administrativo e telas sem entrada no menu: só admin */}
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.admin} />}>
+            <Route path="/gerenciar-usuarios" element={<GerenciarUsuarios />} />
+            <Route path="/cadastro" element={<Cadastro />} />
+            <Route path="/home-adm" element={<HomeAdm />} />
+            <Route path="/upload" element={<Upload />} />
+            <Route path="/importacao-vida" element={<ImportVida />} />
+            <Route path="/envio-email" element={<EnvEmail />} />
+            <Route path="/config-email" element={<ConfigEmail />} />
+            <Route path="/mapa" element={<Mapa />} />
+            <Route path="/mapa-redes" element={<MapaRedes />} />
+            <Route path="/workflow" element={<Workflow />} />
+            <Route path="/rh" element={<RH />} />
+            <Route path="/chat" element={<ChatPage />} />
+            <Route path="/teste-page-styled" element={<TestePageSC />} />
+            <Route path="/teste-page-chat" element={<TestePageCH />} />
+            <Route path="/teste-page-agenda" element={<TesteAgenda />} />
+          </Route>
 
-          <Route path="/workflow" element={< Workflow />} />
-
-          <Route path="/rh" element={<RH />} />
-
-          <Route path="/teste-page-styled" element={<TestePageSC />} />
-          <Route path="/teste-page-chat" element={<TestePageCH />} />
-          <Route path="/teste-page-agenda" element={<TesteAgenda />} />
-
-          <Route path="/chat" element={<ChatPage />} />
-
-          {/* Tratamento de Erros */}
-          <Route path="/tratamento-erros" element={<TratamentoErros />} />
-          <Route path="/tratamento-erros/tratamento-de-erros-boat" element={<TratamentoErrosBOAT />} />
-
-          {/* Formatos de Arquivos */}
-          <Route path="/formatos-arquivos" element={<FormatosArquivos />} />
-          <Route path="/formatos-arquivos/converter-boleto-csv" element={<ConverterBoletoCSV />} />
-
-          <Route path="/mapa-redes" element={<MapaRedes />} />
-          
-          <Route path="/cadastro-pessoas" element={<CadastroPessoasHome />} />
-          <Route path="/cadastro-pessoas/cadastrar" element={<CadastroPessoas />} />
-          <Route path="/cadastro-pessoas/atualizar" element={<AtualizarPessoas />} />
-
-          {/* Vistorias */}
-          <Route path="/vistorias" element={<ConsultaVistorias />} />
-
-          {/* Condomed — rotas restritas de verdade, não só escondidas no menu */}
-          <Route element={<PrivateRouter allowed={['admin', 'condomed']} />}>
+          {/* Condomed */}
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.condomed} />}>
             <Route path="/condomed" element={<CondomedHome />} />
             <Route path="/condomed/cursos-cipa" element={<CursoCipa />} />
             <Route path="/condomed/turmas" element={<HistoricoTurmas />} />
