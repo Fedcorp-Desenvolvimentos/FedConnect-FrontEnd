@@ -1,5 +1,16 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaCalendarAlt, FaChevronLeft, FaChevronRight, FaHistory, FaSearch, FaUsers } from "react-icons/fa";
+import {
+  FaCalendarAlt,
+  FaChevronLeft,
+  FaChevronRight,
+  FaChevronUp,
+  FaFilter,
+  FaHistory,
+  FaListUl,
+  FaSearch,
+  FaUsers,
+} from "react-icons/fa";
 import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { formatCPF, formatDateBR } from "../../../utils/formatters";
 import { ORDEM_LOCAIS, STATUS_TURMA } from "../CursoCipa/hooks/useCursoCipa";
@@ -44,11 +55,24 @@ function Paginacao({ pagina, total, count, onMudar }) {
 }
 
 function SeloStatus({ status }) {
-  const tom = status === "cancelada" ? "erro" : status === "realizada" ? "ok" : undefined;
-  return tom ? (
-    <C.Selo $tom={tom}>{ROTULO_STATUS[status] || status}</C.Selo>
-  ) : (
-    <span>{ROTULO_STATUS[status] || status}</span>
+  return <S.SeloPonto $status={status}>{ROTULO_STATUS[status] || status}</S.SeloPonto>;
+}
+
+/** Cabeçalho de cartão: ícone, título, subtítulo e um espaço à direita. */
+function CabecalhoCartao({ icone, titulo, subtitulo, direita }) {
+  return (
+    <C.CartaoCabecalho>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.9rem" }}>
+        <C.MedidaIcone>{icone}</C.MedidaIcone>
+        <div>
+          <C.CartaoTitulo>
+            <h2>{titulo}</h2>
+          </C.CartaoTitulo>
+          <C.CartaoSubtitulo>{subtitulo}</C.CartaoSubtitulo>
+        </div>
+      </div>
+      {direita}
+    </C.CartaoCabecalho>
   );
 }
 
@@ -75,6 +99,10 @@ const Ajuda = () => (
 export default function HistoricoTurmas() {
   const navigate = useNavigate();
   const h = useHistoricoTurmas();
+  // Filtros recolhíveis: quem já achou o que queria ganha a tela para a tabela.
+  const [filtrosAbertos, setFiltrosAbertos] = useState({ turmas: true, participantes: true });
+  const alternarFiltros = (aba) =>
+    setFiltrosAbertos((atual) => ({ ...atual, [aba]: !atual[aba] }));
 
   const abrirTurma = (id) => navigate(`/condomed/turmas/${id}`);
 
@@ -129,8 +157,24 @@ export default function HistoricoTurmas() {
         </S.Abas>
 
         {h.aba === "turmas" && (
-          <S.Superficie>
-            <form onSubmit={submeterTurmas}>
+          <>
+          <C.CartaoDetalhe>
+            <CabecalhoCartao
+              icone={<FaFilter />}
+              titulo="Filtros de busca"
+              subtitulo="Refine os dados para encontrar as turmas desejadas"
+              direita={
+                <S.BotaoRecolher
+                  type="button"
+                  $aberto={filtrosAbertos.turmas}
+                  onClick={() => alternarFiltros("turmas")}
+                  aria-label={filtrosAbertos.turmas ? "Recolher filtros" : "Expandir filtros"}
+                >
+                  <FaChevronUp size={13} />
+                </S.BotaoRecolher>
+              }
+            />
+            <form onSubmit={submeterTurmas} hidden={!filtrosAbertos.turmas}>
               <S.FiltrosLinha>
                 <C.Campo>
                   De
@@ -186,13 +230,16 @@ export default function HistoricoTurmas() {
                 </C.Campo>
                 <C.Campo style={{ gridColumn: "span 2" }}>
                   Buscar
-                  <input
-                    value={h.filtrosTurmas.busca}
-                    onChange={(e) =>
-                      h.setFiltrosTurmas({ ...h.filtrosTurmas, busca: e.target.value })
-                    }
-                    placeholder="Condomínio, administradora, nome ou CPF"
-                  />
+                  <S.EntradaComIcone>
+                    <FaSearch size={12} />
+                    <input
+                      value={h.filtrosTurmas.busca}
+                      onChange={(e) =>
+                        h.setFiltrosTurmas({ ...h.filtrosTurmas, busca: e.target.value })
+                      }
+                      placeholder="Condomínio, administradora, nome ou CPF"
+                    />
+                  </S.EntradaComIcone>
                 </C.Campo>
               </S.FiltrosLinha>
               <C.Acoes>
@@ -204,7 +251,14 @@ export default function HistoricoTurmas() {
                 </C.Botao>
               </C.Acoes>
             </form>
+          </C.CartaoDetalhe>
 
+          <C.CartaoDetalhe>
+            <CabecalhoCartao
+              icone={<FaListUl />}
+              titulo="Resultado das turmas"
+              subtitulo="Lista de turmas encontradas de acordo com os filtros aplicados"
+            />
             {h.turmas.results.length === 0 ? (
               <C.Vazio>
                 {h.carregando ? "Carregando..." : "Nenhuma turma no período com esses filtros."}
@@ -213,13 +267,13 @@ export default function HistoricoTurmas() {
               <C.Tabela>
                 <thead>
                   <tr>
+                    <th>Código</th>
                     <th>Data</th>
                     <th>Local</th>
                     <th>Situação</th>
                     <th>Inscritos</th>
-                    <th>Condomínios</th>
-                    <th>Administradoras</th>
-                    <th />
+                    <th>Instrutor</th>
+                    <th style={{ textAlign: "right" }}>Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -229,6 +283,9 @@ export default function HistoricoTurmas() {
                       onClick={() => abrirTurma(turma.id)}
                       title="Abrir a turma"
                     >
+                      <td className="numero">
+                        <strong style={{ color: "#0f3d5d" }}>{turma.codigo}</strong>
+                      </td>
                       <td className="numero">{formatDateBR(turma.data, "-")}</td>
                       <td>{turma.local_nome}</td>
                       <td>
@@ -245,13 +302,12 @@ export default function HistoricoTurmas() {
                           </>
                         )}
                       </td>
-                      <td>
-                        {(turma.condominios || []).slice(0, 2).join(", ") || "—"}
-                        {(turma.condominios || []).length > 2 &&
-                          ` +${turma.condominios.length - 2}`}
+                      <td>{turma.instrutor_nome || <span style={{ color: "#b45309" }}>a definir</span>}</td>
+                      <td className="acao">
+                        <S.LinkAbrir>
+                          Abrir <FaChevronRight size={10} />
+                        </S.LinkAbrir>
                       </td>
-                      <td className="numero">{(turma.administradoras || []).length}</td>
-                      <td className="acao">Abrir ›</td>
                     </S.LinhaClicavel>
                   ))}
                 </tbody>
@@ -263,26 +319,46 @@ export default function HistoricoTurmas() {
               count={h.turmas.count}
               onMudar={h.setPaginaTurmas}
             />
-          </S.Superficie>
+          </C.CartaoDetalhe>
+          </>
         )}
 
         {h.aba === "participantes" && (
-          <S.Superficie>
-            <form onSubmit={submeterParticipantes}>
+          <>
+          <C.CartaoDetalhe>
+            <CabecalhoCartao
+              icone={<FaFilter />}
+              titulo="Filtros de busca"
+              subtitulo="Procure uma pessoa, um condomínio ou uma administradora"
+              direita={
+                <S.BotaoRecolher
+                  type="button"
+                  $aberto={filtrosAbertos.participantes}
+                  onClick={() => alternarFiltros("participantes")}
+                  aria-label={filtrosAbertos.participantes ? "Recolher filtros" : "Expandir filtros"}
+                >
+                  <FaChevronUp size={13} />
+                </S.BotaoRecolher>
+              }
+            />
+            <form onSubmit={submeterParticipantes} hidden={!filtrosAbertos.participantes}>
               <S.FiltrosLinha>
                 <C.Campo style={{ gridColumn: "span 2" }}>
                   Buscar
-                  <input
-                    value={h.filtrosParticipantes.busca}
-                    onChange={(e) =>
-                      h.setFiltrosParticipantes({
-                        ...h.filtrosParticipantes,
-                        busca: e.target.value,
-                      })
-                    }
-                    placeholder="Nome, CPF, condomínio ou administradora"
-                    autoFocus
-                  />
+                  <S.EntradaComIcone>
+                    <FaSearch size={12} />
+                    <input
+                      value={h.filtrosParticipantes.busca}
+                      onChange={(e) =>
+                        h.setFiltrosParticipantes({
+                          ...h.filtrosParticipantes,
+                          busca: e.target.value,
+                        })
+                      }
+                      placeholder="Nome, CPF, condomínio ou administradora"
+                      autoFocus
+                    />
+                  </S.EntradaComIcone>
                 </C.Campo>
                 <C.Campo>
                   Turmas de
@@ -324,7 +400,14 @@ export default function HistoricoTurmas() {
                 </C.Botao>
               </C.Acoes>
             </form>
+          </C.CartaoDetalhe>
 
+          <C.CartaoDetalhe>
+            <CabecalhoCartao
+              icone={<FaUsers />}
+              titulo="Resultado dos participantes"
+              subtitulo="Uma linha por inscrição: a mesma pessoa pode aparecer em mais de uma turma"
+            />
             {h.participantes.results.length === 0 ? (
               <C.Vazio>
                 {h.carregando ? "Carregando..." : "Nenhuma inscrição encontrada."}
@@ -339,7 +422,7 @@ export default function HistoricoTurmas() {
                     <th>Administradora</th>
                     <th>Turma</th>
                     <th>Situação</th>
-                    <th />
+                    <th style={{ textAlign: "right" }}>Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -354,12 +437,19 @@ export default function HistoricoTurmas() {
                       <td>{inscricao.condominio_nome}</td>
                       <td>{inscricao.administradora_nome || "—"}</td>
                       <td>
-                        {formatDateBR(inscricao.turma.data, "-")} · {inscricao.turma.local_nome}
+                        <strong style={{ color: "#0f3d5d" }}>{inscricao.turma.codigo}</strong>
+                        <C.Secundario>
+                          {formatDateBR(inscricao.turma.data, "-")} · {inscricao.turma.local_nome}
+                        </C.Secundario>
                       </td>
                       <td>
                         <SeloStatus status={inscricao.turma.status} />
                       </td>
-                      <td className="acao">Abrir ›</td>
+                      <td className="acao">
+                        <S.LinkAbrir>
+                          Abrir <FaChevronRight size={10} />
+                        </S.LinkAbrir>
+                      </td>
                     </S.LinhaClicavel>
                   ))}
                 </tbody>
@@ -371,7 +461,8 @@ export default function HistoricoTurmas() {
               count={h.participantes.count}
               onMudar={h.setPaginaParticipantes}
             />
-          </S.Superficie>
+          </C.CartaoDetalhe>
+          </>
         )}
       </C.Container>
     </PageLayout>

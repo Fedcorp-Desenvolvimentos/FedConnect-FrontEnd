@@ -3,3 +3,5 @@ RF-HIS-001;ADR-0009|FedConnect-Back-End specs curso-cipa-historico design.md;Arq
 RF-HIS-002;ADR-0009|FedConnect-Back-End specs curso-cipa-historico design.md;Arquitetura de Componentes|Contratos de API e Estado;;T-HIS-1.3|T-HIS-1.4;CT-HIS-002;PA-026
 RF-HIS-003;ADR-0009|MAPEAMENTO_CIPA_FASE2.md secao 2;Arquitetura de Componentes|Fluxo Principal|Tratamento de Erros;;T-HIS-1.2|T-HIS-1.5|T-HIS-1.6;CT-HIS-003|CT-HIS-004;
 RNF-HIS-001;CLAUDE.md fonte unica;Arquitetura de Componentes|Impacto e Riscos;;T-HIS-1.1|T-HIS-1.2;CT-HIS-004;
+RF-HIS-004;FedConnect-Back-End specs curso-cipa-historico RF-HIS-003;Arquitetura de Componentes|Fluxo Principal;;T-HIS-2.1;CT-HIS-005;PA-026
+RF-HIS-005;PA-026|PA-028|FedConnect-Back-End specs curso-cipa-historico RF-HIS-004;a definir no design;;;CT-HIS-006;PA-026|PA-028

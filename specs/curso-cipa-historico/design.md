@@ -1,6 +1,6 @@
 # Design — Histórico, consulta e detalhe da turma (fase A)
 
-> **Rastreabilidade** — RF: RF-HIS-001..003 · INV: — · ADR: ADR-0009 · Questões: PA-026
+> **Rastreabilidade** — RF: RF-HIS-001..004 · INV: — · ADR: ADR-0009 · Questões: PA-026
 > **Status:** aprovado · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
 > **Baseado em:** `requirements.md` (aprovado)
 
@@ -22,7 +22,8 @@ Uma segunda página da área (`/condomed/turmas`) e um detalhe por turma (`/cond
 | `src/pages/Condomed/CursoCipa/components/InscritosPanel.jsx` | vira moldura: overlay, cabeçalho e "Ver detalhe"; renderiza `InscritosConteudo` |
 | `src/pages/Condomed/CursoCipa/components/ExcluirTurmaModal.jsx` (novo) | confirmação de exclusão extraída de `CursoCipa.jsx`, com a perda por condomínio |
 | `src/pages/Condomed/CursoCipa/hooks/useCursoCipa.js` | delega inscritos ao `useInscritos`; mantém a API que a agenda consome |
-| `src/services/cursoCipaService.js` | `obterTurma`, `listarHistorico`, `listarParticipantes` |
+| `src/services/cursoCipaService.js` | `obterTurma`, `listarHistorico`, `listarParticipantes`, `baixarListaPresenca` (blob + nome do `Content-Disposition`) |
+| `useTurmaDetalhe`, `TurmaDetalhe.jsx` (fase B) | `baixarListaPresenca`/`baixandoLista`; botão "Lista de presença (PDF)" nas ações do cabeçalho |
 | `AppRouter.jsx`, `Breadcrumb.jsx`, `CondomedHome.jsx`, `CondomedHomeHelp.jsx` | rotas sob a guarda `admin/condomed`, rótulo, card e ajuda |
 
 ## Contratos de API e Estado
@@ -67,6 +68,7 @@ Nenhuma — páginas e rotas novas; a agenda mantém o comportamento (o modal co
 | CT-HIS-002 | RF-HIS-002 | Buscar "Maria" e um CPF com máscara devolve uma linha por inscrição; clique abre a turma certa |
 | CT-HIS-003 | RF-HIS-003 | No detalhe, adicionar/editar/remover inscrito e editar/excluir a turma funcionam como na agenda; id inexistente mostra a página de não encontrada |
 | CT-HIS-004 | RNF-HIS-001, RF-HIS-003 | Na agenda, o painel continua funcionando igual e ganha "Ver detalhe" que abre a página certa |
+| CT-HIS-005 | RF-HIS-004 | No detalhe, o botão baixa `lista-presenca-cipa-<data>-<local>.pdf`; durante a geração mostra "Gerando..."; funciona em turma futura e vazia; erro do backend vira snackbar |
 
 ## Impacto e Riscos
 

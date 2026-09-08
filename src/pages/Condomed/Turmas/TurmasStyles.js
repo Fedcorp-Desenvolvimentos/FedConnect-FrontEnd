@@ -42,13 +42,6 @@ export const Aba = styled.button`
   }
 `;
 
-export const Superficie = styled.section`
-  background: #ffffff;
-  border: 1px solid #e5eaf0;
-  border-radius: 14px;
-  padding: 1rem 1.25rem 1.25rem;
-`;
-
 export const FiltrosLinha = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
@@ -98,28 +91,78 @@ export const Resumo = styled.p`
   }
 `;
 
-/** Cabeçalho do detalhe da turma: medidas rápidas em linha. */
-export const Medidas = styled.div`
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
+/** Situação com ponto colorido, como no histórico. */
+export const SeloPonto = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: ${({ $status }) =>
+    $status === "cancelada" ? "#fee2e2" : $status === "realizada" ? "#dbeafe" : "#dcfce7"};
+  color: ${({ $status }) =>
+    $status === "cancelada" ? "#991b1b" : $status === "realizada" ? "#1e40af" : "#166534"};
 
-  span {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #64748b;
-  }
-
-  strong {
-    font-size: 1.15rem;
-    letter-spacing: -0.02em;
-    color: #0f3d5d;
-    text-transform: none;
+  &::before {
+    content: "";
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: currentColor;
   }
 `;
+
+/** Botão redondo de recolher/expandir no canto do cartão de filtros. */
+export const BotaoRecolher = styled.button`
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 12px;
+  border: 1px solid #e5eaf0;
+  background: #ffffff;
+  color: #0f3d5d;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+
+  svg {
+    transition: transform 0.18s ease;
+    transform: rotate(${({ $aberto }) => ($aberto ? "0deg" : "180deg")});
+  }
+`;
+
+/** Campo de texto com ícone à esquerda, do tamanho dos demais inputs. */
+export const EntradaComIcone = styled.div`
+  position: relative;
+
+  svg {
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+  }
+
+  input {
+    width: 100%;
+    padding-left: 2.2rem !important;
+  }
+`;
+
+/** "Abrir ›" na coluna de ações. */
+export const LinkAbrir = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #0f3d5d;
+  font-weight: 600;
+`;
+
