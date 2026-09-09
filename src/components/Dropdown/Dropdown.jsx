@@ -37,7 +37,7 @@ const Dropdown = ({ sidebarOpen = true }) => {
       </button>
 
       <ul className={`dropdown-content${isOpen ? " show" : ""}`}>
-        {["admin", "usuario", "moderador", "comercial", "administradora", "faturamento", "ti", "condomed"].includes(nivelAcesso) && (
+        {["admin", "usuario", "moderador", "comercial", "administradora", "faturamento", "ti", "condomed", "esocial"].includes(nivelAcesso) && (
           <>
             <li>
               <Link to="/minha-conta" className="dropdown-item" onClick={() => setIsOpen(false)}>

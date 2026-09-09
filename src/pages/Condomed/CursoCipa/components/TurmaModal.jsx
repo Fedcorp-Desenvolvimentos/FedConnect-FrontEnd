@@ -6,6 +6,13 @@ import { STATUS_TURMA } from "../hooks/useCursoCipa";
 import { useInstrutores } from "../hooks/useInstrutores";
 import * as S from "../CursoCipaStyles";
 
+
+/** Data de hoje no fuso local, em AAAA-MM-DD (toISOString usaria UTC e viraria "amanhã" à noite). */
+const hojeLocalISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
 const VAZIA = {
   local: "",
   data: "",
@@ -67,6 +74,12 @@ export default function TurmaModal({
     const novos = {};
     if (!form.local) novos.local = "Escolha o local.";
     if (!form.data) novos.data = "Escolha a data.";
+    else if (
+      form.data < hojeLocalISO() &&
+      form.data !== turma?.data
+    ) {
+      novos.data = "Essa data já passou. Escolha hoje ou um dia futuro.";
+    }
     setErros(novos);
     if (Object.keys(novos).length) return;
 
@@ -116,6 +129,8 @@ export default function TurmaModal({
               <input
                 type="date"
                 value={form.data}
+                // Turma nova não pode cair no passado; turma antiga mantém a data que tem.
+                min={turma ? undefined : hojeLocalISO()}
                 onChange={(evento) => alterar("data", evento.target.value)}
               />
               {erros.data && <span className="erro">{erros.data}</span>}

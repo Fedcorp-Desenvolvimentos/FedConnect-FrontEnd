@@ -16,7 +16,7 @@ const opcoesCondomed = [
     title: 'Cursos CIPA',
     desc: 'Agende turmas no auditório ou na sala de reunião e registre os funcionários inscritos.',
     to: '/condomed/cursos-cipa',
-    niveis: ['admin', 'condomed'],
+    niveis: ['admin', 'condomed', 'esocial'],
     color: COR_CONDOMED,
   },
   {
@@ -25,7 +25,7 @@ const opcoesCondomed = [
     title: 'Turmas e participantes',
     desc: 'Histórico das turmas por período e consulta de quem participou, por nome, CPF, condomínio ou administradora.',
     to: '/condomed/turmas',
-    niveis: ['admin', 'condomed'],
+    niveis: ['admin', 'condomed', 'esocial'],
     color: COR_CONDOMED,
   },
   {
@@ -34,7 +34,7 @@ const opcoesCondomed = [
     title: 'Cadastros',
     desc: 'Palestrantes que assinam o certificado (com a assinatura digitalizada) e locais onde o curso acontece, com capacidade.',
     to: '/condomed/cadastros',
-    niveis: ['admin', 'condomed'],
+    niveis: ['admin', 'condomed', 'esocial'],
     color: COR_CONDOMED,
   },
   {
@@ -43,7 +43,8 @@ const opcoesCondomed = [
     title: 'Robô eSocial (SOC)',
     desc: 'Coleta os recibos S-2220 no Portal eSocial do SOC a partir da planilha de controle. Roda nesta máquina: o cartão abre ou inicia o painel.',
     robo: true,
-    niveis: ['admin', 'condomed'],
+    // Restrito: só quem tem o nível eSocial (dois operadores) e o admin.
+    niveis: ['admin', 'esocial'],
     color: COR_CONDOMED,
   },
 ];

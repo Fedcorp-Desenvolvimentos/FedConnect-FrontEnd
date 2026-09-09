@@ -301,6 +301,12 @@ export const DiaSemana = styled.div`
  * dia é atalho de mouse; pelo teclado se agenda pelo botão "Nova turma".
  */
 export const Dia = styled.div`
+  /* Dia passado: sem cursor de agendar e levemente apagado; as turmas nele seguem normais. */
+  ${({ $passado }) => $passado && css`
+    cursor: default;
+    background: #fafbfc;
+    & > *:first-child { color: #94a3b8; }
+  `}
   min-height: 104px;
   border-right: 1px solid #eef2f6;
   background: ${({ $foraDoMes }) => ($foraDoMes ? "#fafbfc" : "#ffffff")};

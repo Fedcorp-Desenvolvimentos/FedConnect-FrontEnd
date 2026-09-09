@@ -15,7 +15,8 @@ export const NIVEIS_COMUNS = [
   "ti",
   "financeiro",
   "vistoria",
-  "condomed"
+  "condomed",
+  "esocial"
 ];
 
 export const ROUTE_ACCESS = {
@@ -31,7 +32,9 @@ export const ROUTE_ACCESS = {
   analytics: ["admin", "ti"],
   cadastroPessoas: ["admin", "ti"],
   metricas: ["admin"],
-  condomed: ["admin", "condomed"],
+  condomed: ["admin", "condomed", "esocial"],
+  // Robô eSocial (SOC): só os operadores autorizados, não toda a Condomed.
+  esocial: ["admin", "esocial"],
 
   // Níveis que PODEM ver Automação; o Sidebar ainda restringe por e-mail.
   automacao: ["admin", "faturamento", "ti", "usuario", "comercial", "financeiro"],

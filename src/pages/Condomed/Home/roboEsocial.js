@@ -1,13 +1,17 @@
 // Integração com o robô eSocial (RPA SOC), que roda na máquina do operador.
 //
 // O navegador não executa arquivos locais, então o card faz duas coisas:
-// 1. se o painel do robô já está de pé (http://localhost:3000), abre-o;
+// 1. se o painel do robô já está de pé (http://localhost:3210), abre-o;
 // 2. se não está, chama o protocolo `fedrobo://esocial`, que o Windows resolve
 //    para o `iniciar-robo.bat` (instalado uma vez por PC com
 //    `instalar-atalho-fedconnect.bat`, na pasta do robô), e espera o painel subir.
 
+// Porta exclusiva do robô (3210): a 3000 colide com o FedConnect em
+// desenvolvimento e com outros serviços locais, e a verificação "está de pé?"
+// não consegue distinguir quem respondeu. O iniciar-robo-fedconnect.bat sobe
+// o painel nesta porta.
 export const URL_PAINEL_ROBO =
-  import.meta.env.VITE_ROBO_ESOCIAL_URL || "http://localhost:3000/";
+  import.meta.env.VITE_ROBO_ESOCIAL_URL || "http://localhost:3210/";
 
 export const PROTOCOLO_ROBO = "fedrobo://esocial";
 
