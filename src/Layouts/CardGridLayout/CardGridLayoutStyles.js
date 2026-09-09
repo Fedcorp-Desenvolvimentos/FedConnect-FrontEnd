@@ -150,11 +150,15 @@ export const Description = styled.p`
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  /* O flex: 1 pode esticar a caixa além das 3 linhas e deixar uma 4ª linha
+     cortada aparecendo sob as reticências; o teto de altura fecha o recorte. */
+  max-height: calc(1.6em * 3);
 
   @media (max-width: 768px) {
     font-size: 0.8125rem;
     margin-bottom: 1.25rem;
     -webkit-line-clamp: 4;
+    max-height: calc(1.6em * 4);
   }
 `;
 

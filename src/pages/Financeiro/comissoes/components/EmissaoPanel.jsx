@@ -51,7 +51,7 @@ export const EmissaoPanel = ({
         </label>
 
         {documentType === 'voucher' && (
-          <label>
+          <label className="bloco">
             Empresa pagadora (Recebemos de)
             <select
               value={empresaPagadoraTipo || ''}

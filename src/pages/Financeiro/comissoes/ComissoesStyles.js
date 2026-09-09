@@ -535,6 +535,23 @@ export const EmissaoOptions = styled.div`
       border-radius: 8px;
       font-size: 13.5px;
       background: white;
+      /* O select dimensiona-se pela opção mais longa; sem teto ele vaza do painel. */
+      max-width: 100%;
+      min-width: 0;
+      text-overflow: ellipsis;
+    }
+
+    /* Campo em bloco (rótulo em cima, select ocupando a largura do painel):
+       usado na empresa pagadora, cujas opções trazem nome e CNPJ. */
+    &.bloco {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      gap: 6px;
+
+      select {
+        width: 100%;
+      }
     }
   }
 `;
