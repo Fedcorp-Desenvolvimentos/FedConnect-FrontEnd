@@ -1,4 +1,4 @@
 requisito;origem;design;invariantes;tarefas;testes;questoes
-RF-CIP-006;PA-029|FedConnect-Back-End specs curso-cipa-cadastros RF-CIP-006|useInstrutores.js;a definir no design;;;CT-CIP-020;PA-029
-RF-CIP-007;PA-029|FedConnect-Back-End specs curso-cipa-cadastros RF-CIP-007|useCursoCipa.js listarLocais;a definir no design;;;CT-CIP-021;PA-029
-RNF-CIP-003;FedConnect-Back-End specs curso-cipa-cadastros RNF-CIP-004;a definir no design;;;CT-CIP-020|CT-CIP-021;
+RF-CIP-006;PA-029|FedConnect-Back-End specs curso-cipa-cadastros RF-CIP-006|useInstrutores.js;Arquitetura de Componentes|Fluxo Principal|Tratamento de Erros;;T-CAD-2.1|T-CAD-2.2|T-CAD-2.3|T-CAD-2.4;CT-CIP-020;PA-029
+RF-CIP-007;PA-029|FedConnect-Back-End specs curso-cipa-cadastros RF-CIP-007|useCursoCipa.js listarLocais;Arquitetura de Componentes|Fluxo Principal|Tratamento de Erros|Decisões;;T-CAD-1.2|T-CAD-2.1|T-CAD-2.2|T-CAD-2.3|T-CAD-2.4;CT-CIP-021;PA-029
+RNF-CIP-003;FedConnect-Back-End specs curso-cipa-cadastros RNF-CIP-004;Contratos de API e Estado|Decisões;;T-CAD-1.1;CT-CIP-020|CT-CIP-021;

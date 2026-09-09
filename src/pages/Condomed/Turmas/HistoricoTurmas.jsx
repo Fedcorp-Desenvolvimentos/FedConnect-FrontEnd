@@ -13,12 +13,12 @@ import {
 } from "react-icons/fa";
 import PageLayout from "../../../Layouts/PageLayout/PageLayout";
 import { formatCPF, formatDateBR } from "../../../utils/formatters";
-import { ORDEM_LOCAIS, STATUS_TURMA } from "../CursoCipa/hooks/useCursoCipa";
+import { STATUS_TURMA } from "../CursoCipa/hooks/useCursoCipa";
+import { useLocaisCipa } from "../CursoCipa/hooks/useLocaisCipa";
 import { useHistoricoTurmas, PAGINA } from "./hooks/useHistoricoTurmas";
 import * as C from "../CursoCipa/CursoCipaStyles";
 import * as S from "./TurmasStyles";
 
-const NOME_LOCAL = { AUDITORIO: "Auditório", SALA_REUNIAO: "Sala de reunião" };
 const ROTULO_STATUS = Object.fromEntries(STATUS_TURMA.map((s) => [s.valor, s.rotulo]));
 
 function Paginacao({ pagina, total, count, onMudar }) {
@@ -56,6 +56,20 @@ function Paginacao({ pagina, total, count, onMudar }) {
 
 function SeloStatus({ status }) {
   return <S.SeloPonto $status={status}>{ROTULO_STATUS[status] || status}</S.SeloPonto>;
+}
+
+/** Realizada com presentes aptos sem certificado: falta emitir (contagem do backend). */
+function CertificadosPendentes({ turma }) {
+  if (turma.status !== "realizada" || !(turma.aptos_sem_certificado > 0)) return null;
+  return (
+    <S.SeloContagem
+      $tom="erro"
+      title={`${turma.aptos_sem_certificado} ${turma.aptos_sem_certificado === 1 ? "presente apto" : "presentes aptos"} sem certificado`}
+      style={{ marginLeft: "0.4rem" }}
+    >
+      {turma.aptos_sem_certificado} sem certificado
+    </S.SeloContagem>
+  );
 }
 
 /** Cabeçalho de cartão: ícone, título, subtítulo e um espaço à direita. */
@@ -99,6 +113,8 @@ const Ajuda = () => (
 export default function HistoricoTurmas() {
   const navigate = useNavigate();
   const h = useHistoricoTurmas();
+  // Inclui inativos: o histórico filtra turmas de locais que já não existem nas opções.
+  const locais = useLocaisCipa({ todos: true });
   // Filtros recolhíveis: quem já achou o que queria ganha a tela para a tabela.
   const [filtrosAbertos, setFiltrosAbertos] = useState({ turmas: true, participantes: true });
   const alternarFiltros = (aba) =>
@@ -205,9 +221,9 @@ export default function HistoricoTurmas() {
                     }
                   >
                     <option value="">Todos os locais</option>
-                    {ORDEM_LOCAIS.map((codigo) => (
-                      <option key={codigo} value={codigo}>
-                        {NOME_LOCAL[codigo]}
+                    {locais.map((local) => (
+                      <option key={local.codigo} value={local.codigo}>
+                        {local.nome}
                       </option>
                     ))}
                   </select>
@@ -290,6 +306,7 @@ export default function HistoricoTurmas() {
                       <td>{turma.local_nome}</td>
                       <td>
                         <SeloStatus status={turma.status} />
+                        <CertificadosPendentes turma={turma} />
                       </td>
                       <td className="numero">
                         {turma.total_inscritos}/{turma.capacidade}

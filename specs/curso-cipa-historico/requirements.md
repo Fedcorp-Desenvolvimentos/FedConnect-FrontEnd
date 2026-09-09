@@ -1,8 +1,8 @@
 # Requisitos — Histórico, consulta e documentos do CIPA (fase 2)
 
-> **Rastreabilidade** — RF: RF-HIS-001..006 · RNF: RNF-HIS-001 · ADR: ADR-0009 · Questões: PA-026, PA-028, PA-030
-> **Fase 3 (presença): `RF-HIS-005` em revisão — aguardando aprovação do dono antes do design.**
-> **Fase D (certificado): `RF-HIS-006` em rascunho (2026-09-08) — aguarda aprovação e depende da fase 3 e de `specs/curso-cipa-cadastros/`.**
+> **Rastreabilidade** — RF: RF-HIS-001..006 · RNF: RNF-HIS-001 · ADR: ADR-0009 · Questões: PA-026, PA-028, PA-030, PA-031
+> **Fase 3 (presença): `RF-HIS-005` aprovado em 2026-09-08 (instrução do dono "segue o que dá pra fazer") e implementado no mesmo dia (aba Presença em `TurmaDetalhe`).**
+> **Fase D (certificado): `RF-HIS-006` aprovado em 2026-09-08 (respostas do dono a PA-030/PA-031 e instrução "segue o que dá pra fazer") e implementado em 2026-09-09 (aba Certificados).**
 > **Status:** aprovado · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-08
 
 ## Contexto e Problema
@@ -66,7 +66,7 @@
 - **ENQUANTO** há marcações não salvas, a interface **DEVE** sinalizar e pedir confirmação ao sair da aba ou da página. `[E]` decisão local de tela
 - **QUANDO** a presença já foi registrada, **ENTÃO** a aba **DEVE** mostrar quem registrou e quando, e permitir regravar a qualquer tempo. `[D]` PA-026 (sem prazo)
 - **SE** a turma está cancelada, **ENTÃO** a aba **DEVE** aparecer desabilitada com o motivo. `[E]` regra do backend
-- **SE** a data da turma ainda não chegou, **ENTÃO** a aba **DEVE** aparecer desabilitada com "disponível a partir de <data>". `[P]` PA-028
+- **SE** a data da turma ainda não chegou, **ENTÃO** a aba **DEVE** aparecer desabilitada com "disponível a partir de <data>". `[D]` PA-028
 - **QUANDO** edito a turma, **ENTÃO** o formulário **NÃO DEVE** mais oferecer "Realizada" como situação escolhível — ela é consequência da presença; mostra-se como estado, não como opção. `[D]` PA-026
 - **QUANDO** olho o histórico e a lista de inscritos, **ENTÃO** as contagens de presentes/ausentes **DEVEM** vir do backend, nunca calculadas na tela. `[E]` regra do `CLAUDE.md`
 
@@ -77,12 +77,12 @@
 **Como** operador da Condomed, **quero** emitir e baixar os certificados de quem esteve na turma a partir do detalhe, **para** fechar a turma no mesmo lugar em que marquei a presença: dos 30 inscritos, confirmo os 18 presentes e saio com os 18 certificados.
 
 - **QUANDO** abro o detalhe de uma turma realizada com presença registrada, **ENTÃO** a interface **DEVE** mostrar a aba **Certificados** com um resumo vindo do backend (presentes, emitidos, aptos sem certificado, impedidos) e a lista dos presentes, cada um com o estado: **emitido** (número e data), **apto** ou **impedido** (motivo, ex.: sem CNPJ do condomínio). `[E]` `FedConnect-Back-End/specs/curso-cipa-historico/` RF-HIS-005 (contagens e estados vêm do backend)
-- **QUANDO** clico em "Emitir certificados (N)", **ENTÃO** a interface **DEVE** pedir confirmação, enviar uma única chamada ao backend e, ao receber a resposta, recarregar a turma e mostrar o resultado: quantos foram emitidos e quem ficou impedido, com atalho para editar o inscrito e um novo "Emitir" só para os pendentes. `[P]` PA-030
+- **QUANDO** clico em "Emitir certificados (N)", **ENTÃO** a interface **DEVE** pedir confirmação, enviar uma única chamada ao backend e, ao receber a resposta, recarregar a turma e mostrar o resultado: quantos foram emitidos e quem ficou impedido, com atalho para editar o inscrito e um novo "Emitir" só para os pendentes. `[D]` PA-030
 - **SE** a turma está sem instrutor ou o instrutor está sem assinatura, **ENTÃO** a aba **DEVE** mostrar o aviso com atalho para editar a turma (ou o palestrante) e manter "Emitir" desabilitado — a regra é a do backend, a tela só antecipa. `[E]` `FedConnect-Back-End/specs/curso-cipa-historico/` RF-HIS-005
 - **QUANDO** há certificados emitidos, **ENTÃO** a aba **DEVE** oferecer "Baixar todos (PDF)" e, em cada linha emitida, "Baixar", ambos com o nome de arquivo indicado pelo backend no `Content-Disposition`, como já faz a lista de presença. `[E]` `useTurmaDetalhe.baixarListaPresenca`
 - **ENQUANTO** um PDF está sendo gerado, o botão correspondente **DEVE** ficar desabilitado com "Gerando..."; falha vira snackbar. `[E]` padrão de `TurmaDetalhe.jsx`
 - **SE** a turma está cancelada ou ainda sem presença registrada, **ENTÃO** a aba **DEVE** aparecer desabilitada com o motivo ("registre a presença primeiro"). `[E]` regra do backend
-- **QUANDO** tento excluir uma turma ou um inscrito com certificado emitido, **ENTÃO** a interface **DEVE** explicar que a turma só pode ser cancelada e o inscrito não pode ser removido, mostrando a mensagem do backend. `[E]` regra do backend (RF-HIS-005 de lá)
+- **QUANDO** a turma tem certificado emitido, **ENTÃO** a interface **DEVE** desabilitar Excluir turma e a opção "Cancelada" no formulário, com o motivo ("turma com certificados emitidos"), e não permitir remover inscrito com certificado; se o backend recusar mesmo assim, mostra a mensagem dele. `[D]` PA-031
 - **QUANDO** olho o histórico, **ENTÃO** a coluna de situação **DEVE** indicar turmas realizadas com certificados pendentes (aptos sem certificado > 0), com o número vindo do backend. `[E]` regra do `CLAUDE.md`
 
 **Verificação prevista (detalhada no design, após aprovação):** CT-HIS-007 — aba lista presentes com estado emitido/apto/impedido; "Emitir" faz uma chamada, recarrega e mostra impedidos com atalho; sem instrutor/assinatura o botão fica desabilitado com aviso; "Baixar todos" e "Baixar" usam o nome do servidor; aba desabilitada em turma cancelada ou sem presença; excluir turma/inscrito com certificado mostra a recusa do backend.
@@ -96,5 +96,5 @@ Adicionar, editar, remover e checar CPF vivem em um hook (`useInscritos`) e num 
 ## Questões em Aberto
 
 - PA-026: perguntas ao solicitante sobre presença e certificado (espelha a questão de mesmo teor no registro do backend, número 007). Travam as fases C e D; não travam esta.
-- PA-030: apresentação da emissão parcial (espelha a 012 do backend) — trava um critério de RF-HIS-006.
+- PA-028, PA-030 e PA-031: fechadas em 2026-09-08 com as respostas do dono.
 - PA-029 (`specs/curso-cipa-cadastros/`): a aba lê instrutor e assinatura do cadastro; a fase D depende dessa spec.

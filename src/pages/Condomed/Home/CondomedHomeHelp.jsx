@@ -1,4 +1,4 @@
-import { FaUserMd, FaChalkboardTeacher, FaHistory, FaLock } from "react-icons/fa";
+import { FaUserMd, FaChalkboardTeacher, FaHistory, FaRobot, FaUserCog, FaLock } from "react-icons/fa";
 
 const secao = { marginBottom: "1.5rem" };
 
@@ -46,6 +46,35 @@ export const CondomedHomeHelp = () => (
         uma pessoa, um condomínio ou uma administradora apareceram. Cada turma abre
         numa página própria, com a lista de inscritos — e, em breve, presença e
         documentos.
+      </p>
+    </div>
+
+    <div style={secao}>
+      <h3 style={titulo}>
+        <FaUserCog /> Cadastros
+      </h3>
+      <p style={texto}>
+        Palestrantes (nome, título, registro MTE e assinatura digitalizada, que sai no
+        certificado) e locais do curso (capacidade e unidade emissora). Quem já tem turma não
+        se exclui: desativa, e continua no histórico. Só um local pode ser a sala de reunião
+        da Agenda geral.
+      </p>
+    </div>
+
+    <div style={secao}>
+      <h3 style={titulo}>
+        <FaRobot /> Robô eSocial (SOC)
+      </h3>
+      <p style={texto}>
+        Automação que lê a planilha de controle e busca, no Portal eSocial do SOC, o
+        recibo S-2220 de cada funcionário pendente. O robô <strong>roda na máquina do
+        operador</strong>, não no FedConnect. Ao clicar em &ldquo;Abrir robô&rdquo;, o
+        cartão abre o painel se ele já estiver de pé; se não estiver, inicia o robô por
+        um atalho do Windows (<code>fedrobo://</code>) e abre o painel assim que ele
+        responder. Esse atalho é instalado uma vez por PC, com o
+        <code> instalar-atalho-fedconnect.bat</code> que fica na pasta do robô. Se o
+        navegador perguntar se pode abrir o &ldquo;fedrobo&rdquo;, marque para lembrar a
+        escolha.
       </p>
     </div>
 

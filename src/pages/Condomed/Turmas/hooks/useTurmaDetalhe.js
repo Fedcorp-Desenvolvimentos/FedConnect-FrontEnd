@@ -70,18 +70,45 @@ export function useTurmaDetalhe(turmaId) {
     [turmaId, enqueueSnackbar, avisarErro]
   );
 
+  /** Grava o lote de presença; a turma volta do backend já Realizada. */
+  const [salvandoPresenca, setSalvandoPresenca] = useState(false);
+  const registrarPresenca = useCallback(
+    async (presencas) => {
+      setSalvandoPresenca(true);
+      try {
+        const atualizada = await CursoCipaService.registrarPresenca(turmaId, presencas);
+        setTurma(atualizada);
+        enqueueSnackbar(
+          `Presença registrada: ${atualizada.presentes} presentes, ${atualizada.ausentes} ausentes.`,
+          { variant: "success" }
+        );
+        return atualizada;
+      } catch (erro) {
+        avisarErro(erro, "Não foi possível registrar a presença.");
+        return null;
+      } finally {
+        setSalvandoPresenca(false);
+      }
+    },
+    [turmaId, enqueueSnackbar, avisarErro]
+  );
+
+  /** Salva um blob com o nome que o backend sugeriu. */
+  const salvarArquivo = ({ blob, nomeArquivo }) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = nomeArquivo;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   /** Baixa a lista de presença em PDF; o navegador salva com o nome do backend. */
   const [baixandoLista, setBaixandoLista] = useState(false);
   const baixarListaPresenca = useCallback(async () => {
     setBaixandoLista(true);
     try {
-      const { blob, nomeArquivo } = await CursoCipaService.baixarListaPresenca(turmaId);
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = nomeArquivo;
-      link.click();
-      URL.revokeObjectURL(url);
+      salvarArquivo(await CursoCipaService.baixarListaPresenca(turmaId));
       return true;
     } catch (erro) {
       avisarErro(erro, "Não foi possível gerar a lista de presença.");
@@ -90,6 +117,56 @@ export function useTurmaDetalhe(turmaId) {
       setBaixandoLista(false);
     }
   }, [turmaId, avisarErro]);
+
+  /** Emite certificados em lote (RF-HIS-006); a turma volta atualizada dentro do lote. */
+  const [emitindo, setEmitindo] = useState(false);
+  const emitirCertificados = useCallback(async () => {
+    setEmitindo(true);
+    try {
+      const lote = await CursoCipaService.emitirCertificados(turmaId);
+      if (lote.turma) setTurma(lote.turma);
+      const n = lote.emitidos.length;
+      enqueueSnackbar(
+        n
+          ? `${n} ${n === 1 ? "certificado emitido" : "certificados emitidos"}${
+              lote.impedidos.length ? `; ${lote.impedidos.length} sem CNPJ ficaram de fora.` : "."
+            }`
+          : lote.impedidos.length
+          ? "Nenhum certificado emitido: os presentes pendentes estão sem CNPJ."
+          : "Nada a emitir: todos os presentes aptos já têm certificado.",
+        { variant: n ? "success" : "warning" }
+      );
+      return lote;
+    } catch (erro) {
+      avisarErro(erro, "Não foi possível emitir os certificados.");
+      return null;
+    } finally {
+      setEmitindo(false);
+    }
+  }, [turmaId, enqueueSnackbar, avisarErro]);
+
+  /** `baixandoCertificado`: "todos", o número em download, ou null. */
+  const [baixandoCertificado, setBaixandoCertificado] = useState(null);
+  const baixarCertificados = useCallback(async () => {
+    setBaixandoCertificado("todos");
+    try {
+      salvarArquivo(await CursoCipaService.baixarCertificadosTurma(turmaId));
+    } catch (erro) {
+      avisarErro(erro, "Não foi possível gerar os certificados.");
+    } finally {
+      setBaixandoCertificado(null);
+    }
+  }, [turmaId, avisarErro]);
+  const baixarCertificado = useCallback(async (numero) => {
+    setBaixandoCertificado(numero);
+    try {
+      salvarArquivo(await CursoCipaService.baixarCertificado(numero));
+    } catch (erro) {
+      avisarErro(erro, "Não foi possível gerar o certificado.");
+    } finally {
+      setBaixandoCertificado(null);
+    }
+  }, [avisarErro]);
 
   const excluir = useCallback(async () => {
     try {
@@ -106,6 +183,9 @@ export function useTurmaDetalhe(turmaId) {
     turma, locais, carregando, naoEncontrada, salvando,
     recarregar, atualizar, excluir,
     baixarListaPresenca, baixandoLista,
+    registrarPresenca, salvandoPresenca,
+    emitirCertificados, emitindo,
+    baixarCertificados, baixarCertificado, baixandoCertificado,
   };
 }
 

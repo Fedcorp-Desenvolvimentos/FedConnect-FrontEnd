@@ -1,7 +1,7 @@
-# Design — Histórico, consulta e detalhe da turma (fase A)
+# Design — Histórico, consulta e detalhe da turma (fases A–D)
 
-> **Rastreabilidade** — RF: RF-HIS-001..004 · INV: — · ADR: ADR-0009 · Questões: PA-026
-> **Status:** aprovado · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-04
+> **Rastreabilidade** — RF: RF-HIS-001..006 · INV: — · ADR: ADR-0009 · Questões: PA-026, PA-028, PA-030, PA-031
+> **Status:** aprovado · **Dono:** Ingrid Aylana · **Atualizado:** 2026-09-09
 > **Baseado em:** `requirements.md` (aprovado)
 
 ## Visão Geral da Solução
@@ -25,6 +25,17 @@ Uma segunda página da área (`/condomed/turmas`) e um detalhe por turma (`/cond
 | `src/services/cursoCipaService.js` | `obterTurma`, `listarHistorico`, `listarParticipantes`, `baixarListaPresenca` (blob + nome do `Content-Disposition`) |
 | `useTurmaDetalhe`, `TurmaDetalhe.jsx` (fase B) | `baixarListaPresenca`/`baixandoLista`; botão "Lista de presença (PDF)" nas ações do cabeçalho |
 | `AppRouter.jsx`, `Breadcrumb.jsx`, `CondomedHome.jsx`, `CondomedHomeHelp.jsx` | rotas sob a guarda `admin/condomed`, rótulo, card e ajuda |
+| `src/pages/Condomed/Turmas/PresencaConteudo.jsx` (novo, fase C) | aba Presença: três estados por inscrito editados em memória, "Marcar todos presentes" (só quem está sem registro), Desfazer, Salvar em um único `POST presenca/`; bloqueada em turma cancelada ou antes da data, com o motivo; mostra quem registrou e quando; avisa pendências (`beforeunload` e `onPendencias` para o pai) |
+| `TurmaDetalhe.jsx` (fase C) | abas Inscritos/Presença (`TurmasStyles.Abas`); troca de aba com marcações pendentes pede confirmação; contagens vêm da turma |
+| `useTurmaDetalhe.js`, `cursoCipaService.js` (fase C) | `registrarPresenca(presencas)` → substitui a turma pela resposta (já Realizada, com `presentes`/`ausentes`/`sem_registro`) |
+| `TurmaModal.jsx` (fase C) | "Realizada" deixa de ser opção: aparece travada quando já é o estado |
+| `TurmasStyles.js` (fase C) | `SeloContagem`, `Segmentado`, `OpcaoSegmento` |
+| `src/pages/Condomed/Turmas/CertificadosConteudo.jsx` (novo, fase D) | aba Certificados: presentes com estado emitido (número, quando, por quem) / apto / impedido (sem CNPJ); bloqueio antecipado com o motivo (cancelada, sem presença, sem instrutor, instrutor sem assinatura) e atalho "Editar turma"; "Emitir certificados (N)" com confirmação e resultado do lote (emitidos, já existentes, impedidos por nome); "Baixar todos (N)" e "Baixar" por linha; "Informar CNPJ" leva ao inscrito na aba Inscritos |
+| `TurmaDetalhe.jsx` (fase D) | terceira aba; aviso "turma com certificados: não pode ser excluída nem cancelada"; Excluir turma desabilitado com certificado; `editarInicial` para o atalho de CNPJ |
+| `useTurmaDetalhe.js`, `cursoCipaService.js` (fase D) | `emitirCertificados` (substitui a turma pela do lote), `baixarCertificados` (turma) e `baixarCertificado` (número), com `baixandoCertificado` = "todos" \| número \| null; `baixarPdf()` comum |
+| `InscritosConteudo.jsx` (fase D) | prop `editarInicial`: outra aba pode abrir um inscrito em edição |
+| `TurmaModal.jsx` (fase D) | "Cancelada" sai das opções quando há certificado (PA-031); botão Excluir só quando permitido |
+| `HistoricoTurmas.jsx` (fase D) | selo "N sem certificado" ao lado da situação em turma realizada com presentes aptos sem certificado (contagem do backend) |
 
 ## Contratos de API e Estado
 
@@ -69,6 +80,8 @@ Nenhuma — páginas e rotas novas; a agenda mantém o comportamento (o modal co
 | CT-HIS-003 | RF-HIS-003 | No detalhe, adicionar/editar/remover inscrito e editar/excluir a turma funcionam como na agenda; id inexistente mostra a página de não encontrada |
 | CT-HIS-004 | RNF-HIS-001, RF-HIS-003 | Na agenda, o painel continua funcionando igual e ganha "Ver detalhe" que abre a página certa |
 | CT-HIS-005 | RF-HIS-004 | No detalhe, o botão baixa `lista-presenca-cipa-<data>-<local>.pdf`; durante a geração mostra "Gerando..."; funciona em turma futura e vazia; erro do backend vira snackbar |
+| CT-HIS-006 | RF-HIS-005 | Aba Presença lista na ordem da lista impressa; marcar e salvar envia um lote e a situação vira Realizada sem clique extra; "Marcar todos presentes" não altera ausentes; sair da aba com marcações pendentes pede confirmação; turma cancelada e turma futura mostram a aba bloqueada com o motivo; "Realizada" não aparece mais como opção no formulário — capturas com API simulada em 2026-09-08 |
+| CT-HIS-007 | RF-HIS-006 | Aba Certificados lista presentes com estado emitido/apto/impedido e as contagens do backend; "Emitir" pede confirmação, faz uma chamada, recarrega e mostra emitidos e impedidos por nome; sem instrutor/assinatura o botão fica desabilitado com o aviso e "Editar turma"; "Baixar todos" e "Baixar" usam o nome do servidor; aba bloqueada em turma cancelada ou sem presença; com certificado, Excluir some e "Cancelada" sai do formulário; histórico marca "N sem certificado" — capturas com API simulada em 2026-09-09 |
 
 ## Impacto e Riscos
 

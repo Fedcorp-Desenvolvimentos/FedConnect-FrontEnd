@@ -166,3 +166,51 @@ export const LinkAbrir = styled.span`
   font-weight: 600;
 `;
 
+/* ---------- Aba Presença ---------- */
+
+export const SeloContagem = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: ${({ $tom }) => ($tom === "ok" ? "#dcfce7" : $tom === "erro" ? "#fee2e2" : "#f1f5f9")};
+  color: ${({ $tom }) => ($tom === "ok" ? "#166534" : $tom === "erro" ? "#991b1b" : "#475569")};
+`;
+
+export const Segmentado = styled.div`
+  display: inline-flex;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+`;
+
+export const OpcaoSegmento = styled.button`
+  border: none;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  background: ${({ $ativa, $tom }) =>
+    $ativa ? ($tom === "erro" ? "#fee2e2" : "#dcfce7") : "#ffffff"};
+  color: ${({ $ativa, $tom }) =>
+    $ativa ? ($tom === "erro" ? "#991b1b" : "#166534") : "#64748b"};
+
+  & + & {
+    border-left: 1px solid #cbd5e1;
+  }
+
+  &:hover:not(:disabled) {
+    background: ${({ $tom }) => ($tom === "erro" ? "#fef2f2" : "#f0fdf4")};
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+`;

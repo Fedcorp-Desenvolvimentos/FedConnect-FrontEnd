@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { parseISO, format } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import { FaTimes } from "react-icons/fa";
-import { ORDEM_LOCAIS, STATUS_TURMA } from "../hooks/useCursoCipa";
+import { STATUS_TURMA } from "../hooks/useCursoCipa";
 import { useInstrutores } from "../hooks/useInstrutores";
 import * as S from "../CursoCipaStyles";
 
@@ -52,10 +52,10 @@ export default function TurmaModal({
         : {
             ...VAZIA,
             data: dataInicial || "",
-            local: localInicial || ORDEM_LOCAIS[0],
+            local: localInicial || locais[0]?.codigo || "",
           }
     );
-  }, [aberto, turma, dataInicial, localInicial]);
+  }, [aberto, turma, dataInicial, localInicial, locais]);
 
   if (!aberto) return null;
 
@@ -98,14 +98,15 @@ export default function TurmaModal({
                 value={form.local}
                 onChange={(evento) => alterar("local", evento.target.value)}
               >
-                {ORDEM_LOCAIS.map((codigo) => {
-                  const local = locais.find((item) => item.codigo === codigo);
-                  return (
-                    <option key={codigo} value={codigo}>
-                      {local ? `${local.nome} · ${local.capacidade} lugares` : codigo}
-                    </option>
-                  );
-                })}
+                {locais.map((local) => (
+                  <option key={local.codigo} value={local.codigo}>
+                    {local.nome} · {local.capacidade} lugares
+                  </option>
+                ))}
+                {/* Turma antiga num local desativado: mantém a opção só para exibir. */}
+                {turma?.local && !locais.some((l) => l.codigo === turma.local) && (
+                  <option value={turma.local}>{turma.local_nome} (desativado)</option>
+                )}
               </select>
               {erros.local && <span className="erro">{erros.local}</span>}
             </S.Campo>
@@ -143,11 +144,24 @@ export default function TurmaModal({
           <S.Linha>
             <S.Campo>
               Situação
+              {/* "Realizada" é consequência da presença registrada (RF-HIS-005),
+                  não uma opção: aparece como estado, travada, quando já é o caso. */}
               <select
                 value={form.status}
                 onChange={(evento) => alterar("status", evento.target.value)}
+                disabled={form.status === "realizada"}
+                title={
+                  form.status === "realizada"
+                    ? "Definida pelo registro de presença"
+                    : undefined
+                }
               >
-                {STATUS_TURMA.map((item) => (
+                {STATUS_TURMA.filter(
+                  (item) =>
+                    (item.valor !== "realizada" || form.status === "realizada") &&
+                    // PA-031: com certificado emitido a turma não pode ser cancelada.
+                    (item.valor !== "cancelada" || !(turma?.certificados_emitidos > 0))
+                ).map((item) => (
                   <option key={item.valor} value={item.valor}>
                     {item.rotulo}
                   </option>
@@ -173,7 +187,7 @@ export default function TurmaModal({
           )}
 
           <S.Acoes>
-            {turma && (
+            {turma && onExcluir && (
               <S.Botao type="button" $variante="perigo" onClick={() => onExcluir(turma)}>
                 Excluir turma
               </S.Botao>

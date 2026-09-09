@@ -5,14 +5,40 @@ const entrada = keyframes`
   to { opacity: 1; transform: none; }
 `;
 
-/** As duas cores que separam os locais no calendário, na legenda e no painel. */
+/**
+ * Cores que separam os locais no calendário, na legenda e no painel.
+ *
+ * Os locais são cadastro (RF-CIP-007), então a paleta é atribuída por
+ * `registrarCoresLocais(locais)` quando a lista chega: a sala da agenda fica
+ * verde-azulado, os demais recebem a paleta na ordem. Os dois códigos
+ * originais têm cor fixa para a tela não mudar de cara.
+ */
+const PALETA_LOCAIS = [
+  { forte: "#0F3D5D", media: "#5b8fb4", clara: "#eef4f9" },
+  { forte: "#7c3aed", media: "#a78bfa", clara: "#f3eefe" },
+  { forte: "#b45309", media: "#f59e0b", clara: "#fff7e6" },
+  { forte: "#be185d", media: "#f472b6", clara: "#fdf0f6" },
+  { forte: "#0369a1", media: "#38bdf8", clara: "#ebf7fd" },
+];
+const COR_SALA_AGENDA = { forte: "#0f766e", media: "#5aa39c", clara: "#e9f4f2" };
+
 export const CORES_LOCAL = {
-  AUDITORIO: { forte: "#0F3D5D", media: "#5b8fb4", clara: "#eef4f9" },
-  SALA_REUNIAO: { forte: "#0f766e", media: "#5aa39c", clara: "#e9f4f2" },
+  AUDITORIO: PALETA_LOCAIS[0],
+  SALA_REUNIAO: COR_SALA_AGENDA,
 };
 
+export function registrarCoresLocais(locais = []) {
+  let indice = 1;
+  locais.forEach((local) => {
+    if (CORES_LOCAL[local.codigo]) return;
+    CORES_LOCAL[local.codigo] = local.compartilha_sala_reuniao
+      ? COR_SALA_AGENDA
+      : PALETA_LOCAIS[indice++ % PALETA_LOCAIS.length];
+  });
+}
+
 export const cor = (local, tom = "forte") =>
-  (CORES_LOCAL[local] || CORES_LOCAL.AUDITORIO)[tom];
+  (CORES_LOCAL[local] || PALETA_LOCAIS[0])[tom];
 
 export const Container = styled.div`
   animation: ${entrada} 0.3s cubic-bezier(0.16, 1, 0.3, 1);

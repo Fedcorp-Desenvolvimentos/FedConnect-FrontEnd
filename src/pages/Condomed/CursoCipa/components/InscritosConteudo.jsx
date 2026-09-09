@@ -56,6 +56,8 @@ export default function InscritosConteudo({
   onEditar,
   onRemover,
   onEditarTurma,
+  // Inscrito que outra aba pediu para editar (ex.: "Informar CNPJ" nos certificados).
+  editarInicial = null,
   onExcluirTurma,
   // "modal" (agenda, dentro do InscritosPanel) ou "pagina" (detalhe da turma,
   // em dois cartões com cabeçalho). O conteúdo e as regras são os mesmos.
@@ -123,6 +125,11 @@ export default function InscritosConteudo({
           (i) => apenasDigitos(i.cpf) === cpfDigitado && i.id !== editando?.id
         )
       : null;
+
+  useEffect(() => {
+    if (editarInicial) iniciarEdicao(editarInicial);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editarInicial]);
 
   const iniciarEdicao = (inscrito) => {
     setEditando(inscrito);

@@ -5,11 +5,36 @@ import api from "./api";
 
 const API_URL = "cursos-cipa/";
 
+/** GET de um PDF: blob + nome do arquivo sugerido pelo backend no Content-Disposition. */
+async function baixarPdf(url, nomePadrao) {
+  const response = await api.get(url, { responseType: "blob" });
+  const disposicao = response.headers?.["content-disposition"] || "";
+  const casado = /filename="?([^";]+)"?/.exec(disposicao);
+  return { blob: response.data, nomeArquivo: casado ? casado[1] : nomePadrao };
+}
+
+/** Campos do palestrante em FormData (a assinatura é arquivo); sem arquivo, JSON basta. */
+function montarFormInstrutor(dados) {
+  const { assinatura, ...campos } = dados;
+  if (!(assinatura instanceof File)) return campos;
+  const form = new FormData();
+  Object.entries(campos).forEach(([chave, valor]) => {
+    if (valor !== undefined && valor !== null) form.append(chave, valor);
+  });
+  form.append("assinatura", assinatura);
+  return form;
+}
+
 export const CursoCipaService = {
-  /** Locais e capacidades (auditório 30, sala de reunião 10). */
-  listarLocais: async () => {
-    const response = await api.get(`${API_URL}locais/`);
+  /** Locais do curso (cadastro editável, RF-CIP-007). Só ativos, salvo `todos`. */
+  listarLocais: async ({ todos = false } = {}) => {
+    const response = await api.get(`${API_URL}locais/`, { params: todos ? { todos: 1 } : {} });
     return response.data;
+  },
+  criarLocal: async (dados) => (await api.post(`${API_URL}locais/`, dados)).data,
+  atualizarLocal: async (id, dados) => (await api.patch(`${API_URL}locais/${id}/`, dados)).data,
+  excluirLocal: async (id) => {
+    await api.delete(`${API_URL}locais/${id}/`);
   },
 
   /** Turmas de um local no mês. `mes` é 1–12. */
@@ -20,10 +45,18 @@ export const CursoCipaService = {
     return data?.results ?? [];
   },
 
-  /** Instrutores que assinam o certificado — lista fixa no backend. */
-  listarInstrutores: async () => {
-    const response = await api.get(`${API_URL}instrutores/`);
+  /** Palestrantes (cadastro editável, RF-CIP-006). Só ativos, salvo `todos`. */
+  listarInstrutores: async ({ todos = false } = {}) => {
+    const response = await api.get(`${API_URL}instrutores/`, { params: todos ? { todos: 1 } : {} });
     return response.data;
+  },
+  /** `dados` vira multipart quando há `assinatura` (File); o backend nunca devolve o arquivo. */
+  criarInstrutor: async (dados) =>
+    (await api.post(`${API_URL}instrutores/`, montarFormInstrutor(dados))).data,
+  atualizarInstrutor: async (id, dados) =>
+    (await api.patch(`${API_URL}instrutores/${id}/`, montarFormInstrutor(dados))).data,
+  excluirInstrutor: async (id) => {
+    await api.delete(`${API_URL}instrutores/${id}/`);
   },
 
   obterTurma: async (turmaId) => {
@@ -89,6 +122,32 @@ export const CursoCipaService = {
   excluirInscrito: async (turmaId, inscricaoId) => {
     await api.delete(`${API_URL}${turmaId}/inscricoes/${inscricaoId}/`);
   },
+
+  /**
+   * Presença em lote (RF-HIS-005): `[{inscricao_id, presente}]`. Ou grava
+   * tudo, ou nada. Devolve a turma completa, já Realizada e com as contagens.
+   */
+  registrarPresenca: async (turmaId, presencas) => {
+    const response = await api.post(`${API_URL}${turmaId}/presenca/`, { presencas });
+    return response.data;
+  },
+
+  /**
+   * Emite certificados para os presentes aptos (RF-HIS-006). Idempotente.
+   * Devolve `{emitidos, ja_existentes, impedidos, turma}`.
+   */
+  emitirCertificados: async (turmaId) => {
+    const response = await api.post(`${API_URL}${turmaId}/certificados/`);
+    return response.data;
+  },
+
+  /** Todos os certificados emitidos da turma num PDF (frente e verso cada). */
+  baixarCertificadosTurma: async (turmaId) =>
+    baixarPdf(`${API_URL}${turmaId}/certificados/pdf/`, "certificados-cipa.pdf"),
+
+  /** Um certificado pelo número — reemissão com o mesmo número. */
+  baixarCertificado: async (numero) =>
+    baixarPdf(`certificados/${encodeURIComponent(numero)}/pdf/`, `certificado-${numero}.pdf`),
 
   /**
    * Lista de presença da turma em PDF (RF-HIS-004). Devolve blob e o nome do

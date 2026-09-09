@@ -4,9 +4,9 @@ import { CursoCipaService } from "../../../../services/cursoCipaService";
 /**
  * Instrutores que assinam o certificado, para o select da turma.
  *
- * A lista é fixa no backend (decisão do dono, 2026-09-04: sem cadastro
- * editável). Fonte única entre o formulário de turma e a importação por
- * planilha — os dois mostram o mesmo select.
+ * Vem do cadastro de palestrantes (RF-CIP-006; só os ativos). Fonte única
+ * entre o formulário de turma e a importação por planilha — os dois mostram o
+ * mesmo select.
  */
 export function useInstrutores(ativo = true) {
   const [instrutores, setInstrutores] = useState([]);
