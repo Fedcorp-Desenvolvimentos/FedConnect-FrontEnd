@@ -16,7 +16,7 @@ export const URL_PAINEL_ROBO =
 export const PROTOCOLO_ROBO = "fedrobo://esocial";
 
 const ESPERA_ENTRE_TENTATIVAS_MS = 2000;
-const TENTATIVAS_APOS_LANCAR = 15; // ~30 s: npm run web + navegador do Playwright
+const TENTATIVAS_APOS_LANCAR = 30; // ~60 s: cobre a primeira execução, que instala dependências
 
 const dormir = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 

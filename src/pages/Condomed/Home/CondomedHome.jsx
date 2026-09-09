@@ -41,7 +41,7 @@ const opcoesCondomed = [
     key: 'robo-esocial',
     icon: <FaRobot />,
     title: 'Robô eSocial (SOC)',
-    desc: 'Coleta os recibos S-2220 no Portal eSocial do SOC a partir da planilha de controle. Roda nesta máquina: o cartão abre ou inicia o painel.',
+    desc: 'Coleta os recibos S-2220 no Portal eSocial do SOC a partir da planilha de controle. Abre ou inicia o painel neste PC.',
     robo: true,
     // Restrito: só quem tem o nível eSocial (dois operadores) e o admin.
     niveis: ['admin', 'esocial'],
@@ -51,9 +51,10 @@ const opcoesCondomed = [
 
 const TEXTO_ESTADO_ROBO = {
   verificando: 'Verificando o painel...',
-  iniciando: 'Iniciando o robô nesta máquina (aguarde, até 30 s)...',
+  iniciando:
+    'Iniciando o robô nesta máquina. Se o navegador perguntar se pode abrir "fedrobo", clique em Abrir. Aguarde até 60 s...',
   falhou:
-    'O painel não respondeu. Confira se o atalho fedrobo:// foi instalado neste PC (instalar-atalho-fedconnect.bat, na pasta do robô) ou inicie o iniciar-robo.bat à mão.',
+    'O painel não respondeu. Verifique, nesta ordem: (1) se apareceu a pergunta do navegador e ela foi aceita; (2) se o atalho foi instalado neste PC, rodando instalar-atalho-fedconnect.bat em S:\INGRYD\ROBO-ESOCIAL-SOC; (3) se abriu uma janela preta do robô e o que ela diz. Alternativa: iniciar-robo-fedconnect.bat à mão e clicar de novo.',
 };
 
 /** Botão do robô: abre o painel se está de pé; senão lança o .bat pelo protocolo e espera. */
