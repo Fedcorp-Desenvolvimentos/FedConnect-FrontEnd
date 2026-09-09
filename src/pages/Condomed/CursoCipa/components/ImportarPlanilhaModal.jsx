@@ -25,6 +25,13 @@ import * as S from "../CursoCipaStyles";
  * funcionários extras de última hora, e cortar a lista faria a ordem das linhas
  * escolher quem faz o curso. O excesso é avisado, não impedido.
  */
+
+/** Data de hoje no fuso local, em AAAA-MM-DD (toISOString usaria UTC e viraria "amanhã" à noite). */
+const hojeLocalISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
 export default function ImportarPlanilhaModal({
   aberto,
   dataInicial,
@@ -174,6 +181,7 @@ export default function ImportarPlanilhaModal({
               <input
                 type="date"
                 value={data}
+                min={hojeLocalISO()}
                 onChange={(e) => setData(e.target.value)}
               />
             </S.Campo>

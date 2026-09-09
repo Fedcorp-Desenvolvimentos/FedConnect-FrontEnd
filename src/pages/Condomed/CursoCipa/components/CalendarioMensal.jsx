@@ -48,13 +48,23 @@ export default function CalendarioMensal({
             const chave = format(dia, "yyyy-MM-dd");
             const doDia = turmasPorDia[chave] || [];
             const foraDoMes = !isSameMonth(dia, referencia);
+            // Dia que já passou não recebe turma nova (o backend também recusa);
+            // as turmas que já estão nele continuam clicáveis.
+            const passado = chave < hoje;
 
             return (
               <S.Dia
                 key={chave}
                 $foraDoMes={foraDoMes}
-                onClick={foraDoMes ? undefined : () => onAgendar(chave)}
-                title={foraDoMes ? undefined : `Agendar turma em ${format(dia, "dd/MM")}`}
+                $passado={passado && !foraDoMes}
+                onClick={foraDoMes || passado ? undefined : () => onAgendar(chave)}
+                title={
+                  foraDoMes
+                    ? undefined
+                    : passado
+                    ? "Dia já passou — não é possível agendar"
+                    : `Agendar turma em ${format(dia, "dd/MM")}`
+                }
               >
                 <S.NumeroDia $hoje={chave === hoje} $foraDoMes={foraDoMes}>
                   {format(dia, "d")}

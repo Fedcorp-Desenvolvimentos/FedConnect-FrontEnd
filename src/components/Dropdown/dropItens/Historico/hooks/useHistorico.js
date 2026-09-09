@@ -16,7 +16,7 @@ export const useHistorico = (user, pagina, porPagina) => {
     setError('');
     
     try {
-      const niveisPermitidos = ["admin", "moderador", "usuario", "comercial", "condomed"];
+      const niveisPermitidos = ["admin", "moderador", "usuario", "comercial", "condomed", "esocial"];
       
       if (!niveisPermitidos.includes(user.nivel_acesso)) {
         setError('Usuário sem permissão para ver o histórico.');

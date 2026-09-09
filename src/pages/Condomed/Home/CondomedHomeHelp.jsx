@@ -92,9 +92,11 @@ export const CondomedHomeHelp = () => (
         <FaLock /> Quem tem acesso
       </strong>
       <p style={{ ...texto, marginTop: "0.5rem" }}>
-        Somente os níveis <strong>Condomed</strong> e <strong>Administrador</strong>. Os
-        cartões respeitam o nível de quem está logado, e as rotas são bloqueadas mesmo se
-        o endereço for digitado direto na barra do navegador.
+        Os níveis <strong>Condomed</strong>, <strong>Condomed eSocial</strong> e{" "}
+        <strong>Administrador</strong>. O cartão do robô eSocial aparece só para o nível
+        Condomed eSocial (e Administrador). Os cartões respeitam o nível de quem está
+        logado, e as rotas são bloqueadas mesmo se o endereço for digitado direto na barra
+        do navegador.
       </p>
     </div>
   </>

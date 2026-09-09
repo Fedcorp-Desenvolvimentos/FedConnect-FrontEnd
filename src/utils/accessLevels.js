@@ -8,7 +8,8 @@ export const ACCESS_LEVELS = {
   FATURAMENTO: "faturamento",
   FINANCEIRO: "financeiro",
   VISTORIA: "vistoria",
-  CONDOMED: "condomed"
+  CONDOMED: "condomed",
+  ESOCIAL: "esocial"
 };
 
 export const ACCESS_LEVEL_LABELS = {
@@ -21,7 +22,8 @@ export const ACCESS_LEVEL_LABELS = {
   [ACCESS_LEVELS.FATURAMENTO]: "Faturista",
   [ACCESS_LEVELS.FINANCEIRO]: "Financeiro",
   [ACCESS_LEVELS.VISTORIA]: "Vistoria",
-  [ACCESS_LEVELS.CONDOMED]: "Condomed"
+  [ACCESS_LEVELS.CONDOMED]: "Condomed",
+  [ACCESS_LEVELS.ESOCIAL]: "Condomed eSocial"
 };
 
 // Função para obter o label do nível de acesso
@@ -52,6 +54,7 @@ export const getAccessLevelColor = (level) => {
     [ACCESS_LEVELS.FINANCEIRO]: "#0d9488", // teal
     [ACCESS_LEVELS.VISTORIA]: "#059669", // verde escuro
     [ACCESS_LEVELS.CONDOMED]: "#be185d", // rosa escuro
+    [ACCESS_LEVELS.ESOCIAL]: "#9d174d", // rosa mais escuro: Condomed + robô eSocial
     [ACCESS_LEVELS.USUARIO]: "#64748b" // cinza
   };
   return colors[level] || "#64748b";
@@ -69,7 +72,8 @@ export const ACCESS_LEVEL_ORDER = [
   ACCESS_LEVELS.FATURAMENTO,
   ACCESS_LEVELS.FINANCEIRO,
   ACCESS_LEVELS.VISTORIA,
-  ACCESS_LEVELS.CONDOMED
+  ACCESS_LEVELS.CONDOMED,
+  ACCESS_LEVELS.ESOCIAL
 ];
 
 /** Opções `{ value, label }` para os selects de nível de acesso. */
