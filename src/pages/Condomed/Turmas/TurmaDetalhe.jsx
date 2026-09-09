@@ -4,6 +4,7 @@ import { parseISO, format } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import {
   FaArrowLeft,
+  FaAward,
   FaBuilding,
   FaCalendarAlt,
   FaChalkboardTeacher,
@@ -14,6 +15,7 @@ import {
   FaMapMarkerAlt,
   FaTimesCircle,
   FaUser,
+  FaUserCheck,
   FaUsers,
 } from "react-icons/fa";
 import PageLayout from "../../../Layouts/PageLayout/PageLayout";
@@ -23,7 +25,10 @@ import ExcluirTurmaModal from "../CursoCipa/components/ExcluirTurmaModal";
 import { useInscritos } from "../CursoCipa/hooks/useInscritos";
 import { STATUS_TURMA } from "../CursoCipa/hooks/useCursoCipa";
 import { useTurmaDetalhe } from "./hooks/useTurmaDetalhe";
+import PresencaConteudo from "./PresencaConteudo";
+import CertificadosConteudo from "./CertificadosConteudo";
 import * as C from "../CursoCipa/CursoCipaStyles";
+import * as S from "./TurmasStyles";
 
 const ROTULO_STATUS = Object.fromEntries(STATUS_TURMA.map((s) => [s.valor, s.rotulo]));
 
@@ -43,6 +48,20 @@ export default function TurmaDetalhe() {
 
   const [editando, setEditando] = useState(false);
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
+  // "inscritos" | "presenca" (RF-HIS-005). Certificados chegam na fase D.
+  const [aba, setAbaInterna] = useState("inscritos");
+  const [presencaPendente, setPresencaPendente] = useState(false);
+  const [inscritoParaEditar, setInscritoParaEditar] = useState(null);
+  const setAba = (proxima) => {
+    if (
+      proxima !== aba &&
+      presencaPendente &&
+      !window.confirm("Há marcações de presença não salvas. Sair da aba e descartá-las?")
+    ) {
+      return;
+    }
+    setAbaInterna(proxima);
+  };
 
   // Inscritos carregam quando a turma chega (e recarregam se o id mudar).
   useEffect(() => {
@@ -186,8 +205,59 @@ export default function TurmaDetalhe() {
               <strong>Observação:</strong>&nbsp;{turma.observacao}
             </C.AvisoBloco>
           )}
+          {turma.certificados_emitidos > 0 && (
+            <C.AvisoBloco $tom="aviso" style={{ marginTop: 0, marginBottom: "1rem" }}>
+              <FaAward size={11} />
+              Turma com {turma.certificados_emitidos}{" "}
+              {turma.certificados_emitidos === 1 ? "certificado emitido" : "certificados emitidos"}: não pode
+              mais ser excluída nem cancelada, e os participantes certificados não podem ser removidos.
+            </C.AvisoBloco>
+          )}
 
-          <InscritosConteudo
+          <S.Abas role="tablist">
+            <S.Aba
+              type="button"
+              role="tab"
+              $ativa={aba === "inscritos"}
+              aria-selected={aba === "inscritos"}
+              onClick={() => setAba("inscritos")}
+            >
+              <FaUsers size={12} /> Inscritos <small>{inscritos.inscritos.length}</small>
+            </S.Aba>
+            <S.Aba
+              type="button"
+              role="tab"
+              $ativa={aba === "presenca"}
+              aria-selected={aba === "presenca"}
+              onClick={() => setAba("presenca")}
+              title={
+                turma.status === "cancelada"
+                  ? "Turma cancelada"
+                  : "Quem veio e quem faltou; a turma vira Realizada ao salvar"
+              }
+            >
+              <FaUserCheck size={12} /> Presença
+              <small>
+                {turma.presentes ?? 0}/{turma.total_inscritos ?? inscritos.inscritos.length}
+              </small>
+            </S.Aba>
+            <S.Aba
+              type="button"
+              role="tab"
+              $ativa={aba === "certificados"}
+              aria-selected={aba === "certificados"}
+              onClick={() => setAba("certificados")}
+              title="Emitir e baixar os certificados de quem esteve no curso"
+            >
+              <FaAward size={12} /> Certificados
+              <small>
+                {turma.certificados_emitidos ?? 0}/{turma.presentes ?? 0}
+              </small>
+            </S.Aba>
+          </S.Abas>
+
+          {aba === "inscritos" && (
+            <InscritosConteudo
               layout="pagina"
               turma={turma}
               inscritos={inscritos.inscritos}
@@ -196,8 +266,37 @@ export default function TurmaDetalhe() {
               onEditar={inscritos.editar}
               onRemover={inscritos.remover}
               onEditarTurma={() => setEditando(true)}
-              onExcluirTurma={() => setConfirmandoExclusao(true)}
+              onExcluirTurma={turma.certificados_emitidos > 0 ? undefined : () => setConfirmandoExclusao(true)}
+              editarInicial={inscritoParaEditar}
             />
+          )}
+
+          {aba === "certificados" && (
+            <CertificadosConteudo
+              turma={turma}
+              inscritos={turma.inscricoes || []}
+              onEmitir={detalhe.emitirCertificados}
+              emitindo={detalhe.emitindo}
+              onBaixarTodos={detalhe.baixarCertificados}
+              onBaixarUm={detalhe.baixarCertificado}
+              baixando={detalhe.baixandoCertificado}
+              onEditarTurma={() => setEditando(true)}
+              onEditarInscrito={(inscrito) => {
+                setInscritoParaEditar(inscrito);
+                setAbaInterna("inscritos");
+              }}
+            />
+          )}
+
+          {aba === "presenca" && (
+            <PresencaConteudo
+              turma={turma}
+              inscritos={turma.inscricoes || []}
+              onSalvar={detalhe.registrarPresenca}
+              salvando={detalhe.salvandoPresenca}
+              onPendencias={setPresencaPendente}
+            />
+          )}
 
           <TurmaModal
             aberto={editando}
@@ -205,10 +304,14 @@ export default function TurmaDetalhe() {
             locais={detalhe.locais}
             salvando={detalhe.salvando}
             onSalvar={salvarTurma}
-            onExcluir={() => {
-              setEditando(false);
-              setConfirmandoExclusao(true);
-            }}
+            onExcluir={
+              turma.certificados_emitidos > 0
+                ? undefined
+                : () => {
+                    setEditando(false);
+                    setConfirmandoExclusao(true);
+                  }
+            }
             onFechar={() => setEditando(false)}
           />
 

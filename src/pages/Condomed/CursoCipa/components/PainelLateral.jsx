@@ -1,7 +1,6 @@
 import { parseISO, format } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import { FaExclamationCircle, FaExclamationTriangle } from "react-icons/fa";
-import { ORDEM_LOCAIS } from "../hooks/useCursoCipa";
 import * as S from "../CursoCipaStyles";
 
 function LinhaTurma({ turma, onAbrir, rotuloData }) {
@@ -121,14 +120,13 @@ export default function PainelLateral({
         <S.CartaoTopo>
           <h3>Ocupação por local</h3>
         </S.CartaoTopo>
-        {ORDEM_LOCAIS.map((codigo) => {
-          const medida = resumo.porLocal[codigo];
-          const local = locais.find((item) => item.codigo === codigo);
+        {locais.map((local) => {
+          const medida = resumo.porLocal[local.codigo] || { ocupacao: 0, turmas: 0, inscritos: 0, vagas: 0 };
           return (
-            <S.LinhaLocal key={codigo}>
-              <b>{local?.nome || codigo}</b>
+            <S.LinhaLocal key={local.codigo}>
+              <b>{local.nome}</b>
               <em>{medida.ocupacao}%</em>
-              <S.Barra $local={codigo} $porcento={medida.ocupacao} />
+              <S.Barra $local={local.codigo} $porcento={medida.ocupacao} />
               <small>
                 {medida.turmas} {medida.turmas === 1 ? "turma" : "turmas"} ·{" "}
                 {medida.inscritos} de {medida.vagas} vagas

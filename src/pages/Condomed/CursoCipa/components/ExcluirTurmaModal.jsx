@@ -49,7 +49,7 @@ export default function ExcluirTurmaModal({ turma, onConfirmar, onCancelar }) {
                 : `os ${turma.total_inscritos} inscritos abaixo saem`
             } do sistema.`
           : "A turma não tem ninguém inscrito.",
-        turma.local === "SALA_REUNIAO" ? "A reserva da sala na agenda é liberada." : "",
+        turma.tem_espelho != null ? "A reserva da sala na agenda é liberada." : "",
         "Não dá para desfazer.",
       ]
         .filter(Boolean)

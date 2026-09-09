@@ -10,7 +10,6 @@ import {
 } from "react-icons/fa";
 import { listarAdministradoras } from "../../../../services/vistoriasService";
 import CursoCipaService from "../../../../services/cursoCipaService";
-import { ORDEM_LOCAIS } from "../hooks/useCursoCipa";
 import { useInstrutores } from "../hooks/useInstrutores";
 import lerPlanilhaInscritos from "../lerPlanilhaInscritos";
 import * as S from "../CursoCipaStyles";
@@ -34,7 +33,7 @@ export default function ImportarPlanilhaModal({
   onImportar,
   onFechar,
 }) {
-  const [local, setLocal] = useState(ORDEM_LOCAIS[0]);
+  const [local, setLocal] = useState("");
   const [data, setData] = useState("");
   const [instrutor, setInstrutor] = useState("");
   const [observacao, setObservacao] = useState("");
@@ -49,14 +48,14 @@ export default function ImportarPlanilhaModal({
 
   useEffect(() => {
     if (!aberto) return;
-    setLocal(ORDEM_LOCAIS[0]);
+    setLocal(locais[0]?.codigo || "");
     setData(dataInicial || "");
     setInstrutor("");
     setObservacao("");
     setArquivo(null);
     setLeitura(null);
     setErroLeitura("");
-  }, [aberto, dataInicial]);
+  }, [aberto, dataInicial, locais]);
 
   // A administradora de cada linha tem de existir na base: é o código que o
   // backend grava, e a planilha só traz o nome.
@@ -163,14 +162,11 @@ export default function ImportarPlanilhaModal({
             <S.Campo>
               Local
               <select value={local} onChange={(e) => setLocal(e.target.value)}>
-                {ORDEM_LOCAIS.map((codigo) => {
-                  const item = locais.find((l) => l.codigo === codigo);
-                  return (
-                    <option key={codigo} value={codigo}>
-                      {item ? `${item.nome} · ${item.capacidade} lugares` : codigo}
-                    </option>
-                  );
-                })}
+                {locais.map((item) => (
+                  <option key={item.codigo} value={item.codigo}>
+                    {item.nome} · {item.capacidade} lugares
+                  </option>
+                ))}
               </select>
             </S.Campo>
             <S.Campo>

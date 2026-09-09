@@ -1,5 +1,5 @@
 import { FaChevronLeft, FaChevronRight, FaSearch, FaTimes } from "react-icons/fa";
-import { ORDEM_LOCAIS, STATUS_TURMA } from "../hooks/useCursoCipa";
+import { STATUS_TURMA } from "../hooks/useCursoCipa";
 import * as S from "../CursoCipaStyles";
 
 export default function BarraFiltros({
@@ -33,9 +33,9 @@ export default function BarraFiltros({
           aria-label="Filtrar por local"
         >
           <option value="">Todos os locais</option>
-          {ORDEM_LOCAIS.map((codigo) => (
-            <option key={codigo} value={codigo}>
-              {locais.find((item) => item.codigo === codigo)?.nome || codigo}
+          {locais.map((local) => (
+            <option key={local.codigo} value={local.codigo}>
+              {local.nome}
             </option>
           ))}
         </S.Select>
@@ -69,15 +69,11 @@ export default function BarraFiltros({
       </S.Filtros>
 
       <S.Legenda>
-        {ORDEM_LOCAIS.map((codigo) => {
-          const local = locais.find((item) => item.codigo === codigo);
-          return (
-            <S.ItemLegenda key={codigo} $local={codigo}>
-              {local?.nome || codigo}
-              {local ? ` · ${local.capacidade} lugares` : ""}
-            </S.ItemLegenda>
-          );
-        })}
+        {locais.map((local) => (
+          <S.ItemLegenda key={local.codigo} $local={local.codigo}>
+            {local.nome} · {local.capacidade} lugares
+          </S.ItemLegenda>
+        ))}
       </S.Legenda>
     </>
   );

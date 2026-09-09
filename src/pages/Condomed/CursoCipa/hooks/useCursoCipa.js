@@ -3,13 +3,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSnackbar } from "notistack";
 import { CursoCipaService } from "../../../../services/cursoCipaService";
 import { extrairMensagemApi, useInscritos } from "./useInscritos";
+import { registrarCoresLocais } from "../CursoCipaStyles";
 
 // Quem importava daqui continua funcionando; a definição mora em useInscritos.
 export { extrairMensagemApi };
 
-export const AUDITORIO = "AUDITORIO";
-export const SALA_REUNIAO = "SALA_REUNIAO";
-export const ORDEM_LOCAIS = [AUDITORIO, SALA_REUNIAO];
+// Os locais vêm do cadastro (RF-CIP-007): a ordem das abas, da legenda e do
+// painel é a ordem em que o backend os devolve. Nada de código fixo aqui.
 
 export const STATUS_TURMA = [
   { valor: "agendada", rotulo: "Agendada" },
@@ -60,7 +60,9 @@ export function useCursoCipa() {
     let ativo = true;
     CursoCipaService.listarLocais()
       .then((lista) => {
-        if (ativo) setLocais(lista || []);
+        if (!ativo) return;
+        registrarCoresLocais(lista || []);
+        setLocais(lista || []);
       })
       .catch((erro) => avisarErro(erro, "Não foi possível carregar os locais."));
     return () => {
@@ -241,11 +243,12 @@ export function useCursoCipa() {
       if (!mapa[turma.data]) mapa[turma.data] = [];
       mapa[turma.data].push(turma);
     });
+    const ordem = locais.map((local) => local.codigo);
     Object.values(mapa).forEach((lista) =>
-      lista.sort((a, b) => ORDEM_LOCAIS.indexOf(a.local) - ORDEM_LOCAIS.indexOf(b.local))
+      lista.sort((a, b) => ordem.indexOf(a.local) - ordem.indexOf(b.local))
     );
     return mapa;
-  }, [turmasVisiveis]);
+  }, [turmasVisiveis, locais]);
 
   const ativas = useMemo(
     () => turmasVisiveis.filter((turma) => turma.status !== "cancelada"),
@@ -279,7 +282,7 @@ export function useCursoCipa() {
   /** Medidas do mês em exibição, no total e por local. */
   const resumo = useMemo(() => {
     const porLocal = {};
-    ORDEM_LOCAIS.forEach((codigo) => {
+    locais.forEach(({ codigo }) => {
       porLocal[codigo] = medir(ativas.filter((turma) => turma.local === codigo));
     });
     return {
@@ -292,7 +295,7 @@ export function useCursoCipa() {
         return turma.data <= paraISO(limite);
       }).length,
     };
-  }, [ativas, hoje]);
+  }, [ativas, hoje, locais]);
 
   /**
    * O que exige ação, sempre daqui para a frente: turma sem ninguém inscrito,
