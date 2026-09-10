@@ -29,6 +29,8 @@ export const ROUTE_ACCESS = {
   comercial: ["admin", "comercial", "financeiro"],
   faturamento: ["admin", "faturamento", "ti"],
   financeiro: ["admin", "ti", "financeiro"],
+  // Relatório de faturas pendentes: financeiro, faturamento e admin (decisão do dono, 2026-09-09).
+  faturasPendentes: ["admin", "financeiro", "faturamento"],
   analytics: ["admin", "ti"],
   cadastroPessoas: ["admin", "ti"],
   metricas: ["admin"],

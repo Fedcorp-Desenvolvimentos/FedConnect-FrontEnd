@@ -54,6 +54,7 @@ function Breadcrumb({ onToggleSidebar, sidebarOpen, className }) {
     '/condomed/cursos-cipa': 'Cursos CIPA',
     '/condomed/turmas': 'Turmas e participantes',
     '/condomed/cadastros': 'Cadastros',
+    '/financeiro/faturas-pendentes': 'Faturas pendentes',
     '/workflow': 'Workflow Hub',
     '/rh': 'RH Hub'
   };
