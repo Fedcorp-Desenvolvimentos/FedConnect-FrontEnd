@@ -127,6 +127,7 @@ import CursoCipa from '../pages/Condomed/CursoCipa/CursoCipa';
 import HistoricoTurmas from '../pages/Condomed/Turmas/HistoricoTurmas';
 import TurmaDetalhe from '../pages/Condomed/Turmas/TurmaDetalhe';
 import CadastrosCondomed from '../pages/Condomed/Cadastros/CadastrosCondomed';
+import FaturasPendentes from '../pages/Financeiro/FaturasPendentes/FaturasPendentes';
 import Loading from '../components/Loading/Loading.jsx';
 
 const AppRouter = () => {
@@ -208,6 +209,11 @@ const AppRouter = () => {
             <Route path="/financeiro/santander/workspaces" element={<SantanderWorkspaces />} />
             <Route path="/financeiro/santander/empresas" element={<SantanderEmpresas />} />
             <Route path="/financeiro/santander/boletos" element={<SantanderBoletos />} /> */}
+          </Route>
+
+          {/* Relatório de faturas pendentes: financeiro, faturamento e admin */}
+          <Route element={<PrivateRouter allowed={ROUTE_ACCESS.faturasPendentes} />}>
+            <Route path="/financeiro/faturas-pendentes" element={<FaturasPendentes />} />
           </Route>
 
           {/* Automação */}

@@ -1,0 +1,4 @@
+requisito;origem;design;invariantes;tarefas;testes;questoes
+RF-FIN-001;PA-032|tela legada Relatorio de Faturas Pendentes|FedConnect-Back-End specs relatorio-faturas-pendentes RF-FAT-001;Arquitetura de Componentes|Contratos de API e Estado|Tratamento de Erros;;T-FIN-1.2|T-FIN-1.3|T-FIN-2.1;CT-FIN-001;PA-032
+RF-FIN-002;consultaFatura.js exportar|PA-033|routeAccess.js;Arquitetura de Componentes|Fluxo Principal|Decisões;;T-FIN-1.1|T-FIN-1.3|T-FIN-1.4|T-FIN-2.1;CT-FIN-002;
+RNF-FIN-001;FedConnect-Back-End specs relatorio-faturas-pendentes RNF-FAT-002;Contratos de API e Estado;;T-FIN-1.1|T-FIN-1.2;CT-FIN-001|CT-FIN-002;

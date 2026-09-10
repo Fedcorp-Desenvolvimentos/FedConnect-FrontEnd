@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaFileInvoiceDollar, FaSearch } from 'react-icons/fa';
+import { FaFileInvoiceDollar, FaSearch, FaExclamationCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import CardGridLayout from '../../../Layouts/CardGridLayout/CardGridLayout';
@@ -23,6 +23,15 @@ const opcoesFinanceiro = [
     to: '/financeiro/consulta-comissao',
     niveis: ['admin', 'ti', 'financeiro'],
     color: '#1a5a7a',
+  },
+  {
+    key: 'faturas-pendentes',
+    icon: <FaExclamationCircle />,
+    title: 'Faturas pendentes',
+    desc: 'Relatório dos documentos sem pagamento, com os filtros do legado. Gera planilha e PDF.',
+    to: '/financeiro/faturas-pendentes',
+    niveis: ['admin', 'financeiro', 'faturamento'],
+    color: '#b45309',
   },
   // {
   //   key: 'santander',

@@ -6,7 +6,8 @@ import {
   FaExternalLinkAlt,
   FaFileInvoiceDollar,
   FaCopy,
-  FaFunnelDollar 
+  FaFunnelDollar,
+  FaExclamationCircle,
 } from "react-icons/fa";
 import CardGridLayout from "../../Layouts/CardGridLayout/CardGridLayout";
 import { Card, CardBody, IconWrapper, Title, Description, Button, ExternalButton } from "../../Layouts/CardGridLayout/CardGridLayoutStyles";
@@ -74,7 +75,16 @@ const operacionais = [
     color: "#2463eb",
     external: false,
   },
-  
+  {
+    key: "faturas-pendentes",
+    icon: <FaExclamationCircle />,
+    title: "Faturas Pendentes",
+    desc: "Relatório dos documentos sem pagamento, com os filtros do legado. Gera planilha e PDF.",
+    to: "/financeiro/faturas-pendentes",
+    niveis: ["admin", "financeiro", "faturamento"],
+    color: "#b45309",
+    external: false,
+  },
 ];
 
 const FaturamentoHome = () => {

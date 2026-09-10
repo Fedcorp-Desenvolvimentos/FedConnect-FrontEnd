@@ -89,3 +89,17 @@ Formato de cada entrada: título, status (`aberta` | `fechada`), dono, severidad
 - **Trava:** um critério de RF-HIS-006 (`specs/curso-cipa-historico/`).
 - **Questão:** espelha a questão de número 013 do registro do backend.
 - **Resposta (2026-09-08):** turma com certificado emitido **não pode ser excluída nem cancelada**. A tela esconde/desabilita Excluir e a opção "Cancelada" nessa turma e mostra o motivo.
+
+## PA-032 — Filtros do relatório de faturas pendentes que a tela oferece na primeira versão
+
+- **Status:** fechada (2026-09-09) · **Dono:** Ingrid Aylana · **Severidade:** média
+- **Resposta (2026-09-09):** confirmado pelo dono: Co-Estipulante é a administradora; **Produtor, Comercial e Pagamento saem**. Filtros da tela: fatura, seguradora, cedente, administradora, apólice, vencimento de/até, início de vigência, classificação (OBS/depósito), situação (vencidas/a vencer/todas — questão aberta no registro do FedHub) e ordenação (vencimento, fatura, administradora, documento). A linha da tabela é o documento (boleto), como no PDF do legado.
+- **Trava:** RF-FIN-001 (`specs/relatorio-faturas-pendentes/`).
+- **Questão:** a tela legada tem dez filtros. Alguns dependem de coluna ainda não confirmada no Firebird (questão de mesmo teor no registro do FedHub, a de número que trata das colunas do legado). Hipótese: a primeira versão oferece fatura, seguradora, cedente, administradora (Co-Estipulante), produtor, apólice, período de vencimento, início de vigência, classificação (OBS/depósito) e ordenação; "Comercial" e "Pagamento" ficam de fora até a resposta. Seguradora, cedente e administradora com busca por nome, como já existe nas consultas de faturas.
+
+## PA-033 — Relatório de faturas pendentes: pedido e quem acessa
+
+- **Status:** fechada (2026-09-09) · **Dono:** Ingrid Aylana · **Severidade:** alta
+- **Trava:** RF-FIN-001, RF-FIN-002 (`specs/relatorio-faturas-pendentes/`).
+- **Questão:** registrada já com a resposta, para servir de decisão citável nas regras do relatório de faturas pendentes.
+- **Resposta (2026-09-09):** o dono pediu a tela do relatório de faturas pendentes no Financeiro, com Excel e PDF, para **financeiro, faturamento e admin**. Espelha a questão de mesmo teor no registro do backend.
